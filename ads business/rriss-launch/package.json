@@ -1,0 +1,17 @@
+{
+  "name": "rriss-launch",
+  "private": true,
+  "scripts": {
+    "studio": "remotion studio",
+    "render": "remotion render RrissLaunch out/rriss-launch.mp4"
+  },
+  "dependencies": {
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@fontsource/unbounded": "^5.3.0",
+    "@remotion/cli": "^4.0.534",
+    "@remotion/fonts": "^4.0.534",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "^4.0.534"
+  }
+}
