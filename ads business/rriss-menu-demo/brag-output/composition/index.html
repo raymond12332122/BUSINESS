@@ -1,0 +1,364 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, height=1920" />
+<title>RRISS — Animación de menús para pantallas</title>
+<script src="assets/js/gsap.min.js"></script>
+<style>
+@font-face { font-family: "DM Serif Display"; src: url("assets/fonts/dm-serif-display-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; }
+@font-face { font-family: "DM Serif Display"; src: url("assets/fonts/dm-serif-display-latin-400-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; }
+@font-face { font-family: "Outfit"; src: url("assets/fonts/outfit-latin-400-normal.woff2") format("woff2"); font-weight: 400; }
+@font-face { font-family: "Outfit"; src: url("assets/fonts/outfit-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+@font-face { font-family: "Outfit"; src: url("assets/fonts/outfit-latin-800-normal.woff2") format("woff2"); font-weight: 800; }
+@font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/jetbrains-mono-latin-500-normal.woff2") format("woff2"); font-weight: 500; }
+
+:root {
+  --paper: #F6F3EC;
+  --card: #FBFAF6;
+  --navy: #0E2A6B;
+  --deep: #081A47;
+  --blue: #1F4FD8;
+  --gold: #C9A24A;
+  --gold-hi: #E2C26A;
+}
+body { margin: 0; background: var(--paper); font-family: "Outfit", sans-serif; color: var(--navy); }
+#root { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--paper); }
+.clip { position: absolute; inset: 0; }
+.serif { font-family: "DM Serif Display", serif; font-weight: 400; }
+.mono { font-family: "JetBrains Mono", monospace; font-weight: 500; letter-spacing: 0.12em; }
+
+/* background */
+.glow { position: absolute; border-radius: 50%; }
+.glow-a { width: 1100px; height: 1100px; left: -380px; top: 980px; background: radial-gradient(circle, rgba(31,79,216,0.20) 0%, rgba(31,79,216,0) 65%); }
+.glow-b { width: 900px; height: 900px; left: 520px; top: -260px; background: radial-gradient(circle, rgba(201,162,74,0.26) 0%, rgba(201,162,74,0) 65%); }
+.ghost::before { content: "menú"; }
+.ghost { position: absolute; left: -40px; top: 760px; font-family: "DM Serif Display", serif; font-size: 460px; line-height: 1; color: var(--navy); opacity: 0.1; white-space: nowrap; }
+.corner { position: absolute; width: 44px; height: 44px; border-color: var(--gold); border-style: solid; border-width: 0; }
+
+/* hook */
+.hook { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.mask { overflow: hidden; padding: 0 10px 6px; }
+.hook-line { display: block; font-family: "Outfit"; font-weight: 800; font-size: 124px; line-height: 1.02; letter-spacing: -0.02em; }
+.hook-bar-wrap { position: relative; margin-top: 18px; }
+.hook-bar { position: absolute; inset: 0; background: var(--gold); transform-origin: left center; }
+.hook-line.small { position: relative; font-size: 84px; padding: 8px 28px 4px; }
+.hook-kicker { margin-top: 40px; font-size: 26px; color: var(--navy); }
+
+/* wall */
+.wall { position: absolute; left: 60px; top: 150px; width: 960px; height: 560px; border-radius: 28px; background: radial-gradient(ellipse at 50% 0%, #22408A 0%, var(--deep) 70%); box-shadow: 0 30px 60px rgba(8,26,71,0.28); }
+.wall-trim { position: absolute; left: 0; right: 0; bottom: 0; height: 14px; background: var(--gold); border-radius: 0 0 28px 28px; }
+.wall-lamp { position: absolute; top: 0; width: 120px; height: 10px; border-radius: 0 0 10px 10px; background: var(--gold-hi); box-shadow: 0 0 60px 30px rgba(226,194,106,0.25); }
+.wall-screens { position: absolute; left: 64px; top: 92px; display: flex; gap: 16px; }
+.mini { width: 196px; height: 351px; background: #04102E; border-radius: 10px; padding: 6px; box-sizing: content-box; }
+
+.label { position: absolute; left: 0; right: 0; top: 760px; display: flex; align-items: center; justify-content: center; gap: 24px; }
+.label-rule { width: 120px; height: 4px; background: var(--gold); }
+.label-text { font-weight: 800; font-size: 40px; letter-spacing: 0.04em; color: var(--navy); }
+
+/* big screens */
+.bigs { position: absolute; left: 45px; top: 870px; display: flex; gap: 40px; }
+.big { width: 451px; height: 808px; background: #04102E; border-radius: 22px; padding: 12px; box-sizing: content-box; box-shadow: 0 34px 60px rgba(8,26,71,0.30); }
+.caption { position: absolute; top: 1730px; display: flex; align-items: center; gap: 12px; font-size: 22px; color: var(--navy); }
+.caption i { display: block; width: 14px; height: 14px; background: var(--gold); }
+
+.crt { position: relative; width: 100%; height: 100%; overflow: hidden; border-radius: 10px; background: #04102E; }
+.scaler { position: absolute; left: 0; top: 0; width: 480px; height: 860px; transform-origin: 0 0; }
+.big .scaler { transform: scale(0.9396); }
+.mini .scaler { transform: scale(0.4083); }
+
+/* panels (480 x 860) */
+.panel { position: absolute; inset: 0; overflow: hidden; }
+.menu-panel { background: var(--card); }
+.page { position: absolute; inset: 0; }
+.head { position: absolute; left: 0; top: 0; width: 480px; height: 124px; background: var(--navy); }
+.head-title { position: absolute; left: 28px; top: 26px; font-size: 54px; line-height: 1; color: #FFFFFF; white-space: nowrap; }
+.head-title em { color: var(--gold-hi); }
+.head-tag { position: absolute; right: 26px; top: 50px; font-size: 18px; color: var(--gold-hi); }
+.rows { position: absolute; left: 0; top: 136px; width: 480px; }
+.row { position: relative; height: 126px; display: flex; align-items: center; padding: 0 22px; box-sizing: border-box; border-bottom: 2px solid rgba(201,162,74,0.55); }
+.hl { position: absolute; inset: 4px 8px; background: rgba(201,162,74,0.22); border-radius: 14px; opacity: 0; }
+.thumb { position: relative; flex: none; width: 92px; height: 92px; border-radius: 50%; overflow: hidden; border: 4px solid var(--gold); box-sizing: border-box; }
+.thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.render { position: relative; flex: none; width: 104px; height: 104px; }
+.render img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.info { position: relative; flex: 1; margin-left: 18px; min-width: 0; }
+.name { font-size: 30px; line-height: 1.05; color: var(--navy); white-space: nowrap; }
+.sub { margin-top: 6px; font-size: 18px; color: #3A4F86; white-space: nowrap; }
+.pill { position: relative; flex: none; padding: 8px 14px 6px; border-radius: 999px; background: var(--navy); color: var(--gold-hi); font-weight: 800; font-size: 30px; }
+.pblock { position: relative; flex: none; width: 104px; height: 88px; border-radius: 12px; background: var(--navy); color: var(--gold-hi); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 42px; letter-spacing: -0.02em; }
+.foot { position: absolute; left: 22px; right: 22px; bottom: 24px; display: flex; justify-content: space-between; font-size: 18px; color: var(--navy); }
+.bands { position: absolute; inset: 0; display: flex; flex-direction: column; }
+.band { flex: 1; transform-origin: left center; }
+.band.b1 { background: var(--navy); } .band.b2 { background: var(--gold); } .band.b3 { background: var(--blue); }
+
+.brand-panel { background: radial-gradient(circle at 50% 42%, var(--blue) 0%, var(--navy) 62%, var(--deep) 100%); }
+.ring { position: absolute; left: 30px; top: 150px; width: 420px; height: 420px; border-radius: 50%; border: 5px solid var(--gold); opacity: 0; }
+.cup { position: absolute; left: 140px; top: 70px; width: 200px; height: 200px; }
+.cup path { fill: none; stroke: var(--gold-hi); stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; }
+.bc { position: absolute; left: 0; right: 0; top: 300px; text-align: center; font-size: 46px; font-style: italic; color: #FFFFFF; }
+.word { position: absolute; left: 0; right: 0; top: 352px; display: flex; justify-content: center; overflow: hidden; padding-bottom: 8px; }
+.word span { display: block; font-family: "DM Serif Display", serif; font-size: 138px; line-height: 1; color: var(--gold-hi); }
+.brule { position: absolute; left: 120px; width: 240px; top: 512px; height: 4px; background: var(--gold); transform-origin: center; }
+.btag { position: absolute; left: 0; right: 0; top: 540px; text-align: center; font-size: 18px; color: #FFFFFF; }
+.bfoot { position: absolute; left: 0; right: 0; top: 802px; text-align: center; font-weight: 600; font-size: 25px; color: #FFFFFF; }
+.badge { position: absolute; left: 140px; top: 578px; width: 200px; height: 200px; border-radius: 50%; background: var(--gold); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--deep); box-shadow: 0 0 0 8px rgba(226,194,106,0.35); }
+.badge b { font-weight: 800; font-size: 64px; line-height: 1; }
+.badge small { font-weight: 800; font-size: 19px; letter-spacing: 0.14em; }
+.promo { position: absolute; left: 0; right: 0; top: 800px; text-align: center; font-size: 27px; color: #FFFFFF; }
+.spark { position: absolute; left: 236px; top: 674px; width: 9px; height: 9px; border-radius: 50%; background: var(--gold-hi); opacity: 0; }
+
+/* outro */
+.outro-bg { position: absolute; inset: 0; background: radial-gradient(circle at 50% 40%, var(--navy) 0%, var(--deep) 80%); }
+.outro-in { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.outro-cup { width: 150px; height: 150px; margin-bottom: 40px; }
+.outro-cup path { fill: none; stroke: var(--gold-hi); stroke-width: 8; stroke-linecap: round; stroke-linejoin: round; }
+.o1 { font-size: 120px; line-height: 1.05; color: #FFFFFF; }
+.o2 { font-size: 120px; line-height: 1.05; font-style: italic; color: var(--gold-hi); }
+.orule { width: 420px; height: 5px; background: var(--gold); margin: 46px 0 40px; }
+.o3 { font-size: 26px; color: #FFFFFF; }
+.o4 { margin-top: 18px; font-weight: 600; font-size: 34px; color: var(--gold-hi); }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-width="1080" data-height="1920" data-duration="22">
+
+  <section id="bg" class="clip" data-start="0" data-duration="22">
+    <div class="glow glow-a"></div>
+    <div class="glow glow-b"></div>
+    <div class="ghost" data-layout-ignore></div>
+    <div class="corner" style="left:36px;top:36px;border-top-width:4px;border-left-width:4px"></div>
+    <div class="corner" style="right:36px;top:36px;border-top-width:4px;border-right-width:4px"></div>
+    <div class="corner" style="right:36px;bottom:36px;border-bottom-width:4px;border-right-width:4px"></div>
+    <div class="corner" style="left:36px;bottom:36px;border-bottom-width:4px;border-left-width:4px"></div>
+  </section>
+
+  <section id="stage" class="clip" data-start="0" data-duration="19.2">
+    <div id="hook" class="hook">
+      <div class="mask"><span class="hook-line">ANIMACIÓN</span></div>
+      <div class="mask"><span class="hook-line">DE MENÚS</span></div>
+      <div class="hook-bar-wrap">
+        <div class="hook-bar"></div>
+        <div class="mask"><span class="hook-line small">PARA PANTALLAS</span></div>
+      </div>
+      <div class="hook-kicker mono">BREAD &amp; COFFEE RRISS · DEMO</div>
+    </div>
+
+    <div id="wall" class="wall">
+      <div class="wall-lamp" style="left:150px"></div>
+      <div class="wall-lamp" style="left:420px"></div>
+      <div class="wall-lamp" style="left:690px"></div>
+      <div class="wall-screens">
+        <div class="mini"><div class="crt" data-slot="brand"></div></div>
+        <div class="mini"><div class="crt" data-slot="menu"></div></div>
+        <div class="mini"><div class="crt" data-slot="menu"></div></div>
+        <div class="mini"><div class="crt" data-slot="brand"></div></div>
+      </div>
+      <div class="wall-trim"></div>
+    </div>
+
+    <div id="label" class="label">
+      <div class="label-rule"></div>
+      <div class="label-text">ANIMACIÓN PARA PANTALLAS</div>
+      <div class="label-rule"></div>
+    </div>
+
+    <div id="bigs" class="bigs">
+      <div class="big"><div class="crt">
+        <div class="scaler">
+          <div class="panel menu-panel">
+            <div class="page p1">
+              <div class="head"><div class="head-title serif">Bebidas <em>frías</em></div><div class="head-tag mono">MENÚ 01</div></div>
+              <div class="rows">
+                <div class="row"><div class="hl"></div><div class="thumb"><img src="assets/photos/boba.jpg" style="object-position:50% 58%" alt="" /></div><div class="info"><div class="name serif">Blueberry Boba</div><div class="sub">Edición limitada</div></div><div class="pill">$65</div></div>
+                <div class="row"><div class="hl"></div><div class="thumb"><img src="assets/photos/taro.jpg" style="object-position:45% 50%" alt="" /></div><div class="info"><div class="name serif">Helado de taro</div><div class="sub">Chocolate y fresa</div></div><div class="pill">$60</div></div>
+                <div class="row"><div class="hl"></div><div class="thumb"><img src="assets/photos/frappe.jpg" style="object-position:50% 45%" alt="" /></div><div class="info"><div class="name serif">Frappé caramelo</div><div class="sub">Con crema batida</div></div><div class="pill">$70</div></div>
+                <div class="row"><div class="hl"></div><div class="thumb"><img src="assets/photos/fresas.jpg" style="object-position:50% 70%" alt="" /></div><div class="info"><div class="name serif">Fresas con crema</div><div class="sub">El clásico</div></div><div class="pill">$55</div></div>
+                <div class="row"><div class="hl"></div><div class="thumb"><img src="assets/photos/vaso.jpg" style="object-position:55% 62%" alt="" /></div><div class="info"><div class="name serif">Malteada</div><div class="sub">Chocolate y galleta</div></div><div class="pill">$60</div></div>
+              </div>
+              <div class="foot mono"><span>BREAD &amp; COFFEE RRISS</span><span>16 OZ</span></div>
+            </div>
+            <div class="page p2">
+              <div class="head"><div class="head-title serif">Café <em>&amp; pan</em></div><div class="head-tag mono">MENÚ 02</div></div>
+              <div class="rows">
+                <div class="row"><div class="hl"></div><div class="render"><img src="assets/3d/cafe.png" alt="" /></div><div class="info"><div class="name serif">Café de la casa</div><div class="sub">Recién molido</div></div><div class="pblock">$35</div></div>
+                <div class="row"><div class="hl"></div><div class="render"><img src="assets/3d/croissant.png" alt="" /></div><div class="info"><div class="name serif">Croissant</div><div class="sub">De mantequilla</div></div><div class="pblock">$40</div></div>
+                <div class="row"><div class="hl"></div><div class="render"><img src="assets/3d/pastel.png" alt="" /></div><div class="info"><div class="name serif">Pastel</div><div class="sub">Por rebanada</div></div><div class="pblock">$55</div></div>
+                <div class="row"><div class="hl"></div><div class="render"><img src="assets/3d/dona.png" alt="" /></div><div class="info"><div class="name serif">Donas</div><div class="sub">Glaseado azul</div></div><div class="pblock">$25</div></div>
+                <div class="row"><div class="hl"></div><div class="thumb" style="margin:0 6px"><img src="assets/photos/crepa.jpg" style="object-position:50% 60%" alt="" /></div><div class="info"><div class="name serif">Crepas</div><div class="sub">Dulces o saladas</div></div><div class="pblock">$75</div></div>
+              </div>
+              <div class="foot mono"><span>BREAD &amp; COFFEE RRISS</span><span>RECIÉN HECHO</span></div>
+            </div>
+            <div class="bands"><div class="band b1"></div><div class="band b2"></div><div class="band b3"></div></div>
+          </div>
+        </div>
+      </div></div>
+
+      <div class="big"><div class="crt">
+        <div class="scaler">
+          <div class="panel brand-panel">
+            <div class="ring"></div><div class="ring"></div><div class="ring"></div><div class="ring"></div>
+            <svg class="cup" viewBox="0 0 200 200">
+              <path class="d-body" pathLength="1" d="M40 78 L160 78 L150 150 Q147 166 131 166 L69 166 Q53 166 50 150 Z" />
+              <path class="d-handle" pathLength="1" d="M157 92 Q190 90 186 116 Q182 140 151 138" />
+              <path class="d-saucer" pathLength="1" d="M22 182 Q100 198 178 182" />
+              <path class="d-steam" pathLength="1" d="M78 62 Q66 48 78 34 Q90 20 78 6" />
+              <path class="d-steam" pathLength="1" d="M100 62 Q88 48 100 34 Q112 20 100 6" />
+              <path class="d-steam" pathLength="1" d="M122 62 Q110 48 122 34 Q134 20 122 6" />
+            </svg>
+            <div class="bc serif">Bread &amp; Coffee</div>
+            <div class="word"><span>R</span><span>R</span><span>I</span><span>S</span><span>S</span></div>
+            <div class="brule"></div>
+            <div class="btag mono">PANADERÍA · PASTELERÍA · CAFÉ</div>
+            <div class="bfoot" data-layout-allow-overlap>Pide en caja o por WhatsApp</div>
+            <div class="spark"></div><div class="spark"></div><div class="spark"></div><div class="spark"></div>
+            <div class="spark"></div><div class="spark"></div><div class="spark"></div><div class="spark"></div>
+            <div class="badge"><small>COMBO</small><b>$65</b></div>
+            <div class="promo serif" data-layout-allow-overlap>Café + croissant</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+
+    <div class="caption mono" style="left:45px"><i></i>PANTALLA 01 · MENÚ</div>
+    <div class="caption mono" style="left:560px"><i></i>PANTALLA 02 · MARCA</div>
+  </section>
+
+  <section id="outro" class="clip" data-start="18.6" data-duration="3.4">
+    <div class="outro-bg"></div>
+    <div class="outro-in">
+      <svg class="outro-cup" viewBox="0 0 200 200">
+        <path class="o-path" pathLength="1" d="M40 78 L160 78 L150 150 Q147 166 131 166 L69 166 Q53 166 50 150 Z" />
+        <path class="o-path" pathLength="1" d="M157 92 Q190 90 186 116 Q182 140 151 138" />
+        <path class="o-path" pathLength="1" d="M22 182 Q100 198 178 182" />
+      </svg>
+      <div class="mask"><div class="o1 serif" data-layout-allow-overlap>Tu menú,</div></div>
+      <div class="mask"><div class="o2 serif" data-layout-allow-overlap>en movimiento.</div></div>
+      <div class="orule"></div>
+      <div class="o3 mono">DEMO PARA BREAD &amp; COFFEE RRISS</div>
+      <div class="o4">Animación de menús para pantallas</div>
+    </div>
+  </section>
+</div>
+
+<script>
+  // Mirror the two large screens onto the wall screens before any tween is built.
+  const menuSrc = document.querySelector(".big .menu-panel").closest(".scaler");
+  const brandSrc = document.querySelector(".big .brand-panel").closest(".scaler");
+  document.querySelectorAll(".mini .crt").forEach((slot) => {
+    const src = slot.dataset.slot === "menu" ? menuSrc : brandSrc;
+    slot.appendChild(src.cloneNode(true));
+  });
+
+  const menus = [...document.querySelectorAll(".menu-panel")];
+  const brands = [...document.querySelectorAll(".brand-panel")];
+  const tl = gsap.timeline({ paused: true });
+
+  // background ambience
+  tl.fromTo(".glow-a", { scale: 0.9 }, { scale: 1.12, duration: 5.5, ease: "sine.inOut", yoyo: true, repeat: 3 }, 0);
+  tl.fromTo(".glow-b", { scale: 1.1 }, { scale: 0.92, duration: 5.5, ease: "sine.inOut", yoyo: true, repeat: 3 }, 0);
+  tl.fromTo(".ghost", { x: 0 }, { x: -260, duration: 22, ease: "none" }, 0);
+
+  // 1. hook
+  tl.fromTo(".hook-line", { yPercent: 115 }, { yPercent: 0, duration: 0.7, ease: "power4.out", stagger: 0.18 }, 0.15);
+  tl.fromTo(".hook-bar", { scaleX: 0 }, { scaleX: 1, duration: 0.55, ease: "power3.inOut" }, 0.4);
+  tl.fromTo(".hook-kicker", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 1.0);
+  tl.to("#hook", { y: -160, scale: 0.86, opacity: 0, duration: 0.45, ease: "power2.in" }, 2.15);
+
+  // 2. screens arrive
+  tl.fromTo("#wall", { y: -760 }, { y: 0, duration: 0.85, ease: "power3.out" }, 2.3);
+  tl.fromTo(".big", { y: 1100 }, { y: 0, duration: 0.85, ease: "power3.out", stagger: 0.12 }, 2.4);
+  tl.fromTo(".label-text", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.5, ease: "back.out(1.6)" }, 2.75);
+  tl.fromTo(".label-rule", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power3.out" }, 2.9);
+  tl.fromTo(".caption", { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.45, ease: "power2.out", stagger: 0.1 }, 3.3);
+  document.querySelectorAll(".crt").forEach((crt, i) => {
+    const at = 3.0 + (i % 3) * 0.06;
+    tl.fromTo(crt, { scaleX: 0, scaleY: 0.006 }, { scaleX: 1, duration: 0.16, ease: "power2.out" }, at);
+    tl.to(crt, { scaleY: 1, duration: 0.24, ease: "power3.out" }, at + 0.16);
+  });
+
+  // 3. brand panel build + 7. promo
+  brands.forEach((b) => {
+    const q = (s) => b.querySelectorAll(s);
+    tl.fromTo(q(".d-body"), { strokeDashoffset: 1, strokeDasharray: 1 }, { strokeDashoffset: 0, duration: 0.7, ease: "power2.inOut" }, 3.35);
+    tl.fromTo(q(".d-handle"), { strokeDashoffset: 1, strokeDasharray: 1 }, { strokeDashoffset: 0, duration: 0.35, ease: "power2.out" }, 3.75);
+    tl.fromTo(q(".d-saucer"), { strokeDashoffset: 1, strokeDasharray: 1 }, { strokeDashoffset: 0, duration: 0.4, ease: "power2.out" }, 3.85);
+    tl.fromTo(q(".d-steam"), { strokeDashoffset: 1, strokeDasharray: 1 }, { strokeDashoffset: 0, duration: 0.5, ease: "sine.out", stagger: 0.12 }, 4.05);
+    tl.fromTo(q(".cup"), { y: 210, scale: 1.45 }, { y: 0, scale: 1, duration: 0.7, ease: "power3.inOut" }, 4.75);
+    tl.fromTo(q(".bc"), { opacity: 0, y: 26 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 5.05);
+    tl.fromTo(q(".word span"), { yPercent: 110 }, { yPercent: 0, duration: 0.6, ease: "back.out(1.4)", stagger: 0.07 }, 5.15);
+    tl.fromTo(q(".brule"), { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power3.out" }, 5.55);
+    tl.fromTo(q(".btag"), { opacity: 0 }, { opacity: 1, duration: 0.4 }, 5.7);
+    tl.fromTo(q(".bfoot"), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 5.85);
+    q(".ring").forEach((ring, j) => {
+      tl.set(ring, { opacity: 0, scale: 0.35 }, 0);
+      for (let k = 0; k < 6; k++) {
+        tl.fromTo(ring, { scale: 0.35, opacity: 0.85 }, { scale: 1.6, opacity: 0, duration: 2.4, ease: "power1.out", immediateRender: false }, 4.9 + j * 0.6 + k * 2.4);
+      }
+    });
+    tl.to(q(".bfoot"), { opacity: 0, y: 20, duration: 0.3, ease: "power2.in" }, 11.9);
+    tl.fromTo(q(".badge"), { scale: 0, rotation: -200, opacity: 0 }, { scale: 1, rotation: 0, opacity: 1, duration: 0.85, ease: "back.out(1.5)" }, 12.4);
+    tl.fromTo(q(".promo"), { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 12.9);
+    q(".spark").forEach((s, j) => {
+      const a = (j / 8) * Math.PI * 2;
+      tl.fromTo(s, { x: 0, y: 0, opacity: 1, scale: 1.4 }, { x: Math.cos(a) * 170, y: Math.sin(a) * 170, opacity: 0, scale: 0.4, duration: 0.8, ease: "power2.out", immediateRender: false }, 12.75);
+    });
+    for (let k = 0; k < 4; k++) {
+      tl.to(q(".badge"), { scale: 1.07, duration: 0.45, ease: "sine.inOut", yoyo: true, repeat: 1 }, 14.0 + k * 1.15);
+    }
+  });
+
+  // 4-6. menu pages
+  menus.forEach((m) => {
+    const q = (s) => m.querySelectorAll(s);
+    const p1rows = m.querySelectorAll(".p1 .row");
+    const p2rows = m.querySelectorAll(".p2 .row");
+    tl.set(m.querySelector(".p2"), { opacity: 0 }, 0);
+    tl.fromTo(q(".p1 .head"), { xPercent: -100 }, { xPercent: 0, duration: 0.6, ease: "power3.out" }, 3.5);
+    tl.fromTo(q(".p1 .head-title, .p1 .head-tag"), { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out", stagger: 0.1 }, 3.85);
+    p1rows.forEach((r, i) => {
+      const t = 3.95 + i * 0.16;
+      tl.fromTo(r.querySelector(".info"), { opacity: 0, x: -50 }, { opacity: 1, x: 0, duration: 0.5, ease: "power3.out" }, t);
+      tl.fromTo(r.querySelector(".thumb"), { scale: 0 }, { scale: 1, duration: 0.55, ease: "back.out(1.8)" }, t + 0.05);
+      tl.fromTo(r.querySelector(".pill"), { scale: 0, rotation: -12 }, { scale: 1, rotation: 0, duration: 0.5, ease: "back.out(2)" }, t + 0.3);
+      tl.fromTo(r.querySelector(".thumb img"), { scale: 1 }, { scale: 1.12, duration: 7, ease: "none" }, t);
+      const h = 6.1 + i * 1.0;
+      tl.fromTo(r.querySelector(".hl"), { opacity: 0 }, { opacity: 1, duration: 0.3, ease: "power2.out" }, h);
+      tl.to(r.querySelector(".hl"), { opacity: 0, duration: 0.3, ease: "power2.in" }, h + 0.75);
+      tl.to(r.querySelector(".pill"), { scale: 1.12, duration: 0.25, ease: "power2.out", yoyo: true, repeat: 1 }, h + 0.1);
+    });
+    tl.fromTo(q(".p1 .foot"), { opacity: 0 }, { opacity: 1, duration: 0.4 }, 4.9);
+
+    // page change
+    const bands = q(".band");
+    tl.fromTo(bands, { scaleX: 0, transformOrigin: "left center" }, { scaleX: 1, duration: 0.35, ease: "power3.in", stagger: 0.08 }, 11.6);
+    tl.set(m.querySelector(".p1"), { opacity: 0 }, 12.12);
+    tl.set(m.querySelector(".p2"), { opacity: 1 }, 12.12);
+    tl.to(bands, { scaleX: 0, transformOrigin: "right center", duration: 0.35, ease: "power3.out", stagger: 0.08 }, 12.15);
+
+    p2rows.forEach((r, i) => {
+      const t = 12.45 + i * 0.15;
+      const pic = r.querySelector(".render, .thumb");
+      tl.fromTo(pic, { opacity: 0, x: -90, rotation: -10 }, { opacity: 1, x: 0, rotation: 0, duration: 0.55, ease: "power3.out" }, t);
+      tl.fromTo(r.querySelector(".info"), { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, t + 0.08);
+      tl.fromTo(r.querySelector(".pblock"), { opacity: 0, y: -46 }, { opacity: 1, y: 0, duration: 0.55, ease: "bounce.out" }, t + 0.2);
+      tl.to(pic, { y: -6, duration: 1.1, ease: "sine.inOut", yoyo: true, repeat: 3 }, 13.6 + i * 0.2);
+      const h = 14.4 + i * 0.75;
+      tl.fromTo(r.querySelector(".hl"), { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power2.out" }, h);
+      tl.to(r.querySelector(".hl"), { opacity: 0, duration: 0.25, ease: "power2.in" }, h + 0.55);
+    });
+  });
+
+  // 8. outro
+  tl.fromTo(".outro-bg", { yPercent: 100 }, { yPercent: 0, duration: 0.6, ease: "power3.inOut" }, 18.6);
+  tl.fromTo(".o-path", { strokeDashoffset: 1, strokeDasharray: 1 }, { strokeDashoffset: 0, duration: 0.6, ease: "power2.inOut", stagger: 0.1 }, 19.05);
+  tl.fromTo(".o1", { yPercent: 110 }, { yPercent: 0, duration: 0.65, ease: "power4.out" }, 19.25);
+  tl.fromTo(".o2", { yPercent: 110 }, { yPercent: 0, duration: 0.65, ease: "power4.out" }, 19.45);
+  tl.fromTo(".orule", { scaleX: 0 }, { scaleX: 1, duration: 0.5, ease: "power3.out" }, 19.9);
+  tl.fromTo(".o3", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 20.05);
+  tl.fromTo(".o4", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out" }, 20.25);
+
+  window.__timelines["main"] = tl;
+</script>
+</body>
+</html>
