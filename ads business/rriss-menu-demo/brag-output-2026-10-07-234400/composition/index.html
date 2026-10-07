@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1080, height=1920" />
+<title>RRISS — Menú en pantalla</title>
+<script src="assets/js/gsap.min.js"></script>
+<style>
+@font-face { font-family: "DM Serif Display"; src: url("assets/fonts/dm-serif-display-latin-400-normal.woff2") format("woff2"); font-weight: 400; font-style: normal; }
+@font-face { font-family: "DM Serif Display"; src: url("assets/fonts/dm-serif-display-latin-400-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; }
+@font-face { font-family: "Outfit"; src: url("assets/fonts/outfit-latin-400-normal.woff2") format("woff2"); font-weight: 400; }
+@font-face { font-family: "Outfit"; src: url("assets/fonts/outfit-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+@font-face { font-family: "Outfit"; src: url("assets/fonts/outfit-latin-800-normal.woff2") format("woff2"); font-weight: 800; }
+@font-face { font-family: "JetBrains Mono"; src: url("assets/fonts/jetbrains-mono-latin-500-normal.woff2") format("woff2"); font-weight: 500; }
+
+:root {
+  --bg: #E6EDF8;
+  --card: #FFFFFF;
+  --soft: #7A9BD8;
+  --tile: #EEF3FB;
+  --ink: #23407E;
+  --mid: #4E6FB5;
+  --gold: #C9A24A;
+  --gold-hi: #E2C26A;
+  --gold-deep: #8E6A22;
+  --on-gold: #15295A;
+}
+body { margin: 0; background: var(--bg); font-family: "Outfit", sans-serif; color: var(--ink); }
+#root { position: relative; width: 100%; height: 100%; overflow: hidden; background: var(--bg); }
+.clip { position: absolute; inset: 0; }
+.serif { font-family: "DM Serif Display", serif; font-weight: 400; }
+.mono { font-family: "JetBrains Mono", monospace; font-weight: 500; letter-spacing: 0.12em; }
+.mask { overflow: hidden; padding-bottom: 10px; }
+
+/* background */
+.pattern { position: absolute; left: -80px; top: 0; width: 1240px; height: 1920px; background-image: radial-gradient(circle, rgba(122,155,216,0.32) 3px, transparent 3.5px); background-size: 40px 40px; }
+.glow { position: absolute; border-radius: 50%; }
+.glow-a { width: 1200px; height: 1200px; left: -420px; top: 820px; background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 62%); }
+.glow-b { width: 1000px; height: 1000px; left: 460px; top: -300px; background: radial-gradient(circle, rgba(226,194,106,0.30) 0%, rgba(226,194,106,0) 62%); }
+
+/* chrome */
+.logo { position: absolute; left: 60px; top: 52px; }
+.logo-word { font-size: 66px; line-height: 1; color: var(--ink); }
+.logo-sub { font-size: 28px; font-style: italic; color: var(--mid); margin-top: 2px; }
+.top-tag { position: absolute; right: 60px; top: 78px; font-size: 20px; color: var(--ink); }
+.top-rule { position: absolute; left: 60px; right: 60px; top: 176px; height: 3px; background: var(--gold); }
+.dots { position: absolute; left: 0; right: 0; top: 1728px; display: flex; justify-content: center; gap: 30px; }
+.dot { width: 16px; height: 16px; border-radius: 8px; background: var(--soft); }
+.band { position: absolute; left: 0; right: 0; top: 1786px; height: 96px; background: var(--ink); overflow: hidden; }
+.track { position: absolute; left: 0; top: 0; height: 96px; display: flex; align-items: center; white-space: nowrap; }
+.track span { font-weight: 600; font-size: 30px; letter-spacing: 0.08em; color: #FFFFFF; padding-right: 40px; }
+.track b { color: var(--gold-hi); font-weight: 800; padding-right: 40px; }
+.sweep { position: absolute; left: 0; right: 0; top: -12px; height: 5px; background: var(--gold); box-shadow: 0 0 24px 6px rgba(226,194,106,0.6); }
+
+/* seg 0: menu grid */
+.m-title { position: absolute; left: 60px; top: 206px; font-size: 92px; line-height: 1; color: var(--ink); }
+.m-tag { position: absolute; right: 60px; top: 246px; font-size: 22px; color: var(--ink); }
+.grid { position: absolute; left: 50px; top: 330px; width: 980px; display: grid; grid-template-columns: repeat(3, 312px); grid-auto-rows: 320px; gap: 20px 22px; }
+.card { position: relative; background: var(--card); border-radius: 24px; overflow: hidden; box-shadow: 0 14px 30px rgba(35,64,126,0.13); }
+.card.gold { background: linear-gradient(160deg, #F6E7B8 0%, var(--gold-hi) 100%); }
+.pic { position: absolute; left: 0; top: 0; width: 312px; height: 196px; overflow: hidden; background: var(--tile); }
+.card.gold .pic { background: rgba(255,255,255,0.35); }
+.pic img { width: 100%; height: 100%; display: block; }
+.pic img.cover { object-fit: cover; }
+.pic img.fit { object-fit: contain; }
+.num { position: absolute; left: 12px; top: 12px; width: 46px; height: 46px; border-radius: 50%; background: var(--gold); color: var(--on-gold); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 24px; }
+.cname { position: absolute; left: 18px; right: 12px; top: 210px; font-size: 30px; line-height: 1.05; color: var(--ink); white-space: nowrap; }
+.cprice { position: absolute; left: 18px; bottom: 18px; padding: 6px 18px 4px; border-radius: 999px; background: var(--gold); color: var(--on-gold); font-weight: 800; font-size: 32px; }
+.card.gold .cprice { background: var(--ink); color: #FFFFFF; }
+.shine { position: absolute; left: 0; top: 330px; width: 360px; height: 1340px; background: linear-gradient(105deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.65) 50%, rgba(255,255,255,0) 100%); }
+
+/* feature segments */
+.arch { position: absolute; left: 90px; top: 220px; width: 900px; height: 940px; border-radius: 450px 450px 36px 36px; overflow: hidden; border: 10px solid #FFFFFF; box-sizing: border-box; box-shadow: 0 30px 60px rgba(35,64,126,0.20); background: var(--tile); }
+.arch img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.f-label { position: absolute; left: 80px; top: 1196px; display: flex; align-items: center; gap: 14px; font-size: 22px; color: var(--ink); }
+.f-label i { display: block; width: 16px; height: 16px; background: var(--gold); }
+.f-name { position: absolute; left: 70px; top: 1240px; }
+.f-name div { font-size: 124px; line-height: 1; color: var(--ink); white-space: nowrap; }
+.f-sub { position: absolute; left: 80px; top: 1530px; font-weight: 600; font-size: 38px; color: var(--mid); }
+.f-tag { position: absolute; left: 80px; top: 1600px; padding: 10px 18px 8px; background: var(--gold); color: var(--on-gold); font-size: 22px; border-radius: 8px; }
+.badge { position: absolute; left: 760px; top: 1040px; width: 250px; height: 250px; border-radius: 50%; background: var(--gold); display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--on-gold); box-shadow: inset 0 0 0 8px rgba(255,255,255,0.75), 0 18px 36px rgba(35,64,126,0.25); }
+.badge b { font-weight: 800; font-size: 92px; line-height: 1; }
+.badge small { font-size: 22px; margin-top: 4px; }
+.deco { position: absolute; inset: 0; pointer-events: none; }
+.pearl { position: absolute; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #4A5E96 0%, #1C2C55 60%); }
+.bubble { position: absolute; border-radius: 50%; border: 4px solid rgba(255,255,255,0.9); }
+.sparkle { position: absolute; width: 60px; height: 60px; }
+.sparkle path { fill: var(--gold-hi); }
+.ribbon-wrap { position: absolute; left: 30px; top: 300px; }
+.ribbon { padding: 14px 40px; background: var(--gold); color: var(--on-gold); font-weight: 800; font-size: 40px; letter-spacing: 0.1em; transform: rotate(-12deg); box-shadow: 0 10px 24px rgba(35,64,126,0.2); }
+.drizzle { position: absolute; left: 90px; top: 220px; width: 900px; height: 940px; }
+.drizzle path { fill: none; stroke: var(--gold-hi); stroke-width: 18; stroke-linecap: round; }
+.ice { position: absolute; border-radius: 18px; background: rgba(255,255,255,0.6); border: 4px solid var(--soft); }
+
+/* seg 4: café & pan */
+.p-title { position: absolute; left: 70px; top: 214px; font-size: 110px; line-height: 1; color: var(--ink); }
+.p-title em { color: var(--gold-deep); }
+.p-tag { position: absolute; right: 60px; top: 268px; font-size: 22px; color: var(--ink); }
+.pgrid { position: absolute; left: 60px; top: 380px; display: grid; grid-template-columns: repeat(2, 465px); grid-auto-rows: 640px; gap: 30px; }
+.pcard { position: relative; background: var(--card); border-radius: 28px; box-shadow: 0 16px 34px rgba(35,64,126,0.14); }
+.pimg { position: absolute; left: 52px; top: 40px; width: 360px; height: 360px; }
+.pimg img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.pname { position: absolute; left: 0; right: 0; top: 430px; text-align: center; font-size: 50px; color: var(--ink); }
+.psub { position: absolute; left: 0; right: 0; top: 494px; text-align: center; font-size: 26px; color: var(--mid); }
+.pprice { position: absolute; left: 152px; top: 548px; width: 160px; height: 64px; border-radius: 999px; background: var(--gold); color: var(--on-gold); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 40px; }
+.steam { position: absolute; left: 142px; top: 30px; width: 180px; height: 140px; }
+.steam path { fill: none; stroke: var(--soft); stroke-width: 9; stroke-linecap: round; }
+
+/* seg 5: combo */
+.c-title { position: absolute; left: 0; right: 0; top: 220px; text-align: center; }
+.c-title .t1 { font-size: 150px; line-height: 1; color: var(--ink); }
+.c-title .t2 { font-size: 104px; line-height: 1.05; font-style: italic; color: var(--gold-deep); }
+.c-item { position: absolute; width: 560px; height: 560px; }
+.c-item img { width: 100%; height: 100%; object-fit: contain; display: block; }
+.plus { position: absolute; left: 480px; top: 780px; width: 120px; height: 120px; border-radius: 50%; background: var(--gold); color: var(--on-gold); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 84px; line-height: 1; box-shadow: 0 12px 26px rgba(35,64,126,0.22); }
+.burst { position: absolute; left: 330px; top: 1090px; width: 420px; height: 420px; }
+.burst polygon { fill: var(--gold); }
+.c-price { position: absolute; left: 330px; top: 1090px; width: 420px; height: 420px; display: flex; flex-direction: column; align-items: center; justify-content: center; color: var(--on-gold); }
+.c-price small { font-size: 24px; }
+.c-price b { font-weight: 800; font-size: 130px; line-height: 1; }
+.c-sub { position: absolute; left: 0; right: 0; top: 1560px; text-align: center; font-weight: 600; font-size: 38px; color: var(--mid); }
+.c-cta { position: absolute; left: 0; right: 0; top: 1626px; text-align: center; font-size: 22px; color: var(--ink); }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-width="1080" data-height="1920" data-duration="30">
+
+  <section id="bg" class="clip" data-start="0" data-duration="30">
+    <div class="pattern" data-layout-ignore></div>
+    <div class="glow glow-a" data-layout-ignore></div>
+    <div class="glow glow-b" data-layout-ignore></div>
+  </section>
+
+  <section id="seg0" class="clip" data-start="0" data-duration="5">
+    <div class="m-title serif">Nuestro menú</div>
+    <div class="m-tag mono">BEBIDAS 16 OZ</div>
+    <div class="grid">
+      <div class="card"><div class="pic"><img class="cover" src="assets/photos/boba.jpg" style="object-position:50% 62%" alt="" /></div><div class="num">1</div><div class="cname serif">Blueberry Boba</div><div class="cprice">$65</div></div>
+      <div class="card"><div class="pic"><img class="cover" src="assets/photos/taro.jpg" style="object-position:45% 55%" alt="" /></div><div class="num">2</div><div class="cname serif">Helado de taro</div><div class="cprice">$60</div></div>
+      <div class="card"><div class="pic"><img class="cover" src="assets/photos/frappe.jpg" style="object-position:50% 40%" alt="" /></div><div class="num">3</div><div class="cname serif">Frappé caramelo</div><div class="cprice">$70</div></div>
+      <div class="card"><div class="pic"><img class="cover" src="assets/photos/fresas.jpg" style="object-position:50% 70%" alt="" /></div><div class="num">4</div><div class="cname serif">Fresas con crema</div><div class="cprice">$55</div></div>
+      <div class="card"><div class="pic"><img class="cover" src="assets/photos/vaso.jpg" style="object-position:55% 66%" alt="" /></div><div class="num">5</div><div class="cname serif">Malteada</div><div class="cprice">$60</div></div>
+      <div class="card"><div class="pic"><img class="cover" src="assets/photos/helados.jpg" style="object-position:50% 50%" alt="" /></div><div class="num">6</div><div class="cname serif">Helados</div><div class="cprice">$50</div></div>
+      <div class="card"><div class="pic"><img class="cover" src="assets/photos/crepa.jpg" style="object-position:50% 62%" alt="" /></div><div class="num">7</div><div class="cname serif">Crepas</div><div class="cprice">$75</div></div>
+      <div class="card"><div class="pic"><img class="fit" src="assets/3d/cafe.png" alt="" /></div><div class="num">8</div><div class="cname serif">Café de la casa</div><div class="cprice">$35</div></div>
+      <div class="card"><div class="pic"><img class="fit" src="assets/3d/croissant.png" alt="" /></div><div class="num">9</div><div class="cname serif">Croissant</div><div class="cprice">$40</div></div>
+      <div class="card"><div class="pic"><img class="fit" src="assets/3d/pastel.png" alt="" /></div><div class="num">10</div><div class="cname serif">Pastel</div><div class="cprice">$55</div></div>
+      <div class="card"><div class="pic"><img class="fit" src="assets/3d/dona.png" alt="" /></div><div class="num">11</div><div class="cname serif">Donas</div><div class="cprice">$25</div></div>
+      <div class="card gold"><div class="pic"><img class="fit" src="assets/3d/cafe.png" style="width:60%;position:absolute;left:4%;top:12%;height:88%" alt="" /><img class="fit" src="assets/3d/croissant.png" style="width:60%;position:absolute;left:38%;top:16%;height:84%" alt="" /></div><div class="num">12</div><div class="cname serif">Combo mañanero</div><div class="cprice">$65</div></div>
+    </div>
+    <div class="shine" data-layout-ignore></div>
+  </section>
+
+  <section id="seg1" class="clip" data-start="5" data-duration="5">
+    <div class="arch"><img src="assets/photos/boba.jpg" style="object-position:50% 64%" alt="" /></div>
+    <div class="deco deco-boba"></div>
+    <div class="f-label mono"><i></i>DESTACADO 01</div>
+    <div class="f-name serif"><div class="mask"><div>Blueberry</div></div><div class="mask"><div>Boba</div></div></div>
+    <div class="f-sub">Leche de blueberry con perlas</div>
+    <div class="f-tag mono">EDICIÓN LIMITADA</div>
+    <div class="badge"><b>$65</b><small class="mono">16 OZ</small></div>
+  </section>
+
+  <section id="seg2" class="clip" data-start="10" data-duration="5">
+    <div class="arch"><img src="assets/photos/taro.jpg" style="object-position:45% 50%" alt="" /></div>
+    <div class="deco deco-taro"></div>
+    <div class="ribbon-wrap"><div class="ribbon">NUEVO</div></div>
+    <div class="f-label mono"><i></i>DESTACADO 02</div>
+    <div class="f-name serif"><div class="mask"><div>Helado</div></div><div class="mask"><div>de taro</div></div></div>
+    <div class="f-sub">Con chocolate y fresa</div>
+    <div class="f-tag mono">NUEVO SABOR</div>
+    <div class="badge"><b>$60</b><small class="mono">VASO</small></div>
+  </section>
+
+  <section id="seg3" class="clip" data-start="15" data-duration="5">
+    <div class="arch"><img src="assets/photos/frappe.jpg" style="object-position:50% 46%" alt="" /></div>
+    <div class="deco deco-ice"></div>
+    <svg class="drizzle" viewBox="0 0 900 940" data-layout-allow-overflow>
+      <path class="dz" pathLength="1" d="M-20 300 C 90 210, 180 390, 290 300 S 490 210, 600 300 S 800 390, 920 290" />
+      <path class="dz2" pathLength="1" d="M200 318 L200 430" />
+      <path class="dz2" pathLength="1" d="M470 268 L470 360" />
+      <path class="dz2" pathLength="1" d="M700 330 L700 470" />
+    </svg>
+    <div class="f-label mono"><i></i>DESTACADO 03</div>
+    <div class="f-name serif"><div class="mask"><div>Frappé</div></div><div class="mask"><div>caramelo</div></div></div>
+    <div class="f-sub">Con crema batida</div>
+    <div class="f-tag mono">BEBIDA FRÍA</div>
+    <div class="badge"><b>$70</b><small class="mono">16 OZ</small></div>
+  </section>
+
+  <section id="seg4" class="clip" data-start="20" data-duration="5">
+    <div class="p-title serif">Café <em>&amp; pan</em></div>
+    <div class="p-tag mono">RECIÉN HECHO</div>
+    <div class="pgrid">
+      <div class="pcard"><div class="pimg"><img src="assets/3d/cafe.png" alt="" /></div>
+        <svg class="steam" viewBox="0 0 180 140"><path class="st" pathLength="1" d="M50 130 Q30 100 50 70 Q70 40 50 10" /><path class="st" pathLength="1" d="M90 130 Q70 100 90 70 Q110 40 90 10" /><path class="st" pathLength="1" d="M130 130 Q110 100 130 70 Q150 40 130 10" /></svg>
+        <div class="pname serif">Café</div><div class="psub">De la casa</div><div class="pprice">$35</div></div>
+      <div class="pcard"><div class="pimg"><img src="assets/3d/croissant.png" alt="" /></div><div class="pname serif">Croissant</div><div class="psub">De mantequilla</div><div class="pprice">$40</div></div>
+      <div class="pcard"><div class="pimg"><img src="assets/3d/pastel.png" alt="" /></div><div class="pname serif">Pastel</div><div class="psub">Por rebanada</div><div class="pprice">$55</div></div>
+      <div class="pcard"><div class="pimg"><img src="assets/3d/dona.png" alt="" /></div><div class="pname serif">Donas</div><div class="psub">Glaseado azul</div><div class="pprice">$25</div></div>
+    </div>
+  </section>
+
+  <section id="seg5" class="clip" data-start="25" data-duration="5">
+    <div class="c-title"><div class="mask"><div class="t1 serif">Combo</div></div><div class="mask"><div class="t2 serif">mañanero</div></div></div>
+    <div class="c-item c-cafe" style="left:-10px;top:540px"><img src="assets/3d/cafe.png" alt="" /></div>
+    <div class="c-item c-crois" style="left:520px;top:550px"><img src="assets/3d/croissant.png" alt="" /></div>
+    <div class="plus">+</div>
+    <svg class="burst" viewBox="-100 -100 200 200"><polygon id="burst-poly" points="" /></svg>
+    <div class="c-price"><small class="mono">SOLO</small><b>$65</b></div>
+    <div class="c-sub">Café de la casa + croissant</div>
+    <div class="c-cta mono">PÍDELO EN CAJA</div>
+  </section>
+
+  <section id="chrome" class="clip" data-start="0" data-duration="30">
+    <div class="logo"><div class="logo-word serif">RRISS</div><div class="logo-sub serif">Bread &amp; Coffee</div></div>
+    <div class="top-tag mono">PANADERÍA · PASTELERÍA · CAFÉ</div>
+    <div class="top-rule"></div>
+    <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <div class="band"><div class="track" data-layout-allow-overflow></div></div>
+    <div class="sweep" data-layout-ignore></div>
+  </section>
+</div>
+
+<script>
+  // Seeded PRNG so decoration placement is identical on every render.
+  function rng(seed) {
+    return function () {
+      seed |= 0; seed = (seed + 0x6d2b79f5) | 0;
+      let t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  const R = rng(20261007);
+  const add = (parent, cls, css, html) => {
+    const el = document.createElement("div");
+    el.className = cls;
+    Object.assign(el.style, css);
+    if (html) el.innerHTML = html;
+    parent.appendChild(el);
+    return el;
+  };
+
+  const pearls = [];
+  const bubbles = [];
+  const boba = document.querySelector(".deco-boba");
+  for (let i = 0; i < 14; i++) {
+    const s = 30 + R() * 16;
+    pearls.push({ el: add(boba, "pearl", { left: 170 + R() * 720 + "px", top: 960 + R() * 150 + "px", width: s + "px", height: s + "px" }), t: 0.7 + R() * 1.6 });
+  }
+  for (let i = 0; i < 12; i++) {
+    const s = 26 + R() * 34;
+    bubbles.push({ el: add(boba, "bubble", { left: 160 + R() * 760 + "px", top: 1080 + "px", width: s + "px", height: s + "px" }), t: 0.9 + R() * 2.2, drift: (R() - 0.5) * 120 });
+  }
+
+  const sparkles = [];
+  const taro = document.querySelector(".deco-taro");
+  const star = '<svg viewBox="-30 -30 60 60" width="60" height="60"><path d="M0 -30 Q4 -4 30 0 Q4 4 0 30 Q-4 4 -30 0 Q-4 -4 0 -30 Z" /></svg>';
+  const spots = [[110, 360], [930, 300], [60, 760], [960, 640], [220, 1080], [860, 980], [520, 240], [40, 520], [990, 860], [380, 1110]];
+  spots.forEach(([x, y]) => sparkles.push({ el: add(taro, "sparkle", { left: x - 30 + "px", top: y - 30 + "px" }, star), t: R() * 1.2 }));
+
+  const cubes = [];
+  const ice = document.querySelector(".deco-ice");
+  [[40, 520, 96], [930, 420, 84], [70, 860, 110], [950, 820, 92], [880, 1060, 70], [150, 1080, 76]].forEach(([x, y, s]) => {
+    cubes.push(add(ice, "ice", { left: x - s / 2 + "px", top: y - s / 2 + "px", width: s + "px", height: s + "px" }));
+  });
+
+  const pts = [];
+  for (let i = 0; i < 32; i++) {
+    const r = i % 2 ? 78 : 98;
+    const a = (i / 32) * Math.PI * 2 - Math.PI / 2;
+    pts.push((Math.cos(a) * r).toFixed(2) + "," + (Math.sin(a) * r).toFixed(2));
+  }
+  document.getElementById("burst-poly").setAttribute("points", pts.join(" "));
+
+  const track = document.querySelector(".track");
+  const unit = "<span>BREAD &amp; COFFEE RRISS</span><b>·</b><span>PANADERÍA</span><b>·</b><span>PASTELERÍA</span><b>·</b><span>CAFÉ</span><b>·</b>";
+
+  document.fonts.ready.then(() => {
+    const probe = document.createElement("div");
+    probe.style.cssText = "display:flex;white-space:nowrap";
+    probe.innerHTML = unit;
+    track.appendChild(probe);
+    const unitW = probe.getBoundingClientRect().width;
+    track.removeChild(probe);
+    const loops = Math.max(1, Math.round(1800 / unitW));
+    track.innerHTML = unit.repeat(loops + Math.ceil(1080 / unitW) + 1);
+
+    const tl = gsap.timeline({ paused: true });
+
+    // persistent ambience (each ends where it began, so the 30s loop is seamless)
+    tl.fromTo(".track", { x: 0 }, { x: -loops * unitW, duration: 30, ease: "none" }, 0);
+    tl.fromTo(".pattern", { x: 0, y: 0 }, { x: -80, y: -80, duration: 30, ease: "none" }, 0);
+    tl.fromTo(".glow-a", { scale: 1 }, { scale: 1.18, duration: 7.5, ease: "sine.inOut", yoyo: true, repeat: 3 }, 0);
+    tl.fromTo(".glow-b", { scale: 1 }, { scale: 0.85, duration: 7.5, ease: "sine.inOut", yoyo: true, repeat: 3 }, 0);
+
+    const dots = document.querySelectorAll(".dot");
+    tl.set(dots[0], { scaleX: 2.6, backgroundColor: "#C9A24A" }, 0);
+    for (let k = 1; k <= 6; k++) {
+      const at = k < 6 ? k * 5 - 0.2 : 29.6;
+      tl.to(dots[k - 1], { scaleX: 1, backgroundColor: "#7A9BD8", duration: 0.4, ease: "power2.inOut" }, at);
+      tl.to(dots[k % 6], { scaleX: 2.6, backgroundColor: "#C9A24A", duration: 0.4, ease: "power2.inOut" }, at);
+    }
+    [4.75, 9.75, 14.75, 19.75, 24.75, 29.45].forEach((at) => {
+      tl.fromTo(".sweep", { y: 0 }, { y: 1940, duration: 0.55, ease: "power2.inOut", immediateRender: false }, at);
+    });
+
+    // seg 0 — full menu
+    tl.fromTo("#seg0 .m-title", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 0.1);
+    tl.fromTo("#seg0 .m-tag", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.4);
+    tl.fromTo("#seg0 .card", { opacity: 0, scale: 0.7, y: 50 }, { opacity: 1, scale: 1, y: 0, duration: 0.6, ease: "back.out(1.5)", stagger: { each: 0.06, grid: [4, 3], from: "start" } }, 0.25);
+    tl.fromTo("#seg0 .pic img", { scale: 1.15 }, { scale: 1, duration: 2.4, ease: "power2.out" }, 0.3);
+    tl.fromTo("#seg0 .cprice", { scale: 0 }, { scale: 1, duration: 0.45, ease: "back.out(2.2)", stagger: 0.05 }, 0.95);
+    tl.fromTo("#seg0 .num", { scale: 0, rotation: -90 }, { scale: 1, rotation: 0, duration: 0.4, ease: "back.out(2)", stagger: 0.04 }, 1.0);
+    tl.fromTo("#seg0 .shine", { x: -420 }, { x: 1180, duration: 1.3, ease: "power2.inOut" }, 2.1);
+    document.querySelectorAll("#seg0 .cprice").forEach((p, i) => {
+      tl.to(p, { scale: 1.14, duration: 0.18, ease: "power2.out", yoyo: true, repeat: 1 }, 2.6 + i * 0.12);
+    });
+    tl.to("#seg0 .card", { opacity: 0, scale: 0.85, duration: 0.35, ease: "power2.in", stagger: { each: 0.025, from: "end" } }, 4.35);
+    tl.to("#seg0 .m-title, #seg0 .m-tag", { opacity: 0, y: -30, duration: 0.35, ease: "power2.in" }, 4.6);
+
+    // shared feature entrance/exit
+    function feature(id, t0) {
+      const s = (q) => `${id} ${q}`;
+      tl.fromTo(s(".arch"), { clipPath: "inset(100% 0% 0% 0% round 450px 450px 36px 36px)", y: 60 }, { clipPath: "inset(0% 0% 0% 0% round 450px 450px 36px 36px)", y: 0, duration: 0.8, ease: "power3.out" }, t0 + 0.05);
+      tl.fromTo(s(".arch img"), { scale: 1.2 }, { scale: 1.04, duration: 5, ease: "none" }, t0);
+      tl.fromTo(s(".f-label"), { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.45, ease: "power2.out" }, t0 + 0.3);
+      tl.fromTo(s(".f-name .mask > div"), { yPercent: 110 }, { yPercent: 0, duration: 0.65, ease: "power4.out", stagger: 0.12 }, t0 + 0.4);
+      tl.fromTo(s(".f-sub"), { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, t0 + 0.75);
+      tl.fromTo(s(".f-tag"), { opacity: 0, x: -40 }, { opacity: 1, x: 0, duration: 0.45, ease: "back.out(1.6)" }, t0 + 0.9);
+      tl.fromTo(s(".badge"), { scale: 0, rotation: -140 }, { scale: 1, rotation: 0, duration: 0.8, ease: "back.out(1.7)" }, t0 + 0.6);
+      tl.to(s(".badge"), { rotation: 7, duration: 0.55, ease: "sine.inOut", yoyo: true, repeat: 3 }, t0 + 1.6);
+      tl.to(s(".badge"), { scale: 1.1, duration: 0.3, ease: "power2.out", yoyo: true, repeat: 1 }, t0 + 3.1);
+      tl.to([s(".arch"), s(".deco")], { opacity: 0, y: -50, duration: 0.45, ease: "power2.in" }, t0 + 4.45);
+      tl.to([s(".f-label"), s(".f-name"), s(".f-sub"), s(".f-tag")], { opacity: 0, y: -30, duration: 0.4, ease: "power2.in", stagger: 0.04 }, t0 + 4.4);
+      tl.to(s(".badge"), { scale: 0, rotation: 90, duration: 0.4, ease: "back.in(1.6)" }, t0 + 4.5);
+    }
+
+    // seg 1 — boba
+    feature("#seg1", 5);
+    pearls.forEach((p) => {
+      tl.fromTo(p.el, { y: -900, opacity: 1 }, { y: 0, duration: 0.95, ease: "bounce.out" }, 5 + p.t);
+    });
+    tl.set(pearls.map((p) => p.el), { y: -900 }, 0);
+    bubbles.forEach((b) => {
+      tl.fromTo(b.el, { y: 0, x: 0, opacity: 0 }, { y: -760, x: b.drift, opacity: 0.95, duration: 2.6, ease: "sine.out" }, 5 + b.t);
+      tl.to(b.el, { opacity: 0, duration: 0.5, ease: "power1.in" }, 5 + b.t + 2.1);
+    });
+
+    // seg 2 — taro
+    feature("#seg2", 10);
+    tl.fromTo("#seg2 .ribbon-wrap", { x: -520 }, { x: 0, duration: 0.7, ease: "back.out(1.5)" }, 10.9);
+    tl.to("#seg2 .ribbon-wrap", { x: -520, duration: 0.4, ease: "power2.in" }, 14.45);
+    sparkles.forEach((sp) => {
+      tl.set(sp.el, { scale: 0 }, 0);
+      for (let c = 0; c < 2; c++) {
+        const at = 10.8 + sp.t + c * 1.5;
+        tl.fromTo(sp.el, { scale: 0, rotation: 0 }, { scale: 1, rotation: 90, duration: 0.45, ease: "back.out(2)", immediateRender: false }, at);
+        tl.to(sp.el, { scale: 0, rotation: 180, duration: 0.45, ease: "power2.in" }, at + 0.6);
+      }
+    });
+
+    // seg 3 — frappé
+    feature("#seg3", 15);
+    tl.fromTo("#seg3 .dz", { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.1, ease: "power2.inOut" }, 15.7);
+    tl.fromTo("#seg3 .dz2", { strokeDasharray: 1, strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.7, ease: "power1.in", stagger: 0.2 }, 16.6);
+    tl.to("#seg3 .drizzle", { opacity: 0, y: -50, duration: 0.45, ease: "power2.in" }, 19.45);
+    cubes.forEach((c, i) => {
+      tl.fromTo(c, { scale: 0, rotation: -40 }, { scale: 1, rotation: 0, duration: 0.6, ease: "back.out(1.8)" }, 15.6 + i * 0.12);
+      tl.to(c, { y: i % 2 ? -26 : 26, rotation: i % 2 ? 14 : -14, duration: 1.3, ease: "sine.inOut", yoyo: true, repeat: 1 }, 16.4 + i * 0.1);
+    });
+
+    // seg 4 — café & pan
+    tl.fromTo("#seg4 .p-title", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out" }, 20.1);
+    tl.fromTo("#seg4 .p-tag", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 20.4);
+    tl.fromTo("#seg4 .pcard", { opacity: 0, y: 90 }, { opacity: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.12 }, 20.2);
+    tl.fromTo("#seg4 .pimg", { y: -420, rotation: -14 }, { y: 0, rotation: 0, duration: 0.95, ease: "bounce.out", stagger: 0.15 }, 20.5);
+    tl.fromTo("#seg4 .pname, #seg4 .psub", { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.45, ease: "power2.out", stagger: 0.05 }, 21.0);
+    tl.fromTo("#seg4 .pprice", { scale: 0 }, { scale: 1, duration: 0.5, ease: "back.out(2.2)", stagger: 0.12 }, 21.3);
+    tl.to("#seg4 .pimg", { y: -14, duration: 0.9, ease: "sine.inOut", yoyo: true, repeat: 1, stagger: 0.2 }, 22.3);
+    tl.to("#seg4 .pprice", { scale: 1.12, duration: 0.2, ease: "power2.out", yoyo: true, repeat: 1, stagger: 0.25 }, 23.0);
+    for (let c = 0; c < 2; c++) {
+      tl.fromTo("#seg4 .st", { strokeDasharray: 1, strokeDashoffset: 1, opacity: 1 }, { strokeDashoffset: 0, duration: 0.8, ease: "sine.out", stagger: 0.15, immediateRender: c === 0 }, 21.2 + c * 1.5);
+      tl.to("#seg4 .st", { opacity: 0, duration: 0.4, stagger: 0.15 }, 22.2 + c * 1.5);
+    }
+    tl.to("#seg4 .pcard", { opacity: 0, y: -60, duration: 0.4, ease: "power2.in", stagger: 0.06 }, 24.35);
+    tl.to("#seg4 .p-title, #seg4 .p-tag", { opacity: 0, y: -30, duration: 0.35, ease: "power2.in" }, 24.55);
+
+    // seg 5 — combo (exits to an empty canvas: the loop point)
+    tl.fromTo("#seg5 .c-title .mask > div", { yPercent: 110 }, { yPercent: 0, duration: 0.65, ease: "power4.out", stagger: 0.14 }, 25.1);
+    tl.fromTo("#seg5 .c-cafe", { x: -700, rotation: -20 }, { x: 0, rotation: 0, duration: 0.75, ease: "power3.out" }, 25.4);
+    tl.fromTo("#seg5 .c-crois", { x: 700, rotation: 20 }, { x: 0, rotation: 0, duration: 0.75, ease: "power3.out" }, 25.5);
+    tl.fromTo("#seg5 .plus", { scale: 0, rotation: -180 }, { scale: 1, rotation: 0, duration: 0.55, ease: "back.out(2.2)" }, 26.1);
+    tl.fromTo("#seg5 .burst", { scale: 0, rotation: -30 }, { scale: 1, rotation: 0, duration: 0.6, ease: "back.out(1.6)" }, 26.3);
+    tl.to("#seg5 .burst", { rotation: 50, duration: 3.1, ease: "none" }, 26.9);
+    tl.fromTo("#seg5 .c-price", { scale: 0 }, { scale: 1, duration: 0.55, ease: "back.out(2)" }, 26.5);
+    tl.fromTo("#seg5 .c-sub", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" }, 26.8);
+    tl.fromTo("#seg5 .c-cta", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 27.1);
+    tl.to("#seg5 .c-cafe", { x: 24, duration: 0.25, ease: "power2.out", yoyo: true, repeat: 1 }, 27.6);
+    tl.to("#seg5 .c-crois", { x: -24, duration: 0.25, ease: "power2.out", yoyo: true, repeat: 1 }, 27.6);
+    tl.to("#seg5 .c-price", { scale: 1.12, duration: 0.25, ease: "power2.out", yoyo: true, repeat: 1 }, 28.1);
+    tl.to("#seg5 .c-cafe", { x: -700, opacity: 0, duration: 0.45, ease: "power2.in" }, 29.3);
+    tl.to("#seg5 .c-crois", { x: 700, opacity: 0, duration: 0.45, ease: "power2.in" }, 29.3);
+    tl.to("#seg5 .plus, #seg5 .burst, #seg5 .c-price", { scale: 0, duration: 0.4, ease: "back.in(1.6)" }, 29.35);
+    tl.to("#seg5 .c-title, #seg5 .c-sub, #seg5 .c-cta", { opacity: 0, y: -30, duration: 0.35, ease: "power2.in" }, 29.45);
+
+    window.__timelines["main"] = tl;
+  });
+</script>
+</body>
+</html>
