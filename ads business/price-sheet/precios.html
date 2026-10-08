@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Precios — Menús animados y anuncios</title>
+<style>
+@font-face { font-family: "DM Serif Display"; src: url("assets/dm-serif-display-latin-400-normal.woff2") format("woff2"); font-style: normal; }
+@font-face { font-family: "DM Serif Display"; src: url("assets/dm-serif-display-latin-400-italic.woff2") format("woff2"); font-style: italic; }
+@font-face { font-family: "Outfit"; src: url("assets/outfit-latin-400-normal.woff2") format("woff2"); font-weight: 400; }
+@font-face { font-family: "Outfit"; src: url("assets/outfit-latin-600-normal.woff2") format("woff2"); font-weight: 600; }
+@font-face { font-family: "Outfit"; src: url("assets/outfit-latin-800-normal.woff2") format("woff2"); font-weight: 800; }
+@font-face { font-family: "JetBrains Mono"; src: url("assets/jetbrains-mono-latin-500-normal.woff2") format("woff2"); }
+
+:root { --bg: #E6EDF8; --ink: #23407E; --mid: #4E6FB5; --soft: #7A9BD8; --gold: #C9A24A; --gold-hi: #E2C26A; --gold-deep: #8E6A22; --on-gold: #15295A; }
+@page { size: 1080px 1920px; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; width: 1080px; height: 1920px; }
+body { position: relative; overflow: hidden; background: var(--bg); font-family: "Outfit", sans-serif; color: var(--ink); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.pattern { position: absolute; inset: 0; background-image: radial-gradient(circle, rgba(122,155,216,0.30) 3px, transparent 3.5px); background-size: 40px 40px; }
+.glow { position: absolute; border-radius: 50%; }
+.glow.a { width: 1100px; height: 1100px; left: -420px; top: 700px; background: radial-gradient(circle, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0) 62%); }
+.glow.b { width: 900px; height: 900px; left: 520px; top: -320px; background: radial-gradient(circle, rgba(226,194,106,0.32) 0%, rgba(226,194,106,0) 62%); }
+.serif { font-family: "DM Serif Display", serif; font-weight: 400; }
+.mono { font-family: "JetBrains Mono", monospace; letter-spacing: 0.12em; }
+.wrap { position: absolute; inset: 0; padding: 70px 60px 0; }
+
+.kicker { font-size: 22px; display: flex; align-items: center; gap: 14px; }
+.kicker i { width: 16px; height: 16px; background: var(--gold); display: block; }
+h1 { margin: 22px 0 0; font-size: 104px; line-height: 0.98; font-weight: 400; }
+h1 em { color: var(--gold-deep); }
+.rule { height: 4px; background: var(--gold); margin: 34px 0 0; }
+
+.hero { display: flex; gap: 46px; margin-top: 36px; align-items: center; }
+.tv { flex: none; width: 260px; padding: 12px; border-radius: 26px; background: #0F1F45; box-shadow: 0 26px 50px rgba(35,64,126,0.28); }
+.tv img { display: block; width: 236px; height: 420px; object-fit: cover; border-radius: 14px; }
+.perks { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 30px; }
+.perks li { display: flex; gap: 20px; align-items: flex-start; }
+.perks b { flex: none; width: 54px; height: 54px; border-radius: 50%; background: var(--gold); color: var(--on-gold); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 26px; }
+.perks div { font-size: 32px; line-height: 1.15; font-weight: 600; }
+.perks small { display: block; font-weight: 400; font-size: 24px; color: var(--mid); margin-top: 4px; }
+
+.plans { display: grid; grid-template-columns: repeat(2, 465px); grid-auto-rows: 340px; gap: 30px; margin-top: 44px; }
+.plan { position: relative; background: #FFFFFF; border-radius: 26px; padding: 30px 30px 26px; box-shadow: 0 16px 34px rgba(35,64,126,0.13); display: flex; flex-direction: column; }
+.plan .name { font-size: 42px; line-height: 1; }
+.plan ul { margin: 16px 0 0; padding: 0 0 0 26px; font-size: 24px; line-height: 1.35; color: var(--mid); }
+.plan .price { margin-top: auto; display: flex; align-items: baseline; gap: 10px; }
+.plan .price b { font-weight: 800; font-size: 76px; line-height: 1; letter-spacing: -0.02em; color: var(--ink); }
+.plan .price span { font-size: 26px; font-weight: 600; color: var(--mid); }
+.plan.star { background: linear-gradient(160deg, #F6E7B8 0%, var(--gold-hi) 100%); box-shadow: 0 0 0 4px var(--gold), 0 20px 40px rgba(142,106,34,0.25); }
+.plan.star ul, .plan.star .price span { color: var(--on-gold); }
+.plan.star .price b { color: var(--on-gold); }
+.tag { position: absolute; right: 22px; top: -18px; padding: 8px 16px 6px; border-radius: 999px; background: var(--ink); color: #FFFFFF; font-size: 18px; }
+
+.footer { position: absolute; left: 0; right: 0; bottom: 0; height: 210px; background: var(--ink); color: #FFFFFF; padding: 34px 60px 0; }
+.offer { font-size: 36px; font-weight: 600; }
+.offer em { font-style: normal; color: var(--gold-hi); font-weight: 800; }
+.fine { margin-top: 18px; font-size: 19px; line-height: 1.55; color: #D7E1F4; }
+</style>
+</head>
+<body>
+<div class="pattern"></div>
+<div class="glow a"></div>
+<div class="glow b"></div>
+
+<div class="wrap">
+  <div class="kicker mono"><i></i>PANTALLAS · REDES · WHATSAPP</div>
+  <h1 class="serif">Menús animados <em>y anuncios</em></h1>
+  <div class="rule"></div>
+
+  <div class="hero">
+    <div class="tv"><img src="assets/menu-preview.jpg" alt="Ejemplo de menú animado" /></div>
+    <ul class="perks">
+      <li><b>1</b><div>Tus productos en movimiento<small>Lo que sale en grande es lo que más se pide.</small></div></li>
+      <li><b>2</b><div>Cambia precios sin reimprimir<small>Nada de lonas ni menús nuevos cada vez.</small></div></li>
+      <li><b>3</b><div>Un diseño, todos lados<small>Tele del local, Instagram, Facebook y estados.</small></div></li>
+      <li><b>4</b><div>Listo en 2 días<small>Con tu lista de productos y precios.</small></div></li>
+    </ul>
+  </div>
+
+  <div class="plans">
+    <div class="plan">
+      <div class="name serif">Anuncio suelto</div>
+      <ul><li>1 video de 10–15 s</li><li>Para redes o pantalla</li><li>Promo, producto nuevo o temporada</li></ul>
+      <div class="price"><b>$350</b><span>c/u</span></div>
+    </div>
+    <div class="plan">
+      <div class="name serif">Menú para pantalla</div>
+      <ul><li>Menú animado en loop</li><li>Tus productos y precios reales</li><li>Para TV vertical u horizontal</li></ul>
+      <div class="price"><b>$1,500</b><span>pago único</span></div>
+    </div>
+    <div class="plan">
+      <div class="name serif">Redes mensual</div>
+      <ul><li>4 anuncios al mes</li><li>Uno por semana</li><li>Sale a $300 cada uno</li></ul>
+      <div class="price"><b>$1,200</b><span>/ mes</span></div>
+    </div>
+    <div class="plan star">
+      <div class="tag mono">RECOMENDADO</div>
+      <div class="name serif">Todo incluido</div>
+      <ul><li>Menú para pantalla</li><li>4 anuncios al mes</li><li>Cambios de precios sin costo</li></ul>
+      <div class="price"><b>$1,990</b><span>/ mes</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="offer">Primer mes del Todo incluido: <em>$1,500</em> · Sin contrato</div>
+  <div class="fine">Precios en pesos mexicanos. Pago único: 50% de anticipo. Paquetes: mes por adelantado.<br />Cambios de precios fuera de paquete: $150 por actualización.</div>
+</div>
+</body>
+</html>
