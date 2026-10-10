@@ -1,0 +1,27 @@
+<!doctype html><html><body style="margin:0;background:#000">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import * as C from './lib/chars.js';
+import * as P from './lib/props.js';
+import * as G from './lib/gear.js';
+try {
+const W=1600,H=800;
+const r = new THREE.WebGLRenderer({antialias:true}); r.setSize(W,H); r.shadowMap.enabled=true; r.shadowMap.type=THREE.PCFSoftShadowMap; document.body.appendChild(r.domElement);
+r.toneMapping=THREE.ACESFilmicToneMapping; r.toneMappingExposure=1.05;
+const s = new THREE.Scene(); s.add(P.sky('#5d8fd6','#cfe3f2'));
+s.add(new THREE.HemisphereLight(0xdfefff,0x5a6a45,1.3)); const d=new THREE.DirectionalLight(0xfff2dd,2.6); d.position.set(3,6,5); d.castShadow=true; d.shadow.mapSize.set(2048,2048); Object.assign(d.shadow.camera,{left:-6,right:6,top:4,bottom:-4}); s.add(d);
+s.add(P.ground(60,'#7fae58','#6a9a48',3));
+await C.loadCast();
+const q=new URLSearchParams(location.search); const view=q.get('v')||'front';
+const keys=['oguri','tamamo','cafe','doto','mcqueen','daiwa','suzuka','helios'];
+const poses=[{...C.aim(0,0),gun:'aim'},{...C.runArmed(0.1),gun:'port'},{...C.crouch(0),gun:'tube'},C.wave(0.1),C.knocked(0.3),C.cheer(0.15),{...C.walkArmed(0.12),gun:'low'},{...C.aim(0,0,1),gun:'aim'}];
+const faces=[['open','frown'],['squint','open'],['open','neutral'],['happy','smile'],['dizzy','wavy'],['sparkle','teeth'],['open','small'],['shock','tri']];
+keys.forEach((k,i)=>{ const c=C.spawn(k); c.root.position.x=(i-3.5)*1.0; s.add(c.root);
+  if(i<3) G.guerrilla(c, {weapon: i==2?'tube':'rifle'}); else if(i>=4) G.army(c);
+  c.apply(poses[i]); c.setFace(...faces[i]); });
+const cam = new THREE.PerspectiveCamera(30,W/H,0.1,500);
+if(view==='side'){cam.position.set(9,1.0,0.5); cam.lookAt(0,0.5,0);} else if(view==='close'){const cx=+(q.get('cx')||-2.5),az=+(q.get('az')||0); cam.position.set(cx+Math.sin(az)*3.2,0.75,Math.cos(az)*3.2); cam.lookAt(cx,0.5,0);} else {cam.position.set(0,1.4,8.5); cam.lookAt(0,0.5,0);}
+r.render(s,cam); window.__ready=true;
+} catch(e){ window.__error=String(e.stack||e); }
+</script></body></html>

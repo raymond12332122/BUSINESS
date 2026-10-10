@@ -1,0 +1,58 @@
+{
+  "scenes": [
+    { "id": "title", "lead": 1.6, "tail": 1.0, "lines": [
+      "Guerrilla warfare is how the weak fight the strong.",
+      "Small, mobile bands avoid big battles, strike where the enemy is weak, and vanish before it can hit back.",
+      "Let's break down how it works."
+    ]},
+    { "id": "imbalance", "lead": 0.8, "tail": 2.2, "lines": [
+      "Picture a powerful army: tanks, trucks, and soldiers by the thousand.",
+      "Now picture the other side: a handful of fighters with rifles.",
+      "In an open battle, the small side gets crushed.",
+      "So guerrillas simply refuse to fight that battle."
+    ]},
+    { "id": "hitrun", "lead": 0.8, "tail": 1.0, "gaps": { "1": 5.5, "2": 1.0 }, "lines": [
+      "Rule one: hit and run.",
+      "The guerrillas choose the time and the place. An ambush on a supply convoy. A raid on a lonely outpost.",
+      "They strike hard and fast, then disappear before reinforcements arrive.",
+      "Mao Zedong summed it up: the enemy advances, we retreat. The enemy camps, we harass. The enemy tires, we attack. The enemy retreats, we pursue."
+    ]},
+    { "id": "terrain", "lead": 0.8, "tail": 1.6, "gaps": { "2": 1.2 }, "lines": [
+      "Rule two: use the terrain.",
+      "Forests, mountains, swamps and cities let small groups hide from a much bigger force.",
+      "In Vietnam, fighters around Cu Chi dug a tunnel network more than two hundred kilometers long.",
+      "The enemy patrol arrives, and finds nobody."
+    ]},
+    { "id": "people", "lead": 0.8, "tail": 1.6, "lines": [
+      "Rule three: the people.",
+      "Mao wrote that a guerrilla must move among the people the way a fish swims in the sea.",
+      "Locals give food, shelter, new recruits, and most importantly, information: where the enemy is, and where it's going.",
+      "Lose the people's support, and the guerrilla has nowhere left to hide."
+    ]},
+    { "id": "supply", "lead": 0.8, "tail": 1.4, "gaps": { "1": 1.0 }, "lines": [
+      "Rule four: hit the supply lines, not the strongest units.",
+      "An army can't fight without fuel, food and ammunition, and all of it moves on roads and railways.",
+      "In World War One, T. E. Lawrence and Arab fighters raided the Hejaz Railway again and again.",
+      "In World War Two, Soviet and Yugoslav partisans blew up rail lines behind German lines, and tied down whole divisions far from the front."
+    ]},
+    { "id": "ukraine", "lead": 0.8, "tail": 2.4, "gaps": { "1": 1.6 }, "lines": [
+      "The same ideas still work today, with new tools.",
+      "In 2022, as Russian columns pushed toward Kyiv, small Ukrainian teams with anti-tank weapons and cheap drones ambushed vehicles strung out along the roads.",
+      "A few people, a drone, and a good hiding spot could stop a convoy cold."
+    ]},
+    { "id": "dilemma", "lead": 0.8, "tail": 1.6, "gaps": { "1": 0.8 }, "lines": [
+      "This creates a nightmare for the stronger army.",
+      "It has to guard every road, every bridge and every town. The guerrillas only have to hit one of them.",
+      "Spread out, the army is weak everywhere. Bunched up, it hands the countryside to the guerrillas."
+    ]},
+    { "id": "victory", "lead": 0.8, "tail": 2.6, "gaps": { "1": 1.2 }, "lines": [
+      "So how do guerrillas win? Usually not by destroying the enemy army.",
+      "They win by not losing: making the war so long and so costly that the enemy decides to go home.",
+      "As Henry Kissinger put it: the guerrilla wins if he does not lose. The conventional army loses if it does not win."
+    ]},
+    { "id": "outro", "lead": 0.8, "tail": 4.0, "gaps": { "0": 0.8 }, "lines": [
+      "Hit and run. Use the terrain. Win over the people. Cut the supply lines. And outlast the enemy.",
+      "That's guerrilla warfare."
+    ]}
+  ]
+}
