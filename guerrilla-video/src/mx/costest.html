@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0;background:#000">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import * as C from '../lib/chars.js';
+import * as K from './kit.js';
+import { stage } from '../lib/stage.js';
+try {
+  const W = 1600, H = 900, q = new URLSearchParams(location.search);
+  const r = new THREE.WebGLRenderer({ antialias: true }); r.setSize(W, H); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(r.domElement);
+  const scene = stage({ skyTop: '#5d8ad0', skyHor: '#efe3c8', groundA: '#c9b58a', groundB: '#b9a477', sunPos: [4, 9, 8], shadow: 10, hemiGround: '#9a8460' });
+  await C.loadCast();
+  const list = [['diaz', 'mcqueen'], ['madero', 'cafe'], ['villa', 'tamamo'], ['zapata', 'oguri'], ['huerta', 'daiwa'], ['carranza', 'suzuka'], ['obregon', 'helios'], ['adelita', 'doto'],
+    ['campesino', 'doto'], ['rebelde', 'oguri'], ['federal', 'daiwa'], ['gringo', 'helios']];
+  list.forEach(([o, k], i) => { const c = C.spawn(k); c.seed = i; K.OUTFITS[o](c); c.root.position.set((i - 5.5) * 1.05, 0, 0); scene.add(c.root);
+    c.apply({ ...C.idle(0.3, i), gun: c.gun ? 'low' : 'none' }); c.setFace('open', 'smile'); });
+  const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 500);
+  const g = +(q.get('g') || 0), az = +(q.get('az') || 0);
+  const cx = [-4.2, -0.05, 4.15, 1.85][g];
+  const dist = g === 3 ? 2.2 : 5.2; cam.position.set(cx + Math.sin(az) * dist, 1.0, Math.cos(az) * dist); cam.lookAt(cx, 0.72, 0);
+  r.render(scene, cam); window.__ready = true;
+} catch (e) { window.__error = String(e.stack || e); }
+</script></body></html>

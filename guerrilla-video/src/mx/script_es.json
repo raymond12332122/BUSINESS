@@ -1,0 +1,70 @@
+{
+  "scenes": [
+    { "id": "title", "lead": 1.8, "tail": 1.2, "lines": [
+      "En mil novecientos diez, México estalló en una revolución que duró diez años y cambió al país para siempre.",
+      "Hubo dictadores, traiciones, ejércitos de campesinos y algunos de los personajes más famosos de nuestra historia.",
+      "Esta es la Revolución Mexicana."
+    ]},
+    { "id": "porfiriato", "lead": 0.8, "tail": 1.2, "gaps": { "1": 0.8 }, "lines": [
+      "Durante más de treinta años, México fue gobernado por Porfirio Díaz. A esa época se le llama el Porfiriato.",
+      "El país se modernizó: llegaron los ferrocarriles, las fábricas y mucha inversión extranjera.",
+      "Pero la riqueza se quedó en muy pocas manos. Unas cuantas familias y grandes haciendas eran dueñas de casi toda la tierra, mientras millones de campesinos trabajaban en ellas por salarios miserables, muchos atrapados en deudas que nunca podían pagar.",
+      "Y no había democracia: Porfirio Díaz se reelegía una y otra vez."
+    ]},
+    { "id": "madero", "lead": 0.8, "tail": 1.4, "lines": [
+      "En mil novecientos diez, Francisco I. Madero se lanzó a la presidencia contra Díaz, con un lema muy claro: sufragio efectivo, no reelección.",
+      "Díaz lo mandó encarcelar y se declaró ganador de las elecciones.",
+      "Madero escapó a Estados Unidos y desde ahí lanzó el Plan de San Luis: un llamado a levantarse en armas el veinte de noviembre de mil novecientos diez."
+    ]},
+    { "id": "uprising", "lead": 0.8, "tail": 1.4, "gaps": { "1": 1.8 }, "lines": [
+      "La chispa prendió. En el norte se levantaron Pascual Orozco y Francisco Villa, al que todos conocían como Pancho Villa. En el sur, Emiliano Zapata.",
+      "En mayo de mil novecientos once, los rebeldes tomaron Ciudad Juárez, en la frontera.",
+      "Pocos días después, Porfirio Díaz renunció y se fue al exilio a Francia. Nunca volvió."
+    ]},
+    { "id": "ayala", "lead": 0.8, "tail": 1.6, "lines": [
+      "Madero ganó las elecciones y llegó a la presidencia, pero quiso cambiar las cosas poco a poco, sin tocar a los grandes hacendados.",
+      "Zapata exigía que las tierras se devolvieran a los pueblos. Como Madero no lo hizo, Zapata lo desconoció con el Plan de Ayala.",
+      "Su grito de guerra era: ¡Tierra y libertad!"
+    ]},
+    { "id": "huerta", "lead": 0.8, "tail": 1.6, "gaps": { "0": 1.2 }, "lines": [
+      "En febrero de mil novecientos trece, durante la llamada Decena Trágica, estalló una rebelión en la capital.",
+      "El general Victoriano Huerta, que debía defender al gobierno, traicionó a Madero.",
+      "Madero fue asesinado, y Huerta se convirtió en dictador."
+    ]},
+    { "id": "constitucionalistas", "lead": 0.8, "tail": 1.6, "gaps": { "2": 1.0, "3": 2.0 }, "lines": [
+      "Todo el país se levantó contra Huerta. Venustiano Carranza, gobernador de Coahuila, formó el Ejército Constitucionalista.",
+      "Desde Sonora avanzaba Álvaro Obregón. Desde Chihuahua, Pancho Villa con su famosa División del Norte. Y en el sur seguía peleando Zapata.",
+      "Villa movía a sus tropas en tren. Con ellos viajaban las soldaderas, o Adelitas: mujeres que cocinaban, curaban a los heridos y muchas veces también peleaban.",
+      "En abril de mil novecientos catorce, Estados Unidos ocupó el puerto de Veracruz. En junio, Villa aplastó a los federales en la Batalla de Zacatecas.",
+      "En julio, Huerta renunció y huyó del país."
+    ]},
+    { "id": "split", "lead": 0.8, "tail": 2.0, "gaps": { "1": 1.4 }, "lines": [
+      "Pero al caer Huerta, los revolucionarios se pelearon entre ellos.",
+      "Villa y Zapata querían cambios más profundos y rompieron con Carranza. En diciembre de mil novecientos catorce entraron juntos a la Ciudad de México, y se tomaron una foto famosa en la silla presidencial.",
+      "Pero en mil novecientos quince, Álvaro Obregón derrotó a Villa en las batallas de Celaya, con trincheras, alambre de púas y ametralladoras."
+    ]},
+    { "id": "columbus", "lead": 0.8, "tail": 1.8, "gaps": { "0": 1.4 }, "lines": [
+      "Derrotado, Villa regresó al norte. En mil novecientos dieciséis atacó el pueblo de Columbus, en Estados Unidos.",
+      "Washington mandó a miles de soldados a buscarlo en México durante casi un año, pero nunca lo atraparon."
+    ]},
+    { "id": "constitucion", "lead": 0.8, "tail": 1.6, "lines": [
+      "Mientras tanto, Carranza se quedó con el poder. En mil novecientos diecisiete se firmó en Querétaro una nueva Constitución.",
+      "Prometía repartir la tierra, protegía los derechos de los trabajadores y declaraba que el petróleo y las riquezas del subsuelo eran de la nación.",
+      "Es la misma Constitución que, con muchas reformas, sigue vigente en México hoy."
+    ]},
+    { "id": "fates", "lead": 0.8, "tail": 1.8, "lines": [
+      "Pero la violencia no terminó. En mil novecientos diecinueve, Zapata murió en una emboscada.",
+      "En mil novecientos veinte cayó Carranza, y Álvaro Obregón llegó a la presidencia. Muchos historiadores marcan ahí el fin de la etapa armada de la Revolución.",
+      "Y casi todos sus grandes líderes murieron asesinados: Madero, Zapata, Carranza, Villa, y al final el propio Obregón."
+    ]},
+    { "id": "legacy", "lead": 1.0, "tail": 1.6, "lines": [
+      "La Revolución costó muchísimo: se calcula que murieron cerca de un millón de personas, y cientos de miles huyeron a Estados Unidos.",
+      "Pero de ella nacieron el reparto de tierras, los derechos laborales y buena parte del México moderno.",
+      "Y personajes como Villa, Zapata y las Adelitas se volvieron leyenda."
+    ]},
+    { "id": "outro", "lead": 0.8, "tail": 4.2, "gaps": { "0": 0.8 }, "lines": [
+      "Diez años de guerra que empezaron con una sola idea: sufragio efectivo, no reelección.",
+      "Esa fue la Revolución Mexicana."
+    ]}
+  ]
+}

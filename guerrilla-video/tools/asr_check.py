@@ -3,7 +3,7 @@ import subprocess, sys
 import numpy as np
 from faster_whisper import WhisperModel
 
-m = WhisperModel('small', device='cpu', compute_type='int8')
+m = WhisperModel(__import__('os').environ.get('ASR_MODEL', 'medium'), device='cpu', compute_type='int8')
 for f in sys.argv[1:]:
     pcm = subprocess.run(['ffmpeg', '-loglevel', 'error', '-i', f, '-f', 's16le', '-ac', '1', '-ar', '16000', '-'], capture_output=True, check=True).stdout
     audio = np.frombuffer(pcm, np.int16).astype(np.float32) / 32768

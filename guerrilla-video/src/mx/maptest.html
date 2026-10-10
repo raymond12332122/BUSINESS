@@ -1,0 +1,23 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0;background:#000">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import * as GM from './geomap.js';
+import { stage } from '../lib/stage.js';
+try {
+  await GM.preload();
+  const W = 1600, H = 900, q = new URLSearchParams(location.search);
+  const r = new THREE.WebGLRenderer({ antialias: true }); r.setSize(W, H); r.shadowMap.enabled = true; r.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(r.domElement);
+  const scene = stage({ groundA: null, skyTop: '#4a6fa8', skyHor: '#cfe0ea', fog: ['#cfe0ea', 60, 200], sunPos: [6, 18, 10], sun: 2.3, hemi: 1.3, shadow: 26 });
+  const map = GM.buildMap(); scene.add(map.group);
+  console.log('DOTS', Object.keys(map.dots).join('|'));
+  for (const n of ['Ciudad de México', 'Chihuahua', 'Ciudad Juárez', 'Zacatecas', 'Veracruz', 'Cuernavaca', 'Columbus', 'San Antonio', 'Celaya', 'Querétaro']) map.dots[n].visible = true;
+  GM.paint(map, [{ t: 0, names: ['Chihuahua', 'Durango'], color: GM.FACTION.villista }, { t: 0, names: ['Morelos', 'Guerrero', 'Puebla'], color: GM.FACTION.zapatista }, { t: 0, names: ['Coahuila', 'Sonora'], color: GM.FACTION.carrancista }, { t: 0, names: ['Ciudad de México', 'México', 'Veracruz', 'Jalisco'], color: GM.FACTION.federal }], 5);
+  const a = GM.arrow([GM.CITY['Chihuahua'], GM.CITY['Torreón'], GM.CITY['Zacatecas']], GM.ARROW.villista, 0.6); a.set(1); scene.add(a);
+  const cam = new THREE.PerspectiveCamera(40, W / H, 0.1, 900);
+  const v = q.get('v') || 'all';
+  if (v === 'all') { cam.position.set(0, 26, 15); cam.lookAt(0, 0, 0.5); }
+  else { cam.position.set(-2, 7, 7); cam.lookAt(-1.5, 0, 0); }
+  r.render(scene, cam); window.__ready = true;
+} catch (e) { window.__error = String(e.stack || e); }
+</script></body></html>
