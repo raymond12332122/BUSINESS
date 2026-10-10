@@ -30,11 +30,11 @@ function lathe(profile, color, seg = 40, opts = {}) {
   const g = new THREE.LatheGeometry(profile.map(([r, y]) => new THREE.Vector2(r, y)), seg);
   const m = mesh(g, std(color, { side: THREE.DoubleSide, flatShading: false, ...opts })); m.castShadow = true; return m;
 }
-export function sombrero(style = 'charro') {
+export function sombrero(style = 'charro', color = null) {
   const g = new THREE.Group();
   const S = {
     // Zapata: dark felt charro hat, tall crown, wide upturned brim, silver band
-    charro: { col: '#2f2a28', band: '#c9c3b8', prof: [[0, 0.5], [0.1, 0.49], [0.19, 0.44], [0.25, 0.32], [0.29, 0.16], [0.31, 0.06], [0.36, 0.03], [0.55, 0.0], [0.7, 0.03], [0.78, 0.09], [0.8, 0.13], [0.78, 0.11], [0.68, 0.04], [0.5, -0.015], [0.33, -0.01], [0.31, 0.0]] },
+    charro: { col: '#4a3d35', band: '#c9c3b8', prof: [[0, 0.5], [0.1, 0.49], [0.19, 0.44], [0.25, 0.32], [0.29, 0.16], [0.31, 0.06], [0.36, 0.03], [0.55, 0.0], [0.7, 0.03], [0.78, 0.09], [0.8, 0.13], [0.78, 0.11], [0.68, 0.04], [0.5, -0.015], [0.33, -0.01], [0.31, 0.0]] },
     // Villa: tan felt sombrero, medium crown
     villa: { col: '#b39466', band: '#5a3d25', prof: [[0, 0.42], [0.12, 0.41], [0.21, 0.36], [0.27, 0.25], [0.3, 0.1], [0.32, 0.05], [0.4, 0.02], [0.58, 0.0], [0.7, 0.04], [0.74, 0.08], [0.72, 0.065], [0.6, 0.01], [0.42, -0.01], [0.32, 0.0]] },
     // campesino palm hat: light straw, round crown
@@ -44,21 +44,22 @@ export function sombrero(style = 'charro') {
     panama: { col: '#efe6cf', band: '#2a2320', prof: [[0, 0.27], [0.08, 0.28], [0.18, 0.27], [0.26, 0.19], [0.29, 0.08], [0.31, 0.03], [0.44, 0.012], [0.5, 0.03], [0.52, 0.04], [0.5, 0.028], [0.44, -0.004], [0.31, 0.0]] },
     campaign: { col: '#7d6a45', band: '#4a3a24', prof: [[0, 0.27], [0.05, 0.285], [0.12, 0.27], [0.22, 0.2], [0.28, 0.1], [0.3, 0.04], [0.32, 0.02], [0.48, 0.008], [0.52, 0.0], [0.48, -0.006], [0.31, 0.0]] },
   }[style];
-  const k = { charro: 0.74, villa: 0.7, palm: 0.62, texana: 0.9, campaign: 0.9, panama: 0.9 }[style];
+  const k = { charro: 0.64, villa: 0.7, palm: 0.62, texana: 0.9, campaign: 0.9, panama: 0.9 }[style];
   const prof = S.prof.map(([r, y]) => [r > 0.33 ? 0.33 + (r - 0.33) * k : r, y]);
-  g.add(lathe(prof, S.col));
+  g.add(lathe(prof, color || S.col));
   const band = mesh(new THREE.CylinderGeometry(0.305, 0.31, 0.05, 40, 1, true), std(S.band, { side: THREE.DoubleSide }));
   band.position.y = 0.06; g.add(band);
   if (style === 'charro') for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2; const d = mesh(new THREE.SphereGeometry(0.012, 6, 4), std('#e8e4dc', { metalness: 0.6, roughness: 0.3 })); d.position.set(Math.cos(a) * (0.33 + 0.29 * k), 0.022, Math.sin(a) * (0.33 + 0.29 * k)); g.add(d); }
   return g;
 }
 export function kepi(color = '#3d4a63') {
-  // French-style kepi: short crown sloping forward, flat top smaller than the band, black visor.
+  // Kepi: soft-edged crown that leans forward over a short black visor, gold band and red piping.
   const g = new THREE.Group();
-  const c = mesh(new THREE.CylinderGeometry(0.235, 0.33, 0.29, 28), std(color)); c.position.set(0, 0.145, -0.03); c.rotation.x = 0.17; g.add(c);
-  const top = mesh(new THREE.CircleGeometry(0.235, 28), std('#8a2f2a', { side: THREE.DoubleSide })); top.rotation.x = -Math.PI / 2 + 0.17; top.position.set(0, 0.29, -0.006); g.add(top);
-  const vis = mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.016, 24, 1, false, -0.85, 1.7), std('#141414', { roughness: 0.4 })); vis.position.set(0, 0.006, 0.02); vis.rotation.x = 0.18; g.add(vis);
-  const band = mesh(new THREE.CylinderGeometry(0.333, 0.333, 0.045, 28, 1, true), std('#c9a227', { metalness: 0.5, roughness: 0.4, side: THREE.DoubleSide })); band.position.y = 0.035; g.add(band);
+  const crown = lathe([[0, 0.31], [0.16, 0.31], [0.222, 0.302], [0.25, 0.28], [0.272, 0.21], [0.296, 0.11], [0.318, 0.025], [0.322, 0.0]], color, 36);
+  crown.rotation.x = 0.2; crown.position.z = -0.025; g.add(crown);
+  const pip = mesh(new THREE.TorusGeometry(0.22, 0.009, 4, 28), std('#9a2f2a')); pip.rotation.x = -Math.PI / 2 + 0.2; pip.position.set(0, 0.302, 0.036); g.add(pip);
+  const vis = mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.016, 24, 1, false, -0.8, 1.6), std('#141414', { roughness: 0.4 })); vis.position.set(0, 0.008, 0.03); vis.rotation.x = 0.22; g.add(vis);
+  const band = mesh(new THREE.CylinderGeometry(0.322, 0.325, 0.05, 28, 1, true), std('#c9a227', { metalness: 0.5, roughness: 0.4, side: THREE.DoubleSide })); band.position.y = 0.03; g.add(band);
   return g;
 }
 export function bowler(color = '#1d1b1d') {
@@ -153,7 +154,7 @@ export function sarape(colors = ['#b5332e', '#e0a43a', '#2f6b8a', '#efe6d2', '#3
 const HEAD_Y = 0.92;
 export function wearHat(rig, hat, { y = HEAD_Y, tilt = -0.12, scale = 0.86, cap = false } = {}) {
   hideEars(rig); flattenAhoge(rig); rig.hat = hat;
-  if (cap) flattenAhoge(rig, 0.35, /^Sp_He_(Hair0_[LR]|Ribbon\d_[LR])_00/); // close-fitting caps: tuck top strands and ribbons
+  if (cap) { flattenAhoge(rig, 0.02, /^Sp_He_Hair[01]_C_00/); flattenAhoge(rig, 0.3, /^Sp_He_(Hair0_[LR]|Ribbon\d_[LR])_00/); } // close-fitting caps: tuck top strands and ribbons
   hat.scale.setScalar(scale); rig.attach('head', hat, [0, y, -0.02], [tilt * 57.3, 0, 0]); return hat;
 }
 export const OUTFITS = {
@@ -161,9 +162,9 @@ export const OUTFITS = {
   madero: r => r,
   presidente: r => { r.attach('chest', sash(), [0, 0.4, 0]); return r; },
   villa: r => { wearHat(r, sombrero('villa')); r.attach('chest', cananas(), [0, 0.39, 0]); r.equip(P.rifle('#3b3a36', '#8a5a32'), G.HOLDS); return r; },
-  zapata: r => { wearHat(r, sombrero('charro'), { scale: 0.9 }); r.attach('chest', cananas(), [0, 0.39, 0]); r.equip(P.rifle('#3b3a36', '#8a5a32'), G.HOLDS); return r; },
+  zapata: r => { wearHat(r, sombrero('charro'), { scale: 0.78 }); r.attach('chest', cananas(), [0, 0.39, 0]); r.equip(P.rifle('#3b3a36', '#8a5a32'), G.HOLDS); return r; },
   huerta: r => { wearHat(r, kepi('#34405a'), { scale: 1.0, tilt: 0.04, y: 0.86, cap: true }); r.attach('chest', epaulettes(), [0, 0.475, -0.01]); r.attach('head', glasses(true), [0, 0.69, 0.2]); return r; },
-  carranza: r => { wearHat(r, sombrero('texana'), { scale: 0.86 }); r.attach('head', glasses(false), [0, 0.69, 0.2]); return r; },
+  carranza: r => { wearHat(r, sombrero('texana', '#c9bfa8'), { scale: 0.86 }); r.attach('head', glasses(false), [0, 0.69, 0.2]); return r; },
   obregon: r => { wearHat(r, sombrero('texana')); r.attach('chest', crossbelts('#5a4630'), [0, 0.39, 0]); r.equip(P.rifle('#3b3a36', '#7a5232'), G.HOLDS); return r; },
   adelita: r => { wearHat(r, sombrero('palm'), { scale: 0.82 }); r.attach('chest', rebozo('#8a3b4a'), [0, 0.47, -0.01]); r.attach('chest', cananas(), [0, 0.39, 0]); r.equip(P.rifle('#3b3a36', '#8a5a32'), G.HOLDS); return r; },
   campesino: r => { generic(r); wearHat(r, sombrero('palm')); r.attach('chest', sarape(), [0, 0.4, 0]); return r; },
@@ -172,6 +173,8 @@ export const OUTFITS = {
   constitucionalista: r => { generic(r, '#3d2c22'); wearHat(r, sombrero('texana')); r.attach('chest', cananas(), [0, 0.39, 0]); r.equip(P.rifle('#3b3a36', '#7a5232'), G.HOLDS); return r; },
   gringo: r => { generic(r, '#6a5236'); wearHat(r, sombrero('campaign')); r.attach('chest', crossbelts('#5a4a30'), [0, 0.39, 0]); r.equip(P.rifle('#2e3138', '#5a4632'), G.HOLDS); return r; },
   politico: r => { generic(r, '#2e2420'); return r; },
+  orozco: r => { generic(r, '#3a2a20'); wearHat(r, sombrero('texana')); r.attach('chest', cananas(), [0, 0.39, 0]); r.equip(P.rifle('#3b3a36', '#8a5a32'), G.HOLDS); return r; },
+  zapatista: r => { generic(r, '#2e2218'); wearHat(r, sombrero('palm')); r.attach('chest', cananas(), [0, 0.39, 0]); r.equip(P.rifle('#3b3a36', '#8a5a32'), G.HOLDS); return r; },
 };
 export const CASTING = { diaz: 'mcqueen', madero: 'cafe', villa: 'tamamo', zapata: 'oguri', huerta: 'daiwa', carranza: 'suzuka', obregon: 'helios', adelita: 'doto' };
 

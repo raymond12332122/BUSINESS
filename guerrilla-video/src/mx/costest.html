@@ -17,7 +17,7 @@ try {
   const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 500);
   const g = +(q.get('g') || 0), az = +(q.get('az') || 0);
   const cx = [-4.2, -0.05, 4.15, 1.85][g];
-  const dist = g === 3 ? 2.2 : 5.2; cam.position.set(cx + Math.sin(az) * dist, 1.0, Math.cos(az) * dist); cam.lookAt(cx, 0.72, 0);
+  const dist = g === 3 ? 2.2 : 5.2; const cy = +(q.get('cy') || 1.0); cam.position.set(cx + Math.sin(az) * dist, cy, Math.cos(az) * dist); cam.lookAt(cx, 0.72, 0);
   r.render(scene, cam); window.__ready = true;
 } catch (e) { window.__error = String(e.stack || e); }
 </script></body></html>

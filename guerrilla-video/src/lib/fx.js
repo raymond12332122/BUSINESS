@@ -23,8 +23,8 @@ const softTex = canvasTex(64, 64, (g) => {
 });
 
 export class Explosion {
-  constructor(parent, pos, t0, size = 1, seed = 1, { fire = 0, smokeColor = '#6e6a66' } = {}) {
-    this.t0 = t0; this.size = size; this.pos = new THREE.Vector3(...pos); this.fire = fire;
+  constructor(parent, pos, t0, size = 1, seed = 1, { fire = 0, smokeColor = '#6e6a66', light = 1 } = {}) {
+    this.t0 = t0; this.size = size; this.pos = new THREE.Vector3(...pos); this.fire = fire; this.lightK = light;
     const g = this.g = new THREE.Group(); g.position.copy(this.pos); parent.add(g);
     const r = rng(seed);
     this.flash = new THREE.Sprite(new THREE.SpriteMaterial({ map: flashTex, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
@@ -65,7 +65,7 @@ export class Explosion {
     const f = clamp(t / 0.12);
     this.flash.scale.setScalar(S * 3.4 * f * (1 - clamp((t - 0.1) / 0.35)) + 0.001);
     this.flash.material.opacity = 1 - clamp((t - 0.1) / 0.35);
-    this.light.intensity = 60 * S * Math.max(0, 1 - t / 0.6);
+    this.light.intensity = 60 * S * this.lightK * Math.max(0, 1 - t / 0.6);
     for (const b of this.balls) {
       const u = b.userData, k = 1 - Math.exp(-t * 6);
       b.position.copy(u.d).multiplyScalar(k * S * u.sp); b.position.y += t * 0.6 * S;

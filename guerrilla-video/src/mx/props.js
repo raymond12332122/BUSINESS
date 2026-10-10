@@ -70,13 +70,13 @@ export function field(x0, z0, x1, z1, { kind = 'cane', spacing = 0.42, seed = 5,
 export function volcano(h = 26, r = 30, snow = true) {
   const g = new THREE.Group();
   // smooth volcanic cone with a concave profile and a flattened crater rim
-  const prof = []; for (let i = 0; i <= 16; i++) { const u = i / 16; prof.push(new THREE.Vector2(r * (0.06 + 0.94 * Math.pow(u, 1.6)), h * (1 - u))); }
+  const prof = []; for (let i = 0; i <= 24; i++) { const u = i / 24; prof.push(new THREE.Vector2(r * (0.06 + 0.94 * Math.pow(u, 1.6)), h * (1 - u))); }
   const geo = new THREE.LatheGeometry(prof, 40), p = geo.attributes.position;
   for (let i = 0; i < p.count; i++) { const x = p.getX(i), z = p.getZ(i), y = p.getY(i), a = Math.atan2(z, x), k = 1 + 0.05 * Math.sin(a * 5 + 1) * (1 - y / h) + 0.03 * Math.sin(a * 11); p.setX(i, x * k); p.setZ(i, z * k); }
   geo.computeVertexNormals();
-  const cols = [], A = new THREE.Color('#6f7d8c'), B = new THREE.Color('#8f9aa6'), W = new THREE.Color('#f4f6f8'), c = new THREE.Color();
-  for (let i = 0; i < p.count; i++) { const y = p.getY(i) / h, a = Math.atan2(p.getZ(i), p.getX(i)); const line = 0.74 + 0.04 * Math.sin(a * 7) + 0.03 * Math.sin(a * 13 + 2);
-    if (snow && y > line) c.copy(W); else c.copy(A).lerp(B, y); cols.push(c.r, c.g, c.b); }
+  const cols = [], A = new THREE.Color('#4f5a52'), B = new THREE.Color('#6d6f74'), W = new THREE.Color('#f4f6f8'), c = new THREE.Color();
+  for (let i = 0; i < p.count; i++) { const y = p.getY(i) / h, a = Math.atan2(p.getZ(i), p.getX(i)); const line = 0.8 + 0.035 * Math.sin(a * 7) + 0.025 * Math.sin(a * 13 + 2);
+    if (snow && y > line) c.copy(W); else c.copy(A).lerp(B, Math.pow(y, 0.7)); cols.push(c.r, c.g, c.b); }
   geo.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
   g.add(mesh(geo, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 0.95, side: THREE.DoubleSide }), false));
   return g;
@@ -241,7 +241,7 @@ export function jailCell() {
   for (let i = 0; i < 12; i++) g.add(at(cyl(0.025, 0.025, 3, '#2a2826', 6), -1.8 + i * 0.33, 1.5, 1.6));
   g.add(at(box(4, 0.08, 0.06, '#2a2826'), 0, 2.6, 1.6)); g.add(at(box(4, 0.08, 0.06, '#2a2826'), 0, 0.4, 1.6));
   g.add(at(box(0.6, 0.5, 0.05, '#7fb0d8'), 0.8, 2.2, -1.44)); for (let i = 0; i < 4; i++) g.add(at(cyl(0.015, 0.015, 0.5, '#2a2826', 5), 0.6 + i * 0.13, 2.2, -1.42));
-  g.add(at(box(1.4, 0.3, 0.6, '#6b4a2f'), -1.2, 0.35, -1.1));
+  g.add(at(box(1.4, 0.16, 0.6, '#6b4a2f'), -1.2, 0.08, -1.1));
   return g;
 }
 export function desk() {
@@ -361,6 +361,14 @@ export function steamship(hull = '#24211f', { funnels = 2, funnel = '#d8b04a', n
   for (let i = 0; i < funnels; i++) { const f = mesh(new THREE.CylinderGeometry(0.42, 0.42, 2.0, 14), std(funnel)); f.position.set(0, 4.3, -1.6 + i * 2.0); f.rotation.x = -0.12; g.add(f);
     g.add(at(cyl(0.43, 0.43, 0.35, '#1a1a1a', 14), 0, 5.2, -1.6 + i * 2.0 - 0.11, -0.12, 0, 0)); }
   for (const z of [-4.5, 5.2]) g.add(at(cyl(0.06, 0.06, 6, '#5a3a24', 6), 0, 4.5, z));
+  // deck railings (both sides and the stern), lifeboats and a window band on the upper deck
+  const rail = '#e8e2d4';
+  for (const x of [-1.22, 1.22]) { g.add(at(box(0.03, 0.03, 10.2, rail), x, 2.05, -0.9)); g.add(at(box(0.02, 0.02, 10.2, rail), x, 1.85, -0.9));
+    for (let z = -5.9; z <= 4.2; z += 0.5) g.add(at(box(0.025, 0.45, 0.025, rail), x, 1.83, z)); }
+  g.add(at(box(2.44, 0.03, 0.03, rail), 0, 2.05, -5.95)); g.add(at(box(2.44, 0.02, 0.02, rail), 0, 1.85, -5.95));
+  for (let x = -1.2; x <= 1.21; x += 0.4) g.add(at(box(0.025, 0.45, 0.025, rail), x, 1.83, -5.95));
+  for (const [x, z] of [[-0.75, -2.2], [0.75, -2.2], [-0.75, 0.6], [0.75, 0.6]]) { const b = mesh(new THREE.CapsuleGeometry(0.22, 1.0, 4, 8), std('#f3eee2')); b.rotation.x = Math.PI / 2; b.scale.set(1, 1, 0.6); b.position.set(x, 3.62, z); g.add(b); }
+  for (let i = 0; i < 8; i++) g.add(at(box(0.02, 0.24, 0.36, '#3a4a5a'), 0.91, 3.12, -1.9 + i * 0.44)), g.add(at(box(0.02, 0.24, 0.36, '#3a4a5a'), -0.91, 3.12, -1.9 + i * 0.44));
   g.funnelTops = [...Array(funnels)].map((_, i) => new THREE.Vector3(0, 5.5, -1.75 + i * 2.0));
   return g;
 }
@@ -488,4 +496,67 @@ export function tienda() {
   for (const s of [-1, 1]) sc.add(at(cyl(0.08, 0.06, 0.02, '#b8912a', 10), s * 0.19, 0.2, 0));
   g.ledger = new THREE.Vector3(-0.35, 0.6, 0.37);
   return g;
+}
+
+// Camp fire with a clay pot on three sticks; returns group with .update(t) for the flames.
+export function campfire() {
+  const g = new THREE.Group(), r = rng(91);
+  for (let i = 0; i < 9; i++) { const a = i / 9 * Math.PI * 2; g.add(at(mesh(new THREE.DodecahedronGeometry(0.07, 0), std('#7d7468')), Math.cos(a) * 0.3, 0.04, Math.sin(a) * 0.3, r(), r(), r())); }
+  for (let i = 0; i < 4; i++) { const l = cyl(0.03, 0.035, 0.42, '#5a3a24', 6); l.rotation.set(Math.PI / 2, 0, i * 0.8); l.position.y = 0.06; g.add(l); }
+  const flames = [...Array(5)].map((_, i) => { const m = new THREE.Mesh(new THREE.ConeGeometry(0.07, 0.28, 6), new THREE.MeshBasicMaterial({ color: i % 2 ? '#ff9a2a' : '#ffd04a' }));
+    m.position.set((r() - 0.5) * 0.14, 0.17, (r() - 0.5) * 0.14); m.userData.ph = r() * 6; g.add(m); return m; });
+  for (let i = 0; i < 3; i++) { const a = i / 3 * Math.PI * 2; const s = cyl(0.012, 0.012, 0.8, '#4a3220', 5); s.position.set(Math.cos(a) * 0.22, 0.36, Math.sin(a) * 0.22); s.rotation.set(-Math.sin(a) * 0.28, 0, Math.cos(a) * 0.28); g.add(s); }
+  const pot = mesh(new THREE.SphereGeometry(0.15, 14, 10), std('#a4532e')); pot.scale.y = 0.85; pot.position.y = 0.42; g.add(pot);
+  g.add(at(cyl(0.11, 0.12, 0.06, '#8a4526', 12), 0, 0.53, 0));
+  const light = new THREE.PointLight('#ffa040', 1.2, 5, 1.6); light.position.y = 0.4; g.add(light);
+  g.update = t => { flames.forEach((m, i) => { const k = 0.8 + 0.3 * Math.sin(t * 12 + m.userData.ph); m.scale.set(1, k, 1); m.position.y = 0.08 + 0.14 * k; }); light.intensity = 1.1 + 0.25 * Math.sin(t * 15); };
+  return g;
+}
+// Rocky hill (Cerro de la Bufa style) with a small chapel on top.
+export function bufa() {
+  const g = new THREE.Group();
+  const geo = new THREE.SphereGeometry(10, 48, 20, 0, Math.PI * 2, 0, Math.PI / 2), p = geo.attributes.position, r = rng(17);
+  for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i), a = Math.atan2(z, x); const k = 1 + 0.12 * Math.sin(a * 5 + y * 0.3) + 0.06 * Math.sin(a * 13);
+    p.setXYZ(i, x * k * 1.6, y * (0.9 + 0.2 * Math.sin(a * 3)), z * k); }
+  geo.computeVertexNormals();
+  g.add(mesh(geo, smooth('#9a7d62', { roughness: 1 })));
+  const ch = new THREE.Group(); ch.position.set(1, 9.4, 0); g.add(ch);
+  ch.add(at(box(2.0, 1.6, 1.4, '#d9c8a8'), 0, 0.8, 0)); ch.add(at(box(0.7, 1.2, 0.7, '#d9c8a8'), -0.6, 2.2, 0)); const d = mesh(new THREE.SphereGeometry(0.5, 10, 6, 0, Math.PI * 2, 0, Math.PI / 2), std('#c98a4a')); d.position.set(0.4, 1.6, 0); ch.add(d);
+  return g;
+}
+
+// WWI-era biplane (the US 1st Aero Squadron flew over Chihuahua in 1916). Faces +z; .prop spins.
+export function biplane(color = '#9a8a5a') {
+  const g = new THREE.Group(), wing = std('#c9b98a'), body = std(color);
+  g.add(at(box(0.32, 0.32, 2.2, color), 0, 0, 0)); g.add(at(cyl(0.16, 0.05, 0.6, color, 8), 0, 0, -1.35, Math.PI / 2, 0, 0));
+  for (const y of [-0.12, 0.42]) g.add(at(box(3.2, 0.04, 0.55, '#c9b98a'), 0, y, 0.45));
+  for (const x of [-1.2, -0.5, 0.5, 1.2]) g.add(at(box(0.03, 0.54, 0.03, '#5a4a32'), x, 0.15, 0.45));
+  g.add(at(box(1.1, 0.03, 0.35, '#c9b98a'), 0, 0.05, -1.45)); g.add(at(box(0.03, 0.4, 0.3, '#c9b98a'), 0, 0.22, -1.45));
+  for (const x of [-0.35, 0.35]) { g.add(at(box(0.03, 0.4, 0.03, '#3a3a3a'), x, -0.35, 0.65)); const w = mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.06, 12), std('#2a2a2a')); w.rotation.z = Math.PI / 2; w.position.set(x, -0.55, 0.65); g.add(w); }
+  g.add(at(cyl(0.16, 0.16, 0.05, '#3a3a3a', 12), 0, 0, 1.12, Math.PI / 2, 0, 0));
+  const prop = new THREE.Group(); prop.position.z = 1.16; g.add(prop); prop.add(at(box(0.08, 0.9, 0.02, '#5a3a24'), 0, 0, 0));
+  const star = mesh(new THREE.CircleGeometry(0.18, 5), new THREE.MeshBasicMaterial({ color: '#f3ead6', side: THREE.DoubleSide })); star.rotation.x = -Math.PI / 2; star.position.set(1.1, 0.45, 0.45); g.add(star);
+  g.prop = prop; return g;
+}
+
+// Soft additive fire from camera-facing sprites (rises and flickers); returns fn(t, origin, k).
+export function fireSprites(parent, n = 14, { size = 0.5, rise = 1.4, spread = 0.6, life = 0.9 } = {}) {
+  const fl = [...Array(n)].map((_, i) => {
+    const m = new THREE.Sprite(new THREE.SpriteMaterial({ map: puffTex(), color: i % 3 ? '#ff8a2a' : '#ffc04a', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+    m.userData = { ph: i / n, dx: (rng(i + 5)() - 0.5) * spread, dz: (rng(i + 9)() - 0.5) * spread * 0.4 }; m.renderOrder = 4; parent.add(m); return m;
+  });
+  return (t, o, k = 1) => fl.forEach(m => {
+    const u = (t / life + m.userData.ph) % 1;
+    m.position.set(o.x + m.userData.dx * (1 - u * 0.5), o.y + rise * u, o.z + m.userData.dz);
+    m.scale.setScalar(size * k * (1.2 - u * 0.7)); m.material.opacity = k * Math.min(1, u * 8) * (1 - u); m.visible = k > 0.01;
+  });
+}
+
+// Smooth weathered boulder.
+export function boulder(r = 0.7, seed = 0, color = '#9a8064') {
+  const geo = new THREE.IcosahedronGeometry(1, 3), p = geo.attributes.position, rr = rng(seed + 3), ph = [rr() * 6, rr() * 6, rr() * 6];
+  for (let i = 0; i < p.count; i++) { const x = p.getX(i), y = p.getY(i), z = p.getZ(i); const k = 1 + 0.12 * Math.sin(x * 2.1 + ph[0]) * Math.cos(z * 1.7 + ph[1]) + 0.07 * Math.sin(y * 3.3 + ph[2]);
+    p.setXYZ(i, x * k * 1.25, Math.max(-0.35, y) * k * 0.78, z * k); }
+  geo.computeVertexNormals();
+  const m = mesh(geo, smooth(color, { roughness: 0.95 })); m.scale.setScalar(r); m.position.y = r * 0.22; return m;
 }

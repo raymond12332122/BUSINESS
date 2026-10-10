@@ -22,3 +22,11 @@ export function runShots(inst, ctx, shots, t) {
   if (s.sun) s.sun(t);
   return (s.act ? s.act(t, u, t - s.t0) : '') || '';
 }
+
+// Scene-local start time of the n-th spoken word that starts with `w` (case/accents ignored).
+const norm = s => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+export function wt(line, w, n = 0) {
+  const exact = w.endsWith('$'), k = norm(w.replace('$', '')); let c = 0;
+  for (const x of line.words || []) { const v = norm(x.w).replace(/[^a-z0-9ñ]/g, ''); if (exact ? v === k : v.startsWith(k)) { if (c++ === n) return x.t0; } }
+  return line.t0;
+}

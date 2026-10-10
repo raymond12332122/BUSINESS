@@ -50,3 +50,16 @@ export function humble(t, seed = 0) {
   p.armL = [-22, -34, -64]; p.armR = [-22, 34, 64]; p.elbL = [0, -62, 0]; p.elbR = [0, 62, 0];
   return p;
 }
+// Applause: hands meeting in front of the chest.
+export function clap(t, seed = 0) {
+  const p = C.idle(t, seed, 0.5), k = 0.5 + 0.5 * sin(t * 15 + seed * 3);
+  p.armL = [-55, -38 + 10 * k, -66]; p.armR = [-55, 38 - 10 * k, 66]; p.elbL = [0, -70 - 12 * k, 0]; p.elbR = [0, 70 + 12 * k, 0];
+  p.head = [-2, 4 * sin(t + seed), 0];
+  return p;
+}
+// Raising a fist (rallying), one arm up.
+export function fist(t, seed = 0, side = 'R') {
+  const p = C.idle(t, seed), pump = 0.5 + 0.5 * sin(t * 5 + seed);
+  if (side === 'R') { p.armR = [-20, 0, -30 - 25 * pump]; p.elbR = [0, 0, -60]; } else { p.armL = [-20, 0, 30 + 25 * pump]; p.elbL = [0, 0, 60]; }
+  p.head = [-4, 0, 0]; return p;
+}

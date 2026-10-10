@@ -59,7 +59,7 @@ export function zocalo(light = 'day') {
   return s;
 }
 // Interior room (palace office/hall or theatre).
-export function interior({ wall = '#7a2f2a', floor = '#5a3a24', w = 12, d = 10, h = 4.2, lights = [[0, 3.6, 0]], windows = true } = {}) {
+export function interior({ wall = '#7a2f2a', floor = '#5a3a24', w = 12, d = 10, h = 4.2, lights = [[0, 3.6, 0]], windows = true, bulbs = true } = {}) {
   const s = new THREE.Scene();
   s.add(new THREE.HemisphereLight('#ffe7c4', '#3a2a1e', 0.9));
   const sun = new THREE.DirectionalLight('#ffe0b0', 1.4); sun.position.set(4, 8, 6); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
@@ -73,6 +73,7 @@ export function interior({ wall = '#7a2f2a', floor = '#5a3a24', w = 12, d = 10, 
   if (windows) for (const x of [-w / 3, 0, w / 3]) { const win = new THREE.Mesh(new THREE.PlaneGeometry(1.2, 2.2), new THREE.MeshBasicMaterial({ color: '#ffe9c4' })); win.position.set(x, 2.1, -d / 2 + 0.02); s.add(win);
     s.add(LP.at(LP.box(1.5, 0.12, 0.1, '#c9a227'), x, 3.25, -d / 2 + 0.06)); for (const k of [-0.75, 0.75]) s.add(LP.at(LP.box(0.35, 2.6, 0.08, '#8a1f2a'), x + k, 2.1, -d / 2 + 0.07)); }
   for (const [x, y, z] of lights) { const l = new THREE.PointLight('#ffd9a0', 6, 14, 1.4); l.position.set(x, y, z); s.add(l);
+    if (!bulbs) continue;
     const ch = new THREE.Mesh(new THREE.SphereGeometry(0.18, 10, 8), new THREE.MeshBasicMaterial({ color: '#fff0c8' })); ch.position.set(x, y + 0.25, z); s.add(ch); }
   s.background = new THREE.Color('#1a120c');
   s.userData = { sun, hemi: s.children[0], interior: true };
