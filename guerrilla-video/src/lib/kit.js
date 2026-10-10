@@ -2,6 +2,7 @@
 import * as C from './chars.js';
 import * as P from './props.js';
 import { ss } from './util.js';
+import { tr } from './i18n.js';
 
 export function cast(scene, key, kit, x = 0, z = 0, yaw = 0, opts) {
   const c = C.spawn(key); if (kit) kit(c, opts);
@@ -39,6 +40,13 @@ export function stat(x, y, v, l, k = 1, color = '#fff') {
 }
 // Split a narration line into n timed parts (by character length), returns start times.
 export function partTimes(line, parts) {
+  parts = parts.map(tr);
+  if (line.words && line.words.length) {
+    // start of each part = timestamp of its first spoken word
+    let wi = 0; const out = [];
+    for (const p of parts) { out.push(line.words[Math.min(wi, line.words.length - 1)].t0); wi += p.trim().split(/\s+/).length; }
+    return out;
+  }
   const tot = parts.reduce((a, p) => a + p.length, 0); let acc = line.t0; const out = [];
   for (const p of parts) { out.push(acc); acc += (line.t1 - line.t0) * p.length / tot; }
   return out;

@@ -1,0 +1,58 @@
+{
+  "scenes": [
+    { "id": "title", "lead": 1.6, "tail": 1.0, "lines": [
+      "La guerra de guerrillas es la forma en que los débiles pelean contra los fuertes.",
+      "Grupos pequeños y móviles evitan las grandes batallas, atacan donde el enemigo es débil, y desaparecen antes de que pueda responder.",
+      "Veamos cómo funciona."
+    ]},
+    { "id": "imbalance", "lead": 0.8, "tail": 2.2, "lines": [
+      "Imagina un ejército poderoso: tanques, camiones y miles de soldados.",
+      "Ahora imagina al otro bando: un puñado de combatientes con rifles.",
+      "En una batalla abierta, el bando pequeño sería aplastado.",
+      "Por eso, los guerrilleros simplemente se niegan a pelear esa batalla."
+    ]},
+    { "id": "hitrun", "lead": 0.8, "tail": 1.0, "gaps": { "1": 5.5, "2": 1.0 }, "lines": [
+      "Regla número uno: golpear y huir.",
+      "Los guerrilleros eligen el momento y el lugar. Una emboscada a un convoy de suministros. Un ataque a un puesto aislado.",
+      "Golpean fuerte y rápido, y desaparecen antes de que lleguen los refuerzos.",
+      "Mao Zedong lo resumió así: el enemigo avanza, nosotros retrocedemos. El enemigo acampa, nosotros lo hostigamos. El enemigo se cansa, nosotros atacamos. El enemigo se retira, nosotros lo perseguimos."
+    ]},
+    { "id": "terrain", "lead": 0.8, "tail": 1.6, "gaps": { "2": 1.2 }, "lines": [
+      "Regla número dos: aprovechar el terreno.",
+      "Bosques, montañas, pantanos y ciudades permiten que grupos pequeños se escondan de una fuerza mucho mayor.",
+      "En Vietnam, los combatientes de Cu Chi cavaron una red de túneles de más de doscientos kilómetros.",
+      "La patrulla enemiga llega, y no encuentra a nadie."
+    ]},
+    { "id": "people", "lead": 0.8, "tail": 1.6, "lines": [
+      "Regla número tres: la gente.",
+      "Mao escribió que el guerrillero debe moverse entre el pueblo como pez en el agua.",
+      "La población les da comida, refugio, nuevos reclutas y, sobre todo, información: dónde está el enemigo y hacia dónde va.",
+      "Si pierden el apoyo de la gente, los guerrilleros ya no tienen dónde esconderse."
+    ]},
+    { "id": "supply", "lead": 0.8, "tail": 1.4, "gaps": { "1": 1.0 }, "lines": [
+      "Regla número cuatro: atacar las líneas de suministro, no a las unidades más fuertes.",
+      "Un ejército no puede pelear sin combustible, comida ni municiones, y todo eso viaja por carreteras y vías de tren.",
+      "En la Primera Guerra Mundial, Lawrence de Arabia y los combatientes árabes atacaron una y otra vez el ferrocarril del Hiyaz.",
+      "En la Segunda Guerra Mundial, los partisanos soviéticos y yugoslavos volaron vías férreas detrás de las líneas alemanas, y mantuvieron ocupadas a divisiones enteras lejos del frente."
+    ]},
+    { "id": "ukraine", "lead": 0.8, "tail": 2.4, "gaps": { "1": 1.6 }, "lines": [
+      "Las mismas ideas siguen funcionando hoy, con herramientas nuevas.",
+      "En dos mil veintidós, mientras las columnas del ejército ruso avanzaban hacia Kiev, pequeños equipos ucranianos con armas antitanque y drones baratos emboscaron a los vehículos alineados en las carreteras.",
+      "Unas pocas personas, un dron y un buen escondite podían frenar en seco a todo un convoy."
+    ]},
+    { "id": "dilemma", "lead": 0.8, "tail": 1.6, "gaps": { "1": 0.8 }, "lines": [
+      "Esto crea una pesadilla para el ejército más fuerte.",
+      "Tiene que vigilar cada carretera, cada puente y cada pueblo. A los guerrilleros les basta con golpear uno.",
+      "Si se dispersa, es débil en todas partes. Si se agrupa, le entrega el campo a los guerrilleros."
+    ]},
+    { "id": "victory", "lead": 0.8, "tail": 2.6, "gaps": { "1": 1.2 }, "lines": [
+      "Entonces, ¿cómo ganan los guerrilleros? Normalmente, no destruyendo al ejército enemigo.",
+      "Ganan al no perder: haciendo que la guerra sea tan larga y tan costosa que el enemigo decide volver a casa.",
+      "Como dijo Henry Kissinger: la guerrilla gana si no pierde. El ejército convencional pierde si no gana."
+    ]},
+    { "id": "outro", "lead": 0.8, "tail": 4.0, "gaps": { "0": 0.8 }, "lines": [
+      "Golpear y huir. Aprovechar el terreno. Ganarse a la gente. Cortar los suministros. Y resistir más que el enemigo.",
+      "Eso es la guerra de guerrillas."
+    ]}
+  ]
+}

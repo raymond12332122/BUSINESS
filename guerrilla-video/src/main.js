@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import * as C from './lib/chars.js';
+import { LANG, trHTML } from './lib/i18n.js';
 
 const W = 1920, H = 1080;
 const SCENES = ['title', 'imbalance', 'hitrun', 'terrain', 'people', 'supply', 'ukraine', 'dilemma', 'victory', 'outro'];
@@ -12,7 +13,7 @@ async function boot() {
   document.body.prepend(renderer.domElement);
   const ui = document.getElementById('ui'), fade = document.getElementById('fade');
 
-  const TL = await (await fetch('/build/timeline.json')).json();
+  const TL = await (await fetch(LANG === 'en' ? '/build/timeline.json' : `/build/${LANG}/timeline.json`)).json();
   await C.loadCast();
   const only = new URLSearchParams(location.search).get('only');
   const built = [];
@@ -31,8 +32,18 @@ async function boot() {
   function captionAt(lines, t) {
     for (const l of lines) {
       if (t < l.t0 - 0.15 || t > l.t1 + 0.3) continue;
-      // split long lines into chunks timed by length
-      const chunks = splitText(l.text), total = chunks.reduce((a, c) => a + c.length, 0);
+      const chunks = splitText(l.text);
+      if (l.words && l.words.length) {
+        // word timestamps: each chunk starts when its first word is spoken
+        let wi = 0, cur = chunks[0];
+        for (const c of chunks) {
+          const start = l.words[Math.min(wi, l.words.length - 1)].t0;
+          if (t >= start - 0.12) cur = c;
+          wi += c.split(/\s+/).length;
+        }
+        return cur;
+      }
+      const total = chunks.reduce((a, c) => a + c.length, 0);
       let acc = l.t0;
       for (const c of chunks) { const d = (l.t1 - l.t0) * c.length / total; if (t < acc + d || c === chunks[chunks.length - 1]) return c; acc += d; }
     }
@@ -49,7 +60,7 @@ async function boot() {
     if (sc.userData.sky) sc.userData.sky.position.copy(inst.ctx.camera.position);
     renderer.render(sc, inst.ctx.camera);
     const cap = captionAt(s.lines, t);
-    ui.innerHTML = html + (cap && !inst.noCaptions && !(inst.hideCaptions && inst.hideCaptions(t)) ? `<div class="cap">${cap}</div>` : '');
+    ui.innerHTML = trHTML(html) + (cap && !inst.noCaptions && !(inst.hideCaptions && inst.hideCaptions(t)) ? `<div class="cap">${cap}</div>` : '');
     const fi = i === 0 ? 0.6 : 0.3, fo = 0.3;
     fade.style.opacity = Math.max(0, 1 - t / fi, i === TL.scenes.length - 1 ? (t - (s.dur - 1.2)) / 1.2 : 1 - (s.dur - t) / fo).toFixed(3);
   };

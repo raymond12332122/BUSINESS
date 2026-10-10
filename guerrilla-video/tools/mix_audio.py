@@ -1,16 +1,19 @@
 """Synthesize SFX + a music bed and mix them under the narration.
 
-Usage: python3 tools/mix_audio.py  ->  build/mix.wav (44.1 kHz stereo)
+Usage: python3 tools/mix_audio.py [lang]  ->  build[/<lang>]/mix.wav (44.1 kHz stereo)
 Everything is generated procedurally with numpy (seeded), so the mix is reproducible.
 """
 import json, os, wave
 import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+import sys
+LANG = sys.argv[1] if len(sys.argv) > 1 else 'en'
+B = os.path.join(ROOT, 'build') if LANG == 'en' else os.path.join(ROOT, 'build', LANG)
 SR = 44100
 rng = np.random.default_rng(7)
-TL = json.load(open(os.path.join(ROOT, 'build', 'timeline.json')))
-EV = json.load(open(os.path.join(ROOT, 'build', 'events.json')))
+TL = json.load(open(os.path.join(B, 'timeline.json')))
+EV = json.load(open(os.path.join(B, 'events.json')))
 TOTAL = TL['total'] + 0.5
 N = int(TOTAL * SR)
 
@@ -206,7 +209,7 @@ for e in EV:
     sfx[i:i + len(x)] += x * vol
 
 # ------------------------------------------------------------------ narration
-with wave.open(os.path.join(ROOT, 'build', 'narration.wav')) as w:
+with wave.open(os.path.join(B, 'narration.wav')) as w:
     nsr = w.getframerate(); nar = np.frombuffer(w.readframes(w.getnframes()), dtype=np.int16).astype(np.float64) / 32768
 nar = np.interp(np.arange(N) / SR, np.arange(len(nar)) / nsr, nar, right=0)
 nar = norm(nar, 0.92)
@@ -253,6 +256,6 @@ R = nar + musR + sfx
 mx = max(np.max(np.abs(L)), np.max(np.abs(R)))
 L, R = np.tanh(L / mx * 1.25) / np.tanh(1.25) * 0.93, np.tanh(R / mx * 1.25) / np.tanh(1.25) * 0.93
 out = (np.stack([L, R], 1) * 32767).astype(np.int16)
-with wave.open(os.path.join(ROOT, 'build', 'mix.wav'), 'w') as w:
+with wave.open(os.path.join(B, 'mix.wav'), 'w') as w:
     w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR); w.writeframes(out.tobytes())
 print('mix ok', TOTAL, 's; peaks nar/sfx/mus', round(np.abs(nar).max(), 2), round(np.abs(sfx).max(), 2), round(np.abs(musL).max(), 2))
