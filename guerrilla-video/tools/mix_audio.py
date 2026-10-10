@@ -9,7 +9,8 @@ import numpy as np
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 import sys
 LANG = sys.argv[1] if len(sys.argv) > 1 else 'en'
-B = os.path.join(ROOT, 'build') if LANG == 'en' else os.path.join(ROOT, 'build', LANG)
+VIDEO = sys.argv[2] if len(sys.argv) > 2 else 'guerrilla'
+B = os.path.join(ROOT, 'build', *([] if VIDEO == 'guerrilla' else [VIDEO]), *([] if LANG == 'en' else [LANG]))
 SR = 44100
 rng = np.random.default_rng(7)
 TL = json.load(open(os.path.join(B, 'timeline.json')))
@@ -192,10 +193,61 @@ def clock(d):
     return out * 1.4
 
 
+def plane(d):
+    t = t_(d); f = 95 + 8 * np.sin(2 * np.pi * 0.3 * t); ph = np.cumsum(f) / SR
+    x = sum(np.sin(2 * np.pi * k * ph) / k for k in range(1, 9)) * (1 + 0.4 * np.sin(2 * np.pi * 24 * t))
+    x = fft_filter(x, hi=1600) + fft_filter(noise(d), lo=200, hi=1200) * 0.4
+    return fade(norm(x) * 0.3, 1.0, 1.2)
+
+
+def siren(d):
+    t = t_(d); f = 520 + 700 * np.clip(t / d, 0, 1) ** 0.7
+    x = np.sin(2 * np.pi * np.cumsum(f) / SR) + 0.4 * np.sin(4 * np.pi * np.cumsum(f) / SR)
+    return fade(x * 0.22 * np.minimum(1, t * 2), 0.1, 0.3)
+
+
+def waves(d):
+    t = t_(d); x = fft_filter(noise(d), lo=80, hi=1400) * (0.55 + 0.45 * np.sin(2 * np.pi * 0.13 * t) ** 2)
+    return fade(norm(x) * 0.35, 1.0, 1.0)
+
+
+def factory(d):
+    out = np.zeros(int(d * SR))
+    for k in range(int(d / 0.4)):
+        s = int(k * 0.4 * SR); hit = (np.sin(2 * np.pi * 180 * t_(0.12)) + fft_filter(noise(0.12), lo=1500) * 0.6) * env_exp(0.12, 30)
+        out[s:s + len(hit)] += hit[: len(out) - s] * (0.6 if k % 2 else 0.35)
+    out += fft_filter(noise(d), hi=250) * 0.25
+    return fade(out * 0.5, 0.5, 0.8)
+
+
+def clank():
+    d = 0.6; t = t_(d); x = sum(np.sin(2 * np.pi * f * t) for f in (310, 470, 830)) * env_exp(d, 9) + noise(d) * env_exp(d, 40) * 0.5
+    return norm(x) * 0.45
+
+
+def bells(d):
+    out = np.zeros(int(d * SR))
+    for k, f in enumerate([523.3, 659.3, 784, 659.3, 1046.5, 784, 659.3, 523.3] * 3):
+        s = int(k * 0.5 * SR); L = int(2.0 * SR); tt = np.arange(L) / SR
+        tone = (np.sin(2 * np.pi * f * tt) + 0.5 * np.sin(2 * np.pi * f * 2.76 * tt) + 0.25 * np.sin(2 * np.pi * f * 5.4 * tt)) * np.exp(-tt * 2.2)
+        if s < len(out): out[s:s + L] += tone[: len(out) - s]
+    return fade(out * 0.08, 0.01, 0.8)
+
+
+def charge():
+    d = 2.2; t = t_(d); x = np.zeros_like(t)
+    for f in (98, 123.5, 146.8, 196):
+        x += 2 * ((f * t * (1 + 0.05 * t)) % 1) - 1
+    x = fft_filter(x, hi=1500) * np.minimum(1, t * 2) * np.exp(-t * 0.6)
+    roll = fft_filter(noise(d), lo=300, hi=3000) * (0.5 + 0.5 * np.sin(2 * np.pi * 14 * t)) * np.exp(-t * 1.2)
+    return norm(x * 0.6 + roll * 0.5) * 0.5
+
+
 ONE = {'shot': shot, 'boom': lambda: boom(False), 'bigboom': lambda: boom(True), 'whoosh': whoosh, 'pop': pop, 'click': click,
        'thud': thud, 'creak': creak, 'sting': sting, 'sting2': sting2, 'tension': tension, 'beep': beep, 'tick': tick,
-       'missile': missile, 'brakes': brakes, 'cheer': cheer}
-LOOP = {'engine': engine, 'march': march, 'drone': drone, 'train': train, 'wind': wind, 'clock': clock}
+       'missile': missile, 'brakes': brakes, 'cheer': cheer, 'clank': clank, 'charge': charge}
+LOOP = {'engine': engine, 'march': march, 'drone': drone, 'train': train, 'wind': wind, 'clock': clock,
+        'plane': plane, 'siren': siren, 'waves': waves, 'factory': factory, 'bells': bells}
 
 sfx = np.zeros(N)
 cache = {}
@@ -247,6 +299,10 @@ envn = np.sqrt(np.maximum(movavg(nar ** 2, win), 0))
 envn = movavg(envn, int(0.3 * SR))
 duck = 1 - 0.5 * np.clip(envn / (envn.max() * 0.5), 0, 1)
 fin = np.clip(np.minimum(t_all / 2.0, (TOTAL - 0.5 - t_all) / 3.0), 0, 1)
+for sc in TL['scenes']:  # silence the music bed under quiet scenes (the memorial)
+    if sc['id'] == 'cost':
+        a, b = sc['start'], sc['start'] + sc['dur']
+        fin *= 1 - np.clip(np.minimum((t_all - (a - 1.5)) / 1.5, ((b + 1.5) - t_all) / 1.5), 0, 1)
 musL, musR = musL * duck * fin, musR * duck * fin
 
 # ------------------------------------------------------------------ mix

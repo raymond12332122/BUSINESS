@@ -1,6 +1,6 @@
 """Synthesize narration with a Microsoft neural voice and write build/<lang>/timeline.json.
 
-Usage: python3 tools/gen_voice_edge.py es es-MX-JorgeNeural -5%
+Usage: python3 tools/gen_voice_edge.py es es-MX-JorgeNeural -5% [video]
 Lines are cached in build/<lang>/voice/; delete a line's files to re-synthesize it.
 Word timestamps are stored per line so subtitles and on-screen lists sync to the spoken words.
 """
@@ -11,11 +11,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LANG, VOICE, RATE = sys.argv[1], sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else '+0%'
 SR = 24000
 GAP = 0.45
-OUT = os.path.join(ROOT, 'build', LANG)
+VIDEO = sys.argv[4] if len(sys.argv) > 4 else 'guerrilla'
+OUT = os.path.join(ROOT, 'build', LANG) if VIDEO == 'guerrilla' else os.path.join(ROOT, 'build', VIDEO, LANG)
 os.makedirs(os.path.join(OUT, 'voice'), exist_ok=True)
 # Phonetic respellings for the TTS only; subtitles keep the real spelling.
 SAY = {'Cu Chi': 'Ku Chi'}
-script = json.load(open(os.path.join(ROOT, 'src', f'script_{LANG}.json')))
+script = json.load(open(os.path.join(ROOT, 'src', f'script_{LANG}.json') if VIDEO == 'guerrilla' else os.path.join(ROOT, 'src', VIDEO, f'script_{LANG}.json')))
 
 
 def say(text):

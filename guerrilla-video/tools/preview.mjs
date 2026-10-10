@@ -5,7 +5,7 @@ import fs from 'node:fs'; fs.mkdirSync(out, { recursive: true });
 const srv = await serve(8766 + Math.floor(Math.random() * 500));
 const port = srv.address().port;
 const t0 = Date.now();
-const { browser, page } = await openPage(`http://localhost:${port}/src/index.html?only=${id}&lang=${process.env.LANG_V || 'en'}`);
+const { browser, page } = await openPage(`http://localhost:${port}/src/index.html?only=${id}&lang=${process.env.LANG_V || 'en'}&video=${process.env.VIDEO || 'guerrilla'}`);
 console.log('load', ((Date.now() - t0) / 1000).toFixed(1), 's');
 const start = await page.evaluate(id => window.TL.scenes.find(s => s.id === id).start, id);
 for (const t of times.split(',').map(Number)) {

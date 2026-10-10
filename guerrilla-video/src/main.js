@@ -2,8 +2,11 @@ import * as THREE from 'three';
 import * as C from './lib/chars.js';
 import { LANG, trHTML } from './lib/i18n.js';
 
+const VIDEO = new URLSearchParams(location.search).get('video') || 'guerrilla';
+const BASE = VIDEO === 'guerrilla' ? '/build' : `/build/${VIDEO}`;
+const SCENE_DIR = VIDEO === 'guerrilla' ? './scenes' : `./${VIDEO}/scenes`;
+
 const W = 1920, H = 1080;
-const SCENES = ['title', 'imbalance', 'hitrun', 'terrain', 'people', 'supply', 'ukraine', 'dilemma', 'victory', 'outro'];
 
 async function boot() {
   const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
@@ -13,13 +16,14 @@ async function boot() {
   document.body.prepend(renderer.domElement);
   const ui = document.getElementById('ui'), fade = document.getElementById('fade');
 
-  const TL = await (await fetch(LANG === 'en' ? '/build/timeline.json' : `/build/${LANG}/timeline.json`)).json();
+  const TL = await (await fetch(LANG === 'en' ? `${BASE}/timeline.json` : `${BASE}/${LANG}/timeline.json`)).json();
   await C.loadCast();
   const only = new URLSearchParams(location.search).get('only');
   const built = [];
   for (const s of TL.scenes) {
     if (only && !only.split(',').includes(s.id)) { built.push(null); continue; }
-    const mod = await import(`./scenes/${s.id}.js`);
+    const mod = await import(`${SCENE_DIR}/${s.id}.js`);
+    if (mod.preload) await mod.preload();
     const camera = new THREE.PerspectiveCamera(35, W / H, 0.1, 900);
     const ctx = { L: s.lines, dur: s.dur, camera, W, H, renderer,
       project(v) { camera.updateMatrixWorld(); const p = new THREE.Vector3(...v).project(camera); return [(p.x + 1) / 2 * W, (1 - p.y) / 2 * H, p.z < 1]; } };

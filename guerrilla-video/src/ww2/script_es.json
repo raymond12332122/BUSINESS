@@ -1,0 +1,62 @@
+{
+  "scenes": [
+    { "id": "title", "lead": 1.8, "tail": 1.2, "lines": [
+      "En mil novecientos treinta y nueve, Alemania inició la guerra más grande de la historia.",
+      "En menos de dos años conquistó casi toda Europa, y aun así terminó perdiéndola.",
+      "Veamos cómo pasó."
+    ]},
+    { "id": "context", "lead": 0.8, "tail": 1.2, "lines": [
+      "Tras perder la Primera Guerra Mundial, Alemania quedó humillada y en crisis.",
+      "Con Hitler en el poder, se rearmó y empezó a anexar territorios: primero Austria, luego Checoslovaquia.",
+      "El primero de septiembre de mil novecientos treinta y nueve invadió Polonia. Dos días después, Reino Unido y Francia le declararon la guerra.",
+      "Semanas más tarde, la Unión Soviética, que había pactado con Hitler, invadió Polonia por el este."
+    ]},
+    { "id": "blitz", "lead": 0.8, "tail": 1.4, "gaps": { "1": 1.2 }, "lines": [
+      "Alemania usó una forma nueva de pelear: la guerra relámpago, o Blitzkrieg.",
+      "Concentraba tanques y aviones en un solo punto, rompía la línea enemiga y avanzaba sin detenerse.",
+      "Gracias a la radio, todo se coordinaba al instante, y las tropas enemigas quedaban rodeadas antes de poder reaccionar.",
+      "Polonia cayó en unas cinco semanas."
+    ]},
+    { "id": "france", "lead": 0.8, "tail": 1.4, "gaps": { "1": 1.0 }, "lines": [
+      "En mil novecientos cuarenta le tocó a Francia. Los franceses confiaban en la Línea Maginot, una enorme muralla de fortificaciones.",
+      "Pero los tanques alemanes la rodearon, cruzando el bosque de las Ardenas, que se creía imposible de atravesar.",
+      "En seis semanas, Francia se rindió. Más de trescientos mil soldados aliados escaparon por mar desde Dunkerque."
+    ]},
+    { "id": "britain", "lead": 0.8, "tail": 1.6, "gaps": { "0": 1.0 }, "lines": [
+      "Reino Unido quedó solo. Para invadirlo, Alemania necesitaba dominar el cielo.",
+      "Pero los pilotos británicos, guiados por radar, resistieron. Alemania nunca pudo invadir la isla."
+    ]},
+    { "id": "barbarossa", "lead": 0.8, "tail": 1.6, "gaps": { "1": 0.8, "2": 1.0 }, "lines": [
+      "En junio de mil novecientos cuarenta y uno, Alemania atacó a la Unión Soviética con más de tres millones de soldados: la Operación Barbarroja.",
+      "Al principio avanzó a una velocidad increíble y capturó a millones de prisioneros.",
+      "Pero la Unión Soviética era gigantesca. Las distancias, el lodo y después el invierno frenaron a los alemanes.",
+      "En diciembre, a las puertas de Moscú, el Ejército Rojo contraatacó."
+    ]},
+    { "id": "industry", "lead": 0.8, "tail": 1.6, "lines": [
+      "Ese mismo mes, tras el ataque japonés a Pearl Harbor, Alemania le declaró la guerra a Estados Unidos.",
+      "Ahora peleaba al mismo tiempo contra el Imperio británico, la Unión Soviética y Estados Unidos.",
+      "Y esa guerra se ganaba en las fábricas: Estados Unidos construyó cerca de trescientos mil aviones durante la guerra. Alemania, solo alrededor de ciento veinte mil."
+    ]},
+    { "id": "stalingrad", "lead": 0.8, "tail": 1.6, "gaps": { "1": 1.0 }, "lines": [
+      "En mil novecientos cuarenta y dos, Alemania buscó el petróleo del Cáucaso y atacó la ciudad de Stalingrado.",
+      "La batalla se peleó calle por calle, entre ruinas. Los soviéticos rodearon al Sexto Ejército alemán, que se rindió en febrero de mil novecientos cuarenta y tres.",
+      "Desde entonces, en el este, Alemania casi solo retrocedió."
+    ]},
+    { "id": "dday", "lead": 0.8, "tail": 1.8, "gaps": { "0": 1.0 }, "lines": [
+      "En junio de mil novecientos cuarenta y cuatro, los aliados desembarcaron en Normandía. Casi al mismo tiempo, el Ejército Rojo lanzó una ofensiva gigantesca en el este.",
+      "Alemania quedó atrapada entre dos frentes que se cerraban."
+    ]},
+    { "id": "berlin", "lead": 0.8, "tail": 1.8, "lines": [
+      "En abril de mil novecientos cuarenta y cinco, las tropas soviéticas entraron en Berlín. Hitler se suicidó, y el ocho de mayo Alemania se rindió sin condiciones.",
+      "La guerra en Europa había terminado."
+    ]},
+    { "id": "cost", "lead": 1.4, "tail": 2.4, "lines": [
+      "Fue la guerra más mortífera de la historia. Murieron decenas de millones de personas, entre ellas seis millones de judíos asesinados en el Holocausto."
+    ]},
+    { "id": "outro", "lead": 0.8, "tail": 4.0, "gaps": { "1": 0.6 }, "lines": [
+      "¿Por qué perdió Alemania? La guerra relámpago ganaba batallas rápidas, pero no podía ganar una guerra larga.",
+      "Le faltaban petróleo, soldados y fábricas, y peleaba contra enemigos mucho más grandes, en varios frentes a la vez.",
+      "Velocidad sin recursos no basta. Esa es la gran lección de la Blitzkrieg."
+    ]}
+  ]
+}
