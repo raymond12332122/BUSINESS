@@ -440,8 +440,8 @@ export function waterloo(light = 'overcast') {
 }
 // Night sea with moon
 export function nightSea() {
-  const s = napoStage('night', [null, null], { seed: 251, groundA: null, fog: ['#1a2238', 40, 180], hemi: 0.75, sun: 0.8 });
-  sea(s, { color: '#1c2e44', y: 0 });
+  const s = napoStage('night', [null, null], { seed: 251, groundA: null, fog: ['#1f2a44', 50, 220], hemi: 1.15, sun: 1.1, skyHor: '#2a3a60' });
+  sea(s, { color: '#24405e', y: 0 });
   const moon = new THREE.Mesh(new THREE.SphereGeometry(4, 16, 12), new THREE.MeshBasicMaterial({ color: '#f3ecd6', fog: false })); moon.position.set(30, 30, -120); s.add(moon);
   const glint = new THREE.Mesh(new THREE.PlaneGeometry(6, 80), new THREE.MeshBasicMaterial({ color: '#c8d4ea', transparent: true, opacity: 0.18, depthWrite: false })); glint.rotation.x = -Math.PI / 2; glint.position.set(14, 0.3, -60); s.add(glint);
   const isl = new THREE.Mesh(new THREE.SphereGeometry(16, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), std('#232a2e', { flatShading: true })); isl.scale.set(1.4, 0.35, 1); isl.position.set(-30, -0.5, -50); s.add(isl);
