@@ -18,10 +18,10 @@ export function build(ctx) {
   // ---- 1. The young artillery officer (Toulon)
   const T = S.toulon('golden');
   const gun = N.fieldGun(); gun.position.set(-0.4, 0, 0.2); gun.rotation.y = Math.PI - 0.5; T.add(gun);
-  const young = K.person(T, 'napoleonYoung', 'napoleonYoung', 0.6, 0.6, 0.5);
+  const young = K.person(T, 'napoleonYoung', 'napoleonYoung', 0.6, 0.6, 0.5); K.faceTint(young, '#f6e4cf');
   // ---- 2. The emperor
   const Th = S.palaceFR('#efe6d2', { imperial: true });
-  const emp = K.person(Th, 'coronation', 'coronation', 0, -2.15, 0);
+  const emp = K.person(Th, 'coronation', 'coronation', 0, -2.15, 0); K.faceTint(emp, '#f6e6da');
   // ---- 3. Saint Helena at sunset
   const SH = S.stHelena();
   const hN = SH.island.heightAt(-0.6, -10.8), hC = Math.max(SH.island.heightAt(0.9, -6.4), SH.island.heightAt(0.6, -7.4), hN);

@@ -45,7 +45,7 @@ export function build(ctx) {
   const Tl = S.toulon('golden');
   const guns = [-1.8, 0.6, 3.0].map((x, i) => { const g = N.fieldGun(); g.position.set(x, 0, 0.6); g.rotation.y = Math.PI + (i - 1) * 0.08; Tl.add(g); return g; });
   const crew = [[-2.5, 0.9], [-0.1, 1.1], [2.3, 0.9]].map(([x, z], i) => K.person(Tl, ['doto', 'helios', 'tamamo'][i], 'artillero', x, z, Math.PI - 0.3));
-  const young = K.person(Tl, 'napoleonYoung', 'napoleonYoung', 4.4, 0.9, Math.PI - 0.45);
+  const young = K.person(Tl, 'napoleonYoung', 'napoleonYoung', 4.4, 0.9, Math.PI - 0.45); K.faceTint(young, '#f6e4cf');
   const gfx = new FX.Volleys(Tl, { size: 0.7, life: 4.2, drift: [0.3, 0.15, 0] });
   guns.forEach((g, i) => { for (let k = 0; k < 3; k++) { const tt = L[2].t0 + 0.6 + i * 0.7 + k * 1.9; g.updateMatrixWorld(true); const p = new THREE.Vector3(); g.muzzle.getWorldPosition(p); gfx.add(tt, p, [0, 0.05, -1], { puffs: 3, size: 1.4 }); g.fireTimes = (g.fireTimes || []).concat(tt); } });
   const splash = new FX.Volleys(Tl, { color: '#f4f8fa', size: 1.2, life: 2.0, drift: [0, 0.4, 0] });

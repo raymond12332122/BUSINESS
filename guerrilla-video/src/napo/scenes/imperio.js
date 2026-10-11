@@ -57,7 +57,7 @@ export function build(ctx) {
       ml.root.position.set(3.6 - enter * 2.5, 0, -0.4 - enter * 0.4); ml.root.rotation.y = enter < 1 ? -Math.PI / 2 : -0.7;
       K.pose(ml, enter > 0 && enter < 1 ? C.walk(t, 0.7, 2) : A.humble(t, 2)); ml.setFace(C.blinkEye(t, 2), 'smile');
       nap.root.rotation.y = t < tCas ? -0.5 : 0.6; K.pose(nap, C.idle(t, 3, 0.5)); nap.setFace(C.blinkEye(t, 3), t > tCas ? 'smile' : 'neutral');
-      return film(t) + nameplate(ctx, [jos.root.position.x, 1.45, jos.root.position.z], 'Josefina', 'Emperatriz · 1804–1809', tJos - 0.1, tCas + 0.6)
+      return film(t) + nameplate(ctx, [jos.root.position.x, 1.45, jos.root.position.z], 'Josefina', 'Emperatriz · 1804–1809', tHere - 0.2, tJos + 1.0)
         + nameplate(ctx, [ml.root.position.x, 1.45, ml.root.position.z], 'María Luisa de Austria', 'Emperatriz · 1810', tPri - 0.1, ctx.dur)
         + badge(t, '1810', 'Una boda imperial', 'Napoleón busca un heredero para su trono', tP + 0.3, tJos - 0.3);
     } },

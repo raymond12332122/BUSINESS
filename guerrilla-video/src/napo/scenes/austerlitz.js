@@ -27,6 +27,7 @@ export function build(ctx) {
   const hz = horse({ coat: '#efeae2', mane: '#ddd6c8', cloth: '#2a3f8f', trim: '#d4af37', seed: 9 }); hz.position.set(0.2, 0, 2.6); hz.rotation.y = 1.05; Au.add(hz);
   const nap = K.person(Au, 'napoleon', 'napoleon', 0, 0, 0);
   const mars = [[-1.35, 2.3, 0.5], [1.35, 2.0, 0.2]].map(([x, z, y], i) => K.person(Au, ['tamamo', 'helios'][i], 'marshal', x, z, y));
+  [nap, ...mars].forEach(c => K.faceTint(c, '#f4dfd0')); // warm dawn light
   const fr = [[-6, -3], [0, -1.5], [6, -3]].map(([x, z], i) => { const tr = new Troop(Au, { rows: 5, cols: 8, seed: 60 + i, coat: '#2f4590', hat: 'shako' }); tr.x = x; tr.z0 = z; return tr; });
   const allies = [[-8, -22, '#e8e4dc', '#1d1b1c'], [0, -24, '#2f5038', '#151517'], [8, -22, '#e8e4dc', '#1d1b1c']].map(([x, z, coat, hat], i) => { const tr = new Troop(Au, { rows: 4, cols: 9, seed: 70 + i, coat, hat: 'shako', hatColor: hat, plume: null }); tr.x = x; tr.z0 = z; return tr; });
   const guns = [-3, 3].map(x => { const g = N.fieldGun(); g.position.set(x, 0, 0.5); g.rotation.y = Math.PI; Au.add(g); return g; });

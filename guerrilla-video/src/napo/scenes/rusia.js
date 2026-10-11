@@ -56,7 +56,7 @@ export function build(ctx) {
   const embers = new FX.Embers(Mo, { n: 200, box: [-26, 26, 0, 16, -30, -8] });
   const mhz = horse({ coat: '#efeae2', mane: '#ddd6c8', cloth: '#2a3f8f', seed: 14 }); mhz.position.set(1.6, 0, 4.5); mhz.rotation.y = Math.PI - 0.15; Mo.add(mhz);
   const napM = K.person(Mo, 'napoleon', 'napoleon', 0, 0, 0);
-  const marM = K.person(Mo, 'tamamo', 'marshal', -0.4, 5.0, Math.PI - 0.2);
+  const marM = K.person(Mo, 'tamamo', 'marshal', 3.5, 2.6, Math.PI + 0.25);
   // ---- 6. The tsar refuses
   const W = S.winterPalace();
   const zar = K.person(W, 'zar', 'zar', -0.5, -0.6, 0.25);

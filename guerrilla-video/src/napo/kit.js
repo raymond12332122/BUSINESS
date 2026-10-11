@@ -302,8 +302,10 @@ function ermineTex() {
 export function wearCape(r, c, pos = [0, 0.5, -0.1]) { r.attach('chest', c, pos); r.cape = c; return c; }
 
 // ------------------------------------------------------------ outfits and casting
-// tamamo's ribbons and the hair-bun ornament on top of her head poke through close-fitting caps
-const hat = (r, h, o) => { const w = wearHat(r, h, o); if (o?.cap && r.key === 'tamamo') { flattenAhoge(r, 0.02, /^Sp_He_Ribbon\d_[LR]_00/); dropHairBits(r, [[-0.219, 0.957, 0.168], [-0.197, 0.91, 0.112]]); } return w; };
+// Ear ornaments that are part of the hair mesh float beside the head once the ears are hidden and poke out of hats
+// (tamamo's blue bauble, suzuka's green ear cover); tamamo's ribbons also stick through close-fitting caps.
+const HAIR_BITS = { tamamo: [[-0.219, 0.957, 0.168], [-0.197, 0.91, 0.112]], suzuka: [[-0.243, 0.921, 0.086], [-0.246, 0.83, 0.094], [-0.285, 0.852, 0.039], [-0.178, 0.875, 0.099]] };
+const hat = (r, h, o) => { const w = wearHat(r, h, o); if (HAIR_BITS[r.key]) dropHairBits(r, HAIR_BITS[r.key]); if (o?.cap && r.key === 'tamamo') flattenAhoge(r, 0.02, /^Sp_He_Ribbon\d_[LR]_00/); return w; };
 // Remove small one-sided hair ornaments that poke through hats: collapse every mesh island of the hair whose
 // bind-space centroid lies within r of one of the given points (works on a private copy of the geometry).
 export function dropHairBits(rig, points, r = 0.03) {

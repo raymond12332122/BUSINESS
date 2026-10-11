@@ -52,7 +52,7 @@ export function build(ctx) {
   // ---- 5. Promotion by merit
   const Pm = S.field('golden', { seed: 51 });
   const napM = K.person(Pm, 'napoleon', 'napoleon', -0.55, 0.2, 1.05);
-  const sold = K.person(Pm, 'oguri', 'fusilier', 0.55, 0.2, -1.05);
+  const sold = K.person(Pm, 'oguri', 'fusilier', 0.55, 0.2, -1.05); [napM, sold].forEach(c => K.faceTint(c, '#f4dfd0'));
   const medal = K.star(); medal.scale.setScalar(1.7); medal.visible = false; sold.attach('chest', medal, [-0.07, 0.43, 0.13]);
   const ranks = new Troop(Pm, { rows: 2, cols: 16, seed: 90, coat: '#2f4590' });
   const flagP = N.flag('eagle', 3.0, 1.2, 0.8, { finial: 'eagle' }); flagP.position.set(-2.8, 0, -2.6); Pm.add(flagP);
