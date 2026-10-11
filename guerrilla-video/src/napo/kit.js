@@ -34,6 +34,7 @@ export const UNIFORMS = {
   austrianbride: { dark: '#7a8aa6', mid: '#c9d6ee', light: '#ffffff', gold: '#d4af37' },
   royal: { dark: '#1a2250', mid: '#2c3c8f', light: '#f6f3ea', gold: '#e2bd45' },
   diplomat: { dark: '#121214', mid: '#2a2a30', light: '#f4f1ea', gold: '#c9a227' },
+  deputy: { dark: '#4a0f14', mid: '#a3202a', light: '#f3f0e8', gold: '#d4af37' },
   mexican: { dark: '#2a2420', mid: '#6b5a48', light: '#efe7d6', gold: '#c9a227' },
 };
 const uniCache = new Map();
@@ -190,6 +191,14 @@ export function crown({ gold = '#e2bd45', velvet = '#8a1f2a', jewels = true } = 
   g.add(at(box(0.016, 0.08, 0.016, gold), 0, 0.38, 0)); g.add(at(box(0.05, 0.016, 0.016, gold), 0, 0.39, 0));
   return g;
 }
+// Small jewelled tiara (empresses): a gold band rising to a point at the front.
+export function tiara({ gold = '#e2bd45', gem = '#c0272d' } = {}) {
+  const g = new THREE.Group(), m = std(gold, { metalness: 0.75, roughness: 0.3 });
+  const band = mesh(new THREE.TorusGeometry(0.25, 0.012, 6, 40, Math.PI * 1.1), m); band.rotation.set(Math.PI / 2, 0, -Math.PI * 0.05 - Math.PI * 0.5); g.add(band);
+  for (let i = -3; i <= 3; i++) { const a = i * 0.24, h = 0.09 - Math.abs(i) * 0.018; const c = mesh(new THREE.ConeGeometry(0.018, h, 4), m); c.position.set(Math.sin(a) * 0.25, h / 2, Math.cos(a) * 0.25); g.add(c);
+    if (i % 2 === 0) { const j = mesh(new THREE.SphereGeometry(0.016, 8, 6), std(i === 0 ? gem : '#f4f1ea', { roughness: 0.2, metalness: 0.2 })); j.position.set(Math.sin(a) * 0.256, 0.012, Math.cos(a) * 0.256); g.add(j); } }
+  return g;
+}
 export function zucchetto(color = '#f6f3ec') { const m = mesh(new THREE.SphereGeometry(0.2, 18, 10, 0, Math.PI * 2, 0, Math.PI / 2.6), std(color)); return new THREE.Group().add(m); }
 // Cossack papakha (fur hat with coloured top).
 export function papakha(top = '#b8342f') {
@@ -299,10 +308,12 @@ export const OUTFITS = {
   napoleon: r => { uniformize(r, 'napoleon'); hat(r, bic(), { scale: 0.86, y: 0.88, tilt: -0.05, cap: true }); return r; },
   napoleonAlps: r => { OUTFITS.napoleon(r); wearCape(r, cape('#b0222c', '#d8b04a')); return r; },
   coronation: r => { uniformize(r, 'royal'); hat(r, laurel(), { scale: 1.0, y: 0.86, tilt: 0.22 }); wearCape(r, cape('#9a1b2a', '#f6f2ea', { w: 0.56, h: 0.5, ermine: true })); return r; },
+  coronationBare: r => { uniformize(r, 'royal'); hideEars(r); flattenAhoge(r); wearCape(r, cape('#9a1b2a', '#f6f2ea', { w: 0.56, h: 0.5, ermine: true })); return r; },
+  deputy: r => { generic(r, '#2e2420'); uniformize(r, 'deputy'); hat(r, (() => { const g = new THREE.Group(); g.add(lathe([[0, 0.2], [0.24, 0.2], [0.26, 0.17], [0.27, 0.0], [0.25, -0.01]], '#a3202a')); return g; })(), { scale: 0.86, y: 0.88, tilt: -0.04, cap: true }); return r; },
   napoleonYoung: r => { uniformize(r, 'french'); hat(r, bic({ plume: '#c0272d' }), { scale: 0.82, y: 0.88, tilt: -0.05, cap: true }); r.attach('chest', epaulettes(), [0, 0.475, -0.01]); return r; },
   emperor: r => { uniformize(r, 'royal'); hat(r, laurel(), { scale: 1.0, y: 0.86, tilt: 0.22 }); r.attach('chest', star(), [0.07, 0.43, 0.12]); return r; },
-  josefina: r => { uniformize(r, 'empress'); r.attach('head', crown({ velvet: '#f0e6d8' }), [0, 0.84, -0.02]); r.hat = null; return r; },
-  marialuisa: r => { uniformize(r, 'austrianbride'); r.attach('head', crown({ velvet: '#c9d6ee' }), [0, 0.84, -0.02]); return r; },
+  josefina: r => { uniformize(r, 'empress'); hideEars(r); r.attach('head', tiara(), [0, 0.86, 0.0], [-12, 0, 0]); return r; },
+  marialuisa: r => { uniformize(r, 'austrianbride'); hideEars(r); r.attach('head', tiara({ gem: '#2a5fb8' }), [0, 0.86, 0.0], [-12, 0, 0]); return r; },
   nelson: r => { uniformize(r, 'navy'); const b = bic({ trim: '#d9b23c', cockadeCols: ['#1d1b1c', '#1d1b1c', '#1d1b1c'] }); b.rotation.y = Math.PI / 2; hat(r, b, { scale: 0.8, y: 0.88, tilt: 0, cap: true });
     r.attach('chest', epaulettes('#d9b23c'), [0, 0.475, -0.01]); r.attach('chest', star(), [0.07, 0.43, 0.12]); return r; },
   wellington: r => { uniformize(r, 'diplomat'); hat(r, bic({ cockadeCols: ['#1d1b1c', '#1d1b1c', '#1d1b1c'] }), { scale: 0.84, y: 0.88, tilt: -0.04, cap: true }); return r; },
@@ -325,13 +336,13 @@ export const OUTFITS = {
   cosaco: r => { generic(r, '#2a2018'); uniformize(r, 'cossack'); hat(r, papakha(), { scale: 0.9, y: 0.86, tilt: 0.02, cap: true }); return r; },
   guerrillero: r => { generic(r, '#2a2018'); uniformize(r, 'spanish'); hat(r, chambergo(), { scale: 0.86, y: 0.9, tilt: -0.06, cap: true }); r.attach('chest', crossbelts('#3a2a1e'), [0, 0.39, 0]); r.equip(musket('#3b3a36', '#7a5232', false), G.HOLDS); return r; },
   madrileno: r => { generic(r, '#2a2018'); uniformize(r, 'peasant'); hat(r, chambergo('#3a2c22'), { scale: 0.86, y: 0.9, tilt: -0.06, cap: true }); return r; },
-  sansculotte: r => { generic(r, '#3a2a20'); uniformize(r, 'sansculotte'); hat(r, phrygian(), { scale: 0.86, y: 0.86, tilt: -0.05, cap: true }); return r; },
-  sansPike: r => { generic(r, '#3a2a20'); uniformize(r, 'sansculotte'); hat(r, phrygian(), { scale: 0.86, y: 0.86, tilt: -0.05, cap: true }); r.equip(musket('#3b3a36', '#7a5232', true), G.HOLDS); return r; },
+  sansculotte: r => { generic(r, '#3a2a20'); uniformize(r, 'sansculotte'); hat(r, phrygian(), { scale: 0.8, y: 0.86, tilt: -0.05, cap: true }); return r; },
+  sansPike: r => { generic(r, '#3a2a20'); uniformize(r, 'sansculotte'); hat(r, phrygian(), { scale: 0.8, y: 0.86, tilt: -0.05, cap: true }); r.equip(musket('#3b3a36', '#7a5232', true), G.HOLDS); return r; },
   campesinoMx: r => { generic(r, '#2a2018'); uniformize(r, 'mexican'); hat(r, chambergo('#c9b07a'), { scale: 0.86, y: 0.9, tilt: -0.06, cap: true }); return r; },
   diplomat: r => { generic(r, '#2e2420'); uniformize(r, 'diplomat'); r.attach('chest', sash(['#c0272d', '#c0272d']), [0, 0.4, 0]); hideEars(r); return r; },
   civil: r => { generic(r, '#2e2420'); uniformize(r, 'diplomat'); hat(r, tophat(), { scale: 0.86, y: 0.88, tilt: -0.04, cap: true }); return r; },
 };
-export const CASTING = { napoleonAlps: 'cafe', coronation: 'cafe', napoleon: 'cafe', napoleonYoung: 'cafe', emperor: 'cafe', josefina: 'daiwa', marialuisa: 'doto', nelson: 'suzuka', wellington: 'helios', blucher: 'tamamo', zar: 'mcqueen', jose: 'doto', hidalgo: 'oguri', papa: 'tamamo' };
+export const CASTING = { napoleonAlps: 'cafe', coronation: 'cafe', coronationBare: 'cafe', napoleon: 'cafe', napoleonYoung: 'cafe', emperor: 'cafe', josefina: 'daiwa', marialuisa: 'doto', nelson: 'suzuka', wellington: 'helios', blucher: 'tamamo', zar: 'mcqueen', jose: 'doto', hidalgo: 'oguri', papa: 'tamamo' };
 
 let seedCounter = 0;
 export function person(parent, who, outfit = who, x = 0, z = 0, yaw = 0) {

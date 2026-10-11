@@ -45,6 +45,8 @@ export function bastilleSet() {
   const b = N.bastille(); b.position.set(0, 0, -16); s.add(b);
   for (let i = 0; i < 5; i++) { const h = N.townhouseFR(3.4, 4 + (i % 2) * 0.6, ['#e2d6bf', '#d8c8a8', '#e8dcc4', '#d2c2a2', '#e6d9c0'][i], i); h.position.set(-16 + i * 3.6, 0, -6); h.rotation.y = 0.5; s.add(h);
     const h2 = N.townhouseFR(3.4, 4.2 - (i % 2) * 0.5, ['#d8c8a8', '#e8dcc4', '#e2d6bf', '#e6d9c0', '#d2c2a2'][i], i + 5); h2.position.set(10 + i * 3.6, 0, -4 - i * 1.2); h2.rotation.y = -0.6; s.add(h2); }
+  // the far side of the square (seen when looking back at the crowd)
+  for (let i = 0; i < 9; i++) { const h = N.townhouseFR(3.4, 4 + (i % 3) * 0.5, ['#e2d6bf', '#d8c8a8', '#e8dcc4', '#d2c2a2', '#e6d9c0'][i % 5], i + 20); h.position.set(-15 + i * 3.6, 0, 17 + (i % 2) * 0.6); h.rotation.y = Math.PI; s.add(h); }
   s.flags = [];
   for (const [x, z] of [[-2.5, -9.6], [2.8, -9.4]]) { const f = N.flag('fr', 4.2, 1.6, 1.0); f.position.set(x, 0, z); s.add(f); s.flags.push(f); }
   return s;
@@ -70,7 +72,7 @@ export function toulon(light = 'golden') {
   for (let i = 0; i < 7; i++) { const h = N.townhouseFR(3.2, 3.6, ['#e8dcc4', '#d8c8a8', '#e2d6bf'][i % 3], i); h.position.set(-30 + i * 4, -2.2, -42); h.scale.setScalar(1.4); s.add(h); }
   s.ships = [];
   for (const [x, z, r] of [[-16, -34, 0.6], [6, -40, -0.4], [24, -36, 0.9]]) { const sh = N.ship({ len: 11, flag: 'gb', furled: 0.4, seed: x | 0 }); sh.position.set(x, -2.2, z); sh.rotation.y = r; s.add(sh); s.ships.push(sh); }
-  for (let i = 0; i < 6; i++) { const g = N.gabion(1); g.position.set(-2.4 + i * 0.8, 0, 1.2 + (i % 2) * 0.1); s.add(g); }
+  for (let i = 0; i < 5; i++) { const g = N.gabion(0.7); g.position.set(-3.6 + i * 0.62, 0, -0.4 + (i % 2) * 0.08); s.add(g); }
   LP.scatter(s, (r, i) => (i % 3 ? MX.shrub(0.8 + r() * 0.5, i, '#7d8a4e') : LP.pine(1.2 + r() * 0.4, '#3f6b3a', i)), 30, [-14, -8, 14, 10], 32, [[0, 2, 5]]);
   return s;
 }
@@ -86,9 +88,11 @@ export function egypt() {
 // ---------------------------------------------------------------- Saint-Cloud council hall
 export function councilHall() {
   const s = interior({ wall: '#7a5a3a', floor: '#5a3a24', w: 14, d: 10, h: 5.6, lights: [[-3, 4.8, 0], [3, 4.8, 0]] });
-  for (let r = 0; r < 3; r++) s.add(LP.at(LP.box(12, 0.3 + r * 0.3, 1.2, '#4a3220'), 0, 0.15 + r * 0.15, -3.6 + r * 1.2 - 2.4 * 0));
-  s.add(LP.at(LP.box(3, 1.2, 1, '#6b2a22'), 0, 0.6, -1.0));
-  const f = N.flag('fr', 3.6, 1.4, 0.85); f.position.set(-5, 0, -3.8); s.add(f); s.flag = f;
+  s.tiers = [];
+  for (let r = 0; r < 3; r++) { const h = 0.25 * (r + 1), z = -2.2 - r * 1.1; s.add(LP.at(LP.box(12, h, 1.1, '#4a3220'), 0, h / 2, z)); s.add(LP.at(LP.box(12, 0.04, 0.06, '#c9a227'), 0, h, z + 0.55)); s.tiers.push([h, z]); }
+  s.add(LP.at(LP.box(2.4, 0.95, 0.9, '#6b2a22'), 0, 0.475, -0.7)); s.add(LP.at(LP.box(2.5, 0.06, 1.0, '#c9a227'), 0, 0.97, -0.7));
+  const f = N.flag('fr', 3.6, 1.4, 0.85); f.position.set(-5.6, 0, -4.4); s.add(f); s.flag = f;
+  for (const x of [-3.6, 3.6]) { const d = N.drape('fr', 1.1, 2.6); d.position.set(x, 3.4, -4.95); s.add(d); }
   return s;
 }
 // ---------------------------------------------------------------- Notre-Dame
@@ -97,7 +101,8 @@ export function notreDame() {
   s.add(new THREE.HemisphereLight('#fff1d8', '#5a4632', 0.95));
   const sun = new THREE.DirectionalLight('#ffe6c0', 1.6); sun.position.set(8, 14, 6); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
   Object.assign(sun.shadow.camera, { left: -10, right: 10, top: 10, bottom: -10, near: 0.5, far: 50 }); s.add(sun, sun.target);
-  const nave = N.gothicNave({ len: 26, w: 12, h: 13 }); s.add(nave); s.nave = nave;
+  const nave = N.gothicNave({ len: 26, w: 12, h: 13 }); s.add(nave); s.nave = nave; nave.traverse(o => { if (o.isMesh) o.castShadow = false; });
+  for (const sd of [-1, 1]) for (let i = 0; i < 5; i++) { const b = N.drape(i % 2 ? 'bees' : 'royalblue', 1.0, 3.2); b.position.set(sd * 4.7, 5.6, -9 + i * 4); b.rotation.y = -sd * Math.PI / 2; s.add(b); }
   for (const [x, z] of [[-3, -6], [3, -6], [-3, 2], [3, 2]]) { const l = new THREE.PointLight('#ffd9a0', 8, 16, 1.4); l.position.set(x, 5, z); s.add(l); }
   for (let i = 0; i < 4; i++) { const c = N.chandelier(); c.position.set(0, 6.5, -8 + i * 5); s.add(c); }
   s.background = new THREE.Color('#2a2018');

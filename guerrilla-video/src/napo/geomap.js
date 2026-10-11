@@ -24,6 +24,7 @@ export const CITY = {
   'El Cairo': [31.24, 30.04], 'Boulogne': [1.61, 50.73], 'Marsella': [5.37, 43.30], 'Estrasburgo': [7.75, 48.58], 'Arcole': [11.28, 45.36],
   'Rivoli': [10.81, 45.57], 'Marengo': [8.65, 44.90], 'Fontainebleau': [2.70, 48.40], 'Cannes': [7.01, 43.55], 'Grenoble': [5.72, 45.19],
   'Lyon': [4.84, 45.76], 'Burgos': [-3.70, 42.34], 'Vitoria': [-2.67, 42.85], 'Salamanca': [-5.66, 40.97], 'Constantinopla': [28.98, 41.01],
+  'Lodi': [9.50, 45.31], 'Castiglione': [10.49, 45.39], 'Mantua': [10.79, 45.16], 'Niza': [7.27, 43.70], 'Fréjus': [6.74, 43.43], 'Saint-Cloud': [2.22, 48.84],
   'Estocolmo': [18.07, 59.33], 'Copenhague': [12.57, 55.68], 'Brünn': [16.61, 49.20], 'Danzig': [18.65, 54.35], 'Königsberg': [20.51, 54.71],
 };
 export const NAMES = {

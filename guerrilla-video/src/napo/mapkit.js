@@ -49,7 +49,7 @@ function swordsTex() {
 // Pulsing event marker (battle) with an icon sprite.
 export function marker(s, lon, lat, icon = 'swords', color = '#c0272d', size = 1.25) {
   const g = new THREE.Group(); const [x, y, z] = GM.pos(lon, lat); g.position.set(x, y + 0.02, z); s.add(g);
-  const ring = F.ring(color, 0.7); g.add(ring);
+  const ring = F.ring(color, 0.56 * size); g.add(ring);
   const ic = icon === 'swords' ? new THREE.Sprite(new THREE.SpriteMaterial({ map: swordsTex(), transparent: true, depthWrite: false })) : F.bubble(icon, { bg: null, font: 170 });
   ic.center.set(0.5, 0.0); ic.renderOrder = 8; g.add(ic);
   g.update = (t, t0, t1 = 1e9) => { const k = t - t0; g.visible = k > 0 && t < t1; if (!g.visible) return;

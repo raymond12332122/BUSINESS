@@ -24,9 +24,8 @@ export function build(ctx) {
   // ---- 1. Paris, 14 July 1789: the crowd storms the Bastille
   const B = S.bastilleSet(); B.flags.forEach(f => (f.visible = false));
   const mob = [];
-  for (let i = 0; i < 14; i++) { const r = K.person(B, ['doto', 'oguri', 'suzuka', 'helios', 'tamamo', 'mcqueen', 'daiwa'][i % 7], i % 3 === 0 ? 'sansPike' : 'sansculotte', 0, 0, Math.PI);
-    r.lane = -3.2 + (i % 7) * 1.05 + (Math.floor(i / 7) % 2) * 0.5; r.row = Math.floor(i / 7); mob.push(r); }
-  const crowd = new Troop(B, { rows: 5, cols: 14, coat: '#6a5a48', pants: '#e6dcc6', hat: 'round', hatColor: '#2a2622', plume: null, musket: true, belts: '#c0272d', seed: 4, jitter: 0.25, spacing: [0.7, 0.8] });
+  for (let i = 0; i < 18; i++) { const r = K.person(B, ['doto', 'oguri', 'suzuka', 'helios', 'tamamo', 'mcqueen', 'daiwa'][i % 7], i % 3 === 0 ? 'sansPike' : 'sansculotte', 0, 0, Math.PI);
+    r.lane = -3.4 + (i % 6) * 1.25 + (Math.floor(i / 6) % 2) * 0.55; r.row = Math.floor(i / 6); mob.push(r); }
   const banner = N.flag('fr', 2.6, 1.1, 0.7); B.add(banner);
   const fx = new FX.Volleys(B, { size: 0.9, life: 5, drift: [0.4, 0.25, 0] });
   for (let k = 0; k < 7; k++) for (const [x, z] of [[-6, -13], [-2, -12.6], [2, -12.6], [6, -13]]) if ((k + x) % 2 === 0) fx.add(1.0 + k * 1.05 + (x + 6) * 0.07, [x, 8.6, z], [0, -0.15, 1], { puffs: 2, size: 2.2 });
@@ -59,20 +58,13 @@ export function build(ctx) {
 
   const tA = 0, tB = tPocos - 0.15, tC = L[1].t0 - 0.15, tD = L[2].t0 - 0.2;
   const shots = [
-    { t0: tA, set: B, p0: [5.5, 2.4, 9.5], l0: [-0.5, 3.2, -10], p1: [3.6, 1.9, 5.0], l1: [-0.3, 3.6, -12], fov0: 40, act: (t) => {
-      const run = clamp((t - t1789 + 0.2) / 4.2);
-      mob.forEach((r, i) => { const z = 2.6 - r.row * 1.3 - run * 8.6 + (i % 3) * 0.2; r.root.position.set(r.lane, 0, z);
-        const go = run > 0 && run < 1; K.pose(r, go ? { ...C.runArmed(t, 1.1, i), gun: 'port' } : t > tTomo ? { ...C.cheer(t + i * 0.13, i), gun: r.gun ? 'port' : 'none' } : { ...A.fist(t, i, i % 2 ? 'R' : 'L'), gun: r.gun ? 'low' : 'none' });
-        r.setFace(go ? 'squint' : t > tTomo ? 'happy' : 'squint', go ? 'shout' : 'teeth'); });
-      crowd.update(t, { x: 0.2, z: 6.4 - run * 8.0, yaw: Math.PI, march: run > 0 && run < 1 ? 1 : 0, speed: 1.6 });
-      banner.position.set(0.9, 0, 3.6 - run * 8.4); banner.wave(t);
-      fx.update(t); S.aimSun(B, 0, -3);
-      return film(t) + badge(t, '14 de julio de 1789', 'La toma de la Bastilla', 'El pueblo de París asalta la fortaleza-prisión del rey', 3.9, tB - 0.2);
-    } },
+    { t0: tA, set: B, p0: [3.2, 1.25, -5.2], l0: [0.4, 1.0, 4], p1: [3.4, 1.35, -6.6], l1: [0.4, 1.1, 4], fov0: 40, act: (t) => bastille(t)
+        + badge(t, '14 de julio de 1789', 'La toma de la Bastilla', 'El pueblo de París asalta la fortaleza-prisión del rey', 3.9, tTomo - 0.3) },
+    { t0: tTomo - 0.25, set: B, p0: [5.6, 3.3, 7.6], l0: [-0.8, 2.7, -10], p1: [5.0, 3.1, 6.4], l1: [-0.8, 2.9, -10], fov0: 42, act: (t) => bastille(t) },
     { t0: tB, set: T, p0: [0, 1.25, 1.6], l0: [0, 1.15, -3.4], p1: [0, 1.15, 0.6], l1: [0, 1.1, -3.4], fov0: 34, act: (t) => {
       const f = clamp((t - tAbol - 0.15) / 0.55), roll = clamp((t - tAbol - 0.7) / 1.0);
-      const y0 = 0.36 + 0.62 + 0.12, y = f < 1 ? y0 - (y0 - 0.02) * f * f : 0.02 + 0.06 * Math.abs(Math.sin(roll * 9)) * (1 - roll);
-      crown.position.set(0.15 * f + 0.9 * roll, y, -3.42 + 0.7 * f + 0.8 * roll); crown.rotation.set(1.2 * f + roll * 0.3, roll * 4, 0.9 * f + roll * 0.6);
+      const y0 = 0.36 + 0.62 + 0.12, yl = 0.37, y = f < 1 ? y0 - (y0 - yl) * f * f : yl + 0.06 * Math.abs(Math.sin(roll * 9)) * (1 - roll);
+      crown.position.set(0.15 * f + 0.7 * roll, y, -3.42 + 0.55 * f + 0.45 * roll); crown.rotation.set(1.2 * f + roll * 0.3, roll * 4, 0.9 * f + roll * 0.6);
       const dark = ss(tEjec - 0.05, tEjec + 0.6, t);
       S.mood(T, { hemi: 0.9 * (1 - 0.7 * dark), sun: 1.4 * (1 - 0.8 * dark) });
       return film(t) + `<div style="position:absolute;inset:0;background:#2a0606;opacity:${0.45 * dark}"></div>`
@@ -87,11 +79,20 @@ export function build(ctx) {
         + `<div style="position:absolute;left:50%;top:120px;transform:translateX(-50%) scale(${0.9 + 0.1 * ss(tCom, tCom + 0.4, t)});opacity:${fade(t, tCom - 0.1, ctx.dur)};text-align:center;background:rgba(20,16,14,.82);padding:18px 40px;border-radius:14px;border-bottom:6px solid #c0392b">
           <div style="font:800 24px Inter;letter-spacing:.3em;color:#ffb627">1792 – 1815</div><div style="font:900 58px/1.1 'Inter Display',Inter;color:#fff">Más de veinte años de guerras</div></div>`;
     } },
-    { t0: tD, set: Tl, p0: [4.0, 1.6, 6.6], l0: [0.0, 0.6, -6], p1: [3.0, 1.45, 5.2], l1: [0.0, 0.5, -8], fov0: 40, act: (t) => toulon(t)
+    { t0: tD, set: Tl, p0: [5.2, 1.25, 5.4], l0: [-0.5, 0.2, -12], p1: [4.4, 1.15, 4.4], l1: [-0.5, 0.1, -14], fov0: 40, act: (t) => toulon(t)
         + badge(t, 'Tolón, 1793', 'El sitio de Tolón', 'Sus cañones expulsan a la flota británica del puerto', L[2].t0 + 0.3, tNap - 0.7) },
     { t0: tNap - 0.7, set: Tl, p0: [5.9, 1.05, -1.9], l0: [4.3, 0.92, 0.9], p1: [5.5, 1.02, -1.3], l1: [4.3, 0.92, 0.9], fov0: 36, act: (t) => toulon(t)
         + nameplate(ctx, [4.4, 1.42, 0.9], 'Napoleón Bonaparte', 'Joven oficial de artillería', tNap - 0.3, ctx.dur) },
   ];
+  function bastille(t) {
+    const run = clamp((t - t1789 + 0.4) / 4.6);
+    mob.forEach((r, i) => { const z = 6.2 - r.row * 1.4 - run * 9.0 + (i % 3) * 0.25; r.root.position.set(r.lane, 0, z);
+      const go = run > 0 && run < 1; K.pose(r, go ? { ...C.runArmed(t, 1.1, i), gun: 'port' } : t > tTomo ? { ...C.cheer(t + i * 0.13, i), gun: r.gun ? 'port' : 'none' } : { ...A.fist(t, i, i % 2 ? 'R' : 'L'), gun: r.gun ? 'low' : 'none' });
+      r.setFace(t > tTomo ? 'happy' : 'squint', go ? 'shout' : t > tTomo ? 'teeth' : 'shout'); });
+    banner.position.set(0.9, 0, 5.0 - run * 9.0); banner.wave(t);
+    fx.update(t); S.aimSun(B, 0, -2);
+    return film(t);
+  }
   function toulon(t) {
     crew.forEach((c, i) => { const rec = guns[i].fireTimes.some(f => t > f && t < f + 0.5); K.pose(c, rec ? A.humble(t, i) : C.crouch(t, i, 0.35)); c.setFace(rec ? 'squint' : C.blinkEye(t, i), rec ? 'open' : 'neutral'); });
     guns.forEach((g, i) => { const r = g.fireTimes.reduce((a, f) => a + (t > f ? Math.max(0, 1 - (t - f) * 3) : 0), 0); g.position.z = 0.6 + 0.18 * r; });
