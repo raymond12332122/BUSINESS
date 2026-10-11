@@ -133,10 +133,10 @@ export function acity(ctx, s, name, k = 1, cls = 'c') { const d = s.dots[name]; 
 // Revolt spark on the Americas map.
 export function aspark(s, lon, lat, color = '#e8742a') {
   const g = new THREE.Group(); const [x, y, z] = apos(lon, lat); g.position.set(x, y + 0.02, z); s.add(g);
-  const ring = F.ring(color, 0.45); g.add(ring);
+  const ring = F.ring(color, 0.8); g.add(ring);
   const fire = F.bubble('🔥', { bg: null, font: 170 }); fire.center.set(0.5, 0.15); g.add(fire);
   g.update = (t, t0) => { const k = t - t0; g.visible = k > 0; if (k <= 0) return; const rk = (k % 1.4) / 1.4; ring.scale.setScalar(0.5 + rk * 2.2); ring.material.opacity = 0.8 * (1 - rk);
-    const sc = 0.9 * clamp(k / 0.25) * (1 + 0.06 * Math.sin(t * 9 + x)); fire.scale.set(sc, sc, 1); };
+    const sc = 1.6 * clamp(k / 0.25) * (1 + 0.06 * Math.sin(t * 9 + x)); fire.scale.set(sc, sc, 1); };
   g.visible = false; return g;
 }
 export { GM };

@@ -235,7 +235,7 @@ export function dolores() {
   T.add(at(box(2.4, 9.5, 2.4, stone), 0, 4.75, 0));
   T.add(at(box(2.0, 2.6, 2.0, stone), 0, 10.8, 0));
   const arch = new THREE.Shape(); arch.moveTo(-0.6, 0); arch.lineTo(0.6, 0); arch.lineTo(0.6, 1.2); arch.absarc(0, 1.2, 0.6, 0, Math.PI, false); arch.lineTo(-0.6, 0);
-  T.add(at(mesh(new THREE.ShapeGeometry(arch), std('#1a1412')), 0, 9.9, 1.01));
+  T.add(at(mesh(new THREE.ShapeGeometry(arch), std('#3a2a20')), 0, 9.9, 1.01));
   const bell = mesh(new THREE.LatheGeometry([[0, 0.55], [0.18, 0.54], [0.3, 0.4], [0.36, 0.12], [0.46, 0.0], [0.42, -0.02], [0, -0.02]].map(([a, b]) => new THREE.Vector2(a, b)), 20), std('#8a6a2a', { metalness: 0.6, roughness: 0.4, side: THREE.DoubleSide }));
   const bellPivot = new THREE.Group(); bellPivot.position.set(0, 11.2, 0.6); bellPivot.add(bell); bell.position.y = -0.62; T.add(bellPivot); g.bell = bellPivot;
   const dome = mesh(new THREE.SphereGeometry(1.0, 16, 10, 0, Math.PI * 2, 0, Math.PI / 2), flat('#e8d6b5')); dome.position.set(0, 12.1, 0); T.add(dome);

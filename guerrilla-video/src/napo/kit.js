@@ -212,7 +212,7 @@ export function papakha(top = '#b8342f') {
 // Spanish wide-brimmed hat (chambergo / sombrero calañés).
 export function chambergo(color = '#1d1b1c') {
   const g = new THREE.Group();
-  g.add(lathe([[0, 0.24], [0.15, 0.24], [0.24, 0.2], [0.28, 0.08], [0.3, 0.03], [0.5, 0.02], [0.54, 0.04], [0.52, 0.03], [0.48, 0.0], [0.3, -0.005]], color));
+  g.add(lathe([[0, 0.24], [0.15, 0.24], [0.24, 0.2], [0.28, 0.08], [0.3, 0.03], [0.42, 0.02], [0.45, 0.04], [0.435, 0.03], [0.4, 0.0], [0.3, -0.005]], color));
   const band = mesh(new THREE.CylinderGeometry(0.29, 0.3, 0.05, 32, 1, true), std('#8a1f2a', { side: THREE.DoubleSide })); band.position.y = 0.06; g.add(band);
   return g;
 }
@@ -322,7 +322,7 @@ export const OUTFITS = {
   jose: r => { uniformize(r, 'royal'); r.attach('head', crown(), [0, 0.84, -0.02]); r.attach('chest', sash(['#c0272d', '#e8c84a', '#c0272d']), [0, 0.4, 0]); hideEars(r); flattenAhoge(r); return r; },
   hidalgo: r => { uniformize(r, 'priest'); return r; },
   papa: r => { uniformize(r, 'pope'); hat(r, zucchetto(), { scale: 1, y: 0.86, tilt: 0.08 }); return r; },
-  king: r => { uniformize(r, 'royal'); r.attach('head', crown(), [0, 0.84, -0.02]); return r; },
+  king: r => { uniformize(r, 'royal'); hideEars(r); flattenAhoge(r); r.attach('head', crown(), [0, 0.86, -0.02]); return r; },
   marshal: r => { uniformize(r, 'marshal'); hat(r, bic({ trim: '#e2bd45', plume: '#f4f1ea' }), { scale: 0.84, y: 0.88, tilt: -0.04, cap: true }); r.attach('chest', epaulettes('#e2bd45'), [0, 0.475, -0.01]); return r; },
   fusilier: r => { generic(r, '#3a2c26'); uniformize(r, 'french'); hat(r, shako(), { scale: 0.9, y: 0.86, tilt: 0.04, cap: true }); r.attach('chest', crossbelts('#f4f1ea'), [0, 0.39, 0]); r.equip(musket(), G.HOLDS); return r; },
   grenadier: r => { generic(r, '#2e2420'); uniformize(r, 'guard'); hat(r, bearskin(), { scale: 0.86, y: 0.84, tilt: 0.02, cap: true }); r.attach('chest', crossbelts('#f4f1ea'), [0, 0.39, 0]); r.equip(musket(), G.HOLDS); return r; },

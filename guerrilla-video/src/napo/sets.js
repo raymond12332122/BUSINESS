@@ -253,15 +253,15 @@ export function madrid(light = 'day') {
 export function sierraPass() {
   const s = napoStage('golden', ['#b8a07a', '#a89070'], { seed: 121 });
   s.add(MX.sierra({ z: -70, depth: 50, height: 18, seed: 122, base: '#8a7a62', top: '#a89878' }));
-  for (const sd of [-1, 1]) { const ridge = MX.sierra({ x0: -40, x1: 40, z: sd * 9, depth: 8, height: 6, seed: 123 + sd, base: '#9a8466', top: '#b49c78', segX: 60 }); ridge.rotation.y = 0.0; s.add(ridge); }
+  for (const sd of [-1, 1]) { const ridge = MX.sierra({ x0: -60, x1: 60, z: sd * 18, depth: 10, height: 7, seed: 123 + sd, base: '#9a8466', top: '#b49c78', segX: 80 }); s.add(ridge); }
   s.add(LP.strip([[-60, 0.5], [0, 0], [60, -0.5]], 3.2, '#a88e66', 0.012));
-  for (const [x, z, k] of [[-3, -4.2, 1.2], [1.5, -4.6, 1.4], [4.8, -4.0, 1.0], [-6, -4.5, 1.3]]) { const b = MX.boulder(k, x * 7 | 0, '#9a8064'); b.position.set(x, 0.4, z); s.add(b); }
+  for (const [x, z, k] of [[-2.1, -4.4, 0.62], [0.4, -4.6, 0.7], [2.9, -4.3, 0.6], [5.3, -4.5, 0.66], [-4.6, -4.5, 0.7]]) { const b = MX.boulder(k, x * 7 | 0, '#9a8064'); b.position.set(x, 0.1, z); s.add(b); }
   LP.scatter(s, (r, i) => (i % 2 ? MX.shrub(0.8 + r() * 0.4, i, '#7d8a4e') : LP.pine(1.2 + r() * 0.5, '#3f5a3a', i)), 40, [-40, -30, 40, -6], 124, [[0, -4, 7]]);
   return s;
 }
 export function palaceES() {
   const s = interior({ wall: '#8a1f2a', floor: '#5a3a24', w: 12, d: 9, h: 5.2, lights: [[-2.5, 4.3, 0.5], [2.5, 4.3, 0.5]], windows: false });
-  s.add(LP.at(LP.box(4.6, 0.36, 2.4, '#c9a227'), 0, 0.18, -3.2));
+  s.add(LP.at(LP.box(4.6, 0.36, 2.4, '#8a1f2a'), 0, 0.18, -3.2)); s.add(LP.at(LP.box(4.64, 0.05, 0.05, '#c9a227'), 0, 0.36, -2.0));
   const th = N.throne({ fabric: '#8a1f2a' }); th.position.set(0, 0.36, -3.5); s.add(th);
   for (const x of [-4.2, 4.2]) { const d = N.drape('es', 1.4, 3.8); d.position.set(x, 2.4, -4.4); s.add(d); }
   const arms = new THREE.Mesh(new THREE.CircleGeometry(0.9, 32), new THREE.MeshStandardMaterial({ map: MX.canvasTex(256, 256, (g, W) => { g.fillStyle = '#c9a227'; g.beginPath(); g.arc(W / 2, W / 2, W / 2, 0, Math.PI * 2); g.fill();
@@ -271,8 +271,9 @@ export function palaceES() {
 }
 // ---------------------------------------------------------------- Dolores, Nueva España, night of 15–16 Sep 1810
 export function doloresSet() {
-  const s = napoStage('night', ['#7a6a52', '#6a5a46'], { seed: 131, hemi: 0.6, fog: ['#1a1e2e', 25, 110] });
+  const s = napoStage('night', ['#7a6a52', '#6a5a46'], { seed: 131, hemi: 0.95, sun: 0.9, fog: ['#1a1e2e', 30, 120] });
   const ch = N.dolores(); ch.position.set(0, 0, -6); s.add(ch); s.church = ch;
+  const lantern = new THREE.PointLight('#ffb060', 10, 9, 1.4); lantern.position.set(4.2, 10.6, -3.6); s.add(lantern); s.lantern = lantern;
   for (let i = 0; i < 4; i++) { const h = MX.adobe(3, 2.4, 2.2, ['#d9b48a', '#c9967a', '#d6c08f', '#e2c9a2'][i], i); h.position.set(-14 + i * 4, 0, -2 - (i % 2)); h.rotation.y = 0.2; s.add(h); }
   const moon = new THREE.Mesh(new THREE.SphereGeometry(3, 16, 12), new THREE.MeshBasicMaterial({ color: '#f3ecd6', fog: false })); moon.position.set(-40, 40, -120); s.add(moon);
   s.glow = []; for (const [x, z] of [[-3, 3], [3, 2.5], [0, 5]]) { const l = new THREE.PointLight('#ffa040', 6, 10, 1.6); l.position.set(x, 1.8, z); s.add(l); s.glow.push(l); }
