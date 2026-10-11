@@ -51,7 +51,7 @@ export function build(ctx) {
   const napE = K.person(El, 'napoleon', 'napoleon', 8.2, 0, 0.75);
   const brig = N.brig(5); brig.position.set(-8, 0, 19); brig.rotation.y = 1.2; El.add(brig);
 
-  const sfx = [{ t: tUnio - 0.4, type: 'whoosh', vol: 0.6 }, { t: t1813 - 0.2, type: 'drums', dur: 2.0, vol: 0.5 }, ...lv.times().filter((t, i) => i % 3 === 0).map(t => ({ t, type: 'volley', vol: 0.5 })), { t: tNac, type: 'sting2', vol: 0.5 },
+  const sfx = [{ t: tUnio - 0.4, type: 'whoosh', vol: 0.6 }, { t: t1813 - 0.2, type: 'drums', dur: 2.0, vol: 0.5 }, ...lv.groups.map(t => ({ t, type: 'volley', vol: 0.45 })), { t: tNac, type: 'sting2', vol: 0.5 },
     { t: tAli - 0.3, type: 'march', dur: tAbd - tAli - 0.3, vol: 0.6 }, { t: tAli, type: 'crowd', dur: 2.6, vol: 0.4 }, { t: tAbd, type: 'tick', vol: 0.4 }, { t: tAbd + 0.6, type: 'thud', vol: 0.6 },
     { t: tDest - 0.2, type: 'waves', dur: ctx.dur - tDest, vol: 0.5 }];
 

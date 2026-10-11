@@ -30,7 +30,7 @@ export class Snow {
 // add(t0, pos, dir) schedules one shot; update(t) poses everything (pure function of t).
 export class Volleys {
   constructor(parent, { color = '#ebe7df', size = 0.45, life = 4.5, drift = [0.25, 0.12, 0], flashSize = 0.5, max = 400 } = {}) {
-    this.parent = parent; this.o = { color, size, life, drift, flashSize }; this.shots = []; this.pool = []; this.fpool = []; this.max = max;
+    this.parent = parent; this.o = { color, size, life, drift, flashSize }; this.shots = []; this.groups = []; this.pool = []; this.fpool = []; this.max = max;
   }
   add(t0, pos, dir = [0, 0, 1], { puffs = 2, size = 1, seed = this.shots.length + 1 } = {}) {
     const r = rng(seed * 7 + 3), d = new THREE.Vector3(...dir).normalize();
@@ -39,7 +39,7 @@ export class Volleys {
     return this;
   }
   // a row of shooters firing together (rolling volley): positions array, start time, ripple delay
-  volley(t0, positions, dir, ripple = 0.03, opt = {}) { positions.forEach((p, i) => this.add(t0 + i * ripple + (i % 3) * 0.012, p, dir, { ...opt, seed: Math.floor(t0 * 100) + i })); return this; }
+  volley(t0, positions, dir, ripple = 0.03, opt = {}) { this.groups.push(t0); positions.forEach((p, i) => this.add(t0 + i * ripple + (i % 3) * 0.012, p, dir, { ...opt, seed: Math.floor(t0 * 100) + i })); return this; }
   sprite(pool, map, additive) {
     const m = new THREE.Sprite(new THREE.SpriteMaterial({ map, color: additive ? '#ffffff' : this.o.color, transparent: true, depthWrite: false, blending: additive ? THREE.AdditiveBlending : THREE.NormalBlending, fog: true }));
     m.renderOrder = additive ? 6 : 4; this.parent.add(m); pool.push(m); return m;

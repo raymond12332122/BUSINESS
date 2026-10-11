@@ -51,7 +51,7 @@ export function build(ctx) {
   const splash = new FX.Volleys(Tl, { color: '#f4f8fa', size: 1.2, life: 2.0, drift: [0, 0.4, 0] });
   Tl.ships.forEach((sh, i) => { for (let k = 0; k < 3; k++) splash.add(L[2].t0 + 1.5 + i * 0.7 + k * 1.9, [sh.position.x + (k - 1) * 3, -1.8, sh.position.z + 3], [0, 1, 0], { puffs: 2, size: 1.6 }); });
 
-  const sfx = [{ t: 0.2, type: 'crowd', dur: 8.0, vol: 0.7 }, ...fx.times().map(t => ({ t, type: 'boom', vol: 0.25 })), { t: tTomo + 0.2, type: 'cheer', vol: 0.8 },
+  const sfx = [{ t: 0.2, type: 'crowd', dur: 8.0, vol: 0.7 }, ...fx.times().filter((t, i) => i % 2 === 0).map(t => ({ t, type: 'cannon', vol: 0.3 })), { t: tTomo + 0.2, type: 'cheer', vol: 0.8 },
     { t: tAbol + 0.25, type: 'clank', vol: 0.7 }, { t: tEjec + 0.1, type: 'thud', vol: 0.9 }, { t: tEjec + 0.1, type: 'sting2', vol: 0.5 },
     { t: tAter, type: 'tension', vol: 0.5 }, { t: tAli, type: 'whoosh', vol: 0.6 }, { t: tCom, type: 'drums', dur: L[2].t0 - tCom, vol: 0.6 },
     ...guns.flatMap(g => g.fireTimes.map(t => ({ t, type: 'cannon', vol: 0.6 })))];

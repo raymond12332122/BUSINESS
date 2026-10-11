@@ -302,11 +302,78 @@ def fire(d):
     return fade(norm(x) * 0.35, 0.5, 0.8)
 
 
+
+# ---- Napoleonic additions
+def neigh():
+    d = 1.3; t = t_(d); u = t / d
+    f = 600 + 900 * np.sin(np.pi * np.clip(u * 1.4, 0, 1)) ** 0.7 * (1 - 0.5 * u) + 40 * np.sin(2 * np.pi * 13 * t)
+    ph = np.cumsum(f) / SR; x = (2 * (ph % 1) - 1) * 0.6 + np.sin(2 * np.pi * ph) * 0.4
+    x = fft_filter(x, lo=400, hi=3200) * np.sin(np.pi * np.clip(u, 0, 1)) ** 0.6 * (1 + 0.5 * np.sin(2 * np.pi * 26 * t))
+    x += fft_filter(noise(d), lo=800, hi=4000) * np.exp(-((u - 0.85) / 0.1) ** 2) * 0.4
+    return fade(norm(x) * 0.4, 0.02, 0.15)
+
+
+def cannon():
+    d = 2.4; t = t_(d)
+    sub = sweep(62, 26, d) * env_exp(d, 2.6)
+    body = fft_filter(noise(d), hi=420) * env_exp(d, 2.2)
+    crack = fft_filter(noise(d), lo=700) * env_exp(d, 25)
+    x = norm(body) * 0.9 + sub * 1.0 + crack * 0.45
+    x[:int(0.003 * SR)] *= np.linspace(0, 1, int(0.003 * SR))
+    return norm(x) * 0.85
+
+
+def volley():
+    d = 1.6; out = np.zeros(int(d * SR))
+    for k in range(14):
+        s = int(rng.uniform(0, 0.35) * SR); sh = shot(); sh = fft_filter(sh, hi=3500)
+        out[s:s + len(sh)] += sh[: len(out) - s] * rng.uniform(0.35, 0.7)
+    out += fft_filter(noise(d), hi=700) * env_exp(d, 3.0) * 0.25
+    return norm(out) * 0.75
+
+
+def broadside():
+    d = 3.2; out = np.zeros(int(d * SR)); c = cannon()
+    for k in range(9):
+        s = int((k * 0.16 + rng.uniform(0, 0.05)) * SR)
+        out[s:s + len(c)] += c[: len(out) - s] * (1 - k * 0.06)
+    return norm(out) * 0.9
+
+
+def drums(d):
+    out = np.zeros(int(d * SR)); bt = 60 / 108
+    def snare(g):
+        L = 0.16; x = fft_filter(noise(L), lo=900, hi=6000) * env_exp(L, 28) + np.sin(2 * np.pi * 190 * t_(L)) * env_exp(L, 40) * 0.5
+        return x * g
+    bass = sweep(95, 50, 0.3) * env_exp(0.3, 10)
+    for b in range(int(d / bt) + 1):
+        t0 = b * bt
+        if b % 2 == 0:
+            i = int(t0 * SR); out[i:i + len(bass)] += bass[: max(0, len(out) - i)] * 0.8
+        pat = [0, 0.5] if b % 4 != 3 else [0, 0.25, 0.5, 0.75]
+        for p in pat:
+            i = int((t0 + p * bt) * SR); s_ = snare(0.55 if p else 0.8); out[i:i + len(s_)] += s_[: max(0, len(out) - i)]
+    return fade(norm(out) * 0.5, 0.05, 0.4)
+
+
+def choir(d):
+    t = t_(d); x = np.zeros_like(t)
+    for f in (146.8, 220.0, 293.7, 370.0):
+        for det in (-0.006, 0.0, 0.007):
+            ff = f * (1 + det) * (1 + 0.004 * np.sin(2 * np.pi * 5.2 * t + f))
+            x += 2 * ((np.cumsum(ff) / SR) % 1) - 1
+    v = fft_filter(x, lo=600, hi=1100) * 1.0 + fft_filter(x, lo=1000, hi=1500) * 0.5 + fft_filter(x, lo=200, hi=900) * 0.35
+    e = np.minimum(1, t / 1.0) * np.minimum(1, (d - t) / 1.2)
+    return fade(norm(v * e) * 0.35, 0.05, 0.3)
+
+
 ONE = {'shot': shot, 'boom': lambda: boom(False), 'bigboom': lambda: boom(True), 'whoosh': whoosh, 'pop': pop, 'click': click,
        'thud': thud, 'creak': creak, 'sting': sting, 'sting2': sting2, 'tension': tension, 'beep': beep, 'tick': tick,
-       'missile': missile, 'brakes': brakes, 'cheer': cheer, 'clank': clank, 'charge': charge, 'whistle': whistle, 'bell': bell, 'laugh': laugh}
+       'missile': missile, 'brakes': brakes, 'cheer': cheer, 'clank': clank, 'charge': charge, 'whistle': whistle, 'bell': bell, 'laugh': laugh,
+       'neigh': neigh, 'cannon': cannon, 'volley': volley, 'broadside': broadside}
 LOOP = {'engine': engine, 'march': march, 'drone': drone, 'train': train, 'wind': wind, 'clock': clock,
-        'plane': plane, 'siren': siren, 'waves': waves, 'factory': factory, 'bells': bells, 'crowd': crowd, 'mg': mg, 'fire': fire}
+        'plane': plane, 'siren': siren, 'waves': waves, 'factory': factory, 'bells': bells, 'crowd': crowd, 'mg': mg, 'fire': fire,
+        'drums': drums, 'choir': choir}
 
 sfx = np.zeros(N)
 cache = {}
@@ -385,12 +452,101 @@ def corrido():
     return L, R
 
 
+# ------------------------------------------------------------------ martial bed for the Napoleonic video (fife, brass, drums, strings)
+NAPO_MOODS = {'title': 'heroic', 'revolucion': 'tense', 'ascenso': 'heroic', 'trafalgar': 'heroic', 'austerlitz': 'heroic', 'tacticas': 'calm', 'bloqueo': 'tense',
+              'imperio': 'calm', 'rusia': 'somber', 'caida': 'tense', 'waterloo': 'tense', 'legado': 'somber', 'outro': 'heroic'}
+def napo_march():
+    bpm = 104; beat = 60 / bpm; bar = 4 * beat
+    CH = {'C': [48, 52, 55], 'G': [43, 47, 50, 53], 'F': [41, 45, 48], 'Am': [45, 48, 52], 'Dm': [50, 53, 57], 'E': [40, 44, 47, 50], 'Em': [40, 43, 47]}
+    prog = {'heroic': ['C', 'G', 'F', 'C', 'C', 'F', 'G', 'C'], 'tense': ['Am', 'Am', 'Dm', 'E'], 'somber': ['Am', 'Am', 'F', 'F', 'C', 'C', 'E', 'E'], 'calm': ['C', 'Am', 'F', 'G']}
+    mel = [[(67, 1), (72, 1), (72, .5), (74, .5), (76, 1)], [(76, 1), (74, .5), (72, .5), (74, 1), (67, 1)], [(69, 1), (74, 1), (74, .5), (76, .5), (77, 1)], [(76, 2), (0, 1), (67, 1)],
+           [(67, 1), (72, 1), (72, .5), (74, .5), (76, 1)], [(79, 1), (77, .5), (76, .5), (74, 1), (72, 1)], [(69, 1), (71, .5), (72, .5), (74, 1), (71, 1)], [(72, 2), (0, 2)]]
+    lament = [[(76, 2), (74, 1), (72, 1)], [(71, 3), (0, 1)], [(72, 2), (69, 2)], [(0, 4)], [(76, 2), (77, 1), (76, 1)], [(74, 3), (0, 1)], [(71, 2), (68, 2)], [(69, 3), (0, 1)]]
+    L, R = np.zeros(N), np.zeros(N)
+    def add(x, t0, gl=0.5, gr=0.5):
+        i = int(t0 * SR)
+        if i >= N or i < 0: return
+        x = x[: N - i]; L[i:i + len(x)] += x * gl; R[i:i + len(x)] += x * gr
+    cache_ = {}
+    def memo(key, fn):
+        if key not in cache_: cache_[key] = fn()
+        return cache_[key]
+    def saws(f, d, n=2, det=0.005):
+        tt = t_(d); return sum(2 * ((f * (1 + det * (k - (n - 1) / 2)) * tt) % 1) - 1 for k in range(n)) / n
+    def brass(m, d, stab=True):
+        def mk():
+            f = NOTE(m); x = fft_filter(saws(f, d, 2, 0.004), hi=1500 + f) ; tt = t_(d)
+            e = np.minimum(1, tt / 0.035) * (np.exp(-tt * 2.2) * 0.7 + 0.3) if stab else np.minimum(1, tt / 0.08) * np.minimum(1, (d - tt) / 0.15)
+            return x * e
+        return memo(('b', m, round(d, 3), stab), mk)
+    def strings(m, d):
+        def mk():
+            f = NOTE(m); tt = t_(d); x = fft_filter(saws(f, d, 3, 0.007), hi=1300)
+            return x * np.minimum(1, tt / 0.45) * np.minimum(1, (d - tt) / 0.5)
+        return memo(('s', m, round(d, 3)), mk)
+    def fife(m, d):
+        def mk():
+            f = NOTE(m + 12); tt = t_(d); ff = f * (1 + 0.005 * np.sin(2 * np.pi * 5.6 * tt) * np.minimum(1, tt * 3)); ph = np.cumsum(ff) / SR
+            x = np.sin(2 * np.pi * ph) + 0.18 * np.sin(6 * np.pi * ph) + fft_filter(noise(d), lo=2000, hi=7000) * 0.04
+            return x * np.minimum(1, tt / 0.03) * np.minimum(1, (d - tt) / 0.06)
+        return memo(('f', m, round(d, 3)), mk)
+    def snare(g=1.0):
+        return memo(('sn',), lambda: fft_filter(noise(0.16), lo=900, hi=6000) * env_exp(0.16, 28) + np.sin(2 * np.pi * 190 * t_(0.16)) * env_exp(0.16, 40) * 0.5) * g
+    def kick(): return memo(('k',), lambda: sweep(95, 48, 0.32) * env_exp(0.32, 10))
+    def timp(m): return memo(('t', m), lambda: (np.sin(2 * np.pi * NOTE(m) * t_(1.6)) + 0.3 * np.sin(2 * np.pi * NOTE(m) * 1.5 * t_(1.6))) * env_exp(1.6, 2.2) + fft_filter(noise(1.6), hi=300) * env_exp(1.6, 12) * 0.3)
+    def mood_at(t):
+        for sc in TL['scenes']:
+            if sc['start'] <= t < sc['start'] + sc['dur']: return NAPO_MOODS.get(sc['id'], 'heroic')
+        return 'heroic'
+    nb = int(TOTAL / bar) + 1; hb = 0
+    for b in range(nb):
+        t0 = b * bar; m = mood_at(t0 + bar / 2); pr = prog[m]; ch = CH[pr[b % len(pr)]]
+        if m == 'heroic':
+            for k in (0, 2): add(kick() * 0.55, t0 + k * beat)
+            for k in (1, 3): add(snare(0.3), t0 + k * beat, 0.45, 0.55)
+            if b % 2 == 1:
+                for q in range(4): add(snare(0.2), t0 + 3 * beat + q * beat / 4, 0.45, 0.55)
+            for n in ch[:3]: add(brass(n + 12, beat * 1.5) * 0.26, t0, 0.55, 0.45); add(brass(n + 12, beat * 0.6) * 0.18, t0 + 2 * beat, 0.55, 0.45)
+            add(brass(ch[0], beat * 0.9) * 0.35, t0); add(brass(ch[0] + 7, beat * 0.9) * 0.3, t0 + 2 * beat)
+            tt = t0
+            for (n, du) in mel[hb % 8]:
+                if n: add(fife(n, du * beat * 0.95) * 0.22, tt, 0.4, 0.6)
+                tt += du * beat
+            hb += 1
+        elif m == 'tense':
+            for q in range(8): add(strings(ch[0] - 12, beat * 0.45) * (0.32 if q % 2 == 0 else 0.22), t0 + q * beat / 2)
+            add(timp(ch[0] - 12) * 0.5, t0)
+            for n in ch[:3]: add(strings(n, bar) * 0.07, t0, 0.5, 0.5)
+            if b % 4 == 3:
+                for q in range(16): add(snare(0.08 + 0.2 * q / 16), t0 + q * beat / 4, 0.5, 0.5)
+        elif m == 'somber':
+            for n in ch[:3]: add(strings(n, bar) * 0.11, t0, 0.5, 0.5)
+            add(strings(ch[0] - 12, bar) * 0.14, t0)
+            tt = t0
+            for (n, du) in lament[b % 8]:
+                if n: add(fife(n - 12, du * beat * 0.95) * 0.1, tt, 0.45, 0.55)
+                tt += du * beat
+        else:  # calm
+            for n in ch[:3]: add(strings(n, bar) * 0.08, t0, 0.5, 0.5)
+            arp = [ch[0], ch[1], ch[2], ch[0] + 12, ch[2], ch[1], ch[2], ch[0] + 12]
+            for q, n in enumerate(arp): add(memo(('h', n), lambda n=n: ks(NOTE(n + 12), 1.2, 0.3)) * 0.18, t0 + q * beat / 2, 0.4 + 0.03 * q, 0.62 - 0.03 * q)
+    for X_ in (L, R):
+        y = X_.copy()
+        for dms, g in ((29, 0.25), (47, 0.18), (73, 0.13), (109, 0.09), (167, 0.06), (241, 0.04)):
+            d_ = int(dms * SR / 1000); y[d_:] += X_[:-d_] * g
+        X_[:] = fft_filter(y, lo=50, hi=5200)
+    return L, R
+
+
 # ------------------------------------------------------------------ music bed (D minor, slow pads + soft pulse)
 if VIDEO == 'mx':
     musL, musR = corrido(); t_all = np.arange(N) / SR
     sc_ = 0.15 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
+if VIDEO == 'napo':
+    musL, musR = napo_march(); t_all = np.arange(N) / SR
+    sc_ = 0.16 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
 BPM = 84; beat = 60 / BPM
-if VIDEO != 'mx':
+if VIDEO not in ('mx', 'napo'):
     prog = [[146.8, 174.6, 220.0], [116.5, 146.8, 174.6], [174.6, 220.0, 261.6], [130.8, 164.8, 196.0]]  # Dm Bb F C
     bar = 4 * beat
     musL, musR = np.zeros(N), np.zeros(N)

@@ -55,7 +55,7 @@ export function build(ctx) {
     const sh = shipToken('#c0272d'); const [x, y, z] = GM.pos(lo, la, 0.0); sh.position.set(x, 0.0, z); sh.rotation.y = i * 1.3; sh.scale.setScalar(1.3); sh.visible = false; M.add(sh); sh.d = i * 0.12; return sh; });
 
   const sfx = [{ t: 0.1, type: 'waves', dur: tFlota - 0.2, vol: 0.6 }, { t: 0.3, type: 'wind', dur: tFlota, vol: 0.3 }, { t: tFlota - 0.3, type: 'creak', vol: 0.5 },
-    { t: L[1].t0 - 0.2, type: 'waves', dur: tDerr - L[1].t0, vol: 0.5 }, ...fire.times().filter((t, i) => i % 4 === 0).map(t => ({ t, type: 'cannon', vol: 0.35 })),
+    { t: L[1].t0 - 0.2, type: 'waves', dur: tDerr - L[1].t0, vol: 0.5 }, ...fire.groups.filter((t, i) => i % 3 === 0).map(t => ({ t, type: 'broadside', vol: 0.32 })),
     { t: tNel2 - 0.2, type: 'sting2', vol: 0.6 }, { t: tPero, type: 'whoosh', vol: 0.5 }, { t: tDom, type: 'sting', vol: 0.6 }];
 
   const tO = tProt - 0.15, tDk = L[1].t0 - 0.1, tBt = tDerr - 0.25, tH = tNel2 - 0.25, tM = tPero - 0.2;

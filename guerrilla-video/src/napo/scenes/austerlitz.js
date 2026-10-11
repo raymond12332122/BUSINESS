@@ -46,7 +46,7 @@ export function build(ctx) {
   const guardsT = [[-3.2, 2.6, 0.4], [3.2, 2.6, -0.4]].map(([x, z, y], i) => { const g = K.person(T.raft, ['oguri', 'doto'][i], i ? 'russo' : 'grenadier', x, z, y); g.root.position.y = 0.36; return g; });
   const shake = F.bubble('🤝', { bg: null, font: 170 }); shake.visible = false; T.raft.add(shake);
 
-  const sfx = [{ t: 0.1, type: 'wind', dur: tEse, vol: 0.35 }, { t: 0.4, type: 'neigh', vol: 0.4 }, ...vol.times().filter((t, i) => i % 3 === 0).map(t => ({ t, type: 'cannon', vol: 0.4 })),
+  const sfx = [{ t: 0.1, type: 'wind', dur: tEse, vol: 0.35 }, { t: 0.4, type: 'neigh', vol: 0.4 }, ...vol.shots.filter(sh => sh.puffs.length === 3).map(sh => ({ t: sh.t0, type: 'cannon', vol: 0.45 })), ...vol.groups.map(t => ({ t, type: 'volley', vol: 0.4 })),
     { t: tApl, type: 'charge', vol: 0.6 }, { t: tAus + 0.2, type: 'sting2', vol: 0.6 }, { t: tYena - 0.4, type: 'cannon', vol: 0.6 }, { t: tYena, type: 'whoosh', vol: 0.5 },
     { t: t1807, type: 'waves', dur: ctx.dur - t1807, vol: 0.4 }, { t: tFir + 0.1, type: 'sting', vol: 0.7 }];
 

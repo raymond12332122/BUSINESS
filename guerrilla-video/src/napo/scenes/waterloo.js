@@ -60,7 +60,7 @@ export function build(ctx) {
   const hN = SH.island.heightAt(-0.6, -10.8), hC = Math.max(SH.island.heightAt(0.9, -6.4), SH.island.heightAt(0.6, -7.4), hN);
 
   const sfx = [{ t: 0.1, type: 'waves', dur: tDes, vol: 0.6 }, { t: tDes - 0.2, type: 'drums', dur: 2.0, vol: 0.4 }, { t: tVol + 0.3, type: 'cheer', vol: 0.8 },
-    { t: tGob - 0.2, type: 'whoosh', vol: 0.5 }, ...wv.times().filter((t, i) => i % 4 === 0).map(t => ({ t, type: 'volley', vol: 0.5 })), { t: tWat - 0.3, type: 'cannon', vol: 0.6 },
+    { t: tGob - 0.2, type: 'whoosh', vol: 0.5 }, ...wv.groups.map(t => ({ t, type: 'volley', vol: 0.45 })), { t: tWat - 0.3, type: 'cannon', vol: 0.6 },
     { t: tPru - 0.3, type: 'march', dur: 2.4, vol: 0.5 }, { t: tDef - 0.1, type: 'sting2', vol: 0.6 }, { t: tSta - 0.4, type: 'waves', dur: ctx.dur - tSta, vol: 0.6 }, { t: tSta, type: 'wind', dur: ctx.dur - tSta, vol: 0.4 }];
 
   const tL = tDes - 0.2, tM = tGob - 0.2, tW = L[1].t0 - 0.15, tWe = tWel - 0.6, tBl = tPru - 0.4, tD = tDef - 0.25, tS = tSta - 0.35, tS2 = tMur - 0.6;

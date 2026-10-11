@@ -68,7 +68,7 @@ export function build(ctx) {
     g.position.set(x, 0, z); Do.add(g); g.fire = MX.fireSprites(Do, 8, { size: 0.32, rise: 0.45, spread: 0.12, life: 0.55 }); g.top = new THREE.Vector3(x, 1.72, z); return g; });
   const sfx = [{ t: 0.4, type: 'waves', dur: 6.5, vol: 0.35 }, { t: tProh, type: 'clank', vol: 0.6 }, { t: tBloq - 0.1, type: 'thud', vol: 0.8 },
     { t: tInv, type: 'march', dur: 2.6, vol: 0.5 }, { t: tJose - 0.1, type: 'sting2', vol: 0.5 },
-    { t: tLev - 0.4, type: 'crowd', dur: 3.2, vol: 0.7 }, ...vM.times().filter((t, i) => i % 2 === 0).map(t => ({ t, type: 'volley', vol: 0.6 })),
+    { t: tLev - 0.4, type: 'crowd', dur: 3.2, vol: 0.7 }, ...[0, 1].map(k => ({ t: tLev + 0.4 + k * 1.3, type: 'volley', vol: 0.6 })),
     ...gShots.map(([, t]) => ({ t, type: 'shot', vol: 0.45 })), { t: tPal - 0.1, type: 'sting', vol: 0.6 },
     { t: tRey - 0.1, type: 'tension', vol: 0.4 }, { t: tCol, type: 'whoosh', vol: 0.5 }, ...sparks.map(s => ({ t: tCol + 0.3 + s.d, type: 'pop', vol: 0.4 })),
     { t: t1810 + 0.4, type: 'bell', vol: 0.9 }, { t: t1810 + 1.6, type: 'bell', vol: 0.8 }, { t: t1810 + 2.8, type: 'bell', vol: 0.7 }, { t: tGrito - 0.2, type: 'cheer', vol: 0.9 }, { t: tGrito + 0.1, type: 'crowd', dur: ctx.dur - tGrito, vol: 0.6 }];
