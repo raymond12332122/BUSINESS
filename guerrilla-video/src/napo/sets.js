@@ -365,24 +365,41 @@ export function paris1814() {
   return s;
 }
 export function elba(light = 'day') {
-  const s = napoStage(light, [null, null], { seed: 201, groundA: null, fog: ['#dfe6ea', 60, 260] });
-  sea(s, { color: '#3f86a6', y: 0 });
-  const isl = new THREE.Mesh(new THREE.SphereGeometry(18, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2), std('#7d8a52', { flatShading: true })); isl.scale.set(1.4, 0.32, 1); isl.position.set(0, -0.6, -6); s.add(isl);
-  const beach = new THREE.Mesh(new THREE.CylinderGeometry(9, 10, 0.5, 32), std('#d8c49a')); beach.position.set(0, -0.1, 6); s.add(beach);
-  const villa = new THREE.Group(); villa.add(LP.at(LP.box(4, 2.4, 2.6, '#efe2c8'), 0, 1.2, 0)); villa.add(LP.at(LP.box(4.4, 0.4, 3, '#b5603f'), 0, 2.6, 0)); villa.position.set(-3, 4.6, -10); s.add(villa);
-  LP.scatter(s, (r, i) => LP.pine(1.2 + r() * 0.4, '#3f6b3a', i), 30, [-18, -18, 18, -2], 202);
+  const s = napoStage(light, [null, null], { seed: 201, groundA: null, fog: ['#dfe6ea', 80, 360] });
+  sea(s, { color: '#3f86a6', y: 0, size: 900 });
+  const isl = rockIsland(15, 5, 9, { rock: '#8a7a68', grass: '#7d9a52' }); s.add(isl); s.island = isl;
+  const villa = new THREE.Group(); villa.add(LP.at(LP.box(4, 2.4, 2.6, '#efe2c8'), 0, 1.2, 0)); villa.add(LP.at(LP.box(4.4, 0.4, 3, '#b5603f'), 0, 2.6, 0));
+  for (let i = 0; i < 4; i++) villa.add(LP.at(LP.box(0.45, 0.8, 0.05, '#3a3e48'), -1.4 + i * 0.95, 1.3, 1.32));
+  villa.add(LP.at(LP.box(4.1, 3, 2.7, '#cdbf9e'), 0, -1.5, 0)); const vy = Math.min(...[[-2, 0], [2, 0], [0, -1.3], [0, 1.3]].map(([dx, dz]) => isl.heightAt(-2 + dx, -2 + dz)));
+  villa.position.set(-2, vy, -2); s.add(villa);
+  for (let i = 0; i < 18; i++) { const r = LP.rng(i + 70); const x = -10 + r() * 18, z = -8 + r() * 14, y = isl.heightAt(x, z); if (y < 3 || Math.hypot(x + 2, z + 2) < 3) continue; const t = LP.pine(1.1 + r() * 0.4, '#3f6b3a', i); t.position.set(x, y - 0.1, z); s.add(t); }
   return s;
 }
+// Rocky island: a noisy heightfield with steep cliffs, rock-coloured sides and a green top. Returns a mesh with .heightAt(x, z).
+export function rockIsland(R = 14, H = 6, seed = 3, { rock = '#6a5648', grass = '#6f7f48' } = {}) {
+  const g = new THREE.PlaneGeometry(R * 2.6, R * 2.6, 120, 120); g.rotateX(-Math.PI / 2);
+  const p = g.attributes.position, r = LP.rng(seed), ph = [...Array(6)].map(() => r() * 6.28), cols = [], A = new THREE.Color(rock), B = new THREE.Color(grass), c = new THREE.Color();
+  const hAt = (x, z) => { const a = Math.atan2(z, x), d = Math.hypot(x, z) / R;
+    const edge = 1 + 0.12 * Math.sin(a * 3 + ph[0]) + 0.07 * Math.sin(a * 7 + ph[1]) + 0.04 * Math.sin(a * 13 + ph[2]);
+    const k = d / edge; if (k > 1.15) return -1.5;
+    const cliff = 1 - Math.min(1, Math.max(0, (k - 0.82) / 0.2)); const top = 1 + 0.25 * Math.sin(x * 0.35 + ph[3]) * Math.cos(z * 0.3 + ph[4]) + 0.15 * Math.sin(x * 0.9 + z * 0.7 + ph[5]);
+    return -1.5 + (H + 1.5) * Math.pow(cliff, 0.6) * (k < 0.82 ? top * (1 - 0.25 * k) : 0.75 + 0.25 * top); };
+  for (let i = 0; i < p.count; i++) { const x = p.getX(i), z = p.getZ(i), y = hAt(x, z); p.setY(i, y); }
+  g.computeVertexNormals(); const n = g.attributes.normal;
+  for (let i = 0; i < p.count; i++) { const up = n.getY(i), y = p.getY(i); c.copy(A).lerp(B, up > 0.7 && y > H * 0.35 ? 1 : 0).offsetHSL(0, 0, (r() - 0.5) * 0.04); cols.push(c.r, c.g, c.b); }
+  g.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+  const m = new THREE.Mesh(g, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true })); m.receiveShadow = true; m.castShadow = true;
+  m.heightAt = hAt; return m;
+}
 export function stHelena() {
-  const s = napoStage('dusk', [null, null], { seed: 211, groundA: null, fog: ['#c98a66', 60, 260] });
-  sea(s, { color: '#2f5a74', y: 0 });
-  const geo = new THREE.ConeGeometry(30, 22, 18, 6), p = geo.attributes.position, r = LP.rng(3);
-  for (let i = 0; i < p.count; i++) { const y = p.getY(i); if (y < 10.9) { const k = 0.85 + r() * 0.3; p.setX(i, p.getX(i) * k); p.setZ(i, p.getZ(i) * k); p.setY(i, y + (r() - 0.5) * 1.2); } }
-  geo.computeVertexNormals();
-  const isl = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color: '#5a4a42', flatShading: true, roughness: 1 })); isl.position.set(10, 9, -60); s.add(isl); s.island = isl;
-  const cliff = new THREE.Mesh(new THREE.BoxGeometry(14, 10, 10), new THREE.MeshStandardMaterial({ color: '#5a4a42', flatShading: true, roughness: 1 })); cliff.position.set(0, 0, -5); s.add(cliff);
-  const top = new THREE.Mesh(new THREE.BoxGeometry(14.2, 0.3, 10.2), std('#6f7a4a')); top.position.set(0, 5.1, -5); s.add(top);
-  const house = new THREE.Group(); house.add(LP.at(LP.box(4, 1.8, 2.4, '#e8dcc4'), 0, 0.9, 0)); house.add(LP.at(LP.box(4.3, 0.3, 2.7, '#7a4a32'), 0, 1.95, 0)); house.position.set(-3.5, 5.25, -8); s.add(house);
+  const s = napoStage('dusk', [null, null], { seed: 211, groundA: null, fog: ['#c98a66', 90, 420], sunPos: [-10, 6, -16] });
+  sea(s, { color: '#2f5a74', y: 0, size: 900 });
+  const isl = rockIsland(16, 7, 5); s.add(isl); s.island = isl;
+  const house = new THREE.Group(); house.add(LP.at(LP.box(4, 1.8, 2.4, '#e8dcc4'), 0, 0.9, 0)); house.add(LP.at(LP.box(4.3, 0.3, 2.7, '#7a4a32'), 0, 1.95, 0));
+  for (let i = 0; i < 4; i++) house.add(LP.at(LP.box(0.4, 0.7, 0.05, '#3a3e48'), -1.4 + i * 0.95, 0.95, 1.22));
+  house.add(LP.at(LP.box(4.1, 3, 2.5, '#b8ab90'), 0, -1.5, 0)); const hy = Math.min(...[[-2, 0], [2, 0], [0, -1.2], [0, 1.2]].map(([dx, dz]) => isl.heightAt(-4 + dx, 2 + dz)));
+  house.position.set(-4, hy, 2); s.add(house);
+  for (let i = 0; i < 14; i++) { const r = LP.rng(i + 40); const x = -9 + r() * 14, z = -4 + r() * 10, y = isl.heightAt(x, z); if (y < 4) continue; const t = LP.roundTree(0.9 + r() * 0.4, '#4f6f3a', i); t.position.set(x, y - 0.1, z); s.add(t); }
   return s;
 }
 export function vienna() {
