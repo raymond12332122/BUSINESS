@@ -327,7 +327,7 @@ export function borodino() {
   const red = new THREE.Shape(); red.moveTo(-6, 0); red.lineTo(6, 0); red.lineTo(4, 1.6); red.lineTo(-4, 1.6);
   const rg = new THREE.ExtrudeGeometry(red, { depth: 2.4, bevelEnabled: false }); rg.translate(0, 0, -1.2);
   const rm = new THREE.Mesh(rg, std('#7a6a4a', { flatShading: true })); rm.position.set(0, 0, -10); s.add(rm);
-  for (let i = 0; i < 4; i++) { const c = N.fieldGun({ barrel: '#3a3a36', carriage: '#3f5a3a' }); c.position.set(-3 + i * 2, 1.6, -10); c.rotation.y = Math.PI; s.add(c); }
+  s.guns = []; for (let i = 0; i < 4; i++) { const c = N.fieldGun({ barrel: '#3a3a36', carriage: '#3f5a3a' }); c.position.set(-3 + i * 2, 1.6, -9.2); s.add(c); s.guns.push(c); }
   return s;
 }
 export function moscow() {

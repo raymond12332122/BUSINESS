@@ -343,7 +343,7 @@ export const OUTFITS = {
   diplomat: r => { generic(r, '#2e2420'); uniformize(r, 'diplomat'); r.attach('chest', sash(['#c0272d', '#c0272d']), [0, 0.4, 0]); hideEars(r); return r; },
   civil: r => { generic(r, '#2e2420'); uniformize(r, 'diplomat'); hat(r, tophat(), { scale: 0.86, y: 0.88, tilt: -0.04, cap: true }); return r; },
 };
-export const CASTING = { napoleonAlps: 'cafe', coronation: 'cafe', coronationBare: 'cafe', napoleon: 'cafe', napoleonYoung: 'cafe', emperor: 'cafe', josefina: 'daiwa', marialuisa: 'doto', nelson: 'suzuka', wellington: 'helios', blucher: 'tamamo', zar: 'mcqueen', jose: 'doto', hidalgo: 'oguri', papa: 'tamamo' };
+export const CASTING = { napoleonAlps: 'cafe', coronation: 'cafe', coronationBare: 'cafe', napoleon: 'cafe', napoleonYoung: 'cafe', emperor: 'cafe', josefina: 'daiwa', marialuisa: 'helios', nelson: 'suzuka', wellington: 'helios', blucher: 'tamamo', zar: 'mcqueen', jose: 'doto', hidalgo: 'oguri', papa: 'tamamo' };
 
 let seedCounter = 0;
 export function person(parent, who, outfit = who, x = 0, z = 0, yaw = 0) {
