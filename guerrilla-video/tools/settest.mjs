@@ -6,7 +6,7 @@ const [file, out = 'build/settest'] = process.argv.slice(2);
 fs.mkdirSync(out, { recursive: true });
 const shots = JSON.parse(fs.readFileSync(file, 'utf8'));
 const srv = await serve(9300 + Math.floor(Math.random() * 400));
-const { browser, page } = await openPage(`http://localhost:${srv.address().port}/src/napo/settest.html`, 1280, 720);
+const { browser, page } = await openPage(`http://localhost:${srv.address().port}/src/${process.env.VIDEO || 'napo'}/settest.html`, 1280, 720);
 for (const [name, set, p, l, fov, extras] of shots) {
   const a = Date.now();
   await page.evaluate(([s, p, l, f, e]) => window.show(s, p, l, f, e), [set, p, l, fov || 38, extras ?? 'probe']);

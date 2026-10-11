@@ -93,10 +93,10 @@ export function build(ctx) {
       return U.film(t) + U.badge(t, '1 de junio de 2025', 'La elección judicial', 'Jueces y ministros electos por voto popular', tRef - 0.2, tE)
         + turnout(t, t13 - 0.4, tE, 13, { x: 1170, y: 330 }) + U.source(t, t13, tE, 'INE, cómputos de la elección judicial 2025');
     } },
-    { t0: tE, set: Z, p0: [4.0, 1.45, -0.6], l0: [-0.6, 1.05, 6.0], p1: [3.4, 1.4, -0.2], l1: [-0.6, 1.05, 6.0], fov0: 42, act: (t) => {
+    { t0: tE, set: Z, p0: [4.0, 1.45, -0.8], l0: [-0.6, 1.05, 6.0], p1: [3.6, 1.42, -0.9], l1: [-0.6, 1.05, 5.5], fov0: 42, act: (t) => {
       const u = t - tE;
-      [...crowd, ...hats].forEach((p, i) => { p.root.position.z = (p.z0 ??= p.root.position.z) - u * 0.35; K.pose(p, C.walk(t, 0.35, i)); p.setFace(C.blinkEye(t, i), i % 3 ? 'neutral' : 'frown'); });
-      Z.banners.forEach((b, i) => { b.position.z = (b.z0 ??= b.position.z) - u * 0.35; }); Z.mflags.forEach((f, i) => { f.position.z = (f.z0 ??= f.position.z) - u * 0.35; f.wave(t + i); });
+      [...crowd, ...hats].forEach((p, i) => { p.root.position.z = (p.z0 ??= p.root.position.z) - u * 0.25; K.pose(p, C.walk(t, 0.35, i)); p.setFace(C.blinkEye(t, i), i % 3 ? 'neutral' : 'frown'); });
+      Z.banners.forEach((b, i) => { b.position.z = (b.z0 ??= b.position.z) - u * 0.25; }); Z.mflags.forEach((f, i) => { f.position.z = (f.z0 ??= f.position.z) - u * 0.25; f.wave(t + i); });
       return U.film(t) + U.badge(t, '15 de noviembre de 2025', 'Marcha de la Generación Z', 'Tras el asesinato de Carlos Manzo, alcalde de Uruapan', tNov - 0.2, ctx.dur + 1)
         + U.source(t, tUru, ctx.dur + 1, 'Los sombreros recordaban a Manzo, asesinado el 1 de noviembre de 2025');
     } },

@@ -102,7 +102,7 @@ export function courtroom({ mx = false } = {}) {
     x.fillStyle = '#e8e2d0'; x.textAlign = 'center';
     if (mx) { x.font = '900 24px Georgia'; x.fillText('PODER', W / 2, 102); x.fillText('JUDICIAL', W / 2, 134); x.fillText('DE LA', W / 2, 164); x.fillText('FEDERACIÓN', W / 2, 194); }
     else { x.font = '900 30px Georgia'; x.fillText('UNITED STATES', W / 2, 108); x.fillText('DISTRICT COURT', W / 2, 146); x.font = '600 22px Georgia'; x.fillText('E.D.N.Y.', W / 2, 180); } }) }));
-  seal.position.set(0, 2.85, -4.93); seal.scale.setScalar(0.85); s.add(seal);
+  seal.position.set(0, 2.85, -4.86); seal.scale.setScalar(0.85); s.add(seal);
   s.userData.sun.intensity = 2.0; s.userData.hemi.intensity = 1.3;
   const us = X.flag(mx ? 'mx' : 'us', 3, 1.2, 0.75); us.position.set(-2.8, 0, -4.2); s.add(us); s.usFlag = us;
   for (const x of [-1.6, 1.6]) { const t = X.desk(); t.scale.set(1.2, 1.15, 0.9); t.position.set(x, 0, -0.6); s.add(t); }

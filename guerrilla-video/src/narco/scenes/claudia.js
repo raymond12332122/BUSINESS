@@ -37,7 +37,7 @@ export function build(ctx) {
 
   // ---- 1/2. Morning press conference (Sheinbaum, then García Harfuch)
   const Mn = S.mananera(); Mn.screen.material = new THREE.MeshBasicMaterial({ map: screenTex('La mañanera', 'Conferencia de prensa matutina') });
-  const scr1 = Mn.screen.material, scr2 = new THREE.MeshBasicMaterial({ map: screenTex('Gabinete de Seguridad', 'Informe de resultados') });
+  const scr1 = Mn.screen.material, scr0 = new THREE.MeshBasicMaterial({ color: '#2a1016' }), scr2 = new THREE.MeshBasicMaterial({ map: screenTex('Gabinete de Seguridad', 'Informe de resultados') });
   const csp = K.person(Mn, 'sheinbaumSuit', 'sheinbaumSuit', 0, -2.85, 0); csp.root.position.y = 0.25;
   const ogh = K.person(Mn, 'harfuch', 'harfuch', 0, -2.85, 0); ogh.root.position.y = 0.25;
   // ---- 3. Airfield: prisoners handed over to the US
@@ -67,14 +67,13 @@ export function build(ctx) {
         + U.nameplate(ctx, [0, 1.42, -2.85], 'Claudia Sheinbaum', 'Presidenta 2024–2030', tCla - 0.2, tB);
     } },
     { t0: tB, set: Mn, p0: [-1.5, 1.05, -0.4], l0: [0, 1.1, -2.85], p1: [-1.15, 1.05, -0.9], l1: [0, 1.1, -2.85], fov0: 36, act: (t) => {
-      Mn.screen.material = scr1; podium(t, csp, ogh);
-      return U.film(t) + `<div style="position:absolute;inset:0;background:rgba(8,10,16,${0.62 * ss(tB, tB + 0.4, t)})"></div>`
+      Mn.screen.material = scr0; podium(t, csp, ogh);
+      return U.film(t) + `<div style="position:absolute;inset:0;background:rgba(8,10,16,${0.8 * ss(tB, tB + 0.4, t)})"></div>`
         + ask(t, '¿De verdad no hace nada?', tB + 0.2, 'Los datos dicen que sí cambió la estrategia', tLos - 0.1, tC);
     } },
     { t0: tC, set: Mn, p0: [0.9, 1.2, 0.3], l0: [0, 1.12, -2.85], p1: [0.7, 1.18, -0.2], l1: [0, 1.12, -2.85], fov0: 38, act: (t) => {
       Mn.screen.material = scr2; podium(t, ogh, csp);
-      return U.film(t) + U.badge(t, 'Secretaría de Seguridad', 'Más inteligencia, menos enfrentamientos', 'Investigación, detenciones y cooperación', tApo - 0.2, tC2)
-        + U.nameplate(ctx, [0, 1.42, -2.85], 'Omar García Harfuch', 'Secretario de Seguridad', tOmar - 0.2, tC2);
+      return U.film(t) + U.nameplate(ctx, [0, 1.42, -2.85], 'Omar García Harfuch', 'Secretario de Seguridad', tOmar - 0.2, tC2);
     } },
     { t0: tC2, set: Af, p0: [-7.0, 1.45, 1.2], l0: [2.0, 1.15, 0.0], p1: [-6.2, 1.4, 1.4], l1: [2.0, 1.15, 0.0], fov0: 40, act: (t) => {
       file.forEach((p, i) => { const pr = i % 2 === 1;

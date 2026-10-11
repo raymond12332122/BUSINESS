@@ -367,13 +367,195 @@ def choir(d):
     return fade(norm(v * e) * 0.35, 0.05, 0.3)
 
 
+# ------------------------------------------------------------------ extra SFX for the cartels video
+def hit():
+    d = 2.2; t = t_(d)
+    sub = sweep(85, 36, d) * env_exp(d, 2.6)
+    body = fft_filter(noise(d), hi=420) * env_exp(d, 5.5) * 0.8
+    air = fft_filter(noise(d), lo=1800, hi=7000) * env_exp(d, 9) * 0.18
+    x = sub + body + air; x[:int(0.003 * SR)] *= np.linspace(0, 1, int(0.003 * SR))
+    y = x.copy()
+    for dms, g in ((43, 0.3), (89, 0.22), (151, 0.15), (233, 0.1)):
+        dd = int(dms * SR / 1000); y[dd:] += x[:-dd] * g
+    return norm(y) * 0.8
+
+
+def stamp():
+    d = 0.35; t = t_(d)
+    thump = sweep(150, 70, d) * env_exp(d, 26)
+    slap = fft_filter(noise(d), lo=900, hi=4500) * env_exp(d, 60) * 0.7
+    return fade(norm(thump + slap) * 0.75, 0.001, 0.05)
+
+
+def swoosh():
+    d = 0.6; t = t_(d); e = (t / d) ** 2 * np.exp(-((t / d) - 0.85) ** 2 * 18) * 3
+    x = fft_filter(noise(d), lo=900, hi=7000) * np.clip(e, 0, 1)
+    return norm(x) * 0.42
+
+
+def gavel():
+    def knock():
+        d = 0.32; t = t_(d)
+        x = (np.sin(2 * np.pi * 520 * t) * 0.8 + np.sin(2 * np.pi * 1180 * t) * 0.45 + np.sin(2 * np.pi * 2350 * t) * 0.2) * env_exp(d, 24)
+        x += fft_filter(noise(d), lo=1500) * env_exp(d, 140) * 0.6 + sweep(160, 90, d) * env_exp(d, 30) * 0.6
+        return x
+    out = np.zeros(int(0.8 * SR)); a = knock()
+    for k, g in ((0.0, 1.0), (0.19, 0.75)):
+        i = int(k * SR); out[i:i + len(a)] += a[: len(out) - i] * g
+    return fade(norm(out) * 0.75, 0.001, 0.1)
+
+
+def cash():
+    d = 1.3; t = t_(d)
+    clk = np.zeros(int(d * SR)); c = click()
+    for k in (0.0, 0.06): i = int(k * SR); clk[i:i + len(c)] += c
+    ding = sum(a * np.sin(2 * np.pi * f * t) * np.exp(-t * k) for a, f, k in ((1, 2093, 3.2), (0.6, 2637, 3.8), (0.4, 4186, 5.0)))
+    ding = np.concatenate([np.zeros(int(0.12 * SR)), ding])[: len(t)]
+    return fade(norm(clk * 0.5 + ding * 0.6) * 0.5, 0.001, 0.2)
+
+
+def paper():
+    d = 0.7; t = t_(d); out = np.zeros(len(t))
+    for k in range(5):
+        a = rng.uniform(0, d - 0.15); L = int(rng.uniform(0.05, 0.14) * SR); i = int(a * SR)
+        out[i:i + L] += fft_filter(noise(L / SR), lo=1800, hi=8000)[:L] * np.hanning(L) * rng.uniform(0.4, 1)
+    return fade(norm(out) * 0.38, 0.005, 0.08)
+
+
+def cock():
+    d = 0.45; out = np.zeros(int(d * SR))
+    for k, f in ((0.0, 3100), (0.16, 2400)):
+        L = int(0.06 * SR); tt = t_(0.06)
+        x = fft_filter(noise(0.06), lo=1500)[:L] * np.exp(-tt * 90) + np.sin(2 * np.pi * f * tt) * np.exp(-tt * 70) * 0.5
+        i = int(k * SR); out[i:i + L] += x
+    return fade(norm(out) * 0.6, 0.001, 0.05)
+
+
+def notify():
+    d = 0.5; out = np.zeros(int(d * SR))
+    for k, f in ((0.0, 1046.5), (0.12, 1568.0)):
+        tt = t_(0.3); x = (np.sin(2 * np.pi * f * tt) + 0.25 * np.sin(4 * np.pi * f * tt)) * np.exp(-tt * 12) * np.minimum(1, tt / 0.004)
+        i = int(k * SR); out[i:i + len(x)] += x[: len(out) - i]
+    return fade(out * 0.32, 0.001, 0.1)
+
+
+def shutter():
+    d = 1.5; t = t_(d)
+    rattle = fft_filter(noise(d), lo=300, hi=3500) * (0.55 + 0.45 * np.sign(np.sin(2 * np.pi * 22 * t))) * np.minimum(1, t / 0.08)
+    rattle *= np.where(t < 1.15, 1.0, np.exp(-(t - 1.15) * 30))
+    bang = np.zeros(len(t)); i = int(1.15 * SR); b = (fft_filter(noise(0.35), hi=1600) * env_exp(0.35, 18) + sweep(140, 60, 0.35) * env_exp(0.35, 20))
+    bang[i:i + len(b)] += b[: len(bang) - i] * 1.4
+    return fade(norm(rattle * 0.6 + bang) * 0.55, 0.01, 0.1)
+
+
+def riser(d):
+    t = t_(d); u = t / d
+    x = fft_filter(noise(d), lo=400, hi=6000) * u ** 2 * 0.6 + sweep(180, 900, d, 'saw') * u ** 2.5 * 0.25
+    x = fft_filter(x, hi=5000)
+    return fade(norm(x) * 0.42, 0.05, 0.06)
+
+
+def gunfire(d):
+    out = np.zeros(int(d * SR)); s0 = shot()
+    tt = 0.05
+    while tt < d - 0.1:
+        n = 1 if rng.uniform() < 0.6 else int(rng.integers(2, 5))
+        for q in range(n):
+            i = int((tt + q * 0.11) * SR)
+            if i < len(out): out[i:i + len(s0)] += s0[: len(out) - i] * rng.uniform(0.35, 0.9)
+        tt += rng.uniform(0.25, 0.7)
+    out = fft_filter(out, hi=2600); y = out.copy()
+    for dms, g in ((70, 0.35), (160, 0.25), (290, 0.15)):
+        dd = int(dms * SR / 1000); y[dd:] += out[:-dd] * g
+    return fade(norm(y) * 0.5, 0.01, 0.3)
+
+
+def typewriter(d):
+    out = np.zeros(int(d * SR)); c = click()
+    tt = 0.0
+    while tt < d - 0.3:
+        i = int(tt * SR); out[i:i + len(c)] += c[: len(out) - i] * rng.uniform(0.5, 1.0); tt += rng.uniform(0.07, 0.16)
+    b = bell()[: int(0.6 * SR)] * 0.25; i = max(0, len(out) - len(b) - 1); out[i:i + len(b)] += fft_filter(b, lo=1200)[: len(out) - i]
+    return fade(out * 0.6, 0.01, 0.05)
+
+
+def traffic(d):
+    t = t_(d); x = fft_filter(noise(d), hi=320) * 0.55
+    for k in range(int(d / 2.5) + 1):
+        c0 = rng.uniform(0, max(0.1, d - 2.0)); dur = 2.2; i = int(c0 * SR); n = min(int(dur * SR), len(x) - i)
+        if n <= 0: continue
+        tt = t_(dur)[:n]; e = np.exp(-((tt - dur / 2) / (dur / 4)) ** 2)
+        x[i:i + n] += fft_filter(noise(dur), lo=200, hi=1800)[:n] * e * 0.8
+    return fade(norm(x) * 0.32, 0.6, 0.8)
+
+
+def swell(d):
+    t = t_(d); x = np.zeros(len(t))
+    for f in (293.7, 369.99, 440.0, 587.3):
+        for det in (-0.004, 0.004):
+            x += 2 * ((f * (1 + det) * t) % 1) - 1
+    x = fft_filter(x, hi=1600) * np.sin(np.pi * np.clip(t / d, 0, 1)) ** 1.5
+    return fade(norm(x) * 0.3, 0.05, 0.3)
+
+
+def jet(d):
+    t = t_(d)
+    whine = sum(np.sin(2 * np.pi * f * t * (1 + 0.002 * np.sin(2 * np.pi * 0.3 * t))) * a for f, a in ((3150, 0.25), (4720, 0.12)))
+    roar = fft_filter(noise(d), lo=120, hi=1400) * 0.8
+    return fade(norm(roar + whine * 0.5) * 0.38, 0.6, 0.8)
+
+
+def heli(d):
+    t = t_(d); slap = np.maximum(0, np.sin(2 * np.pi * 17 * t)) ** 6
+    x = fft_filter(noise(d), hi=900) * (0.35 + 0.9 * slap) + np.sin(2 * np.pi * 34 * t) * slap * 0.6
+    x += fft_filter(noise(d), lo=2500, hi=6000) * 0.05
+    return fade(norm(x) * 0.5, 0.8, 1.0)
+
+
+def harbor(d):
+    t = t_(d); x = waves(d) * 0.8
+    hs = 2.0; i = int(min(1.0, d * 0.3) * SR); tt = t_(hs)
+    horn = sum(a * np.sin(2 * np.pi * f * tt) for f, a in ((98, 1), (196, 0.5), (294, 0.3), (392, 0.15))) * np.minimum(1, tt / 0.2) * np.minimum(1, (hs - tt) / 0.4)
+    x[i:i + len(horn)] += fft_filter(horn, hi=900)[: len(x) - i] * 0.35
+    return fade(norm(x) * 0.4, 0.5, 0.8)
+
+
+def bubbling(d):
+    out = np.zeros(int(d * SR))
+    for _ in range(int(d * 14)):
+        i = int(rng.uniform(0, max(0.01, d - 0.08)) * SR); dd = rng.uniform(0.02, 0.06); tt = t_(dd)
+        f0 = rng.uniform(280, 700); x = np.sin(2 * np.pi * np.cumsum(f0 * (1 + tt * 6)) / SR) * np.exp(-tt * 60)
+        out[i:i + len(x)] += x[: len(out) - i] * rng.uniform(0.3, 1)
+    out += fft_filter(noise(d), hi=400) * 0.08
+    return fade(norm(out) * 0.35, 0.2, 0.3)
+
+
+def birds(d):
+    out = np.zeros(int(d * SR))
+    for _ in range(int(d * 2.2)):
+        i = int(rng.uniform(0, max(0.01, d - 0.4)) * SR); n = int(rng.integers(1, 4))
+        for q in range(n):
+            dd = rng.uniform(0.05, 0.12); tt = t_(dd); f0 = rng.uniform(2600, 4200); f1 = f0 * rng.uniform(0.7, 1.3)
+            x = np.sin(2 * np.pi * np.cumsum(f0 + (f1 - f0) * tt / dd) / SR) * np.sin(np.pi * tt / dd)
+            j = i + int(q * 0.13 * SR); out[j:j + len(x)] += x[: len(out) - j] * 0.5
+    return fade(out * 0.3, 0.3, 0.4)
+
+
+def night(d):
+    t = t_(d); chirp = (np.sin(2 * np.pi * 4300 * t) * (np.sin(2 * np.pi * 28 * t) > 0.3) * (np.sin(2 * np.pi * 1.6 * t) > 0)).astype(float)
+    x = chirp * 0.25 + fft_filter(noise(d), hi=500) * 0.25
+    return fade(norm(x) * 0.25, 0.5, 0.6)
+
+
 ONE = {'shot': shot, 'boom': lambda: boom(False), 'bigboom': lambda: boom(True), 'whoosh': whoosh, 'pop': pop, 'click': click,
        'thud': thud, 'creak': creak, 'sting': sting, 'sting2': sting2, 'tension': tension, 'beep': beep, 'tick': tick,
        'missile': missile, 'brakes': brakes, 'cheer': cheer, 'clank': clank, 'charge': charge, 'whistle': whistle, 'bell': bell, 'laugh': laugh,
-       'neigh': neigh, 'cannon': cannon, 'volley': volley, 'broadside': broadside}
+       'neigh': neigh, 'cannon': cannon, 'volley': volley, 'broadside': broadside,
+       'hit': hit, 'stamp': stamp, 'swoosh': swoosh, 'gavel': gavel, 'cash': cash, 'paper': paper, 'cock': cock, 'notify': notify, 'shutter': shutter}
 LOOP = {'engine': engine, 'march': march, 'drone': drone, 'train': train, 'wind': wind, 'clock': clock,
         'plane': plane, 'siren': siren, 'waves': waves, 'factory': factory, 'bells': bells, 'crowd': crowd, 'mg': mg, 'fire': fire,
-        'drums': drums, 'choir': choir}
+        'drums': drums, 'choir': choir, 'riser': riser, 'gunfire': gunfire, 'engines': engine, 'sirens': siren, 'typewriter': typewriter, 'traffic': traffic,
+        'swell': swell, 'jet': jet, 'heli': heli, 'harbor': harbor, 'bubbling': bubbling, 'birds': birds, 'night': night}
 
 sfx = np.zeros(N)
 cache = {}
@@ -538,6 +720,82 @@ def napo_march():
     return L, R
 
 
+# ------------------------------------------------------------------ documentary bed for the cartels video (D minor pads, pulse, piano)
+NARCO_MOODS = {'title': 'dark', 'origenes': 'suspense', 'guerra': 'tense', 'corrupcion': 'dark', 'impunidad': 'somber', 'negocio': 'tense', 'mapa': 'tense',
+               'eeuu': 'suspense', 'amlo': 'calm', 'claudia': 'calm', 'criticas': 'somber', 'porque': 'tense', 'outro': 'hope'}
+def narco_bed():
+    bpm = 80; beat = 60 / bpm; bar = 4 * beat
+    CH = {'Dm': [50, 53, 57], 'Bb': [46, 50, 53], 'Gm': [43, 46, 50], 'A': [45, 49, 52], 'F': [41, 45, 48], 'C': [48, 52, 55],
+          'D': [50, 54, 57], 'G': [43, 47, 50], 'Bm': [47, 50, 54]}
+    prog = {'dark': ['Dm', 'Dm', 'Bb', 'A'], 'suspense': ['Dm', 'Bb', 'Gm', 'A'], 'tense': ['Dm', 'Dm', 'Bb', 'A'], 'somber': ['Dm', 'F', 'Gm', 'Dm'],
+            'calm': ['F', 'C', 'Dm', 'Bb'], 'hope': ['D', 'A', 'Bm', 'G']}
+    lament = [[(69, 2), (67, 1), (65, 1)], [(64, 3), (0, 1)], [(65, 2), (62, 2)], [(0, 4)]]
+    L, R = np.zeros(N), np.zeros(N)
+    def add(x, t0, gl=0.5, gr=0.5):
+        i = int(t0 * SR)
+        if i >= N or i < 0: return
+        x = x[: N - i]; L[i:i + len(x)] += x * gl; R[i:i + len(x)] += x * gr
+    cache_ = {}
+    def memo(key, fn):
+        if key not in cache_: cache_[key] = fn()
+        return cache_[key]
+    def saws(f, d, n=3, det=0.006):
+        tt = t_(d); return sum(2 * ((f * (1 + det * (k - (n - 1) / 2)) * tt) % 1) - 1 for k in range(n)) / n
+    def pad(m, d, hi=1100):
+        def mk():
+            f = NOTE(m); tt = t_(d); x = fft_filter(saws(f, d) + 0.6 * np.sin(2 * np.pi * f * tt), hi=hi)
+            return x * np.minimum(1, tt / 0.9) * np.minimum(1, (d - tt) / 0.9)
+        return memo(('p', m, round(d, 3), hi), mk)
+    def piano(m, d=1.8, br=0.35): return memo(('k', m, d, br), lambda: ks(NOTE(m), d, br, 0.997))
+    def kick(): return memo(('kick',), lambda: sweep(100, 42, 0.4) * env_exp(0.4, 9))
+    def hat(): return memo(('hat',), lambda: fft_filter(noise(0.05), lo=6000) * env_exp(0.05, 90))
+    def subb(m, d): return memo(('sb', m, round(d, 3)), lambda: fade(np.tanh(2.2 * np.sin(2 * np.pi * NOTE(m) * t_(d))) * env_exp(d, 3.0), 0.005, 0.04))
+    def trem(m, d):
+        def mk():
+            tt = t_(d); f = NOTE(m); x = fft_filter(saws(f, d, 2, 0.003), hi=2400) * (0.6 + 0.4 * np.sin(2 * np.pi * 7 * tt))
+            return x * np.minimum(1, tt / 1.5) * np.minimum(1, (d - tt) / 1.0)
+        return memo(('tr', m, round(d, 3)), mk)
+    def mood_at(t):
+        for sc in TL['scenes']:
+            if sc['start'] <= t < sc['start'] + sc['dur']: return NARCO_MOODS.get(sc['id'], 'tense')
+        return 'dark'
+    nb = int(TOTAL / bar) + 1
+    for b in range(nb):
+        t0 = b * bar; m = mood_at(t0 + bar / 2); pr = prog[m]; ch = CH[pr[b % len(pr)]]
+        if m in ('dark', 'suspense', 'tense'):
+            for n in ch: add(pad(n - 12, bar) * 0.1, t0, 0.55, 0.45)
+            add(pad(ch[0] - 24, bar, 500) * 0.2, t0)
+            add(kick() * 0.5, t0)
+            if m == 'dark':
+                if b % 2 == 0: add(trem(ch[0] + 12, 2 * bar) * 0.035, t0, 0.4, 0.6)
+            elif m == 'suspense':
+                add(kick() * 0.35, t0 + 2 * beat)
+                for q in range(8): add(piano(ch[(0, 2, 1, 2)[q % 4]] + 12, 0.9, 0.25) * 0.09, t0 + q * beat / 2, 0.42 + 0.02 * q, 0.58 - 0.02 * q)
+            else:
+                add(kick() * 0.4, t0 + 2 * beat)
+                for q in range(8): add(subb(ch[0] - 24 + (12 if q == 7 else 0), beat * 0.45) * 0.16, t0 + q * beat / 2)
+                for q in range(16): add(hat() * (0.05 if q % 4 else 0.08), t0 + q * beat / 4, 0.4, 0.6)
+        elif m == 'somber':
+            for n in ch: add(pad(n - 12, bar) * 0.09, t0, 0.5, 0.5)
+            add(pad(ch[0] - 24, bar, 500) * 0.14, t0)
+            tt = t0
+            for (n, du) in lament[b % 4]:
+                if n: add(piano(n, 2.4, 0.2) * 0.16, tt, 0.45, 0.55)
+                tt += du * beat
+        else:  # calm / hope
+            for n in ch: add(pad(n - 12, bar, 1400) * (0.08 if m == 'calm' else 0.1), t0, 0.5, 0.5)
+            add(pad(ch[0] - 24, bar, 500) * 0.12, t0)
+            arp = [ch[0], ch[1], ch[2], ch[0] + 12, ch[2], ch[1], ch[2], ch[0] + 12]
+            for q, n in enumerate(arp): add(piano(n + 12, 1.4, 0.3) * (0.1 if m == 'calm' else 0.13), t0 + q * beat / 2, 0.4 + 0.03 * q, 0.62 - 0.03 * q)
+            if m == 'hope': add(kick() * 0.3, t0)
+    for X_ in (L, R):
+        y = X_.copy()
+        for dms, g in ((31, 0.28), (53, 0.2), (79, 0.15), (113, 0.11), (173, 0.08), (257, 0.05), (389, 0.03)):
+            d_ = int(dms * SR / 1000); y[d_:] += X_[:-d_] * g
+        X_[:] = fft_filter(y, lo=40, hi=5200)
+    return L, R
+
+
 # ------------------------------------------------------------------ music bed (D minor, slow pads + soft pulse)
 if VIDEO == 'mx':
     musL, musR = corrido(); t_all = np.arange(N) / SR
@@ -545,8 +803,11 @@ if VIDEO == 'mx':
 if VIDEO == 'napo':
     musL, musR = napo_march(); t_all = np.arange(N) / SR
     sc_ = 0.16 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
+if VIDEO == 'narco':
+    musL, musR = narco_bed(); t_all = np.arange(N) / SR
+    sc_ = 0.15 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
 BPM = 84; beat = 60 / BPM
-if VIDEO not in ('mx', 'napo'):
+if VIDEO not in ('mx', 'napo', 'narco'):
     prog = [[146.8, 174.6, 220.0], [116.5, 146.8, 174.6], [174.6, 220.0, 261.6], [130.8, 164.8, 196.0]]  # Dm Bb F C
     bar = 4 * beat
     musL, musR = np.zeros(N), np.zeros(N)

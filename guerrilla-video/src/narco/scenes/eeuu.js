@@ -46,7 +46,7 @@ export function build(ctx) {
       return U.film(t) + U.badge(t, 'Frontera México – EE. UU.', 'Un problema de dos lados', '3,000 km de frontera', tDos - 0.3, tB);
     } },
     { t0: tB, set: A, p0: [-4.5, 34, 6], l0: [-4.5, 0, -8.6], p1: [-4.5, 32, 5], l1: [-4.5, 0, -8.6], fov0: 38, act: (t) => {
-      drugs.forEach(a => a.set(clamp((t - tNorte + 0.3 - a.d) / 2.4))); guns.forEach(a => a.set(0));
+      drugs.forEach(a => { a.visible = true; a.set(clamp((t - tNorte + 0.3 - a.d) / 2.4)); }); guns.forEach(a => a.set(0));
       usTint(t, ss(tMill - 0.2, tMill + 0.5, t));
       return U.film(t) + U.badge(t, 'La droga va al norte', 'Millones de consumidores', 'Fentanilo, cocaína, metanfetamina', tB + 0.2, tC)
         + M.acity(ctx, A, 'Los Ángeles', fade(t, tNorte + 0.6, tC)) + M.acity(ctx, A, 'Chicago', fade(t, tNorte + 1.0, tC)) + M.acity(ctx, A, 'Nueva York', fade(t, tNorte + 1.4, tC))
@@ -54,7 +54,7 @@ export function build(ctx) {
         + U.source(t, tSobre, tC, 'CDC, cifras provisionales');
     } },
     { t0: tC, set: A, p0: [-4.5, 32, 5], l0: [-4.5, 0, -8.6], p1: [-5.0, 30, 4], l1: [-5.0, 0, -8.0], fov0: 38, act: (t) => {
-      const kd = 1 - ss(tC, tC + 0.5, t); drugs.forEach(a => a.set(kd > 0.01 ? 1 : 0)); drugs.forEach(a => (a.visible = kd > 0.01));
+      const kd = 1 - ss(tC, tC + 0.6, t); drugs.forEach(a => { a.visible = kd > 0.01; a.set(kd); });
       guns.forEach(a => { a.visible = true; a.set(clamp((t - tSur + 0.4 - a.d) / 2.0)); });
       usTint(t, 0.6 * (1 - ss(tC, tC + 0.6, t)));
       return U.film(t) + U.badge(t, 'Las armas van al sur', 'Tráfico de armas', 'Compradas legalmente, cruzan de contrabando', tC + 0.2, tD)
