@@ -1,0 +1,28 @@
+<!doctype html><html><head><meta charset="utf-8">
+<style>body{margin:0;background:#000;font-family:Inter,sans-serif}.l{position:absolute;transform:translate(-50%,-50%);font:800 15px Inter;letter-spacing:.12em;text-transform:uppercase;color:rgba(50,36,24,.85);white-space:nowrap}</style></head>
+<body><div id="ui" style="position:absolute;inset:0;pointer-events:none"></div>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import * as GM from './geomap.js';
+import { stage } from '../lib/stage.js';
+try {
+  await GM.preload();
+  const W = 1600, H = 900, q = new URLSearchParams(location.search);
+  const r = new THREE.WebGLRenderer({ antialias: true }); r.setSize(W, H); r.shadowMap.enabled = true; r.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(r.domElement);
+  const scene = stage({ groundA: null, skyTop: '#4a6fa8', skyHor: '#cfe0ea', fog: ['#cfe0ea', 90, 260], sunPos: [6, 30, 12], sun: 2.2, hemi: 1.35, shadow: 40 });
+  const map = GM.buildMap(); scene.add(map.group);
+  const per = q.get('per') || '1812'; GM.setPeriod(map, per);
+  for (const n of ['París', 'Londres', 'Madrid', 'Viena', 'Berlín', 'Moscú', 'Roma', 'Varsovia', 'Austerlitz', 'Waterloo', 'Elba', 'Leipzig']) map.dots[n].visible = true;
+  const cam = new THREE.PerspectiveCamera(40, W / H, 0.1, 900);
+  const v = q.get('v') || 'all';
+  const V = { all: [[2, 62, 30], [2, 0, 2]], west: [[-6, 26, 16], [-5, 0, 3]], central: [[2, 22, 14], [2, 0, -1]], east: [[18, 28, 14], [17, 0, -2]], italy: [[-2, 14, 12], [-2, 0, 4]] }[v];
+  cam.position.set(...V[0]); cam.lookAt(...V[1]); cam.updateMatrixWorld();
+  r.render(scene, cam);
+  const ui = document.getElementById('ui');
+  const pols = ['FRA','GBR','ESP','POR','AUT','PRU','RUS','OTT','SWE','DEN','HRE','CRH','GER','POL','WAR','NED','SUI','SAR','ITK','NAP','PAP','PER','MAR'];
+  for (const p of pols) { const a = GM.labelPos(p, per); if (!a || GM.stateArea(p, per) < 1.5) continue; const v3 = new THREE.Vector3(...a).project(cam);
+    const d = document.createElement('div'); d.className = 'l'; d.textContent = GM.NAMES[p]; d.style.left = ((v3.x + 1) / 2 * W) + 'px'; d.style.top = ((1 - v3.y) / 2 * H) + 'px'; ui.appendChild(d); }
+  window.__ready = true;
+} catch (e) { window.__error = String(e.stack || e); }
+</script></body></html>

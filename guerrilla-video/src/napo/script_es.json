@@ -1,0 +1,68 @@
+{
+ "scenes": [
+  { "id": "title", "lead": 1.8, "tail": 1.2, "lines": [
+    "En mil ochocientos cuatro, un general nacido en la isla de Córcega se coronó emperador de los franceses.",
+    "En los diez años siguientes, sus ejércitos marcharon de Lisboa a Moscú, y casi toda Europa terminó en guerra contra él.",
+    "Estas son las Guerras Napoleónicas."
+  ], "gaps": { "1": 0.8 } },
+  { "id": "revolucion", "lead": 0.8, "tail": 1.2, "lines": [
+    "Todo empezó con la Revolución Francesa. En mil setecientos ochenta y nueve, el pueblo de París tomó la Bastilla, y pocos años después Francia abolió la monarquía y ejecutó a su rey.",
+    "Los reyes de Europa, aterrados de que la revolución se contagiara, se aliaron contra Francia. Comenzaron más de veinte años de guerras.",
+    "En esas guerras se hizo famoso un joven oficial de artillería: Napoleón Bonaparte."
+  ] },
+  { "id": "ascenso", "lead": 0.8, "tail": 1.4, "lines": [
+    "Napoleón ganó batalla tras batalla en Italia, y después se lanzó a conquistar Egipto.",
+    "En mil setecientos noventa y nueve volvió a París, dio un golpe de Estado y se convirtió en el hombre más poderoso de Francia.",
+    "Y en mil ochocientos cuatro, en la catedral de Notre Dame, frente al Papa, se puso la corona él mismo."
+  ] },
+  { "id": "trafalgar", "lead": 0.8, "tail": 1.4, "lines": [
+    "Su gran rival era Gran Bretaña, protegida por el mar y por la flota más poderosa del mundo.",
+    "En mil ochocientos cinco, el almirante Nelson derrotó a la flota francesa y española en la batalla de Trafalgar. Nelson murió en el combate, pero desde entonces los británicos dominaron los mares."
+  ] },
+  { "id": "austerlitz", "lead": 0.8, "tail": 1.4, "lines": [
+    "Pero en tierra, Napoleón parecía invencible. Ese mismo año aplastó a Austria y a Rusia en Austerlitz, su victoria más famosa.",
+    "Al año siguiente destrozó a Prusia en Jena, y en mil ochocientos siete se reunió con el zar de Rusia sobre una balsa, en medio de un río, y firmaron la paz."
+  ] },
+  { "id": "tacticas", "lead": 0.8, "tail": 1.4, "lines": [
+    "¿Por qué ganaba tanto? Primero, por la velocidad: dividía su ejército en cuerpos que marchaban por caminos separados y se juntaban justo a tiempo para la batalla.",
+    "Segundo, por la artillería: concentraba sus cañones en un solo punto para romper la línea enemiga.",
+    "Y tercero, buscaba una sola batalla decisiva para destruir al ejército enemigo de un golpe.",
+    "Además, en su ejército se ascendía por mérito, no por ser noble."
+  ] },
+  { "id": "bloqueo", "lead": 0.8, "tail": 1.6, "lines": [
+    "Como no podía vencer a los británicos en el mar, Napoleón le prohibió a toda Europa comerciar con ellos. A esto se le llamó el Bloqueo Continental.",
+    "Para obligar a Portugal a obedecer, invadió la península ibérica, y en mil ochocientos ocho puso a su hermano José en el trono de España.",
+    "Los españoles se levantaron en armas. Durante seis años, sus guerrillas desangraron al ejército francés. De esa guerra se hizo famosa en todo el mundo la palabra guerrilla.",
+    "Y con el rey de España prisionero de Napoleón, en las colonias americanas comenzaron los movimientos de independencia. En mil ochocientos diez, en la Nueva España, el cura Miguel Hidalgo dio el Grito de Dolores."
+  ], "gaps": { "1": 0.8, "2": 1.0 } },
+  { "id": "imperio", "lead": 0.8, "tail": 1.4, "lines": [
+    "Hacia mil ochocientos diez, el imperio de Napoleón estaba en su punto más alto.",
+    "Francia llegaba de Hamburgo a Roma, y sus hermanos y mariscales gobernaban reinos en España, Italia y Alemania.",
+    "Para tener un heredero, se divorció de Josefina y se casó con una princesa austriaca."
+  ] },
+  { "id": "rusia", "lead": 0.8, "tail": 1.8, "lines": [
+    "Pero en mil ochocientos doce, Rusia dejó de respetar el bloqueo, y Napoleón la invadió con el ejército más grande que Europa había visto: más de seiscientos mil hombres.",
+    "Los rusos se retiraron evitando la batalla y quemando lo que dejaban atrás. En septiembre, tras la sangrienta batalla de Borodinó, Napoleón entró en Moscú, y la encontró vacía y en llamas.",
+    "El zar se negó a negociar. Sin comida y con el invierno encima, Napoleón tuvo que ordenar la retirada.",
+    "El hambre, el frío y los cosacos hicieron el resto. De los más de seiscientos mil hombres que entraron a Rusia, se calcula que regresaron apenas unos cien mil."
+  ], "gaps": { "1": 0.8, "2": 0.8 } },
+  { "id": "caida", "lead": 0.8, "tail": 1.4, "lines": [
+    "Toda Europa se unió contra él. En mil ochocientos trece fue derrotado en Leipzig, en la llamada Batalla de las Naciones.",
+    "Al año siguiente los aliados entraron en París. Napoleón tuvo que abdicar y fue desterrado a la pequeña isla de Elba."
+  ] },
+  { "id": "waterloo", "lead": 0.8, "tail": 1.6, "lines": [
+    "Pero menos de un año después se escapó, desembarcó en Francia y el ejército volvió a ponerse de su lado. Gobernó otra vez durante cien días.",
+    "El dieciocho de junio de mil ochocientos quince se enfrentó en Waterloo a los británicos del duque de Wellington y a los prusianos de Blücher.",
+    "Fue su derrota definitiva. Esta vez lo mandaron a Santa Elena, una isla perdida en medio del océano Atlántico, donde murió seis años después."
+  ], "gaps": { "1": 0.9 } },
+  { "id": "legado", "lead": 0.8, "tail": 1.6, "lines": [
+    "En el Congreso de Viena, los vencedores volvieron a dibujar el mapa de Europa.",
+    "Las Guerras Napoleónicas costaron millones de vidas. Pero también cambiaron el mundo.",
+    "Su Código Civil inspiró las leyes de muchos países, incluido México, y las ideas de la Revolución, como la igualdad ante la ley, se extendieron por toda Europa."
+  ] },
+  { "id": "outro", "lead": 0.8, "tail": 4.2, "lines": [
+    "De oficial de artillería a emperador de media Europa. Y de ahí, a morir desterrado en una isla.",
+    "Esas fueron las Guerras Napoleónicas."
+  ], "gaps": { "0": 0.9 } }
+ ]
+}

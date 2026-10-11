@@ -1,0 +1,29 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body style="margin:0;background:#000">
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import * as C from '../lib/chars.js';
+import * as K from './kit.js';
+import * as HZ from './horse.js';
+import { stage } from '../lib/stage.js';
+try {
+  const W = 1600, H = 900, q = new URLSearchParams(location.search);
+  const r = new THREE.WebGLRenderer({ antialias: true }); r.setSize(W, H); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(r.domElement);
+  const scene = stage({ skyTop: '#5d8ad0', skyHor: '#efe3c8', groundA: '#a9b58a', groundB: '#99a477', sunPos: [4, 9, 8], shadow: 10, hemiGround: '#9a8460' });
+  await C.loadCast();
+  const gaits = [['stand', 0], ['walk', 0], ['gallop', 0], ['stand', 1]];
+  const t = +(q.get('t') || 0.4);
+  gaits.forEach(([g, rear], i) => {
+    const h = HZ.horse({ coat: i === 3 ? '#efeae2' : ['#7a5232', '#5a3a26', '#efeae2'][i], mane: i === 3 ? '#e0dad0' : '#2a1d14', cloth: i === 3 ? '#8a1f2a' : '#2a3f8f', seed: i });
+    h.position.set((i - 1.5) * 1.9, 0, 0); h.rotation.y = +(q.get('yaw') || 1.2); scene.add(h);
+    HZ.animateHorse(h, t, g, { rear });
+    const rd = K.person(scene, i === 3 ? 'napoleon' : 'oguri', i === 3 ? 'napoleon' : 'fusilier', 0, 0, 0);
+    const p = HZ.ridePose(t, i); if (i === 3) { p.armR = [-150, 0, -20]; p.elbR = [0, 0, -10]; }
+    rd.apply({ ...p, gun: 'none' }); rd.setFace('open', 'neutral');
+    HZ.seat(rd, h, { upright: rear ? 0.6 : 0 });
+  });
+  const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 500);
+  const az = +(q.get('az') || 0); cam.position.set(Math.sin(az) * 9, +(q.get('cy') || 1.4), Math.cos(az) * 9); cam.lookAt(0, 0.8, 0);
+  r.render(scene, cam); window.__ready = true;
+} catch (e) { window.__error = String(e.stack || e); }
+</script></body></html>
