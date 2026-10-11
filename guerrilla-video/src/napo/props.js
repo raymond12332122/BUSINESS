@@ -93,7 +93,7 @@ export function ship({ len = 10, hull = '#2a2420', band = '#d8b04a', sails = '#e
   const lh = len * 0.045;
   layer(-lh * 2.2, lh * 2.2, 0.82, '#5a3524');            // below the waterline (copper-brown)
   let y = 0, k = 0.97;
-  for (let d = 0; d < decks; d++) { layer(y, lh * 0.35, k, hull); y += lh * 0.35; layer(y, lh, k * 0.99, band, true); y += lh; k *= 0.97; }
+  for (let d = 0; d < decks; d++) { layer(y, lh * 0.35, k, hull); y += lh * 0.35; layer(y, lh, k * 0.995, band, true); y += lh; k *= 0.985; }
   layer(y, lh * 0.5, k, hull); y += lh * 0.5;
   const deckY = y; g.deckY = deckY;
   // stern castle with windows

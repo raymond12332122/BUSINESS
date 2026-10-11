@@ -37,7 +37,7 @@ export function build(ctx) {
   const M = mapSet({ per: '1805' });
   const jena = GM.arrow([[8.27, 50.0], [10.2, 50.4], CITY['Jena'], [12.5, 52.1], CITY['Berlín']], '#2f4590', 0.5); M.add(jena);
   const mJ = marker(M, ...CITY['Jena'], 'swords', '#2f4590', 1.0);
-  const ev = [{ t: tYena + 0.3, pol: ['PRU'], color: '#7d95cf' }];
+  const ev = [{ t: tYena - 0.25, pol: ['PRU'], color: '#7d95cf' }];
   // ---- 4. Tilsit: the raft on the Niemen
   const T = S.tilsit();
   const napT = K.person(T.raft, 'napoleon', 'napoleon', -1.9, 1.2, Math.PI / 2 - 0.55);
@@ -57,8 +57,8 @@ export function build(ctx) {
     { t0: tB, set: Au, p0: [-7.5, 6.0, 7.5], l0: [1.0, 1.6, -14], p1: [-6.0, 5.4, 5.5], l1: [1.0, 1.8, -14], fov0: 40, act: (t) => austerlitz(t)
         + badge(t, 'La batalla de los tres emperadores', 'Napoleón aplasta a Austria y a Rusia', 'Su victoria más famosa', tApl - 0.1, tM - 0.1) },
     { t0: tM, set: M, p0: [-1.0, 12, 11], l0: [-1.4, 0, -1.2], p1: [-1.0, 11, 9.5], l1: [-1.4, 0, -1.4], fov0: 38, act: (t) => {
-      GM.paint(M.map, ev, t); jena.set(clamp((t - tM - 0.2) / 2.0)); mJ.update(t, tYena - 0.2);
-      return film(t) + city(ctx, M, 'Jena', fade(t, tYena - 0.2, tT), 'c') + city(ctx, M, 'Berlín', fade(t, tYena + 0.6, tT), 'c big')
+      GM.paint(M.map, ev, t); jena.set(clamp((t - tM - 0.1) / 1.6)); mJ.update(t, tYena - 0.4);
+      return film(t) + city(ctx, M, 'Jena', fade(t, tYena - 0.45, tT), 'c') + city(ctx, M, 'Berlín', fade(t, tYena + 0.05, tT), 'c big')
         + badge(t, 'Octubre de 1806', 'Batalla de Jena', 'Prusia es derrotada y Napoleón entra en Berlín', tM + 0.3, tT - 0.1);
     } },
     { t0: tT, set: T, p0: [9, 3.6, 17], l0: [0, 1.6, 0], p1: [6.5, 3.0, 13], l1: [0, 1.6, 0], fov0: 38, act: (t) => tilsit(t)

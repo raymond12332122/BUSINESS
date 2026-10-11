@@ -3,7 +3,7 @@ import * as THREE from 'three';
 import { rng } from '../lib/props.js';
 import { flashTex, softTex } from '../lib/fx.js';
 import { puffTex } from '../mx/props.js';
-import { clamp } from '../lib/util.js';
+import { clamp, ss } from '../lib/util.js';
 
 // Falling / wind-blown snow inside a box that follows nothing (place it around the camera's view).
 export class Snow {
@@ -64,6 +64,43 @@ export class Volleys {
   }
   // [t] list of shot times (for sound events)
   times() { return this.shots.map(s => s.t0); }
+}
+
+// A roundshot / shell striking the ground: flash, a column of thrown earth, flying clods and a grey puff (soft sprites).
+export class Burst {
+  constructor(parent, pos, t0, { size = 1, seed = 1, dirt = '#76664c', smoke = '#9a948a' } = {}) {
+    this.t0 = t0; this.size = size; const r = rng(seed * 13 + 5);
+    this.g = new THREE.Group(); this.g.position.set(...pos); parent.add(this.g);
+    this.flash = new THREE.Sprite(new THREE.SpriteMaterial({ map: flashTex, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true })); this.flash.renderOrder = 6; this.g.add(this.flash);
+    this.parts = [...Array(11)].map((_, i) => { const dirtP = i < 5;
+      const m = new THREE.Sprite(new THREE.SpriteMaterial({ map: puffTex(), color: dirtP ? dirt : smoke, transparent: true, depthWrite: false, fog: true })); m.renderOrder = 4;
+      m.userData = { dirt: dirtP, x: (r() - 0.5) * (dirtP ? 0.5 : 1.0), z: (r() - 0.5) * (dirtP ? 0.5 : 1.0), up: dirtP ? 1.0 + i * 0.45 + r() * 0.4 : 0.4 + r() * 0.7, s: 0.7 + r() * 0.5, rot: r() * 6.28 };
+      this.g.add(m); return m; });
+    const cm = new THREE.MeshStandardMaterial({ color: '#4e3f2c', flatShading: true }), cg = new THREE.BoxGeometry(1, 1, 1);
+    this.clods = [...Array(9)].map(() => { const m = new THREE.Mesh(cg, cm); m.userData = { v: new THREE.Vector3((r() - 0.5) * 3.2, 3.2 + r() * 2.8, (r() - 0.5) * 3.2), w: new THREE.Vector3(r() * 8, r() * 8, r() * 8), s: 0.05 + r() * 0.05 }; this.g.add(m); return m; });
+    this.update(-1);
+  }
+  update(T) {
+    const a = T - this.t0, S = this.size, life = 4.2; this.g.visible = a >= 0 && a < life; if (!this.g.visible) return;
+    this.flash.visible = a < 0.14; this.flash.position.y = 0.35 * S; this.flash.scale.setScalar(2.4 * S * (1 - a / 0.16));
+    for (const m of this.parts) { const u = m.userData;
+      if (u.dirt) {
+        const rise = 1 - Math.exp(-a * 7), h = u.up * S * rise - Math.max(0, a - 0.45) ** 2 * 1.6 * S;
+        m.position.set(u.x * S * (0.6 + rise), Math.max(0.2 * S, h), u.z * S * (0.6 + rise));
+        m.scale.setScalar(S * u.s * (0.35 + 0.75 * rise));
+        m.material.opacity = 0.95 * Math.min(1, a * 25) * (1 - ss(0.5, 1.5, a));
+      } else {
+        const g = 1 - Math.exp(-a * 3), u2 = clamp(a / life);
+        m.position.set(u.x * S * (0.4 + g) + 0.25 * a, (0.3 + u.up * g) * S + 0.12 * a, u.z * S * (0.4 + g));
+        m.scale.setScalar(S * u.s * (0.6 + 1.6 * Math.sqrt(u2) + 0.5 * g));
+        m.material.opacity = 0.75 * Math.min(1, a * 6) * Math.pow(1 - u2, 1.3);
+      }
+      m.material.rotation = u.rot + a * 0.15;
+    }
+    for (const m of this.clods) { const u = m.userData, ta = Math.min(a, (u.v.y + Math.sqrt(u.v.y * u.v.y)) / 9.8);
+      m.position.set(u.v.x * ta * S * 0.5, Math.max(0.02, (u.v.y * ta - 4.9 * ta * ta) * S * 0.5), u.v.z * ta * S * 0.5);
+      m.rotation.set(u.w.x * ta, u.w.y * ta, u.w.z * ta); m.scale.setScalar(u.s * S); }
+  }
 }
 
 // Rising embers / sparks for burning cities.

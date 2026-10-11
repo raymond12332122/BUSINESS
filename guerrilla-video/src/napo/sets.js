@@ -73,7 +73,7 @@ export function toulon(light = 'golden') {
   s.ships = [];
   for (const [x, z, r] of [[-16, -34, 0.6], [6, -40, -0.4], [24, -36, 0.9]]) { const sh = N.ship({ len: 11, flag: 'gb', furled: 0.4, seed: x | 0 }); sh.position.set(x, -2.2, z); sh.rotation.y = r; s.add(sh); s.ships.push(sh); }
   for (let i = 0; i < 5; i++) { const g = N.gabion(0.7); g.position.set(-3.6 + i * 0.62, 0, -0.4 + (i % 2) * 0.08); s.add(g); }
-  LP.scatter(s, (r, i) => (i % 3 ? MX.shrub(0.8 + r() * 0.5, i, '#7d8a4e') : LP.pine(1.2 + r() * 0.4, '#3f6b3a', i)), 30, [-14, -8, 14, 10], 32, [[0, 2, 5]]);
+  LP.scatter(s, (r, i) => (i % 3 ? MX.shrub(0.8 + r() * 0.5, i, '#7d8a4e') : LP.pine(1.2 + r() * 0.4, '#3f6b3a', i)), 30, [-14, -8, 14, 10], 32, [[0, 2, 5], [5, 5, 4.5], [5.5, -1.5, 3]]);
   return s;
 }
 // ---------------------------------------------------------------- Egypt
@@ -361,7 +361,13 @@ export function paris1814() {
   for (let i = 0; i < 6; i++) { const a = N.townhouseFR(3.4, 4.4, ['#e2d6bf', '#d8c8a8', '#e8dcc4'][i % 3], i); a.position.set(-6, 0, 8 - i * 3.6); a.rotation.y = Math.PI / 2; s.add(a);
     const b = N.townhouseFR(3.4, 4.2, ['#d8c8a8', '#e8dcc4', '#e2d6bf'][i % 3], i + 7); b.position.set(6, 0, 8 - i * 3.6); b.rotation.y = -Math.PI / 2; s.add(b); }
   const nd = new THREE.Group(); for (const x of [-2.6, 2.6]) nd.add(LP.at(LP.box(3.4, 14, 3.4, '#c9bfa8'), x, 7, 0)); nd.add(LP.at(LP.box(9, 9, 3, '#c9bfa8'), 0, 4.5, 0.2));
-  const rose = new THREE.Mesh(new THREE.CircleGeometry(1.4, 24), std('#5a5a6a')); rose.position.set(0, 6.4, 1.75); nd.add(rose); nd.position.set(0, 0, -26); s.add(nd);
+  const roseTex = MX.canvasTex(256, 256, (g, W) => { const c = W / 2; g.fillStyle = '#c9bfa8'; g.fillRect(0, 0, W, W); g.fillStyle = '#34406e'; g.beginPath(); g.arc(c, c, 122, 0, 7); g.fill();
+    for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2; g.fillStyle = ['#8a2f3f', '#3a64a8', '#c9a23a', '#3a64a8'][i % 4]; g.beginPath(); g.arc(c + Math.cos(a) * 88, c + Math.sin(a) * 88, 21, 0, 7); g.fill(); }
+    for (let i = 0; i < 8; i++) { const a = (i + 0.5) / 8 * Math.PI * 2; g.fillStyle = ['#c9a23a', '#8a2f3f'][i % 2]; g.beginPath(); g.arc(c + Math.cos(a) * 48, c + Math.sin(a) * 48, 15, 0, 7); g.fill(); }
+    g.fillStyle = '#c9a23a'; g.beginPath(); g.arc(c, c, 17, 0, 7); g.fill(); g.strokeStyle = '#c9bfa8'; g.lineWidth = 5;
+    for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2; g.beginPath(); g.moveTo(c + Math.cos(a) * 26, c + Math.sin(a) * 26); g.lineTo(c + Math.cos(a) * 122, c + Math.sin(a) * 122); g.stroke(); }
+    g.lineWidth = 9; g.beginPath(); g.arc(c, c, 66, 0, 7); g.stroke(); g.lineWidth = 12; g.beginPath(); g.arc(c, c, 122, 0, 7); g.stroke(); });
+  const rose = new THREE.Mesh(new THREE.CircleGeometry(1.4, 32), new THREE.MeshStandardMaterial({ map: roseTex, roughness: 0.5, emissive: '#ffffff', emissiveMap: roseTex, emissiveIntensity: 0.25 })); rose.position.set(0, 6.4, 1.75); nd.add(rose); nd.position.set(0, 0, -26); s.add(nd);
   return s;
 }
 export function elba(light = 'day') {
@@ -406,7 +412,7 @@ export function vienna() {
   const s = interior({ wall: '#f0e8d8', floor: '#8a6a4a', w: 14, d: 10, h: 6, lights: [[-3, 4.8, 0], [3, 4.8, 0]] });
   for (const x of [-6.95, 6.95]) for (let i = 0; i < 4; i++) s.add(LP.at(LP.box(0.06, 5.4, 0.25, '#d4af37'), x * 0.999, 2.8, -4 + i * 2.6));
   for (const x of [-3, 3]) { const c = N.chandelier(); c.position.set(x, 4.6, 0); s.add(c); }
-  const t = N.pedestalTable('#5a3a24', '#2f5a3a', 4.4, 2.2); t.position.set(0, 0, -0.4); s.add(t);
+  const t = N.pedestalTable('#5a3a24', '#2f5a3a', 3.8, 1.3); t.position.set(0, 0, -0.6); t.scale.y = 0.62; s.add(t); s.table = t;
   return s;
 }
 export function memorial() {

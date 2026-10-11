@@ -302,7 +302,25 @@ function ermineTex() {
 export function wearCape(r, c, pos = [0, 0.5, -0.1]) { r.attach('chest', c, pos); r.cape = c; return c; }
 
 // ------------------------------------------------------------ outfits and casting
-const hat = (r, h, o) => wearHat(r, h, o);
+// tamamo's ribbons and the hair-bun ornament on top of her head poke through close-fitting caps
+const hat = (r, h, o) => { const w = wearHat(r, h, o); if (o?.cap && r.key === 'tamamo') { flattenAhoge(r, 0.02, /^Sp_He_Ribbon\d_[LR]_00/); dropHairBits(r, [[-0.219, 0.957, 0.168], [-0.197, 0.91, 0.112]]); } return w; };
+// Remove small one-sided hair ornaments that poke through hats: collapse every mesh island of the hair whose
+// bind-space centroid lies within r of one of the given points (works on a private copy of the geometry).
+export function dropHairBits(rig, points, r = 0.03) {
+  rig.model.traverse(o => {
+    if (!o.isMesh || !/hair/i.test(o.material.name || '') || !o.geometry.index) return;
+    const g = o.geometry = o.geometry.clone(), P = g.attributes.position, I = g.index.array, n = P.count;
+    const par = Int32Array.from({ length: n }, (_, i) => i), find = x => { while (par[x] !== x) { par[x] = par[par[x]]; x = par[x]; } return x; };
+    for (let i = 0; i < I.length; i += 3) { const a = find(I[i]); par[find(I[i + 1])] = a; par[find(I[i + 2])] = a; }
+    const sum = new Map(); for (let i = 0; i < n; i++) { const k = find(i), s = sum.get(k) || [0, 0, 0, 0]; s[0] += P.getX(i); s[1] += P.getY(i); s[2] += P.getZ(i); s[3]++; sum.set(k, s); }
+    for (let i = 0; i < n; i++) { const s = sum.get(find(i)), c = [s[0] / s[3], s[1] / s[3], s[2] / s[3]];
+      if (points.some(q => Math.hypot(c[0] - q[0], c[1] - q[1], c[2] - q[2]) < r)) P.setXYZ(i, c[0], c[1], c[2]); }
+    P.needsUpdate = true;
+  });
+  return rig;
+}
+// Faces are unlit; in dim or coloured light tint them so they don't glow like masks.
+export function faceTint(rig, color) { rig.faceMats.forEach(m => m.color.set(color)); return rig; }
 const bic = (o = {}) => bicorne(o);
 export const OUTFITS = {
   napoleon: r => { uniformize(r, 'napoleon'); hat(r, bic(), { scale: 0.86, y: 0.88, tilt: -0.05, cap: true }); return r; },

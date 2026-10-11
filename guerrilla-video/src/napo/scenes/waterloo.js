@@ -50,8 +50,8 @@ export function build(ctx) {
   const haze = FX.haze(W, { n: 14, box: [-25, 25, 1, 5, -24, -2], color: '#d4d0c8', size: 10, opacity: 0.2 });
   // ---- 7. Defeat at dusk
   const Df = S.field('dusk', { ground: ['#7a7a52', '#6a6a48'], seed: 330, smoke: true });
-  const dHz = horse({ coat: '#efeae2', mane: '#ddd6c8', cloth: '#2a3f8f', seed: 33 }); dHz.position.set(0, 0, 0); dHz.rotation.y = 0.9; Df.add(dHz);
-  const napD = K.person(Df, 'napoleon', 'napoleon', 0, 0, 0);
+  const dHz = horse({ coat: '#efeae2', mane: '#ddd6c8', cloth: '#2a3f8f', seed: 33 }); dHz.position.set(0, 0, 0); dHz.rotation.y = 1.5; Df.add(dHz);
+  const napD = K.person(Df, 'napoleon', 'napoleon', 0, 0, 0); K.faceTint(napD, '#dcb8a8');
   const guard = new Troop(Df, { rows: 4, cols: 10, seed: 340, coat: '#25336b', hat: 'bearskin' });
   const dHaze = FX.haze(Df, { n: 14, box: [-20, 20, 1, 5, -18, 2], color: '#b8a8a0', size: 10, opacity: 0.35 });
   // ---- 8-9. Saint Helena
@@ -85,10 +85,10 @@ export function build(ctx) {
         + badge(t, '18 de junio de 1815', 'La batalla de Waterloo', 'Hoy en Bélgica', tWat - 0.2, tWe - 0.1) },
     { t0: tWe, set: W, p0: [5.5, 1.85, -6.6], l0: [2.3, 1.4, -10.8], p1: [5.1, 1.8, -7.1], l1: [2.3, 1.4, -10.8], fov0: 36, act: (t) => waterloo(t)
         + nameplate(ctx, [2.5, 2.1, -10.5], 'Duque de Wellington', 'Ejército británico', tWel - 0.2, tBl + 0.2) },
-    { t0: tBl, set: W, p0: [-18.5, 1.7, -2.4], l0: [-21.5, 1.35, -6.0], p1: [-18.9, 1.65, -2.9], l1: [-21.5, 1.35, -6.0], fov0: 38, act: (t) => waterloo(t)
+    { t0: tBl, set: W, p0: [-14.6, 1.9, -0.6], l0: [-20.6, 1.2, -6.4], p1: [-15.2, 1.85, -1.3], l1: [-20.4, 1.2, -6.4], fov0: 38, act: (t) => waterloo(t)
         + nameplate(ctx, [bHz.position.x, 2.1, bHz.position.z], 'Gebhard von Blücher', 'Ejército prusiano', tBlu - 0.25, tD + 0.2) },
-    { t0: tD, set: Df, p0: [1.8, 1.1, 3.4], l0: [-0.2, 1.3, -1.0], p1: [1.5, 1.08, 2.9], l1: [-0.2, 1.3, -1.0], fov0: 38, act: (t) => {
-      animateHorse(dHz, t, 'stand', { seed: 9 }); const p = ridePose(t, 9); p.head = [12, 0, 0]; K.pose(napD, p); seat(napD, dHz); napD.setFace('flat', 'frown');
+    { t0: tD, set: Df, p0: [2.7, 1.55, 2.5], l0: [0.0, 1.4, -0.1], p1: [2.35, 1.5, 2.15], l1: [0.0, 1.42, -0.1], fov0: 38, act: (t) => {
+      animateHorse(dHz, t, 'stand', { seed: 9 }); const p = ridePose(t, 9); p.head = [8, 0, 0]; K.pose(napD, p); seat(napD, dHz); napD.setFace('flat', 'frown');
       guard.update(t, { x: -2, z: -9 - (t - tD) * 0.6, yaw: Math.PI, march: 1, speed: 0.8, tired: 0.4 }); dHaze(t); S.aimSun(Df, 0, -2);
       return film(t) + stamp(t, 'DERROTA<br>DEFINITIVA', tDef + 0.2, tS, { x: 1400, y: 300, rot: -8, color: '#7a1f1f' });
     } },

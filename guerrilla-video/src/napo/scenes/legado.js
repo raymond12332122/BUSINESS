@@ -20,10 +20,10 @@ export function build(ctx) {
   const tCod = wt(L[2], 'codigo'), tLey = wt(L[2], 'leyes'), tMex = wt(L[2], 'mexico'), tIde = wt(L[2], 'ideas'), tIgu = wt(L[2], 'igualdad'), tExt = wt(L[2], 'extendieron');
 
   // ---- 1. The Congress of Vienna
-  const V = S.vienna(); V.children.filter(o => o.isGroup && o.position.z === -0.4).forEach(t => (t.scale.y = 0.62));
-  const dipl = [[-1.6, -1.7, 0.1], [0, -1.8, 0], [1.6, -1.7, -0.1], [-2.6, -0.4, Math.PI / 2], [2.6, -0.4, -Math.PI / 2]].map(([x, z, y], i) =>
+  const V = S.vienna();
+  const dipl = [[-1.3, -1.55, 0.1], [0, -1.6, 0], [1.3, -1.55, -0.1], [-2.25, -0.55, Math.PI / 2], [2.25, -0.55, -Math.PI / 2]].map(([x, z, y], i) =>
     K.person(V, ['zar', 'wellington', 'tamamo', 'oguri', 'doto', 'suzuka', 'daiwa'][i], i === 0 ? 'zar' : i === 1 ? 'wellington' : 'diplomat', x, z, y));
-  const papers = [[-0.8, -0.6], [0.6, -0.3], [0, 0.0]].map(([x, z], i) => { const p = new THREE.Mesh(new THREE.PlaneGeometry(0.4, 0.3), new THREE.MeshStandardMaterial({ color: '#f3ead6' })); p.rotation.set(-Math.PI / 2, 0, i * 0.4); p.position.set(x, 0.535, z - 0.4); V.add(p); return p; });
+  const papers = [[-0.8, -0.45], [0.6, -0.2], [0, 0.1]].map(([x, z], i) => { const p = new THREE.Mesh(new THREE.PlaneGeometry(0.4, 0.3), new THREE.MeshStandardMaterial({ color: '#f3ead6' })); p.rotation.set(-Math.PI / 2, 0, i * 0.4); p.position.set(x, 0.526, z - 0.6); V.add(p); return p; });
   // ---- 2. The map is redrawn (1812 -> 1815)
   const M = mapSet({ per: '1812' });
   // ---- 3. Millions of lives
@@ -32,7 +32,7 @@ export function build(ctx) {
   const Co = S.codeRoom();
   // ---- 5. Equality before the law spreads (map 1815)
   const M2 = mapSet({ per: '1815' });
-  const order = ['FRA', 'NED', 'SUI', 'SAR', 'GER', 'ESP', 'POR', 'PAP', 'TUS', 'NAP', 'SIC', 'AUT', 'PRU', 'DEN', 'POL', 'SWE', 'GBR', 'RUS', 'OTT'];
+  const order = ['FRA', 'NED', 'SUI', 'SAR', 'GER', 'ESP', 'POR', 'PAP', 'TUS', 'NAP', 'SIC', 'AUT', 'PRU', 'DEN', 'POL', 'SWE'];
   const ev2 = order.map((p, i) => ({ t: tIde + 0.1 + i * 0.16, pol: [p], color: '#f0c862' }));
 
   const sfx = [{ t: 0.2, type: 'crowd', dur: tDib, vol: 0.35 }, { t: tDib - 0.05, type: 'whoosh', vol: 0.6 }, { t: tCos - 0.2, type: 'drone', dur: tPero - tCos, vol: 0.4 },
@@ -40,7 +40,7 @@ export function build(ctx) {
 
   const tM = tDib - 0.9, tMe = L[1].t0 - 0.15, tC = tPero - 0.15, tM2 = tIde - 0.3;
   const shots = [
-    { t0: 0, set: V, p0: [0.2, 2.1, 3.6], l0: [0, 0.75, -0.6], p1: [0.2, 1.9, 3.0], l1: [0, 0.75, -0.6], fov0: 42, act: (t) => {
+    { t0: 0, set: V, p0: [0.3, 1.42, 3.4], l0: [0, 0.78, -1.0], p1: [0.25, 1.36, 3.0], l1: [0, 0.8, -1.0], fov0: 42, act: (t) => {
       dipl.forEach((d, i) => { K.pose(d, (i + Math.floor(t * 0.8)) % 3 === 0 ? A.orate(t, i, 0.8) : C.idle(t, i, 0.5)); d.setFace(C.blinkEye(t, i), (i + Math.floor(t * 0.8)) % 3 === 0 ? C.talkMouth(t, i) : 'neutral'); });
       return film(t) + badge(t, '1814 – 1815', 'El Congreso de Viena', 'Los vencedores se reparten Europa', tCon - 0.2, tM - 0.1);
     } },

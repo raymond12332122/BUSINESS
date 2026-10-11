@@ -78,7 +78,7 @@ export function build(ctx) {
       return film(t) + city(ctx, M2, 'Alejandría', fade(t, tM2, tH), 'c') + city(ctx, M2, 'París', fade(t, tVol, tH), 'c big')
         + badge(t, 'Octubre de 1799', 'Regresa a Francia', 'Deja a su ejército en Egipto y vuelve a París', tM2 + 0.3, tH - 0.1);
     } },
-    { t0: tH, set: H, p0: [0.4, 1.5, 6.4], l0: [0.4, 1.0, -2.5], p1: [0.2, 1.4, 5.6], l1: [0.4, 1.0, -2.5], fov0: 40, act: (t) => coup(t)
+    { t0: tH, set: H, p0: [-1.0, 1.7, 7.5], l0: [1.0, 1.0, -1.5], p1: [-0.9, 1.6, 6.8], l1: [1.0, 1.0, -1.5], fov0: 44, act: (t) => coup(t)
         + stamp(t, 'GOLPE DE ESTADO<br>18 DE BRUMARIO', tGol, tH2, { x: 1400, y: 260, rot: -6 }) },
     { t0: tH2, set: H, p0: [1.7, 1.0, 4.6], l0: [2.6, 0.95, 2.4], p1: [1.85, 1.0, 4.15], l1: [2.6, 0.95, 2.4], fov0: 36, act: (t) => coup(t)
         + badge(t, '1799', 'Primer Cónsul', 'El hombre más poderoso de Francia', tConv + 0.1, tN) },

@@ -30,8 +30,8 @@ export function build(ctx) {
   const F = S.field('golden', { ground: ['#9aa65e', '#8a9852'], seed: 77 });
   const order = [['nelson', 'nelson', 'Nelson'], ['josefina', 'josefina', 'Josefina'], ['zar', 'zar', 'Alejandro I'], ['napoleon', 'napoleon', 'Napoleón'], ['wellington', 'wellington', 'Wellington'], ['blucher', 'blucher', 'Blücher'], ['jose', 'jose', 'José Bonaparte'], ['hidalgo', 'hidalgo', 'Miguel Hidalgo']];
   const cast = order.map(([w, o], i) => K.person(F, w, o, -4.2 + i * 1.2, 6 - Math.abs(i - 3.5) * 0.1, 0));
-  const flags = [['gb', -5.6], ['ru', -2.8], ['fr', 0.0], ['pr', 2.8], ['es', 5.0]].map(([k, x]) => { const f = N.flag(k, 3.0, 1.15, 0.7); f.position.set(x - 0.5, 0, 3.4); F.add(f); return f; });
-  const mx = MX.flag('mx', 3.0, 1.15, 0.7); mx.position.set(6.4, 0, 3.6); F.add(mx); flags.push(mx);
+  const flags = [['gb', -5.0], ['ru', -3.0], ['fr', -1.0], ['pr', 1.0], ['es', 3.0]].map(([k, x]) => { const f = N.flag(k, 2.35, 1.0, 0.62); f.position.set(x - 0.5, 0, 3.0); F.add(f); return f; });
+  const mx = MX.flag('mx', 2.35, 1.0, 0.62); mx.position.set(4.5, 0, 3.0); F.add(mx); flags.push(mx);
 
   const sfx = [{ t: 0.3, type: 'cannon', vol: 0.4 }, { t: tEmp - 0.1, type: 'sting2', vol: 0.5 }, { t: tY - 0.1, type: 'waves', dur: L[1].t0 - tY + 0.4, vol: 0.5 }, { t: L[1].t0 - 0.1, type: 'sting', vol: 0.8 }];
 

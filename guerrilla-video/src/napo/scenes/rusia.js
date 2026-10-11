@@ -48,7 +48,7 @@ export function build(ctx) {
   const def = new Troop(Bo, { rows: 2, cols: 12, seed: 150, coat: '#2f5038', hat: 'shako', plume: null });
   const bv = new FX.Volleys(Bo, { size: 1.0, life: 5, drift: [0.4, 0.2, 0.2], flashSize: 1.0 });
   Bo.guns.forEach((g, i) => { for (let k = 0; k < 3; k++) { g.updateMatrixWorld(true); const p = new THREE.Vector3(); g.muzzle.getWorldPosition(p); bv.add(tSep + 0.1 + i * 0.3 + k * 1.1, p, [0, 0, 1], { puffs: 3, size: 1.6 }); } });
-  const booms = [[-4, 0], [2.5, -1.5], [-1, 1.5], [5, 0.5]].map(([x, z], i) => new F.Explosion(Bo, [x, 0, z], tSep + 0.6 + i * 0.7, 0.9, 210 + i, { light: 0.25, smokeColor: '#7a7066' }));
+  const booms = [[-3.5, -4.2], [2.0, -5.6], [-0.8, -3.8], [4.6, -4.8]].map(([x, z], i) => new FX.Burst(Bo, [x, 0, z], tSep + 0.6 + i * 0.7, { size: 1.0, seed: 210 + i }));
   const haze = FX.haze(Bo, { n: 16, box: [-20, 20, 1, 5, -16, 4], color: '#cfcac0', size: 10, opacity: 0.35 });
   // ---- 5. Moscow in flames
   const Mo = S.moscow();
@@ -63,7 +63,7 @@ export function build(ctx) {
   // ---- 7. The retreat begins
   const Sn = S.snowPlain('snow');
   const retreat = [[-2, -6], [-14, -9], [10, -8]].map(([x, z], i) => { const tr = new Troop(Sn, { rows: 4, cols: 9, seed: 160 + i, coat: '#2f4590', hat: 'shako' }); tr.x = x; tr.z = z; return tr; });
-  const shz = horse({ coat: '#e8e2d8', mane: '#d0c8bc', cloth: '#2a3f8f', seed: 16 }); shz.position.set(0.6, 0, 1.6); shz.rotation.y = -Math.PI / 2 - 0.35; Sn.add(shz);
+  const shz = horse({ coat: '#e8e2d8', mane: '#d0c8bc', cloth: '#2a3f8f', seed: 16 }); shz.position.set(0.6, 0, 1.6); shz.rotation.y = -Math.PI / 2 + 0.3; Sn.add(shz);
   const napS = K.person(Sn, 'napoleon', 'napoleon', 0, 0, 0);
   const snow1 = new FX.Snow(Sn, { n: 900, box: [-12, 12, -0.5, 7, -10, 8], wind: [-1.0, -1.1, 0.2], size: 0.07 });
   // ---- 8. Blizzard and cossacks
@@ -128,7 +128,7 @@ export function build(ctx) {
     } },
     { t0: tS, set: Sn, p0: [-4.5, 1.2, 6.5], l0: [1.0, 1.1, -2], p1: [-3.6, 1.15, 5.5], l1: [1.0, 1.1, -2], fov0: 40, act: (t) => {
       retreat.forEach((tr, i) => tr.update(t, { x: tr.x - (t - tS) * 0.7, z: tr.z, yaw: -Math.PI / 2, march: 1, speed: 0.7, tired: 0.5 }));
-      animateHorse(shz, t, 'walk', { speed: 0.6, seed: 7 }); shz.position.x = 0.6 - (t - tS) * 0.4; const p = ridePose(t, 7); p.head = [10, 0, 0]; K.pose(napS, p); seat(napS, shz); napS.setFace('flat', 'frown');
+      animateHorse(shz, t, 'walk', { speed: 0.6, seed: 7 }); shz.position.x = 0.6 - (t - tS) * 0.38; shz.position.z = 1.6 + (t - tS) * 0.12; const p = ridePose(t, 7); p.head = [6, 0, 0]; K.pose(napS, p); seat(napS, shz); napS.setFace('flat', 'frown');
       snow1.update(t); S.aimSun(Sn, 0, 0);
       return film(t) + badge(t, 'Octubre de 1812', 'La retirada', 'Sin comida y con el invierno encima', tSin, tZ - 0.1);
     } },

@@ -118,7 +118,7 @@ export function build(ctx) {
         + badge(t, '1808 – 1825', 'Las independencias', 'Las colonias españolas se levantan', tCol + 0.2, tD - 0.1);
     } },
     { t0: tD, set: Do, p0: [6.6, 7.6, 2.4], l0: [4.2, 9.6, -6.0], p1: [6.2, 8.0, 1.6], l1: [4.2, 10.0, -6.0], fov0: 38, act: (t) => dolores(t) },
-    { t0: tD2, set: Do, p0: [0.5, 1.25, 3.9], l0: [0.1, 1.15, -2.0], p1: [0.4, 1.2, 3.2], l1: [0.1, 1.15, -2.0], fov0: 42, act: (t) => dolores(t)
+    { t0: tD2, set: Do, p0: [0.4, 1.2, 2.2], l0: [0.1, 1.1, -2.0], p1: [0.35, 1.18, 1.6], l1: [0.1, 1.1, -2.0], fov0: 42, act: (t) => dolores(t)
         + nameplate(ctx, [0.2, 1.5, -1.8], 'Miguel Hidalgo', 'Cura de Dolores', tCura - 0.2, tGrito + 0.4)
         + badge(t, '16 de septiembre de 1810', 'El Grito de Dolores', 'Comienza la guerra de independencia de México', tGrito - 0.1, ctx.dur) },
   ];
