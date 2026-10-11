@@ -56,7 +56,7 @@ export function build(ctx) {
       return film(t) + nameplate(ctx, [0, 1.75, -3.1], 'Francisco I. Madero', 'Presidente de México', 1.0, tPero - 0.2)
         + badge(t, '6 de noviembre de 1911', 'Madero, presidente', 'Gana las elecciones con amplio apoyo', 1.6, tPero - 0.2);
     } },
-    { t0: tPero, set: O, p0: [0.9, 1.15, 1.9], l0: [0.4, 0.85, -1.4], p1: [0.7, 1.12, 1.5], l1: [0.4, 0.85, -1.4], fov0: 38, act: (t) => {
+    { t0: tPero, set: O, p0: [1.0, 1.2, 2.5], l0: [0.45, 0.95, -1.3], p1: [0.85, 1.18, 2.15], l1: [0.45, 0.95, -1.3], fov0: 38, act: (t) => {
       { const p = A.sit(t, 2, 4); p.armL = [-50, -25, -60]; p.armR = [-50, 25, 60]; p.elbL = [0, -40, 0]; p.elbR = [0, 40, 0]; p.head = [4, 8 * Math.sin(t * 0.9), 0]; K.pose(m2, p); }
       m2.setFace(C.blinkEye(t, 2), 'small');
       K.pose(hac, A.proud(t, 3)); hac.setFace(t > tHac ? 'happy' : C.blinkEye(t, 3), t > tHac ? 'grin' : 'smile');

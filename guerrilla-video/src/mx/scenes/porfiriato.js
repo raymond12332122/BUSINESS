@@ -113,7 +113,7 @@ export function build(ctx) {
       const n = clamp(Math.floor((t - L[3].t0 - 0.8) / 0.42) + 1, 0, 8);
       const chips = years.slice(0, n).map((y, i) => `<span style="display:inline-block;margin:6px;padding:8px 16px;border-radius:10px;background:#2a211b;color:#fff;font:800 30px Inter;border-bottom:4px solid #e0b84a">${y}</span>`).join('');
       const k = ss(L[3].t0 + 0.5, L[3].t0 + 0.9, t);
-      return film(t) + (k > 0 ? `<div style="position:absolute;left:80px;top:80px;width:640px;opacity:${k}"><div style="font:800 24px Inter;letter-spacing:.2em;color:#e0b84a">DÍAZ, ELECTO EN</div><div style="margin-top:8px">${chips}</div></div>` : '');
+      return film(t) + (k > 0 ? `<div style="position:absolute;left:80px;top:80px;width:600px;padding:18px 20px 14px;background:rgba(32,25,20,.88);border-radius:14px;opacity:${k}"><div style="font:800 24px Inter;letter-spacing:.2em;color:#e0b84a;margin-left:6px">DÍAZ, ELECTO EN</div><div style="margin-top:8px">${chips}</div></div>` : '');
     } },
   ];
   const inst = { scene: Z, scenes: [Z, M, H, T, E], sfx };

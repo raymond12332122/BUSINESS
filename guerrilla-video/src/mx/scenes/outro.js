@@ -37,7 +37,7 @@ export function build(ctx) {
       aimSun(S1, x * 0.5, 0);
       return film(t) + badge(t, '1910 – 1920', 'Diez años de guerra', 'Cerca de un millón de vidas', 0.8, tIdea - 0.1);
     } },
-    { t0: tIdea, set: R, p0: [1.2, 1.25, -0.6], l0: [0, 2.2, -5.2], p1: [0.8, 1.3, -1.6], l1: [0, 2.4, -5.2], fov0: 42, act: (t) => {
+    { t0: tIdea, set: R, p0: [0.95, 1.15, -1.6], l0: [0, 1.7, -4.8], p1: [0.8, 1.17, -2.1], l1: [0, 1.74, -4.8], fov0: 48, act: (t) => {
       K.pose(madero, A.orate(t, 1, 0.9)); madero.setFace(C.blinkEye(t, 1), C.talkMouth(t, 1)); aimSun(R, 0, -2);
       return film(t);
     } },

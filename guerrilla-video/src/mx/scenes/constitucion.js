@@ -82,7 +82,7 @@ export function build(ctx) {
       flagO.wave(t); gush(t, new THREE.Vector3(0.5, 6.8, -18), 1); aimSun(O, 0, -6);
       return film(t) + card(t, tPet - 0.2, L[2].t0 - 0.1, 'ARTÍCULO 27', 'El subsuelo es de la nación', 'El petróleo y los minerales pertenecen a México', { icon: '🛢️' });
     } },
-    { t0: L[2].t0 - 0.2, set: B, p0: [0.75, 1.65, 2.3], l0: [-0.2, 1.25, -0.7], p1: [0.6, 1.6, 1.8], l1: [-0.2, 1.22, -0.7], fov0: 38, act: (t) => {
+    { t0: L[2].t0 - 0.2, set: B, p0: [0.8, 1.5, 3.1], l0: [-0.2, 0.95, -0.6], p1: [0.65, 1.45, 2.6], l1: [-0.2, 0.93, -0.6], fov0: 38, act: (t) => {
       flagB.wave(t * 0.4);
       return film(t) + stamp(t, 'VIGENTE HOY', tVig, ctx.dur, { x: 1440, y: 300, rot: -8, color: '#1f7a3a' })
         + badge(t, '1917 → hoy', 'La Constitución de 1917', 'Con cientos de reformas, sigue rigiendo a México', L[2].t0 + 0.3, tVig - 0.1);

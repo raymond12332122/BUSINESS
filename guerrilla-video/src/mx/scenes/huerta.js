@@ -25,7 +25,7 @@ export function build(ctx) {
   const sb = X.sandbags(7, 2); sb.position.set(0.6, 0, 1.2); D.add(sb);
   const fed = [0, 1, 2].map(i => K.person(D, ['oguri', 'tamamo', 'helios'][i], 'federal', 0.0 + i * 0.75, 1.75 + (i % 2) * 0.2, Math.PI));
   const muz = fed.map(c => new F.Muzzle(c.gun, 4)); muz.forEach((m, i) => m.fire(1.0 + i * 0.4, 7.5));
-  const booms = [[1.4, [-4.4, 2.6, 5.5]], [2.9, [4.3, 1.6, 7.5]], [4.4, [-2.4, 0.4, 9.5]], [5.7, [4.4, 3.0, 3.0]], [6.9, [-4.3, 1.8, 8.5]]].map(([t0, p], i) => new F.Explosion(D, p, t0, 1.2, 70 + i, { fire: 0.6, light: 0.2 }));
+  const booms = [[1.4, [-4.4, 2.6, 5.5]], [2.9, [4.3, 1.6, 7.5]], [4.4, [-2.4, 0.4, 9.5]], [5.7, [4.4, 3.0, 3.0]], [6.9, [-4.3, 1.8, 8.5]]].map(([t0, p], i) => new F.Explosion(D, p, t0, 1.2, 70 + i, { fire: 0.6, light: 0.2, dull: true }));
   const canFlash = [0.8, 3.6, 6.3];
   const canSmoke = X.smokeTrail(D, 10, { color: '#a8a39b', size: 0.6, rise: 2.5, drift: [0.5, 0, -1.5], life: 2.6, opacity: 0.55 });
   const flash = new THREE.PointLight('#ffcf8a', 0, 18, 1.4); flash.position.set(-1.2, 1.5, 0.6); D.add(flash);

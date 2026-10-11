@@ -65,7 +65,7 @@ export function build(ctx) {
       return film(t) + nameplate(ctx, [0, 2.05, -4.2], 'Francisco I. Madero', 'Candidato antirreeleccionista', 1.6, tLema - 0.3)
         + badge(t, '1910', 'Elecciones presidenciales', 'Madero recorre el país en campaña contra Díaz', 2.4, tLema - 0.25);
     } },
-    { t0: tLema - 0.2, set: R, p0: [1.3, 1.15, -0.2], l0: [0, 1.95, -4.8], p1: [1.0, 1.2, -1.0], l1: [0, 2.0, -4.8], fov0: 44, act: (t) => {
+    { t0: tLema - 0.2, set: R, p0: [0.95, 1.15, -1.6], l0: [0, 1.7, -4.8], p1: [0.8, 1.17, -2.1], l1: [0, 1.74, -4.8], fov0: 48, act: (t) => {
       K.pose(madero, A.orate(t, 1, 1)); madero.setFace(t > tSuf ? 'open' : C.blinkEye(t, 1), C.talkMouth(t, 1));
       crowd.forEach((c, i) => K.pose(c, { ...C.cheer(t + i * 0.3, i), gun: 'none' }));
       flags.forEach((f, i) => f.wave(t + i)); aimSun(R, 0, -2);
@@ -87,8 +87,8 @@ export function build(ctx) {
       return film(t) + city(ctx, M, 'San Luis Potosí', fade(t, L[2].t0, tUn)) + city(ctx, M, 'San Antonio', fade(t, L[2].t0 + 2.6, tUn), 'c big')
         + badge(t, 'Octubre de 1910', 'Huida a Texas', 'Escapa disfrazado de ferrocarrilero', L[2].t0 + 0.6, tUn - 0.1);
     } },
-    { t0: tUn - 0.25, set: W, p0: [1.5, 0.98, 1.7], l0: [-0.15, 0.8, -1.0], p1: [1.3, 0.96, 1.35], l1: [-0.15, 0.8, -1.0], fov0: 40, act: (t) => {
-      { const p = A.sign(t, 3); p.head = [5, 0, 0]; p.chest = [5, 0, 0]; p.waist = [4, 0, 0]; K.pose(writer, p); } writer.setFace(C.blinkEye(t, 3), 'neutral');
+    { t0: tUn - 0.25, set: W, p0: [1.05, 0.9, 1.55], l0: [-0.1, 0.82, -1.0], p1: [0.9, 0.9, 1.25], l1: [-0.1, 0.82, -1.0], fov0: 40, act: (t) => {
+      { const p = A.sign(t, 3); p.head = [-2, 6 * Math.sin(t * 0.7), 0]; p.chest = [4, 0, 0]; p.waist = [3, 0, 0]; K.pose(writer, p); } writer.setFace(C.blinkEye(t, 3), 'neutral');
       glass.material.color.setHSL(0.11, 1, 0.72 + 0.04 * Math.sin(t * 13));
       return film(t) + doc(t, tUn, ctx.dur, 'PLAN DE SAN LUIS', [['Madero desconoce la elección de Díaz…', tUn + 0.4], ['…y llama al pueblo a tomar las armas.', wt(L[2], 'levantarse')]],
         { left: 80, top: 90, width: 640, foot: 'San Antonio, Texas · 1910' })

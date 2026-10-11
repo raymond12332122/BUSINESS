@@ -23,8 +23,8 @@ const softTex = canvasTex(64, 64, (g) => {
 });
 
 export class Explosion {
-  constructor(parent, pos, t0, size = 1, seed = 1, { fire = 0, smokeColor = '#6e6a66', light = 1 } = {}) {
-    this.t0 = t0; this.size = size; this.pos = new THREE.Vector3(...pos); this.fire = fire; this.lightK = light;
+  constructor(parent, pos, t0, size = 1, seed = 1, { fire = 0, smokeColor = '#6e6a66', light = 1, dull = false } = {}) {
+    this.t0 = t0; this.size = size; this.pos = new THREE.Vector3(...pos); this.fire = fire; this.lightK = light; this.dull = dull;
     const g = this.g = new THREE.Group(); g.position.copy(this.pos); parent.add(g);
     const r = rng(seed);
     this.flash = new THREE.Sprite(new THREE.SpriteMaterial({ map: flashTex, blending: THREE.AdditiveBlending, depthWrite: false, transparent: true }));
@@ -70,8 +70,14 @@ export class Explosion {
       const u = b.userData, k = 1 - Math.exp(-t * 6);
       b.position.copy(u.d).multiplyScalar(k * S * u.sp); b.position.y += t * 0.6 * S;
       b.scale.setScalar(S * u.s * (0.4 + k) * (1 - clamp((t - 0.5) / 0.6)) + 0.001);
-      b.material.color.setHSL(lerp(0.09, 0.01, clamp(t / 0.5)), 1, lerp(0.55, 0.25, clamp(t / 0.8)));
-      b.material.emissive.setHSL(lerp(0.07, 0.0, clamp(t / 0.5)), 1, lerp(0.42, 0.08, clamp(t / 0.8)));
+      if (this.dull) { // fire that cools into brown-grey smoke instead of saturated red (for dim, overcast scenes)
+        const k2 = clamp(t / 0.7);
+        b.material.color.setHSL(lerp(0.11, 0.06, k2), lerp(1, 0.22, k2), lerp(0.62, 0.24, k2));
+        b.material.emissive.setHSL(lerp(0.09, 0.05, k2), lerp(1, 0.3, k2), lerp(0.48, 0.02, k2));
+      } else {
+        b.material.color.setHSL(lerp(0.09, 0.01, clamp(t / 0.5)), 1, lerp(0.55, 0.25, clamp(t / 0.8)));
+        b.material.emissive.setHSL(lerp(0.07, 0.0, clamp(t / 0.5)), 1, lerp(0.42, 0.08, clamp(t / 0.8)));
+      }
       b.material.opacity = 1 - clamp((t - 0.6) / 0.5); b.visible = t < 1.15;
     }
     for (const m of this.smoke) {
