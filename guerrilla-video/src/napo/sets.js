@@ -164,9 +164,10 @@ export function deck(light = 'day') {
 }
 // ---------------------------------------------------------------- Austerlitz: frosty hills at dawn
 export function austerlitz() {
-  const s = napoStage('sunrise', ['#8f9a6a', '#83905e'], { seed: 81, bumps: 1.2 });
+  const s = napoStage('sunrise', ['#8f9a6a', '#83905e'], { seed: 81, bumps: 1.2, sunPos: [-7, 5, -14], hemi: 1.45 });
   s.add(MX.sierra({ z: -80, depth: 50, height: 9, seed: 82, base: '#6f7a62', top: '#8a947a' }));
-  const pr = new THREE.Mesh(new THREE.SphereGeometry(30, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2), std('#86915f')); pr.scale.set(1.6, 0.18, 1); pr.position.set(6, -0.5, -40); s.add(pr);
+  const pr = new THREE.Mesh(new THREE.SphereGeometry(30, 48, 20, 0, Math.PI * 2, 0, Math.PI / 2), std('#86915f')); pr.scale.set(1.6, 0.18, 1); pr.position.set(6, -0.5, -40); pr.receiveShadow = true; s.add(pr);
+  s.hillY = (x, z) => { const a = (x - 6) / 48, b = (z + 40) / 30, q = 1 - a * a - b * b; return q > 0 ? -0.5 + 5.4 * Math.sqrt(q) : 0; };
   LP.scatter(s, (r, i) => LP.roundTree(1.2 + r() * 0.5, '#5f7f3a', i), 40, [-60, -60, 60, -20], 83);
   for (let i = 0; i < 6; i++) { const h = LP.house(2, 2, 1.4, '#e8dcc4', '#8a4a32'); h.position.set(-30 + i * 2.6, 0, -26 - (i % 2) * 2); s.add(h); }
   const sunDisk = new THREE.Mesh(new THREE.CircleGeometry(6, 32), new THREE.MeshBasicMaterial({ color: '#ffe2b0', fog: false })); sunDisk.position.set(-60, 14, -160); sunDisk.lookAt(0, 0, 0); s.add(sunDisk); s.sunDisk = sunDisk;
@@ -186,7 +187,7 @@ export function tilsit() {
   pav.add(LP.at(LP.box(4.3, 0.18, 2.5, '#d4af37'), 0, 2.62, 0));
   const shield = new THREE.Mesh(new THREE.CircleGeometry(0.5, 24), new THREE.MeshStandardMaterial({ map: MX.canvasTex(128, 128, (g, W) => { g.fillStyle = '#2a3f8f'; g.fillRect(0, 0, W, W); g.fillStyle = '#d4af37'; g.font = '900 90px Georgia'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('N', W / 2, W / 2 + 4); }) }));
   shield.position.set(0, 3.4, 0.75); pav.add(shield);
-  const door = LP.box(1.1, 2.0, 0.05, '#2a2622'); door.position.set(0, 1.0, 1.22); pav.add(door);
+  const door = LP.box(1.1, 2.0, 0.05, '#8a2a2a'); door.position.set(0, 1.0, 1.22); pav.add(door); pav.add(LP.at(LP.box(1.3, 0.12, 0.08, '#d4af37'), 0, 2.05, 1.24));
   s.flags = [];
   for (const [x, k] of [[-3.3, 'fr'], [3.3, 'ru']]) { const f = N.flag(k, 3.2, 1.2, 0.75); f.position.set(x, 0.36, -3.2); raft.add(f); s.flags.push(f); }
   for (const sd of [-1, 1]) LP.scatter(s, (r, i) => LP.roundTree(1.1 + r() * 0.5, '#5f8f3a', i), 30, [-50, sd * 16, 50, sd * 34], 92 + sd);
@@ -194,7 +195,7 @@ export function tilsit() {
 }
 // ---------------------------------------------------------------- strategy board (tactics)
 export function board() {
-  const s = interior({ wall: '#3a2a22', floor: '#2a1e16', w: 14, d: 12, h: 6, lights: [[0, 4.8, 0]], windows: false, bulbs: false });
+  const s = interior({ wall: '#3a2a22', floor: '#2a1e16', w: 14, d: 12, h: 9, lights: [[0, 5.5, 0]], windows: false, bulbs: false });
   s.userData.sun.intensity = 0.9; s.userData.sun.position.set(2, 10, 4);
   const top = MX.canvasTex(1024, 640, (g, W, H) => {
     g.fillStyle = '#7f9a5a'; g.fillRect(0, 0, W, H);
@@ -230,13 +231,13 @@ export function field(light = 'day', { ground = ['#8fa65a', '#7d9450'], seed = 1
 export function tent() {
   const s = interior({ wall: '#e8dcc0', floor: '#7a6448', w: 8, d: 7, h: 4, lights: [[0, 2.4, 0.5]], windows: false, bulbs: false });
   s.userData.sun.intensity = 0.4; s.userData.hemi.intensity = 0.7;
-  const t = N.pedestalTable('#5a3a24', '#e8dcc0', 2.6, 1.5); t.position.set(0, 0, -0.6); s.add(t); s.tableTop = 0.84;
+  const t = N.pedestalTable('#5a3a24', '#e8dcc0', 2.6, 1.5); t.position.set(0, 0, -0.6); t.scale.y = 0.62; s.add(t); s.tableTop = 0.53;
   const map = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.3), new THREE.MeshStandardMaterial({ map: MX.canvasTex(512, 300, (g, W, H) => { g.fillStyle = '#e8dcc0'; g.fillRect(0, 0, W, H); g.strokeStyle = '#6b4a2f'; g.lineWidth = 3;
-    for (let i = 0; i < 9; i++) { g.beginPath(); g.moveTo(Math.random() * W, Math.random() * H); g.bezierCurveTo(Math.random() * W, Math.random() * H, Math.random() * W, Math.random() * H, Math.random() * W, Math.random() * H); g.stroke(); }
+    const rr = LP.rng(17); for (let i = 0; i < 9; i++) { g.beginPath(); g.moveTo(rr() * W, rr() * H); g.bezierCurveTo(rr() * W, rr() * H, rr() * W, rr() * H, rr() * W, rr() * H); g.stroke(); }
     g.fillStyle = '#2f4590'; for (let i = 0; i < 6; i++) g.fillRect(80 + i * 50, 120 + (i % 2) * 30, 26, 14); g.fillStyle = '#c0272d'; for (let i = 0; i < 4; i++) g.fillRect(330 + i * 30, 90 + (i % 2) * 50, 26, 14); }), roughness: 0.9 }));
-  map.rotation.x = -Math.PI / 2; map.position.set(0, 0.85, -0.6); s.add(map);
+  map.rotation.x = -Math.PI / 2; map.position.set(0, 0.535, -0.6); s.add(map);
   for (const x of [-1.0, 1.0]) { const c = MX.campfire ? null : null; const cd = new THREE.Group(); cd.add(LP.at(LP.cyl(0.04, 0.05, 0.28, '#f3ead6', 8), 0, 0.14, 0));
-    const fl = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), new THREE.MeshBasicMaterial({ color: '#ffcf6a' })); fl.scale.y = 1.8; fl.position.y = 0.32; cd.add(fl); cd.position.set(x, 0.85, -0.3); s.add(cd); }
+    const fl = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 6), new THREE.MeshBasicMaterial({ color: '#ffcf6a' })); fl.scale.y = 1.8; fl.position.y = 0.32; cd.add(fl); cd.position.set(x, 0.535, -0.3); s.add(cd); }
   const l = new THREE.PointLight('#ffb862', 6, 8, 1.5); l.position.set(0, 1.6, 0); s.add(l);
   return s;
 }
