@@ -72,13 +72,24 @@ export function minard(path, color, maxW = 2.2, maxMen = 600000, y = GM.H + 0.06
   m.set = p => { m.visible = p > 0.001; g.setDrawRange(0, Math.floor(clamp(p) * (N - 1)) * 6); };
   m.set(0); return m;
 }
-// Little sailing-ship token for the sea (map scale).
-export function shipToken(color = '#c0272d') {
+// Little ship of the line for the map (about 1 unit long, bow towards +z), with billowing sails and a coloured ensign.
+export function shipToken(color = '#c0272d', hullCol = '#3a2a20', band = '#e0b84a') {
   const g = new THREE.Group();
-  const hull = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.12, 0.8), new THREE.MeshStandardMaterial({ color: '#3a2a1e' })); hull.position.y = 0.06; g.add(hull);
-  const sail = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.45), new THREE.MeshStandardMaterial({ color: '#f3eee2', side: THREE.DoubleSide })); sail.position.y = 0.42; g.add(sail);
-  const fl = new THREE.Mesh(new THREE.PlaneGeometry(0.22, 0.12), new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide })); fl.position.set(0.1, 0.74, 0); g.add(fl);
-  const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.75, 5), new THREE.MeshStandardMaterial({ color: '#4a3220' })); mast.position.y = 0.38; g.add(mast);
+  const out = new THREE.Shape(); out.moveTo(0, 0.55); out.quadraticCurveTo(0.17, 0.3, 0.16, -0.05); out.lineTo(0.13, -0.42); out.lineTo(-0.13, -0.42); out.lineTo(-0.16, -0.05); out.quadraticCurveTo(-0.17, 0.3, 0, 0.55);
+  const hg = new THREE.ExtrudeGeometry(out, { depth: 0.14, bevelEnabled: false }); hg.rotateX(-Math.PI / 2);
+  const hull = new THREE.Mesh(hg, new THREE.MeshStandardMaterial({ color: hullCol, roughness: 0.7 })); g.add(hull);
+  const bg = new THREE.ExtrudeGeometry(out, { depth: 0.035, bevelEnabled: false }); bg.rotateX(-Math.PI / 2);
+  const bandM = new THREE.Mesh(bg, new THREE.MeshStandardMaterial({ color: band, roughness: 0.6 })); bandM.scale.set(1.04, 1, 1.01); bandM.position.y = 0.07; g.add(bandM);
+  const sailMat = new THREE.MeshStandardMaterial({ color: '#f6f2e6', roughness: 0.9, side: THREE.DoubleSide });
+  const mastMat = new THREE.MeshStandardMaterial({ color: '#4a3220' });
+  for (const [z, h, w] of [[0.22, 0.62, 0.36], [-0.02, 0.74, 0.42], [-0.25, 0.54, 0.3]]) {
+    const m = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.016, h, 5), mastMat); m.position.set(0, 0.14 + h / 2, z); g.add(m);
+    const sg = new THREE.PlaneGeometry(w, h * 0.62, 6, 3), sp = sg.attributes.position;
+    for (let i = 0; i < sp.count; i++) { const x = sp.getX(i) / w; sp.setZ(i, 0.09 * (1 - 4 * x * x)); }
+    sg.computeVertexNormals(); const sm = new THREE.Mesh(sg, sailMat); sm.position.set(0, 0.14 + h * 0.55, z + 0.02); g.add(sm);
+  }
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(0.16, 0.1), new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide })); fl.rotation.y = Math.PI / 2; fl.position.set(0, 0.32, -0.48); g.add(fl);
+  const pen = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.04), new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide })); pen.rotation.y = Math.PI / 2; pen.position.set(0, 0.9, -0.1); g.add(pen);
   return g;
 }
 

@@ -154,7 +154,7 @@ export function sarape(colors = ['#b5332e', '#e0a43a', '#2f6b8a', '#efe6d2', '#3
 const HEAD_Y = 0.92;
 export function wearHat(rig, hat, { y = HEAD_Y, tilt = -0.12, scale = 0.86, cap = false } = {}) {
   hideEars(rig); flattenAhoge(rig); rig.hat = hat;
-  if (cap) { flattenAhoge(rig, 0.02, /^Sp_He_Hair[01]_C_00/); flattenAhoge(rig, 0.3, /^Sp_He_(Hair0_[LR]|Ribbon\d_[LR])_00/); } // close-fitting caps: tuck top strands and ribbons
+  if (cap) { flattenAhoge(rig, 0.02, /^Sp_He_Hair[01]_C_00/); flattenAhoge(rig, 0.3, /^Sp_He_(Hair0_[LR]|Ribbon\d_[LR])_00/); if (rig.key === 'oguri') flattenAhoge(rig, 0.05, /^Sp_He_Hair3_C_00/); flattenAhoge(rig, 0.25, /^Sp_He_Acc\d_[LR]_00/); } // close-fitting caps: tuck top strands and ribbons
   hat.scale.setScalar(scale); rig.attach('head', hat, [0, y, -0.02], [tilt * 57.3, 0, 0]); return hat;
 }
 export const OUTFITS = {

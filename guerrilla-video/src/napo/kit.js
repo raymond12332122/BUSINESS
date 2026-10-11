@@ -314,7 +314,7 @@ export const OUTFITS = {
   emperor: r => { uniformize(r, 'royal'); hat(r, laurel(), { scale: 1.0, y: 0.86, tilt: 0.22 }); r.attach('chest', star(), [0.07, 0.43, 0.12]); return r; },
   josefina: r => { uniformize(r, 'empress'); hideEars(r); r.attach('head', tiara(), [0, 0.86, 0.0], [-12, 0, 0]); return r; },
   marialuisa: r => { uniformize(r, 'austrianbride'); hideEars(r); r.attach('head', tiara({ gem: '#2a5fb8' }), [0, 0.86, 0.0], [-12, 0, 0]); return r; },
-  nelson: r => { uniformize(r, 'navy'); const b = bic({ trim: '#d9b23c', cockadeCols: ['#1d1b1c', '#1d1b1c', '#1d1b1c'] }); b.rotation.y = Math.PI / 2; hat(r, b, { scale: 0.8, y: 0.88, tilt: 0, cap: true });
+  nelson: r => { uniformize(r, 'navy'); const b = bic({ trim: '#d9b23c', cockadeCols: ['#1d1b1c', '#1d1b1c', '#1d1b1c'] }); hat(r, b, { scale: 0.84, y: 0.88, tilt: -0.05, cap: true });
     r.attach('chest', epaulettes('#d9b23c'), [0, 0.475, -0.01]); r.attach('chest', star(), [0.07, 0.43, 0.12]); return r; },
   wellington: r => { uniformize(r, 'diplomat'); hat(r, bic({ cockadeCols: ['#1d1b1c', '#1d1b1c', '#1d1b1c'] }), { scale: 0.84, y: 0.88, tilt: -0.04, cap: true }); return r; },
   blucher: r => { uniformize(r, 'prussian'); hat(r, shako({ color: '#151517', plate: '#e8e4dc', plume: '#e8e4dc', pompom: false }), { scale: 0.86, y: 0.86, tilt: 0.04, cap: true }); r.attach('chest', epaulettes(), [0, 0.475, -0.01]); return r; },
@@ -329,7 +329,8 @@ export const OUTFITS = {
   artillero: r => { generic(r, '#3a2c26'); uniformize(r, 'guard'); hat(r, shako({ plume: '#c0272d' }), { scale: 0.9, y: 0.86, tilt: 0.04, cap: true }); return r; },
   redcoat: r => { generic(r, '#4a3428'); uniformize(r, 'british'); hat(r, shako({ plate: '#d8d4c8', plume: '#f4f1ea', front: true, bell: 0.0, tall: 0.36 }), { scale: 0.88, y: 0.86, tilt: 0.04, cap: true });
     r.attach('chest', crossbelts('#f4f1ea'), [0, 0.39, 0]); r.equip(musket('#3b3a36', '#6a4428'), G.HOLDS); return r; },
-  sailor: r => { generic(r, '#4a3428'); uniformize(r, 'navy'); hat(r, (() => { const g = new THREE.Group(); g.add(lathe([[0, 0.12], [0.22, 0.12], [0.26, 0.08], [0.28, 0.02], [0.36, 0.02], [0.37, 0.0], [0.28, -0.01]], '#151517')); return g; })(), { scale: 0.9, y: 0.88, tilt: -0.05, cap: true }); return r; },
+  sailor: r => { generic(r, '#4a3428'); uniformize(r, 'navy'); hat(r, (() => { const g = new THREE.Group(); g.add(lathe([[0, 0.21], [0.2, 0.21], [0.255, 0.17], [0.275, 0.02], [0.33, 0.015], [0.34, 0.0], [0.275, -0.01]], '#1c2233'));
+    const band = mesh(new THREE.CylinderGeometry(0.272, 0.272, 0.035, 32, 1, true), std('#f4f1ea', { side: THREE.DoubleSide })); band.position.y = 0.05; g.add(band); return g; })(), { scale: 0.92, y: 0.87, tilt: -0.05, cap: true }); return r; },
   russo: r => { generic(r, '#3a2c26'); uniformize(r, 'russian'); hat(r, shako({ plate: '#d4af37', plume: '#1d1b1c' }), { scale: 0.9, y: 0.86, tilt: 0.04, cap: true }); r.attach('chest', crossbelts('#f4f1ea'), [0, 0.39, 0]); r.equip(musket(), G.HOLDS); return r; },
   austriaco: r => { generic(r, '#3a2c26'); uniformize(r, 'austrian'); hat(r, shako({ color: '#1d1b1c', plate: '#d4af37', plume: '#d4af37', tall: 0.36 }), { scale: 0.9, y: 0.86, tilt: 0.04, cap: true }); r.attach('chest', crossbelts('#1d1b1c'), [0, 0.39, 0]); r.equip(musket(), G.HOLDS); return r; },
   prusiano: r => { generic(r, '#3a2c26'); uniformize(r, 'prussian'); hat(r, shako({ plate: '#e8e4dc', plume: '#e8e4dc' }), { scale: 0.9, y: 0.86, tilt: 0.04, cap: true }); r.attach('chest', crossbelts('#f4f1ea'), [0, 0.39, 0]); r.equip(musket(), G.HOLDS); return r; },

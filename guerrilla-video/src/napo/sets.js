@@ -111,16 +111,31 @@ export function notreDame() {
 }
 // ---------------------------------------------------------------- the white cliffs of Dover
 export function dover() {
-  const s = napoStage('day', ['#7e9a52', '#708c48'], { seed: 51, fog: ['#dfe6ea', 60, 260] });
-  const sw = sea(s, { color: '#3f7a96', y: -0.4 });
-  const cl = new THREE.Shape(); cl.moveTo(-120, 0);
-  for (let x = -120; x <= 120; x += 4) cl.lineTo(x, 14 + 3 * Math.sin(x * 0.07) + 1.5 * Math.sin(x * 0.23));
-  cl.lineTo(120, 0); cl.lineTo(-120, 0);
-  const cg = new THREE.ExtrudeGeometry(cl, { depth: 40, bevelEnabled: false }); cg.translate(0, 0, -40);
-  const cliff = new THREE.Mesh(cg, new THREE.MeshStandardMaterial({ color: '#efebe2', roughness: 0.95, flatShading: true })); cliff.position.set(0, -2, -30); s.add(cliff);
-  const grass = new THREE.Mesh(new THREE.PlaneGeometry(240, 40), std('#6f8f48')); grass.rotation.x = -Math.PI / 2; grass.position.set(0, 13.5, -50); s.add(grass);
-  const f = N.flag('gb', 4.5, 1.8, 1.0); f.position.set(-9, 12.1, -31); s.add(f); s.flag = f;
-  s.ground = null; s.children.filter(o => o.isMesh && o.geometry.type === 'PlaneGeometry' && o.position.y === 0 && o !== sw).forEach(o => (o.visible = false));
+  const s = napoStage('day', [null, null], { seed: 51, groundA: null, fog: ['#dfe6ea', 80, 320] });
+  sea(s, { color: '#3f7a96', y: 0, size: 600 });
+  const top = x => 13 + 2.2 * Math.sin(x * 0.05 + 1) + 1.2 * Math.sin(x * 0.13) + 0.5 * Math.sin(x * 0.37);
+  const W = 300, segX = 240, Z = -40;
+  const face = new THREE.PlaneGeometry(W, 1, segX, 16), fp = face.attributes.position, fc = [];
+  const A = new THREE.Color('#f6f3ec'), B = new THREE.Color('#cfc9bd'), c = new THREE.Color();
+  for (let i = 0; i < fp.count; i++) { const x = fp.getX(i), v = fp.getY(i) + 0.5, h = top(x);
+    const n = 0.45 * Math.sin(x * 1.7) + 0.5 * Math.sin(x * 0.6 + v * 3) + 0.25 * Math.sin(x * 3.1 + v * 7) + 0.3 * Math.sin(x * 0.23 + 2);
+    fp.setXYZ(i, x, -1.5 + v * (h + 1.5), Z + n - v * 3.0);
+    c.copy(A).lerp(B, Math.min(1, Math.max(0, 0.45 + 0.35 * Math.sin(x * 2.3 + v * 5) + 0.25 * Math.sin(x * 0.4) - 0.3 * v))); fc.push(c.r, c.g, c.b); }
+  face.setAttribute('color', new THREE.Float32BufferAttribute(fc, 3)); face.computeVertexNormals();
+  const fm = new THREE.Mesh(face, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1, flatShading: true })); fm.receiveShadow = true; s.add(fm);
+  const cap = new THREE.PlaneGeometry(W, 60, segX, 8); cap.rotateX(-Math.PI / 2); const cp = cap.attributes.position, cc = [], G1 = new THREE.Color('#6f9a48'), G2 = new THREE.Color('#5d8a3e');
+  for (let i = 0; i < cp.count; i++) { const x = cp.getX(i), zz = cp.getZ(i), u = (zz + 30) / 60; // 1 near the edge
+    const n = 0.45 * Math.sin(x * 1.7) + 0.5 * Math.sin(x * 0.6 + 3) + 0.25 * Math.sin(x * 3.1 + 7) + 0.3 * Math.sin(x * 0.23 + 2);
+    const zE = Z + n - 3.0; cp.setXYZ(i, x, top(x) + (1 - u) * 1.5 + 0.05, zE - (1 - u) * 60);
+    c.copy(G1).lerp(G2, 0.5 + 0.5 * Math.sin(x * 0.3 + u * 4)); cc.push(c.r, c.g, c.b); }
+  cap.setAttribute('color', new THREE.Float32BufferAttribute(cc, 3)); cap.computeVertexNormals();
+  s.add(new THREE.Mesh(cap, new THREE.MeshStandardMaterial({ vertexColors: true, roughness: 1 })));
+  // Dover Castle keep and the flag
+  const k = new THREE.Group(); k.add(LP.at(LP.box(5, 6, 5, '#b9b2a2'), 0, 3, 0));
+  for (const [x, z] of [[-2.5, -2.5], [2.5, -2.5], [-2.5, 2.5], [2.5, 2.5]]) k.add(LP.at(LP.box(1.2, 7.2, 1.2, '#b0a998'), x, 3.6, z));
+  for (let i = 0; i < 8; i++) k.add(LP.at(LP.box(0.6, 0.6, 0.6, '#b0a998'), -2.1 + i * 0.6, 6.3, 2.5));
+  k.position.set(-14, top(-14) + 1.2, Z - 12); s.add(k);
+  const f = N.flag('gb', 4.5, 2.2, 1.3); f.position.set(-14, top(-14) + 7.2, Z - 12); s.add(f); s.flag = f;
   return s;
 }
 // ---------------------------------------------------------------- open sea (battles, fleets)
@@ -155,7 +170,7 @@ export function austerlitz() {
   LP.scatter(s, (r, i) => LP.roundTree(1.2 + r() * 0.5, '#5f7f3a', i), 40, [-60, -60, 60, -20], 83);
   for (let i = 0; i < 6; i++) { const h = LP.house(2, 2, 1.4, '#e8dcc4', '#8a4a32'); h.position.set(-30 + i * 2.6, 0, -26 - (i % 2) * 2); s.add(h); }
   const sunDisk = new THREE.Mesh(new THREE.CircleGeometry(6, 32), new THREE.MeshBasicMaterial({ color: '#ffe2b0', fog: false })); sunDisk.position.set(-60, 14, -160); sunDisk.lookAt(0, 0, 0); s.add(sunDisk); s.sunDisk = sunDisk;
-  const fogLayer = new THREE.Mesh(new THREE.PlaneGeometry(200, 120), new THREE.MeshBasicMaterial({ color: '#f2ece2', transparent: true, opacity: 0.55, depthWrite: false })); fogLayer.rotation.x = -Math.PI / 2; fogLayer.position.set(0, 1.4, -40); s.add(fogLayer); s.fogLayer = fogLayer;
+  const fogLayer = new THREE.Mesh(new THREE.PlaneGeometry(220, 70), new THREE.MeshBasicMaterial({ color: '#f2ece2', transparent: true, opacity: 0.55, depthWrite: false })); fogLayer.rotation.x = -Math.PI / 2; fogLayer.position.set(0, 1.4, -70); s.add(fogLayer); s.fogLayer = fogLayer;
   return s;
 }
 // ---------------------------------------------------------------- Tilsit raft on the Niemen
@@ -406,7 +421,7 @@ export function waterloo(light = 'overcast') {
 }
 // Night sea with moon
 export function nightSea() {
-  const s = napoStage('night', [null, null], { seed: 251, groundA: null, fog: ['#141a2b', 30, 160] });
+  const s = napoStage('night', [null, null], { seed: 251, groundA: null, fog: ['#1a2238', 40, 180], hemi: 0.75, sun: 0.8 });
   sea(s, { color: '#1c2e44', y: 0 });
   const moon = new THREE.Mesh(new THREE.SphereGeometry(4, 16, 12), new THREE.MeshBasicMaterial({ color: '#f3ecd6', fog: false })); moon.position.set(30, 30, -120); s.add(moon);
   const glint = new THREE.Mesh(new THREE.PlaneGeometry(6, 80), new THREE.MeshBasicMaterial({ color: '#c8d4ea', transparent: true, opacity: 0.18, depthWrite: false })); glint.rotation.x = -Math.PI / 2; glint.position.set(14, 0.3, -60); s.add(glint);
