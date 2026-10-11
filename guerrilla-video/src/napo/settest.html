@@ -1,0 +1,44 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style></head><body>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+// Set viewer for QA: window.show(name, [px,py,pz], [lx,ly,lz], fov, extras) builds (and caches) a set from sets.js and renders it.
+import * as THREE from 'three';
+import * as C from '../lib/chars.js';
+import * as K from './kit.js';
+import * as S from './sets.js';
+import * as N from './props.js';
+import { Troop } from './troops.js';
+import { horse, animateHorse, ridePose, seat } from './horse.js';
+try {
+  const W = 1280, H = 720;
+  const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); r.setSize(W, H); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(r.domElement);
+  await C.loadCast();
+  const cache = {};
+  const cam = new THREE.PerspectiveCamera(38, W / H, 0.1, 900);
+  window.show = (name, p, l, fov = 38, extras = 'probe') => {
+    const key = name + '|' + extras;
+    if (!cache[key]) {
+      const [fn, ...args] = name.split(':');
+      const s = S[fn](...args.map(a => (isNaN(+a) ? a : +a)));
+      if (extras.includes('probe')) {
+        const a = K.person(s, 'napoleon', 'napoleon', -0.7, 0, 0); a.apply(C.idle(0.3, 1)); a.setFace('open', 'neutral');
+        const b = K.person(s, 'oguri', 'fusilier', 0.7, 0, 0); b.apply({ ...C.idle(0.3, 2), gun: 'low' }); b.setFace('open', 'smile');
+      }
+      for (const it of extras.split(',')) if (it.startsWith('c=')) { const [who, outfit, x, z, yaw, ps] = it.slice(2).split('/'); const c = K.person(s, who, outfit, +x || 0, +z || 0, +yaw || 0);
+        const P = { ...(C[ps || 'idle'] || C.idle)(0.3, 1), gun: c.gun ? 'low' : 'none' }; K.pose(c, P); c.setFace('open', 'smile'); const wm = /wind=([\d.]+)/.exec(extras); if (c.cape) c.cape.wave(0.4, wm ? +wm[1] : 0, 0.3); }
+      if (extras.includes('troop')) { const tr = new Troop(s, { rows: 4, cols: 10, seed: 3 }); tr.update(0.4, { x: 0, z: -6, march: 1 }); }
+      if (extras.includes('rear')) { const h = horse({ coat: '#efeae2', mane: '#e0dad0', cloth: '#8a1f2a', seed: 3 }); h.position.set(0, 0, 0); h.rotation.y = -Math.PI / 2 + 0.12; s.add(h); animateHorse(h, 0.4, 'stand', { rear: 1 });
+        const rd = K.person(s, 'napoleonAlps', 'napoleonAlps', 0, 0, 0); const am = /arm=([-\d.]+)_([-\d.]+)_([-\d.]+)/.exec(extras); const P = ridePose(0.4); if (am) { P.armL = [+am[1], +am[2], +am[3]]; P.elbL = [0, -8, 0]; } P.head = [0, 38, 0]; rd.apply(P); seat(rd, h, { upright: 0.6 }); rd.cape.wave(0.4, 1, 0.4); rd.setFace('open', 'neutral'); }
+      if (extras.includes('horse')) { const h = horse({ seed: 2 }); h.position.set(2.2, 0, 0); s.add(h); animateHorse(h, 0.3, 'stand'); const rd = K.person(s, 'napoleon', 'napoleon', 0, 0, 0); rd.apply(ridePose(0.3)); seat(rd, h); }
+      if (s.sea) s.sea.wave(1.0);
+      cache[key] = s;
+    }
+    const s = cache[key];
+    cam.fov = fov; cam.position.set(...p); cam.lookAt(...l); cam.updateProjectionMatrix();
+    if (s.userData.sky) s.userData.sky.position.copy(cam.position);
+    r.render(s, cam);
+    return true;
+  };
+  window.__ready = true;
+} catch (e) { window.__error = String(e.stack || e); }
+</script></body></html>

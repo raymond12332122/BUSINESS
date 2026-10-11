@@ -29,6 +29,11 @@ function drawFlag(kind, g, W, H) {
   else if (kind === 'royalblue') { g.fillStyle = '#1f3f8f'; g.fillRect(0, 0, W, H); fleurs(g, W, H, '#e2bd45', 3); }
   else if (kind === 'guadalupe') guadalupe(g, W, H);
   else if (kind === 'white') { g.fillStyle = '#f6f3ea'; g.fillRect(0, 0, W, H); }
+  else if (kind === 'bees') { g.fillStyle = '#1f4a34'; g.fillRect(0, 0, W, H); g.fillStyle = '#d4af37'; const n = 3, s = W / n;
+    for (let j = 0; j < Math.ceil(H / s); j++) for (let i = 0; i < n; i++) { const x = s * (i + 0.5) + (j % 2) * s * 0.5 - s * 0.25, y = s * (j + 0.5);
+      g.beginPath(); g.ellipse(x, y + s * 0.04, s * 0.07, s * 0.13, 0, 0, Math.PI * 2); g.fill(); g.beginPath(); g.ellipse(x - s * 0.1, y - s * 0.08, s * 0.1, s * 0.05, -0.5, 0, Math.PI * 2); g.ellipse(x + s * 0.1, y - s * 0.08, s * 0.1, s * 0.05, 0.5, 0, Math.PI * 2); g.fill();
+      g.beginPath(); g.arc(x, y - s * 0.13, s * 0.045, 0, Math.PI * 2); g.fill(); }
+    g.strokeStyle = '#d4af37'; g.lineWidth = W * 0.03; g.strokeRect(W * 0.03, W * 0.03, W - W * 0.06, H - W * 0.06); }
 }
 function fleur(g, x, y, s, c) {
   g.save(); g.translate(x, y); g.scale(s, s); g.fillStyle = c; g.beginPath();
@@ -293,7 +298,7 @@ export function throne({ fabric = '#1f3f8f', gold = '#d4af37', h = 2.2 } = {}) {
   const back = new THREE.Shape(); back.moveTo(-0.55, 0); back.lineTo(0.55, 0); back.lineTo(0.55, h * 0.6); back.quadraticCurveTo(0.55, h * 0.75, 0, h * 0.8); back.quadraticCurveTo(-0.55, h * 0.75, -0.55, h * 0.6);
   const bm = mesh(new THREE.ExtrudeGeometry(back, { depth: 0.14, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.04, bevelSegments: 2 }), gm); bm.position.set(0, 0.55, -0.48); g.add(bm);
   const pad = new THREE.Shape(); pad.moveTo(-0.42, 0.1); pad.lineTo(0.42, 0.1); pad.lineTo(0.42, h * 0.55); pad.quadraticCurveTo(0.42, h * 0.68, 0, h * 0.72); pad.quadraticCurveTo(-0.42, h * 0.68, -0.42, h * 0.55);
-  const pm = mesh(new THREE.ShapeGeometry(pad), std(fabric)); pm.position.set(0, 0.55, -0.31); g.add(pm);
+  const pm = mesh(new THREE.ShapeGeometry(pad), std(fabric)); pm.position.set(0, 0.55, -0.29); g.add(pm);
   for (const x of [-0.5, 0.5]) { g.add(at(mesh(new THREE.BoxGeometry(0.1, 0.1, 0.8), gm), x, 0.95, 0)); g.add(at(mesh(new THREE.SphereGeometry(0.08, 10, 8), gm), x, 0.95, 0.42)); }
   g.add(at(mesh(new THREE.SphereGeometry(0.1, 10, 8), gm), 0, 0.55 + h * 0.8 + 0.04, -0.41));
   return g;

@@ -60,7 +60,6 @@ export function horse({ coat = '#e9e4dc', mane = '#d8d2c6', hoof = '#3a3430', cl
   const saddle = mesh(new THREE.CapsuleGeometry(0.16, 0.2, 4, 12), std('#4a2f1d', { roughness: 0.5 })); saddle.rotation.x = Math.PI / 2; saddle.scale.set(1, 1, 0.35); saddle.position.set(0, 0.24, Z + 0.04); body.add(saddle);
   const pommel = mesh(new THREE.SphereGeometry(0.06, 10, 8), std('#4a2f1d', { roughness: 0.5 })); pommel.position.set(0, 0.3, Z + 0.22); body.add(pommel);
   const strap2 = mesh(new THREE.TorusGeometry(0.098, 0.009, 6, 28), std('#3a2418')); strap2.position.set(0, -0.15, 0.2); strap2.rotation.x = Math.PI / 2 + 0.55; strap2.scale.set(1.05, 1, 0.95); head.add(strap2);
-  const strap = mesh(new THREE.TorusGeometry(0.15, 0.009, 6, 28, Math.PI), std('#3a2418')); strap.position.set(0, -0.02, 0.07); strap.rotation.set(0, Math.PI / 2, 0); head.add(strap);
   // reins from the bit to the saddle front
   const rein = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(0, -0.2, 0.26).add(neckTop), new THREE.Vector3(0, 0.25, Z + 0.62), new THREE.Vector3(0, 0.3, Z + 0.3)]), 16, 0.008, 5), std('#3a2418')); body.add(rein);
   // legs: [x, y, z] of the hip/shoulder in body space

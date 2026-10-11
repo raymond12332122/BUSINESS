@@ -34,14 +34,27 @@ export function token(s, who, outfit, lon, lat, color, yaw = 0, scale = 1.6) {
   g.setPos = (lo, la) => { const [x, y, z] = GM.pos(lo, la); g.position.set(x, y, z); };
   g.setPos(lon, lat); r.token = g; return r;
 }
+// Crossed sabres on a red disc (battle icon), drawn once.
+let SWORDS = null;
+function swordsTex() {
+  if (SWORDS) return SWORDS;
+  const c = document.createElement('canvas'); c.width = c.height = 256; const g = c.getContext('2d');
+  g.fillStyle = '#fbf5e6'; g.beginPath(); g.arc(128, 128, 120, 0, Math.PI * 2); g.fill();
+  g.fillStyle = '#b8322a'; g.beginPath(); g.arc(128, 128, 104, 0, Math.PI * 2); g.fill();
+  for (const sd of [-1, 1]) { g.save(); g.translate(128, 128); g.rotate(sd * Math.PI / 4);
+    g.fillStyle = '#fbf5e6'; g.beginPath(); g.moveTo(-7, 52); g.lineTo(-7, -58); g.quadraticCurveTo(0, -78, 7, -62); g.lineTo(7, 52); g.fill();
+    g.fillRect(-24, 50, 48, 10); g.fillStyle = '#e8c46a'; g.fillRect(-6, 60, 12, 26); g.beginPath(); g.arc(0, 90, 9, 0, Math.PI * 2); g.fill(); g.restore(); }
+  SWORDS = new THREE.CanvasTexture(c); SWORDS.colorSpace = THREE.SRGBColorSpace; return SWORDS;
+}
 // Pulsing event marker (battle) with an icon sprite.
-export function marker(s, lon, lat, icon = '⚔️', color = '#c0272d') {
+export function marker(s, lon, lat, icon = 'swords', color = '#c0272d', size = 1.25) {
   const g = new THREE.Group(); const [x, y, z] = GM.pos(lon, lat); g.position.set(x, y + 0.02, z); s.add(g);
   const ring = F.ring(color, 0.7); g.add(ring);
-  const ic = F.bubble(icon, { bg: null, font: 170 }); ic.center.set(0.5, 0.12); g.add(ic);
+  const ic = icon === 'swords' ? new THREE.Sprite(new THREE.SpriteMaterial({ map: swordsTex(), transparent: true, depthWrite: false })) : F.bubble(icon, { bg: null, font: 170 });
+  ic.center.set(0.5, 0.0); ic.renderOrder = 8; g.add(ic);
   g.update = (t, t0, t1 = 1e9) => { const k = t - t0; g.visible = k > 0 && t < t1; if (!g.visible) return;
     const rk = (k % 1.4) / 1.4; ring.scale.setScalar(0.6 + rk * 2.2); ring.material.opacity = 0.8 * (1 - rk);
-    const sc = 1.2 * clamp(k / 0.25) * (1 + 0.05 * Math.sin(t * 8)); ic.scale.set(sc, sc, 1); };
+    const pop = clamp(k / 0.25), sc = size * (pop < 1 ? 1.25 * Math.sin(pop * Math.PI * 0.62) / Math.sin(Math.PI * 0.62) : 1) * (1 - ss(t1 - 0.25, t1, t)); ic.scale.set(sc, sc, 1); ic.position.y = 0.15; };
   g.visible = false; return g;
 }
 // Minard band: a ribbon whose width follows the army size along a path of [lon, lat, men].

@@ -156,16 +156,26 @@ export function phrygian(color = '#c0272d') {
   const ck = cockade(0.06); ck.position.set(0.17, 0.12, 0.22); ck.rotation.y = 0.6; g.add(ck);
   return g;
 }
-// Golden laurel wreath (Napoleon's coronation).
-export function laurel(color = '#e2bd45') {
-  const g = new THREE.Group(), m = std(color, { metalness: 0.75, roughness: 0.3 });
-  const N = 26;
-  for (let i = 0; i < N; i++) {
-    const a = -Math.PI * 0.92 + (i / (N - 1)) * Math.PI * 1.84;
-    for (const s of [-1, 1]) { const l = mesh(new THREE.SphereGeometry(0.05, 8, 6), m); l.scale.set(0.5, 0.3, 1.25);
-      l.position.set(Math.sin(a) * 0.3, 0.02 + s * 0.035, Math.cos(a) * 0.3); l.rotation.set(0, a + s * 0.6, s * 0.5); g.add(l); }
+// Golden laurel wreath (Napoleon's coronation): two leafy branches that start at the back and meet over the forehead.
+export function laurel(color = '#e8c24a', R = 0.25) {
+  const g = new THREE.Group(), m = std(color, { metalness: 0.35, roughness: 0.35, emissive: '#5a4310', emissiveIntensity: 0.35, side: THREE.DoubleSide });
+  const leaf = new THREE.Shape(); leaf.moveTo(0, 0); leaf.quadraticCurveTo(0.022, 0.035, 0, 0.085); leaf.quadraticCurveTo(-0.022, 0.035, 0, 0);
+  const lg = new THREE.ShapeGeometry(leaf, 6);
+  const N = 14;
+  for (const side of [-1, 1]) {
+    // branch runs from the back (a = PI) to the front (a ~ 0.12) on each side
+    for (let i = 0; i < N; i++) {
+      const u = i / (N - 1), a = side * (Math.PI * 0.94 - u * (Math.PI * 0.94 - 0.16));
+      const x = Math.sin(a) * R, z = Math.cos(a) * R;
+      const nrm = new THREE.Vector3(Math.sin(a), 0, Math.cos(a)), tan = new THREE.Vector3(-Math.cos(a) * side, 0, Math.sin(a) * side);
+      const basis = new THREE.Matrix4().makeBasis(new THREE.Vector3().crossVectors(tan, nrm), tan, nrm);
+      for (const row of [-1, 1]) {
+        const piv = new THREE.Group(); piv.position.set(x, row * 0.012, z); piv.quaternion.setFromRotationMatrix(basis);
+        const l = mesh(lg, m); l.scale.setScalar(1.25 - 0.4 * u); l.rotation.set(0.25, 0, -row * side * 0.6); piv.add(l); g.add(piv);
+      }
+    }
   }
-  const ring = mesh(new THREE.TorusGeometry(0.3, 0.012, 6, 40, Math.PI * 1.84), m); ring.rotation.set(Math.PI / 2, 0, Math.PI / 2 + Math.PI * 0.08); g.add(ring);
+  const ring = mesh(new THREE.TorusGeometry(R, 0.009, 6, 48, Math.PI * 2 - 0.3), std(color, { metalness: 0.6, roughness: 0.3 })); ring.rotation.set(Math.PI / 2, 0, Math.PI / 2 + 0.15); g.add(ring);
   return g;
 }
 // Royal crown (Bourbon / generic kings): gold band, arches, cross, red velvet.
@@ -245,13 +255,52 @@ export function telescope() {
   return g;
 }
 
+// Cape hanging from the shoulders. cape.wave(t, wind, side) animates it: wind 0 hangs still, 1 streams straight back.
+export function cape(color = '#a3202a', lining = '#efe6d2', { w = 0.44, h = 0.46, ermine = false } = {}) {
+  const geo = new THREE.PlaneGeometry(w, h, 10, 12); geo.translate(0, -h / 2, 0);
+  const base = geo.attributes.position.array.slice();
+  const g = new THREE.Group();
+  const outer = mesh(geo, std(color, { roughness: 0.75, side: THREE.BackSide }));
+  const liningMat = std(ermine ? new THREE.Color(color).multiplyScalar(0.8).getStyle() : lining, { roughness: 0.85, side: THREE.FrontSide });
+  const inner = mesh(geo, liningMat); outer.castShadow = inner.castShadow = true; g.add(outer, inner);
+  if (ermine) { // ermine shoulder capelet over the red mantle
+    const em = new THREE.MeshStandardMaterial({ map: ermineTex(), roughness: 0.95, side: THREE.DoubleSide });
+    const cp = mesh(new THREE.CylinderGeometry(0.1, 0.205, 0.11, 28, 1, true), em); cp.scale.set(1, 1, 0.82); cp.position.set(0, -0.04, 0.1); g.add(cp);
+    const rim = mesh(new THREE.TorusGeometry(0.205, 0.016, 6, 32), em); rim.rotation.x = Math.PI / 2; rim.scale.set(1, 0.82, 1); rim.position.set(0, -0.095, 0.1); g.add(rim);
+  }
+  g.wave = (t, wind = 0, side = 0) => {
+    const p = geo.attributes.position;
+    for (let i = 0; i < p.count; i++) {
+      const x0 = base[i * 3], y0 = base[i * 3 + 1], v = Math.max(0, -y0 / h), e = 2 * x0 / w;
+      const fl = Math.sin(t * 7.5 - v * 6 + e * 2.5), fl2 = Math.sin(t * 5.1 - v * 4.3 + e * 4 + 1);
+      let x = x0 * (1 + 0.28 * v), y = y0, z = 0.07 * e * e * (1 - v) - 0.07 * v;
+      z -= wind * Math.pow(v, 1.15) * h * 0.95; y += wind * v * v * h * 0.5;
+      x += wind * side * v * v * h * 0.5;
+      z += (0.012 + wind * 0.05) * v * fl; y += wind * 0.03 * v * fl2;
+      p.setXYZ(i, x, y, z);
+    }
+    p.needsUpdate = true; geo.computeVertexNormals();
+  };
+  g.wave(0, 0); return g;
+}
+let ERMINE = null;
+function ermineTex() {
+  if (ERMINE) return ERMINE;
+  ERMINE = canvasTex(128, 128, (c, W, H) => { c.fillStyle = '#f6f2ea'; c.fillRect(0, 0, W, H); c.fillStyle = '#1d1b1c';
+    for (let j = 0; j < 4; j++) for (let i = 0; i < 4; i++) { const x = (i + (j % 2) * 0.5) * W / 4 + 8, y = j * H / 4 + 10; c.beginPath(); c.moveTo(x, y); c.lineTo(x + 5, y + 14); c.lineTo(x - 5, y + 14); c.fill(); } });
+  ERMINE.wrapS = ERMINE.wrapT = THREE.RepeatWrapping; ERMINE.repeat.set(3, 3); return ERMINE;
+}
+export function wearCape(r, c, pos = [0, 0.5, -0.1]) { r.attach('chest', c, pos); r.cape = c; return c; }
+
 // ------------------------------------------------------------ outfits and casting
 const hat = (r, h, o) => wearHat(r, h, o);
 const bic = (o = {}) => bicorne(o);
 export const OUTFITS = {
   napoleon: r => { uniformize(r, 'napoleon'); hat(r, bic(), { scale: 0.86, y: 0.88, tilt: -0.05, cap: true }); return r; },
+  napoleonAlps: r => { OUTFITS.napoleon(r); wearCape(r, cape('#b0222c', '#d8b04a')); return r; },
+  coronation: r => { uniformize(r, 'royal'); hat(r, laurel(), { scale: 1.0, y: 0.86, tilt: 0.22 }); wearCape(r, cape('#9a1b2a', '#f6f2ea', { w: 0.56, h: 0.5, ermine: true })); return r; },
   napoleonYoung: r => { uniformize(r, 'french'); hat(r, bic({ plume: '#c0272d' }), { scale: 0.82, y: 0.88, tilt: -0.05, cap: true }); r.attach('chest', epaulettes(), [0, 0.475, -0.01]); return r; },
-  emperor: r => { uniformize(r, 'royal'); hat(r, laurel(), { scale: 1.02, y: 0.72, tilt: 0.12 }); r.attach('chest', star(), [0.07, 0.43, 0.12]); return r; },
+  emperor: r => { uniformize(r, 'royal'); hat(r, laurel(), { scale: 1.0, y: 0.86, tilt: 0.22 }); r.attach('chest', star(), [0.07, 0.43, 0.12]); return r; },
   josefina: r => { uniformize(r, 'empress'); r.attach('head', crown({ velvet: '#f0e6d8' }), [0, 0.84, -0.02]); r.hat = null; return r; },
   marialuisa: r => { uniformize(r, 'austrianbride'); r.attach('head', crown({ velvet: '#c9d6ee' }), [0, 0.84, -0.02]); return r; },
   nelson: r => { uniformize(r, 'navy'); const b = bic({ trim: '#d9b23c', cockadeCols: ['#1d1b1c', '#1d1b1c', '#1d1b1c'] }); b.rotation.y = Math.PI / 2; hat(r, b, { scale: 0.8, y: 0.88, tilt: 0, cap: true });
@@ -282,7 +331,7 @@ export const OUTFITS = {
   diplomat: r => { generic(r, '#2e2420'); uniformize(r, 'diplomat'); r.attach('chest', sash(['#c0272d', '#c0272d']), [0, 0.4, 0]); hideEars(r); return r; },
   civil: r => { generic(r, '#2e2420'); uniformize(r, 'diplomat'); hat(r, tophat(), { scale: 0.86, y: 0.88, tilt: -0.04, cap: true }); return r; },
 };
-export const CASTING = { napoleon: 'cafe', napoleonYoung: 'cafe', emperor: 'cafe', josefina: 'daiwa', marialuisa: 'doto', nelson: 'suzuka', wellington: 'helios', blucher: 'tamamo', zar: 'mcqueen', jose: 'doto', hidalgo: 'oguri', papa: 'tamamo' };
+export const CASTING = { napoleonAlps: 'cafe', coronation: 'cafe', napoleon: 'cafe', napoleonYoung: 'cafe', emperor: 'cafe', josefina: 'daiwa', marialuisa: 'doto', nelson: 'suzuka', wellington: 'helios', blucher: 'tamamo', zar: 'mcqueen', jose: 'doto', hidalgo: 'oguri', papa: 'tamamo' };
 
 let seedCounter = 0;
 export function person(parent, who, outfit = who, x = 0, z = 0, yaw = 0) {

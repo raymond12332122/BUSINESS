@@ -258,11 +258,27 @@ export function doloresSet() {
   return s;
 }
 // ---------------------------------------------------------------- palace interiors
-export function palaceFR(wall = '#efe6d2') {
-  const s = interior({ wall, floor: '#7a5a3a', w: 12, d: 9, h: 5.2, lights: [[-2.5, 4.3, 0.5], [2.5, 4.3, 0.5]] });
+export function palaceFR(wall = '#efe6d2', { imperial = false } = {}) {
+  const s = interior({ wall, floor: '#7a5a3a', w: 12, d: 9, h: 5.2, lights: [[-2.5, 4.3, 0.5], [2.5, 4.3, 0.5]], windows: !imperial });
   for (const x of [-5.95, 5.95]) for (let i = 0; i < 3; i++) s.add(LP.at(LP.box(0.06, 4.6, 0.2, '#c9a227'), x * 0.999, 2.4, -3 + i * 3));
   const c = N.chandelier(); c.position.set(0, 4.0, 0); s.add(c);
-  const th = N.throne({ fabric: '#1f3f8f' }); th.position.set(0, 0, -3.7); s.add(th); s.throne = th;
+  const th = N.throne({ fabric: imperial ? '#8a1f2a' : '#1f3f8f' }); th.position.set(0, imperial ? 0.3 : 0, -3.7); s.add(th); s.throne = th;
+  if (imperial) {
+    s.add(LP.at(LP.box(4.4, 0.3, 2.2, '#8a1f2a'), 0, 0.15, -3.5)); s.add(LP.at(LP.box(4.44, 0.05, 0.05, '#d4af37'), 0, 0.3, -2.4)); s.add(LP.at(LP.box(4.44, 0.05, 0.05, '#d4af37'), 0, 0.05, -2.4));
+    const tex = MX.canvasTex(512, 640, (g, W, H) => {
+      const gr = g.createLinearGradient(0, 0, W, 0); gr.addColorStop(0, '#5e0f18'); gr.addColorStop(0.5, '#9a1b2a'); gr.addColorStop(1, '#5e0f18'); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+      g.fillStyle = 'rgba(0,0,0,0.18)'; for (let i = 0; i < 9; i++) g.fillRect(i * W / 9, 0, 6, H);
+      g.fillStyle = '#d4af37'; for (let j = 0; j < 7; j++) for (let i = 0; i < 6; i++) { if (j < 4 && i > 0 && i < 5) continue; const x = (i + 0.5 + (j % 2) * 0.25) * W / 6, y = (j + 0.5) * H / 7;
+        g.beginPath(); g.ellipse(x, y, 7, 11, 0, 0, Math.PI * 2); g.fill(); g.beginPath(); g.ellipse(x - 9, y - 6, 8, 4, -0.5, 0, Math.PI * 2); g.ellipse(x + 9, y - 6, 8, 4, 0.5, 0, Math.PI * 2); g.fill(); }
+      g.strokeStyle = '#d4af37'; g.lineWidth = 10; g.beginPath(); g.arc(W / 2, H * 0.3, 150, Math.PI * 0.62, Math.PI * 2.38); g.stroke();
+      for (let k = 0; k < 18; k++) { const a = Math.PI * 0.66 + k / 17 * Math.PI * 1.68; for (const sd of [-1, 1]) { g.save(); g.translate(W / 2 + Math.cos(a) * 150, H * 0.3 + Math.sin(a) * 150); g.rotate(a + sd * 0.9); g.beginPath(); g.ellipse(0, 0, 22, 8, 0, 0, Math.PI * 2); g.fill(); g.restore(); } }
+      g.font = '900 210px Georgia'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('N', W / 2, H * 0.3 + 12);
+      g.lineWidth = 12; g.strokeRect(14, 14, W - 28, H - 28); });
+    const back = new THREE.Mesh(new THREE.PlaneGeometry(4.4, 5.0), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.85 })); back.position.set(0, 2.6, -4.46); s.add(back);
+    const crownTop = new THREE.Mesh(new THREE.CylinderGeometry(2.5, 2.5, 0.5, 32, 1, true, -Math.PI / 2, Math.PI), std('#8a1f2a', { side: THREE.DoubleSide })); crownTop.position.set(0, 5.0, -4.5); s.add(crownTop);
+    s.add(LP.at(LP.box(5.2, 0.14, 0.2, '#d4af37'), 0, 4.75, -2.05));
+    for (const x of [-2.9, 2.9]) { const d = N.drape('bees', 1.2, 4.6); d.position.set(x, 2.5, -4.42); s.add(d); }
+  }
   return s;
 }
 // ---------------------------------------------------------------- Russia
