@@ -15,7 +15,7 @@ VIDEO = sys.argv[4] if len(sys.argv) > 4 else 'guerrilla'
 OUT = os.path.join(ROOT, 'build', LANG) if VIDEO == 'guerrilla' else os.path.join(ROOT, 'build', VIDEO, LANG)
 os.makedirs(os.path.join(OUT, 'voice'), exist_ok=True)
 # Phonetic respellings for the TTS only; subtitles keep the real spelling.
-SAY = {'Cu Chi': 'Ku Chi', 'Nelson': 'Nélson', 'Jena': 'Yena'}
+SAY = {'Cu Chi': 'Ku Chi', 'Nelson': 'Nélson', 'Jena': 'Yena', 'Harfuch': 'Jarfuch', 'Sheinbaum': 'Shein-báum', 'Capos': 'Cápos', 'capos': 'cápos'}
 script = json.load(open(os.path.join(ROOT, 'src', f'script_{LANG}.json') if VIDEO == 'guerrilla' else os.path.join(ROOT, 'src', VIDEO, f'script_{LANG}.json')))
 
 

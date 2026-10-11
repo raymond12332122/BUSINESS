@@ -1,0 +1,135 @@
+{
+ "scenes": [
+  {
+   "id": "title",
+   "lead": 1.6,
+   "tail": 1.3,
+   "gaps": {
+    "1": 0.7
+   },
+   "lines": [
+    "En dos mil veinticinco asesinaron en México a casi veintiocho mil personas, según el INEGI, y hay más de ciento treinta y dos mil desaparecidos.",
+    "¿Cómo llegó el país hasta aquí? ¿De verdad estamos cayendo poco a poco? ¿Y qué está haciendo el gobierno de Claudia Sheinbaum?",
+    "Esta es la historia de la corrupción y el narcotráfico en México."
+   ]
+  },
+  {
+   "id": "origenes",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Todo empezó con un negocio. En los años ochenta, la cocaína de Colombia comenzó a cruzar por México rumbo a Estados Unidos, el mayor mercado de drogas del mundo.",
+    "Capos como los del Cártel de Guadalajara crecieron con la protección de policías y políticos: pagaban para que nadie los tocara.",
+    "En mil novecientos ochenta y cinco asesinaron a Enrique Camarena, agente de la DEA, y se descubrió que hasta policías federales protegían a los narcos."
+   ]
+  },
+  {
+   "id": "guerra",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "En diciembre de dos mil seis, el presidente Felipe Calderón sacó al Ejército a las calles y le declaró la guerra a los cárteles.",
+    "Cayeron muchos capos, pero los cárteles se partieron en grupos más pequeños que se pelearon a muerte por cada territorio.",
+    "Los asesinatos se dispararon: de unos diez mil en dos mil seis a más de veintisiete mil en dos mil once."
+   ]
+  },
+  {
+   "id": "corrupcion",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Y la corrupción llegó hasta arriba: Genaro García Luna, el secretario de Seguridad que dirigía esa guerra, fue condenado en Estados Unidos a treinta y ocho años de prisión por recibir sobornos del Cártel de Sinaloa.",
+    "En dos mil catorce, cuarenta y tres estudiantes de Ayotzinapa desaparecieron tras ser detenidos por policías municipales coludidos con un grupo criminal.",
+    "Y en dos mil veinticinco cayó una red de contrabando de combustible, el huachicol fiscal, con mandos de la Marina detenidos. La corrupción no es de un solo partido."
+   ]
+  },
+  {
+   "id": "impunidad",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Por eso el crimen casi siempre sale gratis. De cada cien delitos, noventa y tres ni siquiera se denuncian, y menos de uno termina resuelto.",
+    "Según México Evalúa, la impunidad ronda el noventa y nueve por ciento. Y en el Índice de Percepción de la Corrupción, México saca veintisiete de cien: el último lugar de la OCDE."
+   ]
+  },
+  {
+   "id": "negocio",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Hoy los cárteles son mucho más que droga: fabrican fentanilo con químicos traídos de Asia, cobran derecho de piso, roban combustible, trafican personas y extorsionan a productores de limón y aguacate.",
+    "La extorsión alcanzó en dos mil veinticinco su nivel más alto en una década, con más de once mil víctimas denunciadas.",
+    "Según un estudio de la revista Science, el crimen organizado tendría unos ciento setenta y cinco mil integrantes, y necesita reclutar a cientos de jóvenes cada semana."
+   ]
+  },
+  {
+   "id": "mapa",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Los grupos más poderosos son el Cártel de Sinaloa y el Cártel Jalisco Nueva Generación, con presencia en buena parte del país.",
+    "Y desde dos mil veinticuatro, el de Sinaloa vive una guerra interna entre los Chapitos y los Mayos que ya dejó miles de muertos en ese estado."
+   ]
+  },
+  {
+   "id": "eeuu",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Pero el problema tiene dos lados. La droga va al norte porque en Estados Unidos hay millones de consumidores: en dos mil veinticinco murieron allá casi setenta mil personas por sobredosis.",
+    "Y las armas vienen al sur: siete de cada diez armas rastreadas en México vienen de Estados Unidos.",
+    "En dos mil veinticinco, Donald Trump declaró terroristas a seis cárteles mexicanos, y desde entonces presiona con aranceles y amenazas de ataques militares."
+   ]
+  },
+  {
+   "id": "amlo",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "En dos mil dieciocho, Andrés Manuel López Obrador prometió abrazos, no balazos: atender las causas, como la pobreza, en lugar de la guerra.",
+    "Creó la Guardia Nacional y le dio más poder al Ejército, pero su sexenio fue el más violento del que hay registro: cerca de doscientos mil asesinatos.",
+    "En dos mil diecinueve, en el Culiacanazo, el gobierno capturó a Ovidio Guzmán, hijo del Chapo, y lo soltó horas después ante los ataques del cártel."
+   ]
+  },
+  {
+   "id": "claudia",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "En octubre de dos mil veinticuatro llegó a la presidencia Claudia Sheinbaum. ¿De verdad no hace nada? Los datos dicen que sí cambió la estrategia.",
+    "Con Omar García Harfuch en Seguridad, apostó por la inteligencia: reporta más de sesenta y siete mil detenidos, miles de laboratorios inhabilitados y noventa y dos capos enviados a Estados Unidos.",
+    "En febrero de dos mil veintiséis, el Ejército abatió a El Mencho, líder del Cártel Jalisco Nueva Generación. Y según las cifras oficiales, los homicidios diarios ya bajaron a menos de la mitad."
+   ]
+  },
+  {
+   "id": "criticas",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Pero las críticas son fuertes. Organizaciones como México Evalúa y Causa en Común señalan que, mientras bajan los homicidios, suben las desapariciones.",
+    "La extorsión sigue en máximos históricos, y pocos políticos son procesados por sus nexos con el crimen: hasta Washington exige arrestar y enjuiciar a funcionarios corruptos.",
+    "Preocupa también la reforma judicial: los nuevos jueces se eligieron con apenas trece por ciento de participación. Y en noviembre de dos mil veinticinco, el asesinato de Carlos Manzo, alcalde de Uruapan, sacó a miles de jóvenes a marchar."
+   ]
+  },
+  {
+   "id": "porque",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Entonces, ¿por qué no se acaba? Porque es un negocio gigantesco, con millones de clientes del otro lado de la frontera y armas que no dejan de llegar.",
+    "Porque en muchos municipios la policía está mal pagada, amenazada o comprada: plata o plomo. Y porque sin fiscalías ni jueces que funcionen, casi nadie termina en la cárcel.",
+    "Ningún presidente, de ningún partido, lo ha resuelto, y ninguno podría hacerlo solo."
+   ]
+  },
+  {
+   "id": "outro",
+   "lead": 0.8,
+   "tail": 2.4,
+   "lines": [
+    "Los especialistas proponen algunas salidas: policías y fiscalías profesionales, seguir el dinero, castigar a los políticos coludidos, dar opciones a los jóvenes y que Estados Unidos frene sus armas y su consumo.",
+    "¿Estamos cayendo poco a poco? Algunos números mejoran y otros empeoran. Lo que sí está claro es que, sin justicia, la violencia siempre regresa.",
+    "Esta fue la historia de la corrupción y el narcotráfico en México."
+   ]
+  }
+ ]
+}
