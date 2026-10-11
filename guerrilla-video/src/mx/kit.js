@@ -194,3 +194,9 @@ export function pose(r, p) {
   if (r.hat && p.waist && !p.bend) p.waist = [Math.min(10, p.waist[0]), p.waist[1], p.waist[2]];
   r.apply(p);
 }
+// Darken/desaturate a character (memorial look); clones its materials the first time so other instances are untouched.
+export function tint(rig, color = '#ffffff') {
+  if (!rig._tintMats) { rig._tintMats = []; rig.root.traverse(o => { if (o.isMesh) { o.material = Array.isArray(o.material) ? o.material.map(m => m.clone()) : o.material.clone(); (Array.isArray(o.material) ? o.material : [o.material]).forEach(m => { if (m.color) rig._tintMats.push([m, m.color.clone()]); }); } }); }
+  const c = new THREE.Color(color);
+  for (const [m, base] of rig._tintMats) m.color.copy(base).multiply(c);
+}

@@ -54,3 +54,18 @@ export function stamp(t, text, a, b, { x = 1250, y = 560, rot = -8, color = '#b5
   return `<div style="position:absolute;left:${x}px;top:${y}px;transform:translate(-50%,-50%) rotate(${rot}deg) scale(${sc});opacity:${k};border:7px solid ${color};color:${color};
     padding:12px 28px;font:900 46px/1.1 Inter;letter-spacing:.06em;text-align:center;border-radius:10px;background:rgba(243,234,214,.94);box-shadow:0 10px 30px rgba(0,0,0,.35)">${text}</div>`;
 }
+// Big left-side info card (articles, figures).
+export function card(t, a, b, kicker, title, sub = '', { left = 80, top = 90, width = 560, accent = '#e0b84a', icon = '' } = {}) {
+  const k = ss(a, a + 0.35, t) * (1 - ss(b - 0.3, b, t)); if (k <= 0) return '';
+  return `<div style="position:absolute;left:${left}px;top:${top}px;width:${width}px;padding:24px 28px;background:rgba(32,25,20,.9);border-left:8px solid ${accent};border-radius:12px;color:#fff;
+    opacity:${k};transform:translateX(${(1 - ss(a, a + 0.35, t)) * -40}px)">${icon ? `<div style="font-size:64px;line-height:1;margin-bottom:8px">${icon}</div>` : ''}
+    <div style="font:800 22px Inter;letter-spacing:.2em;color:${accent}">${kicker}</div><div style="font:900 44px/1.08 'Inter Display',Inter;margin-top:6px">${title}</div>
+    ${sub ? `<div style="font:500 26px/1.35 Inter;color:#e9dfcc;margin-top:10px">${sub}</div>` : ''}</div>`;
+}
+// Horizontal timeline: items [[label, sub, revealTime]], fill progress 0..1.
+export function timeline(t, a, b, items, fill) {
+  const k = ss(a, a + 0.4, t) * (1 - ss(b - 0.3, b, t)); if (k <= 0) return '';
+  const n = items.length;
+  return `<div class="tl" style="opacity:${k}"><div class="fill" style="width:${fill * 100}%"></div>${items.map(([y, d, tt], i) => { const x = i / (n - 1) * 100, o = ss(tt, tt + 0.3, t);
+    return `<div class="m" style="left:${x}%;opacity:${o}"></div><div class="y" style="left:${x}%;opacity:${o}">${y}</div><div class="d" style="left:${x}%;opacity:${o}">${d}</div>`; }).join('')}</div>`;
+}

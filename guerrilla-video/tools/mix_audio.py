@@ -243,11 +243,70 @@ def charge():
     return norm(x * 0.6 + roll * 0.5) * 0.5
 
 
+def ks(f, d=1.6, bright=0.5, decay=0.996):
+    """Karplus-Strong plucked string, vectorised one period at a time."""
+    n = int(d * SR); P = max(2, int(SR / f)); y = np.zeros(n + P + 1)
+    y[:P] = rng.uniform(-1, 1, P) * (1 - bright) + rng.uniform(-1, 1, P) * bright
+    y[:P] = np.convolve(y[:P], [0.5, 0.5], 'same') if bright < 0.5 else y[:P]
+    for k in range(P, n, P):
+        a = y[k - P:k]; b = y[k - P + 1:k + 1] if k + 1 <= len(y) else a
+        m = min(P, n - k); y[k:k + m] = (0.5 * (a[:m] + b[:m])) * decay
+    return y[:n] * np.exp(-t_(d) * 0.6)
+
+
+def whistle():
+    d = 1.6; t = t_(d); e = np.minimum(1, t * 6) * np.minimum(1, (d - t) * 3)
+    x = sum(np.sin(2 * np.pi * f * t + 0.3 * np.sin(2 * np.pi * 5 * t)) for f in (523, 659, 784)) / 3
+    x += fft_filter(noise(d), lo=900, hi=4000) * 0.35
+    return fade(x * e * 0.35, 0.02, 0.2)
+
+
+def bell():
+    d = 4.0; t = t_(d); f = 196
+    x = sum(a * np.sin(2 * np.pi * f * m * t) * np.exp(-t * k) for a, m, k in ((1, 1, 0.9), (0.6, 2.0, 1.3), (0.45, 2.4, 1.8), (0.3, 3.0, 2.2), (0.2, 4.2, 3.0), (0.25, 0.5, 0.7)))
+    x[:int(0.004 * SR)] *= np.linspace(0, 1, int(0.004 * SR))
+    return norm(x) * 0.42
+
+
+def laugh():
+    out = np.zeros(int(1.0 * SR))
+    for i, f in enumerate([784, 659.3, 784, 987.8]):
+        s = int(i * 0.13 * SR); x = ks(f, 0.5, 0.7)
+        out[s:s + len(x)] += x[: len(out) - s]
+    return fade(norm(out) * 0.3, 0.003, 0.2)
+
+
+def crowd(d):
+    t = t_(d); x = np.zeros(int(d * SR))
+    for k in range(6):
+        mod = 0.5 + 0.5 * np.sin(2 * np.pi * (2.3 + k * 0.7) * t + k) * np.sin(2 * np.pi * (0.31 + k * 0.11) * t + 2 * k)
+        x += fft_filter(noise(d), lo=250 + k * 60, hi=1400 + k * 150) * np.maximum(0, mod)
+    return fade(norm(x) * 0.3, 0.8, 1.0)
+
+
+def mg(d):
+    out = np.zeros(int(d * SR)); sh = shot()[: int(0.12 * SR)]
+    for k in range(int(d * 9)):
+        s = int((k / 9 + rng.uniform(0, 0.01)) * SR)
+        if s < len(out): out[s:s + len(sh)] += sh[: len(out) - s] * rng.uniform(0.5, 0.8)
+    return fade(out * 0.6, 0.02, 0.2)
+
+
+def fire(d):
+    t = t_(d); x = fft_filter(noise(d), hi=700) * 0.4
+    cr = np.zeros(int(d * SR))
+    for _ in range(int(d * 25)):
+        i = rng.integers(0, max(1, len(cr) - 400)); L = int(rng.uniform(0.002, 0.008) * SR)
+        cr[i:i + L] += rng.standard_normal(L) * np.exp(-np.arange(L) / (L / 3)) * rng.uniform(0.3, 1)
+    x += fft_filter(cr, lo=1200)
+    return fade(norm(x) * 0.35, 0.5, 0.8)
+
+
 ONE = {'shot': shot, 'boom': lambda: boom(False), 'bigboom': lambda: boom(True), 'whoosh': whoosh, 'pop': pop, 'click': click,
        'thud': thud, 'creak': creak, 'sting': sting, 'sting2': sting2, 'tension': tension, 'beep': beep, 'tick': tick,
-       'missile': missile, 'brakes': brakes, 'cheer': cheer, 'clank': clank, 'charge': charge}
+       'missile': missile, 'brakes': brakes, 'cheer': cheer, 'clank': clank, 'charge': charge, 'whistle': whistle, 'bell': bell, 'laugh': laugh}
 LOOP = {'engine': engine, 'march': march, 'drone': drone, 'train': train, 'wind': wind, 'clock': clock,
-        'plane': plane, 'siren': siren, 'waves': waves, 'factory': factory, 'bells': bells}
+        'plane': plane, 'siren': siren, 'waves': waves, 'factory': factory, 'bells': bells, 'crowd': crowd, 'mg': mg, 'fire': fire}
 
 sfx = np.zeros(N)
 cache = {}
@@ -266,28 +325,92 @@ with wave.open(os.path.join(B, 'narration.wav')) as w:
 nar = np.interp(np.arange(N) / SR, np.arange(len(nar)) / nsr, nar, right=0)
 nar = norm(nar, 0.92)
 
+# ------------------------------------------------------------------ corrido bed for the Revolution video (3/4, guitarrón + guitar + violin)
+MOODS = {'title': 'bright', 'porfiriato': 'calm', 'madero': 'bright', 'uprising': 'bright', 'ayala': 'bright', 'huerta': 'tense', 'constitucionalistas': 'bright',
+         'split': 'tense', 'columbus': 'bright', 'constitucion': 'calm', 'fates': 'somber', 'legacy': 'somber', 'outro': 'bright'}
+NOTE = lambda name: 440 * 2 ** ((name - 69) / 12)
+def corrido():
+    bpm = 138; beat = 60 / bpm; bar = 3 * beat
+    G = {'G': [55, 59, 62], 'D7': [50, 54, 57, 60], 'C': [48, 52, 55], 'Em': [52, 55, 59], 'B7': [47, 51, 54, 57], 'Am': [45, 48, 52]}
+    prog = {'bright': ['G', 'G', 'D7', 'D7', 'D7', 'D7', 'G', 'G', 'C', 'C', 'G', 'G', 'D7', 'D7', 'G', 'G'],
+            'calm': ['G', 'G', 'C', 'C', 'G', 'G', 'D7', 'D7'], 'tense': ['Em', 'Em', 'B7', 'B7', 'Am', 'Am', 'B7', 'B7'], 'somber': ['Em', 'Em', 'Am', 'Am', 'Em', 'Em', 'B7', 'B7']}
+    # simple original violin line (MIDI), one note per beat, 0 = rest; 16 bars
+    mel = [67, 71, 74, 74, 72, 71, 69, 0, 66, 69, 72, 72, 71, 69, 66, 62, 66, 69, 67, 0, 0, 0, 71, 74,
+           76, 76, 74, 72, 76, 72, 71, 74, 71, 67, 0, 0, 66, 69, 72, 74, 72, 69, 67, 71, 67, 67, 0, 0]   # 16 bars, aligned with 'bright'
+    L, R = np.zeros(N), np.zeros(N)
+    cacheK = {}
+    def pl(f, d, br):
+        k = (round(f, 1), d, br)
+        if k not in cacheK: cacheK[k] = ks(f, d, br)
+        return cacheK[k]
+    def add(x, t0, gl, gr):
+        i = int(t0 * SR)
+        if i >= N: return
+        x = x[: N - i]; L[i:i + len(x)] += x * gl; R[i:i + len(x)] += x * gr
+    def mood_at(t):
+        for sc in TL['scenes']:
+            if sc['start'] <= t < sc['start'] + sc['dur']: return MOODS.get(sc['id'], 'bright')
+        return 'bright'
+    nb = int(TOTAL / bar) + 1
+    for b in range(nb):
+        t0 = b * bar; m = mood_at(t0 + bar / 2); pr = prog[m]; ch = G[pr[b % len(pr)]]
+        root = NOTE(ch[0] - 12); fifth = NOTE(ch[2] - 12) if len(ch) > 2 else root * 1.5
+        bass = root if b % 2 == 0 else fifth
+        if m == 'somber':
+            add(pl(bass, 2.4, 0.2) * 0.9, t0, 0.55, 0.55)
+            for j, n in enumerate(ch[:3]): add(np.sin(2 * np.pi * NOTE(n) * t_(bar)) * np.sin(np.pi * t_(bar) / bar) * 0.18, t0, 0.5, 0.5)
+            continue
+        add(pl(bass, 1.4, 0.25) * 1.0, t0, 0.55, 0.55)                                  # guitarrón on 1
+        strum = [NOTE(n) for n in ch]
+        for k in (1, 2):                                                                  # guitar on 2 and 3
+            if m == 'calm' and k == 2: continue
+            for j, f in enumerate(strum):
+                add(pl(f, 0.9, 0.35) * (0.3 if m != 'tense' else 0.2) * (0.8 if k == 2 else 1), t0 + k * beat + j * 0.012, 0.42 + 0.06 * j, 0.6 - 0.06 * j)
+        if m == 'bright':                                                                 # violin melody, 3 notes per bar
+            for k in range(3):
+                n = mel[((b % 16) * 3 + k) % len(mel)]
+                if not n: continue
+                d = beat * 0.95; tt = t_(d); f = NOTE(n) * (1 + 0.006 * np.sin(2 * np.pi * 5.5 * tt) * np.minimum(1, tt * 4))
+                ph = np.cumsum(f) / SR; v = (2 * (ph % 1) - 1) * 0.6 + np.sin(2 * np.pi * ph) * 0.4
+                v = fft_filter(v, lo=300, hi=3200) * np.minimum(1, tt / 0.05) * np.minimum(1, (d - tt) / 0.08)
+                add(v * 0.16, t0 + k * beat, 0.62, 0.45)
+        if m == 'tense':
+            add(np.sin(2 * np.pi * NOTE(40) * t_(bar)) * 0.12 * np.sin(np.pi * t_(bar) / bar), t0, 0.5, 0.5)
+    # soften and add a small room: a few early reflections, then a gentle low-pass
+    for X_ in (L, R):
+        y = X_.copy()
+        for dms, g in ((23, 0.22), (41, 0.16), (67, 0.12), (97, 0.08), (151, 0.05)):
+            d_ = int(dms * SR / 1000); y[d_:] += X_[:-d_] * g
+        X_[:] = fft_filter(y, lo=60, hi=4200)
+    return L, R
+
+
 # ------------------------------------------------------------------ music bed (D minor, slow pads + soft pulse)
+if VIDEO == 'mx':
+    musL, musR = corrido(); t_all = np.arange(N) / SR
+    sc_ = 0.15 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
 BPM = 84; beat = 60 / BPM
-prog = [[146.8, 174.6, 220.0], [116.5, 146.8, 174.6], [174.6, 220.0, 261.6], [130.8, 164.8, 196.0]]  # Dm Bb F C
-bar = 4 * beat
-musL, musR = np.zeros(N), np.zeros(N)
-t_all = np.arange(N) / SR
-seg = int(2 * bar * SR)
-for k in range(0, N, seg):
-    ch = prog[(k // seg) % 4]; n = min(seg, N - k); tt = np.arange(n) / SR
-    padL = sum(2 * ((f * 0.5 * 1.003 * tt) % 1) - 1 for f in ch) + sum(np.sin(2 * np.pi * f * tt) for f in ch)
-    padR = sum(2 * ((f * 0.5 * 0.997 * tt) % 1) - 1 for f in ch) + sum(np.sin(2 * np.pi * f * tt) for f in ch)
-    e = np.minimum(1, tt / 1.2) * np.minimum(1, (n / SR - tt) / 1.2)
-    musL[k:k + n] += padL * e; musR[k:k + n] += padR * e
-    bass = np.sin(2 * np.pi * ch[0] / 2 * tt) * e
-    musL[k:k + n] += bass * 1.2; musR[k:k + n] += bass * 1.2
-musL, musR = fft_filter(musL, hi=1100), fft_filter(musR, hi=1100)
-# soft low pulse on beats 1 and 3
-pulse = np.zeros(N); kick = sweep(110, 45, 0.35) * env_exp(0.35, 12)
-for b in np.arange(0, TOTAL, 2 * beat):
-    i = int(b * SR); pulse[i:i + len(kick)] += kick[: max(0, N - i)]
-mus_scale = 0.11 / (np.max(np.abs(musL)) + 1e-9)
-musL, musR = musL * mus_scale + pulse * 0.10, musR * mus_scale + pulse * 0.10
+if VIDEO != 'mx':
+    prog = [[146.8, 174.6, 220.0], [116.5, 146.8, 174.6], [174.6, 220.0, 261.6], [130.8, 164.8, 196.0]]  # Dm Bb F C
+    bar = 4 * beat
+    musL, musR = np.zeros(N), np.zeros(N)
+    t_all = np.arange(N) / SR
+    seg = int(2 * bar * SR)
+    for k in range(0, N, seg):
+        ch = prog[(k // seg) % 4]; n = min(seg, N - k); tt = np.arange(n) / SR
+        padL = sum(2 * ((f * 0.5 * 1.003 * tt) % 1) - 1 for f in ch) + sum(np.sin(2 * np.pi * f * tt) for f in ch)
+        padR = sum(2 * ((f * 0.5 * 0.997 * tt) % 1) - 1 for f in ch) + sum(np.sin(2 * np.pi * f * tt) for f in ch)
+        e = np.minimum(1, tt / 1.2) * np.minimum(1, (n / SR - tt) / 1.2)
+        musL[k:k + n] += padL * e; musR[k:k + n] += padR * e
+        bass = np.sin(2 * np.pi * ch[0] / 2 * tt) * e
+        musL[k:k + n] += bass * 1.2; musR[k:k + n] += bass * 1.2
+    musL, musR = fft_filter(musL, hi=1100), fft_filter(musR, hi=1100)
+    # soft low pulse on beats 1 and 3
+    pulse = np.zeros(N); kick = sweep(110, 45, 0.35) * env_exp(0.35, 12)
+    for b in np.arange(0, TOTAL, 2 * beat):
+        i = int(b * SR); pulse[i:i + len(kick)] += kick[: max(0, N - i)]
+    mus_scale = 0.11 / (np.max(np.abs(musL)) + 1e-9)
+    musL, musR = musL * mus_scale + pulse * 0.10, musR * mus_scale + pulse * 0.10
 # duck under narration
 win = int(0.05 * SR)
 def movavg(x, w):
@@ -305,6 +428,11 @@ for sc in TL['scenes']:  # silence the music bed under quiet scenes (the memoria
         fin *= 1 - np.clip(np.minimum((t_all - (a - 1.5)) / 1.5, ((b + 1.5) - t_all) / 1.5), 0, 1)
 musL, musR = musL * duck * fin, musR * duck * fin
 
+if os.environ.get('MUSIC_ONLY'):
+    o = (np.stack([musL, musR], 1) / (max(np.abs(musL).max(), np.abs(musR).max()) + 1e-9) * 0.8 * 32767).astype(np.int16)
+    with wave.open(os.path.join(B, 'music.wav'), 'w') as w:
+        w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR); w.writeframes(o.tobytes())
+    print('music only written'); raise SystemExit
 # ------------------------------------------------------------------ mix
 sfx = sfx * 0.55
 L = nar + musL + sfx

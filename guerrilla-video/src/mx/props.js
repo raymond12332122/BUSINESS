@@ -560,3 +560,27 @@ export function boulder(r = 0.7, seed = 0, color = '#9a8064') {
   geo.computeVertexNormals();
   const m = mesh(geo, smooth(color, { roughness: 0.95 })); m.scale.setScalar(r); m.position.y = r * 0.22; return m;
 }
+
+// Wooden oil derrick (Huasteca veracruzana, 1910s).
+export function derrick(h = 7) {
+  const g = new THREE.Group(), wood = '#4a3a2a', b = 1.4, tp = 0.25;
+  const corners = [[-1, -1], [1, -1], [1, 1], [-1, 1]];
+  for (const [sx, sz] of corners) { const leg = cyl(0.06, 0.08, h * 1.01, wood, 5); leg.position.set(sx * (b + tp) / 2, h / 2, sz * (b + tp) / 2); leg.rotation.set(-sz * Math.atan((b - tp) / 2 / h), 0, sx * Math.atan((b - tp) / 2 / h)); g.add(leg); }
+  for (let i = 1; i < 6; i++) { const y = i * h / 6, w = b - (b - tp) * y / h; for (const [x, z, ry] of [[0, -w / 2, 0], [0, w / 2, 0], [-w / 2, 0, Math.PI / 2], [w / 2, 0, Math.PI / 2]]) g.add(at(box(w, 0.05, 0.05, wood), x, y, z, 0, ry, 0)); }
+  g.add(at(box(2.4, 0.3, 2.4, '#5a4632'), 0, 0.15, 0)); g.add(at(box(0.6, 0.6, 0.6, '#2a2a2a'), 0, 0.6, 0));
+  g.add(at(cyl(0.12, 0.12, 0.5, '#2a2a2a', 8), 0, h + 0.1, 0));
+  return g;
+}
+// Big book of the Constitution (open), with a cover plate.
+export function constitutionBook() {
+  const g = new THREE.Group();
+  const pageTex = canvasTex(512, 640, (c, W, H) => { c.fillStyle = '#f3ead6'; c.fillRect(0, 0, W, H); c.fillStyle = '#2a2116'; c.textAlign = 'center';
+    c.font = '800 34px Georgia'; c.fillText('CONSTITUCIÓN', W / 2, 120); c.font = '600 22px Georgia'; c.fillText('POLÍTICA DE LOS ESTADOS', W / 2, 165); c.fillText('UNIDOS MEXICANOS', W / 2, 195);
+    c.font = '600 20px Georgia'; c.fillText('Querétaro, 5 de febrero de 1917', W / 2, 250); c.fillStyle = '#b9ad93'; for (let i = 0; i < 12; i++) c.fillRect(70, 300 + i * 24, W - 140, 7); });
+  const textTex = canvasTex(512, 640, (c, W, H) => { c.fillStyle = '#f3ead6'; c.fillRect(0, 0, W, H); c.fillStyle = '#2a2116'; c.font = '800 26px Georgia'; c.fillText('Artículo 27', 60, 90);
+    c.fillStyle = '#b9ad93'; for (let i = 0; i < 9; i++) c.fillRect(60, 120 + i * 24, W - 120, 7); c.fillStyle = '#2a2116'; c.fillText('Artículo 123', 60, 380); c.fillStyle = '#b9ad93'; for (let i = 0; i < 8; i++) c.fillRect(60, 410 + i * 24, W - 120, 7); });
+  g.add(at(box(1.34, 0.06, 0.86, '#6b2a22'), 0, 0.03, 0));
+  for (const [s, tex] of [[-1, pageTex], [1, textTex]]) { const p = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.05, 0.8), [std('#efe6d0'), std('#efe6d0'), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.8 }), std('#efe6d0'), std('#efe6d0'), std('#efe6d0')]);
+    p.position.set(s * 0.32, 0.085, 0); p.rotation.z = -s * 0.06; g.add(p); }
+  return g;
+}

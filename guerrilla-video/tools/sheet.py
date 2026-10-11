@@ -2,7 +2,8 @@
 import sys
 from PIL import Image, ImageDraw
 out, files = sys.argv[1], sys.argv[2:]
-W, H, cols = 960, 540, 2
+import os
+W, H, cols = (640, 360, 3) if os.environ.get('SMALL') else (960, 540, 2)
 rows = (len(files) + cols - 1) // cols
 sheet = Image.new('RGB', (W * cols, H * rows), 'black')
 d = ImageDraw.Draw(sheet)
