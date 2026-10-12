@@ -49,7 +49,8 @@ export function build(ctx) {
       Mp.highway.set(1); pul.update(t, tEsp);
       return U.film(t) + U.badge(t, '7 de septiembre de 2026', 'Operativo Enjambre', '23 cateos en el municipio de Esperanza', tSiete - 0.2, tB)
         + PM.chip(ctx, Mp, 'Esperanza', fade(t, tEsp - 0.1, tB), 'frontera con Veracruz', '#c0392b')
-        + PM.label(ctx, PM.ppos(-96.95, 19.12, 0.15), 'VERACRUZ', 'st', fade(t, tFron - 0.2, tB)) + PM.clabel(ctx, Mp, 'Orizaba', fade(t, tFron, tB));
+        + PM.label(ctx, PM.ppos(-96.95, 19.12, 0.15), 'VERACRUZ', 'st', fade(t, tFron - 0.2, tB)) + PM.clabel(ctx, Mp, 'Orizaba', fade(t, tFron, tB))
+        + PM.clabel(ctx, Mp, 'Puebla', fade(t, 0.5, tB), 'c', 'Puebla (capital)');
     } },
     { t0: tB, set: T, p0: [0.9, 1.15, 4.6], l0: [-0.1, 0.85, -3], p1: [0.8, 1.1, 3.9], l1: [-0.1, 0.85, -3], fov0: 40, act: (t) => {
       raid(t, tB);
@@ -62,7 +63,7 @@ export function build(ctx) {
     { t0: tD, set: E, p0: [-0.3, 2.3, 3.4], l0: [-0.3, 0.7, -0.8], p1: [-0.1, 2.1, 3.0], l1: [-0.1, 0.7, -0.8], fov0: 46, act: (t) => {
       guards.forEach((g, i) => { K.pose(g, { ...C.idle(t, i, 0.3), gun: 'port' }); g.setFace(C.blinkEye(t, i), 'neutral'); });
       return U.film(t) + U.badge(t, 'Lo asegurado', 'Arsenal de la red', 'Cateos del 7 de septiembre', tAseg - 0.2, ctx.dur + 1)
-        + U.icons(t, tCuar - 0.3, ctx.dur + 1, [[U.pistolIcon('#e9e6df', 54), 'Más de 40 armas', tCuar - 0.1], [U.pistolIcon('#ff8a6a', 54), '2 rifles Barrett', tBar - 0.1], ['🚙', 'Vehículos blindados', tVeh - 0.1], ['📡', 'Drones e inhibidores', tDro - 0.1]], { y: 790 })
+        + U.icons(t, tCuar - 0.3, ctx.dur + 1, [[U.pistolIcon('#e9e6df', 54), 'Más de 40 armas', tCuar - 0.1], [U.pistolIcon('#ff8a6a', 54), '2 rifles Barrett', tBar - 0.1], ['🚙', 'Vehículos blindados', tVeh - 0.1], ['📡', 'Drones e inhibidores', tDro - 0.1]], { y: 740 })
         + U.source(t, tSus - 0.2, ctx.dur + 1, 'Presuntos responsables: sus casos siguen en proceso');
     } },
   ];

@@ -56,10 +56,10 @@ export function build(ctx) {
   const sfx = [{ t: 0.0, type: 'night', dur: tY, vol: 0.3 }, { t: 0.1, type: 'hiss', dur: tY - 0.2, vol: 0.32 }, { t: tFoc, type: 'hit', vol: 0.45 }, { t: tTre, type: 'pop', vol: 0.45 },
     { t: tY - 0.3, type: 'engines', dur: L[1].t0 - tY + 0.3, vol: 0.45 },
     { t: L[1].t0 - 0.3, type: 'whoosh', vol: 0.35 }, { t: tPla, type: 'cash', vol: 0.5 }, { t: tPlo, type: 'cock', vol: 0.55 },
-    { t: L[2].t0 - 0.35, type: 'sirens', dur: tArm - L[2].t0, vol: 0.25 }, { t: tMor, type: 'stamp', vol: 0.4 },
+    { t: tPart - 0.2, type: 'sirens', dur: tArm - tPart, vol: 0.25 }, { t: tMor, type: 'stamp', vol: 0.4 },
     { t: tArm - 0.4, type: 'swoosh', vol: 0.35 }, { t: tPid, type: 'pop', vol: 0.4 }, { t: tPos, type: 'pop', vol: 0.4 }];
 
-  const tB = tY - 0.3, tC = L[1].t0 - 0.3, tD = L[2].t0 - 0.35, tE = tArm - 0.4;
+  const tB = tY - 0.3, tC = L[1].t0 - 0.3, tD = tPart - 0.15, tE = tArm - 0.4;
   const shots = [
     { t0: 0, set: D, p0: [-1.5, 1.25, 3.6], l0: [0.9, 0.6, -0.6], p1: [-1.3, 1.2, 3.0], l1: [0.9, 0.6, -0.6], fov0: 40, act: (t) => {
       K.pose(man, A.fill(t, 1)); man.setFace(C.blinkEye(t, 1), 'neutral');
@@ -89,8 +89,7 @@ export function build(ctx) {
       mayor.root.position.z = z; K.pose(mayor, A.cuffed(t, 1)); mayor.setFace(C.blinkEye(t, 1), 'frown');
       esc.forEach((e, i) => { e.root.position.z = z + 0.15; K.pose(e, A.escort(t, 2 + i)); e.setFace(C.blinkEye(t, 2 + i), 'neutral'); });
       cars[0].blink(t, 1);
-      return U.film(t) + U.badge(t, 'Esperanza', 'El alcalde llegó por Morena', 'Detenido en septiembre de 2026 · presunto responsable', tAlc - 0.2, tE)
-        + U.big(t, tD + 0.1, tAlc - 0.2, 'No es cosa de un solo partido', { top: 160, size: 64 });
+      return U.film(t) + U.badge(t, 'No es cosa de un solo partido', 'El alcalde de Esperanza llegó por Morena', 'Detenido en septiembre de 2026 · presunto responsable', tD + 0.1, tE);
     } },
     { t0: tE, set: Pr, p0: [1.1, 1.2, 0.6], l0: [0, 1.12, -2.85], p1: [0.8, 1.18, 0.0], l1: [0, 1.12, -2.85], fov0: 38, act: (t) => {
       K.pose(arm, MA.orate(t, 1, 0.55)); arm.setFace(C.blinkEye(t, 1), C.talkMouth(t, 1)); Pr.flags.forEach(f => f.wave(t));

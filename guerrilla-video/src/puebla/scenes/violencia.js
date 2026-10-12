@@ -44,9 +44,9 @@ export function build(ctx) {
 
   const tB = tSeg - 0.3, tC = L[1].t0 - 0.3, tD = L[2].t0 - 0.35, tE = L[3].t0 - 0.35;
   const rates = (t) => U.hbars(t, tC + 0.2, tD, 'Asesinatos por cada 100 mil habitantes, 2025', [
-    ['Sinaloa', 57, tCin - 0.2, false, `<span style="opacity:${ss(tCua - 0.1, tCua + 0.3, t)}">casi 4 veces Puebla</span>`, '#c0392b'],
+    ['Puebla', 15, tQui - 0.1, true, 'por debajo del promedio', '#ff8a3a'],
     ['Nacional', 21.4, tProm - 0.1, false, '', '#7d8796'],
-    ['Puebla', 15, tQui - 0.1, true, 'por debajo del promedio', '#ff8a3a']], { x: 600, y: 230, w: 760, max: 62, dec: 0, sub: 'Defunciones por homicidio, cifras preliminares' });
+    ['Sinaloa', 57, tCin - 0.2, false, `<span style="opacity:${ss(tCua - 0.1, tCua + 0.3, t)}">casi 4 veces Puebla</span>`, '#c0392b']], { x: 600, y: 230, w: 760, max: 62, dec: 0, sub: 'Defunciones por homicidio, cifras preliminares' });
   const shop = (t) => {
     K.pose(keeper, { ...MA.humble(t, 1), head: [-6, 0, 0] }); keeper.setFace(C.blinkEye(t, 1), 'frown');
     K.pose(sic[0], { ...C.point(t, 2, 0), head: [0, 0, 0] }); sic[0].setFace(C.blinkEye(t, 2), 'frown');

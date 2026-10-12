@@ -13,6 +13,12 @@ export { preload } from '../pmap.js';
 const fade = M.fade;
 const C_CJNG = '#c0392b', C_SIN = '#8e44ad', C_FM = '#2e8b57', C_BAR = '#e67e22';
 
+// Small note card, top-left (keeps the lower half of the frame free for the characters).
+function note(t, a, b, text) {
+  const k = ss(a, a + 0.4, t) * (1 - ss(b - 0.35, b, t)); if (k <= 0) return '';
+  return `<div style="position:absolute;left:70px;top:150px;max-width:620px;opacity:${k};transform:translateY(${(1 - k) * 12}px);padding:14px 20px;border-radius:12px;background:rgba(14,16,22,.82);border-left:5px solid #7fb2ff;font:700 24px/1.3 Inter;color:#f1ede4">${text}</div>`;
+}
+
 export function build(ctx) {
   const L = ctx.L;
   const tQui = wt(L[0], 'quien'), tSec = wt(L[0], 'secretaria'), tSiete = wt(L[0], 'siete'), tNac = wt(L[0], 'nacional');
@@ -40,7 +46,7 @@ export function build(ctx) {
   };
   // ---- 3. Sierra Norte: state police at the Veracruz line (Tenampulco)
   const B = S.sierraBorder('overcast');
-  const cops = [K.person(B, 'oguri', 'estatal', 0.7, 4.4, -0.2), K.person(B, 'suzuka', 'estatal', -1.3, 4.1, 0.25), K.person(B, 'helios', 'soldier', -3.3, 2.0, 0.55)];
+  const cops = [K.person(B, 'oguri', 'estatal', 0.7, 4.4, -0.2), K.person(B, 'suzuka', 'estatal', -1.3, 4.1, 0.25), K.person(B, 'helios', 'soldier', -2.75, 2.5, 0.5)];
 
   const sfx = [{ t: 0.2, type: 'whoosh', vol: 0.35 }, { t: tQui, type: 'hit', vol: 0.45 }, { t: tSiete, type: 'pop', vol: 0.5 },
     { t: L[1].t0 - 0.3, type: 'swoosh', vol: 0.4 }, ...GROUPS.map(g => ({ t: g[2], type: 'whoosh', vol: 0.3 })), ...GROUPS.map(g => ({ t: g[2] + 0.9, type: 'pop', vol: 0.4 })),
@@ -70,7 +76,7 @@ export function build(ctx) {
       K.pose(cops[1], { ...C.idle(t, 2, 0.3), gun: 'port' }); cops[1].setFace(C.blinkEye(t, 2), 'neutral');
       K.pose(cops[2], { ...C.idle(t, 3, 0.3), gun: 'port' }); cops[2].setFace(C.blinkEye(t, 3), 'neutral');
       return U.film(t) + U.badge(t, 'Septiembre de 2026 · Tenampulco', 'Vigilancia reforzada en la frontera', 'Para confirmar o descartar la llegada del Cártel de Sinaloa', tSep - 0.2, ctx.dur + 1)
-        + U.source(t, tConf, ctx.dur + 1, 'SSP de Puebla: hasta entonces no había detectado movimientos de ese grupo');
+        + note(t, tConf, ctx.dur + 1, 'SSP de Puebla: hasta entonces, sin movimientos detectados de ese grupo');
     } },
   ];
   const inst = { scene: Mp, scenes: [Mp, B], sfx };

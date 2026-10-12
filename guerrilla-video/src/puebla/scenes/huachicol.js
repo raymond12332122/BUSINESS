@@ -49,7 +49,7 @@ export function build(ctx) {
         + U.counter(t, tCarp - 0.2, tB, 110, 330, 896, 'carpetas por robo de hidrocarburos (ene.–sep. 2025): primer lugar nacional', { from: 200, dur: 1.2, color: '#ffb35a', w: 620 })
         + U.source(t, tHid, tB, 'SESNSP, enero–septiembre de 2025');
     } },
-    { t0: tB, set: D, p0: [-1.6, 0.95, 2.6], l0: [0.5, 0.75, -0.8], p1: [-1.35, 0.95, 2.2], l1: [0.5, 0.85, -0.8], fov0: 40, act: (t) => {
+    { t0: tB, set: D, p0: [-2.2, 1.05, 3.6], l0: [0.3, 0.72, -0.8], p1: [-1.95, 1.02, 3.15], l1: [0.3, 0.8, -0.8], fov0: 40, act: (t) => {
       field(t); gasPlume(t, { x: 0.3, y: 0.25, z: 0 }, ss(tB, tB + 0.6, t));
       return U.film(t) + U.badge(t, 'Gas LP', 'El "huachigas"', 'Tomas en los ductos de gas', tGas - 0.2, tC)
         + U.counterD(t, tMitad - 0.2, tC, 1200, 300, 52.5, 'de las tomas clandestinas de gas LP de todo el país (ene.–mar. 2026)', { from: 10, dur: 1.2, color: '#ff8a6a', suffix: ' %', w: 620, dec: 1 })

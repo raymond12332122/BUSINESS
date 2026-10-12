@@ -36,8 +36,8 @@ export function build(ctx) {
         + U.source(t, tDuc, tB, 'Trazos aproximados');
     } },
     { t0: tB, set: Mp, p0: [1.0, 17, 8.5], l0: [0.4, 0, 0.2], p1: [0.8, 15.5, 7.4], l1: [0.4, 0, 0.2], fov0: 38, act: (t) => {
-      base(t);
-      return U.film(t) + `<div style="position:absolute;inset:0;background:rgba(8,10,16,${0.35 * ss(tB, tB + 0.5, t)})"></div>`
+      base(t); Mp.tintAll('#f2c14e', ss(tCaja - 0.5, tCaja + 0.3, t), 0.55);
+      return U.film(t) + `<div style="position:absolute;inset:0;background:rgba(8,10,16,${0.22 * ss(tB, tB + 0.5, t)})"></div>`
         + U.icons(t, tB + 0.2, ctx.dur + 1, [['⛽', 'Gasolina', tB + 0.3], ['🔥', 'Gas LP', tB + 0.5], ['🚚', 'Mercancía', tB + 0.7]], { y: 180 })
         + `<div style="position:absolute;left:0;right:0;top:420px;text-align:center;font:900 92px 'Inter Display',Inter;color:#fff;text-shadow:0 6px 30px rgba(0,0,0,.6);opacity:${ss(tCaja - 0.3, tCaja + 0.2, t)}">Una caja fuerte</div>`;
     } },

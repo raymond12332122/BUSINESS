@@ -26,7 +26,7 @@ export function build(ctx) {
   const fill2 = new THREE.PointLight('#a8c0ff', 5, 12, 1.4); fill2.position.set(-3.2, 2.0, 4.0); H.add(fill2);
   const pk = N.pickup('#16171a', { night: true }); pk.position.set(1.6, 0, 2.1); pk.rotation.y = -1.35; H.add(pk);
   const driver = K.person(H, 'mcqueen', 'trailero', 0.75, -1.9, -0.55);
-  const gun = [K.person(H, 'tamamo', 'sicarioArmed', -0.55, -0.45, 2.45), K.person(H, 'daiwa', 'sicarioArmed', 2.1, -0.5, -2.45), K.person(H, 'helios', 'sicarioArmed', -0.9, -2.2, 1.5)];
+  const gun = [K.person(H, 'tamamo', 'sicarioArmed', -1.3, -0.35, 2.22), K.person(H, 'daiwa', 'sicarioArmed', 2.1, -0.5, -2.45), K.person(H, 'helios', 'sicarioArmed', -0.9, -2.2, 1.5)];
   // ---- 2. Map at night: the Puebla–Orizaba highway
   const Mp = PM.pueblaMap({ light: 'night' });
 
