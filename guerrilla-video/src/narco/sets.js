@@ -15,19 +15,19 @@ export function nStage(light = 'day', ground = ['#9a9488', '#8e887c'], extra = {
   const L = LIGHT[light];
   return stage({ ...L, groundA: ground[0], groundB: ground[1], shadow: 16, sunPos: light === 'dusk' || light === 'golden' || light === 'dawn' ? [-12, 7, 6] : [7, 14, 8], seed: 7, ...extra });
 }
-const isNight = l => l === 'night' || l === 'nightCity';
-function stars(s, n = 500) {
+export const isNight = l => l === 'night' || l === 'nightCity';
+export function stars(s, n = 500) {
   const r = LP.rng(77);
   s.add(new THREE.Points(new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute([...Array(n)].flatMap(() => { const a = r() * 6.28, b = r() * 1.2 + 0.15; return [Math.cos(a) * 300 * Math.cos(b), 300 * Math.sin(b), Math.sin(a) * 300 * Math.cos(b)]; }), 3)),
     new THREE.PointsMaterial({ color: '#ffffff', size: 1.3, sizeAttenuation: false, fog: false })));
 }
 // Asphalt road along z with lane markings (width w, centred at x).
-function road(s, { x = 0, w = 7, len = 220, z = 0, color = '#3a3b3e' } = {}) {
+export function road(s, { x = 0, w = 7, len = 220, z = 0, color = '#3a3b3e' } = {}) {
   s.add(LP.at(LP.box(w, 0.02, len, color), x, 0.011, z));
   for (let i = 0; i < len / 4; i++) s.add(LP.at(LP.box(0.14, 0.022, 1.8, '#e8e2c8'), x, 0.013, z - len / 2 + i * 4));
   for (const sx of [-1, 1]) s.add(LP.at(LP.box(0.12, 0.022, len, '#d8d2b8'), x + sx * (w / 2 - 0.3), 0.013, z));
 }
-function sidewalk(s, x, len = 120, w = 2.2) { s.add(LP.at(LP.box(w, 0.16, len, '#a8a296'), x, 0.08, 0)); }
+export function sidewalk(s, x, len = 120, w = 2.2) { s.add(LP.at(LP.box(w, 0.16, len, '#a8a296'), x, 0.08, 0)); }
 
 // ------------------------------------------------------------ title: missing-person posters at night
 export function posterStreet() {
@@ -70,14 +70,14 @@ export function newsDesk() {
   return s;
 }
 // ------------------------------------------------------------ the presidential morning press conference
-export function mananera({ screen = null } = {}) {
+export function mananera({ screen = null, podiumText = 'GOBIERNO DE MÉXICO' } = {}) {
   const s = MS.interior({ wall: '#b39a76', floor: '#4a2f22', w: 14, d: 10, h: 5.4, lights: [[-3, 4.6, 1], [3, 4.6, 1]], windows: false, bulbs: false });
   s.userData.sun.intensity = 1.1;
   // carved stone arches on the back wall
   for (let i = 0; i < 5; i++) { const x = -5.6 + i * 2.8; s.add(LP.at(LP.box(0.5, 5.4, 0.3, '#a68a64'), x - 1.4, 2.7, -4.85)); const a = new THREE.Mesh(new THREE.TorusGeometry(1.15, 0.14, 6, 18, Math.PI), LP.mat('#a68a64')); a.position.set(x, 3.6, -4.85); s.add(a); }
   const scr = new THREE.Mesh(new THREE.PlaneGeometry(5.2, 2.6), new THREE.MeshBasicMaterial({ color: '#1d3a5a' })); scr.position.set(0, 2.9, -4.55); s.add(scr); s.screen = scr;
   s.add(LP.at(LP.box(5.5, 2.9, 0.12, '#2a2a2e'), 0, 2.9, -4.62));
-  const pod = N.podium(); pod.position.set(0, 0.25, -2.3); pod.scale.set(0.9, 0.46, 0.9); s.add(pod); s.podium = pod;
+  const pod = N.podium(podiumText); pod.position.set(0, 0.25, -2.3); pod.scale.set(0.9, 0.46, 0.9); s.add(pod); s.podium = pod;
   s.add(LP.at(LP.box(4.2, 0.25, 2.6, '#5a3a28'), 0, 0.125, -2.6));
   for (const x of [-2.6, 2.6]) { const f = X.flag('mx', 3.2, 1.3, 0.8); f.position.set(x, 0.25, -3.6); s.add(f); (s.flags = s.flags || []).push(f); }
   for (let r = 0; r < 3; r++) for (let i = 0; i < 6; i++) { const c = X.chair(false); c.position.set(-3.2 + i * 1.28, 0, 1.5 + r * 1.4); c.rotation.y = Math.PI; s.add(c); }

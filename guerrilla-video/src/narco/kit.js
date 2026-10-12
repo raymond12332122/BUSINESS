@@ -42,6 +42,8 @@ export const PAL = {
   lab: { dark: '#7c8a8e', mid: '#dbe3e5', light: '#f6f8f8', gold: '#c9c9c9' },
   farmer: { dark: '#2a2420', mid: '#6b5a48', light: '#efe7d6', gold: '#c9a227' },
   prisoner: { dark: '#5a3a14', mid: '#d4892e', light: '#f2d9b0', gold: '#c97a1e' },
+  fgr: { dark: '#0c0d10', mid: '#1c1f26', light: '#cfd3da', gold: '#d4af37' },
+  policeMun: { dark: '#1a2a40', mid: '#3d5a80', light: '#e6eaf0', gold: '#c9a227' },
 };
 const uni = (r, p) => uniformize(r, PAL[p] || p);
 
@@ -184,10 +186,18 @@ export const OUTFITS = {
   farmer: r => { generic(r, '#2a2018'); uni(r, 'farmer'); hat(r, sombrero('palm'), { scale: 0.82 }); return r; },
   buscadora: r => { generic(r, ['#2e2420', '#4a3428', '#6a6460'][Math.floor(r.seed * 7) % 3]); uni(r, 'buscadora'); hat(r, sunHat('#e8dcc0', ['#7a3b5a', '#2a5a7a', '#c0272d'][Math.floor(r.seed * 5) % 3]), { scale: 0.86, y: 0.9, tilt: -0.06 }); r.attach('chest', fichaPrint(Math.floor(r.seed * 3)), [0, 0.43, 0.108]); return r; },
   marcha: r => { OUTFITS.joven(r); return r; },
+  // Puebla video
+  armenta: r => { generic(r, '#1d1916'); return politician(r, 'suit', { tieCol: '#7a1f2a' }); },
+  alcalde: r => { generic(r, '#2a221d'); return politician(r, 'suitGray', { tieCol: '#5a2a2a' }); },
+  fgr: r => { generic(r, '#2a221a'); uni(r, 'fgr'); hat(r, cap('#111216', { front: 'FGR', fg: '#d4af37' }), { scale: 0.88, y: 0.88, tilt: -0.05, cap: true }); r.attach('chest', tacVest('#15171c', 'FGR', '#d4af37'), [0, 0.395, -0.005]); rifle(r); return r; },
+  estatal: r => { generic(r, '#2a221a'); uni(r, 'police'); hat(r, cap('#141d33', { front: 'ESTATAL', fg: '#e8e4d8' }), { scale: 0.88, y: 0.88, tilt: -0.05, cap: true }); r.attach('chest', tacVest('#1a2238', 'POLICÍA ESTATAL', '#f2efe6'), [0, 0.395, -0.005]); rifle(r); return r; },
+  municipal: r => { generic(r, '#2a221a'); uni(r, 'policeMun'); hat(r, cap('#22344f', { front: 'MUNICIPAL', fg: '#e8e4d8' }), { scale: 0.88, y: 0.88, tilt: -0.05, cap: true }); r.attach('chest', tacVest('#22344f', 'MUNICIPAL', '#f2efe6'), [0, 0.395, -0.005]); return r; },
+  huachicolero: r => { OUTFITS.civilCap(r); r.attach('head', gaiter(), [0, 0.6, 0.02]); return r; },
+  trailero: r => { OUTFITS.civilCap(r); return r; },
   marchaSombrero: r => { OUTFITS.joven(r); hat(r, sombrero('palm'), { scale: 0.8 }); return r; },
   student: r => { generic(r, '#1d1916'); uni(r, 'civ1'); hideEars(r); flattenAhoge(r); return r; },
 };
-export const CASTING = { calderon: 'mcqueen', pena: 'doto', amlo: 'oguri', amloSuit: 'oguri', sheinbaum: 'cafe', sheinbaumSuit: 'cafe', harfuch: 'helios', garcialuna: 'tamamo', judge: 'daiwa' };
+export const CASTING = { armenta: 'suzuka', calderon: 'mcqueen', pena: 'doto', amlo: 'oguri', amloSuit: 'oguri', sheinbaum: 'cafe', sheinbaumSuit: 'cafe', harfuch: 'helios', garcialuna: 'tamamo', judge: 'daiwa' };
 
 let seedCounter = 0;
 export function person(parent, who, outfit = who, x = 0, z = 0, yaw = 0) {

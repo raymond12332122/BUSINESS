@@ -1,0 +1,125 @@
+{
+ "scenes": [
+  {
+   "id": "title",
+   "lead": 1.4,
+   "tail": 1.3,
+   "gaps": {
+    "1": 0.7
+   },
+   "lines": [
+    "En septiembre de dos mil veintiséis, el gobierno federal detuvo en Puebla a dos presidentes municipales en una misma semana.",
+    "A uno lo investigan por secuestro exprés. Al otro, por formar parte de una red que robaba tráileres en la autopista a Veracruz.",
+    "¿Puebla se está convirtiendo en otro Jalisco, o en otro Sinaloa? Vamos a verlo con datos."
+   ]
+  },
+  {
+   "id": "corredor",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Primero, hay que ver el mapa. Puebla es el paso obligado entre la Ciudad de México y el puerto de Veracruz, uno de los más importantes del país.",
+    "Por su autopista viaja la mercancía que entra y sale de México, y bajo su tierra corren los ductos de Pemex que llevan gasolina y gas al centro del país.",
+    "Para el crimen organizado, Puebla no es un campo de batalla: es una caja fuerte."
+   ]
+  },
+  {
+   "id": "huachicol",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Su especialidad es el robo de combustible. En los primeros nueve meses de dos mil veinticinco, Puebla fue el estado con más carpetas de investigación por robo de hidrocarburos.",
+    "Y con el gas es peor: a inicios de dos mil veintiséis concentró más de la mitad de las tomas clandestinas de gas LP de todo el país.",
+    "Tepeaca, en el llamado Triángulo Rojo, y Tlahuapan, cerca de Texmelucan, fueron los municipios con más perforaciones de México."
+   ]
+  },
+  {
+   "id": "carga",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "El otro gran negocio es el robo a transportistas. En dos mil veinticinco, casi uno de cada cuatro robos de carga en las carreteras del país ocurrió en Puebla: el primer lugar nacional.",
+    "Los asaltos se concentran de noche, en la autopista Puebla Orizaba, y muchos transportistas ya prefieren rodear el estado."
+   ]
+  },
+  {
+   "id": "enjambre",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Y aquí aparece la corrupción. El siete de septiembre, el Operativo Enjambre hizo veintitrés cateos en Esperanza, un municipio en la frontera con Veracruz.",
+    "Detuvo al presidente municipal, a su hermano y a la exdirectora de la policía. Según el Gabinete de Seguridad, formaban parte de una red ligada a Los Zúñiga, una banda de robo de carga, extorsión y secuestro.",
+    "Aseguraron más de cuarenta armas, entre ellas dos rifles Barrett, vehículos blindados, drones e inhibidores de señal. Sus casos siguen en proceso."
+   ]
+  },
+  {
+   "id": "municipios",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Y no es un caso aislado. Días antes cayó el presidente municipal de Tepeyahualco, investigado por secuestro exprés y robo de vehículos.",
+    "En julio, la Fiscalía detuvo a seis directores de seguridad de la Sierra Norte y la Mixteca, acusados de encubrir un laboratorio clandestino de metanfetamina, y el estado tomó el control de sus policías.",
+    "En enero cayeron tres funcionarios de la policía de la capital por proteger a La Barredora. Y la Secretaría de Seguridad estatal dice que investiga a siete alcaldes por posibles nexos con el crimen."
+   ]
+  },
+  {
+   "id": "carteles",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "¿Quién está detrás? La propia Secretaría de Seguridad de Puebla reconoce siete grupos criminales de alcance nacional en el estado.",
+    "Entre ellos, el Cártel Jalisco Nueva Generación, el Cártel de Sinaloa y La Familia Michoacana. Una de las células más activas es La Barredora, aliada del Cártel Jalisco.",
+    "Y en septiembre, la policía estatal reforzó la frontera con Veracruz para confirmar o descartar la llegada del Cártel de Sinaloa."
+   ]
+  },
+  {
+   "id": "violencia",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Ahora, la gran pregunta: ¿Puebla ya es tan violenta como Sinaloa o Jalisco? Según el INEGI, en dos mil veinticinco hubo en Puebla novecientos sesenta y seis asesinatos.",
+    "Es una tasa de quince por cada cien mil habitantes, por debajo del promedio nacional. Sinaloa, en plena guerra interna, llegó a cincuenta y siete: casi cuatro veces más.",
+    "Jalisco, la casa del Cártel Jalisco, tuvo una tasa parecida a la de Puebla, pero carga con miles de desaparecidos.",
+    "Eso sí: en robos, extorsión y otros delitos de alto impacto, Puebla tuvo a inicios de dos mil veintiséis la tasa más alta entre los seis estados más poblados del país."
+   ]
+  },
+  {
+   "id": "gobierno",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "¿Y qué está haciendo el gobierno? El gobernador Alejandro Armenta habla de cero impunidad, presume más de nueve mil quinientos detenidos y reconoce que él y su equipo han recibido amenazas.",
+    "El gobierno federal llevó el Operativo Enjambre a Puebla, y según sus cifras, los homicidios diarios en el estado bajaron cuarenta y uno por ciento entre septiembre de dos mil veinticuatro y diciembre de dos mil veinticinco."
+   ]
+  },
+  {
+   "id": "focos",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Pero los focos rojos siguen encendidos. Las tomas clandestinas de gas crecieron treinta y cinco por ciento a inicios de dos mil veintiséis, y los asaltos a transportistas no paran.",
+    "Muchas policías municipales son pequeñas y mal pagadas: presa fácil del plata o plomo.",
+    "Y no es cosa de un solo partido: el alcalde de Esperanza llegó por Morena, y el propio Armenta pidió a todos los partidos, incluido el suyo, no postular candidatos ligados al crimen en dos mil veintisiete."
+   ]
+  },
+  {
+   "id": "veredicto",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Entonces, ¿Puebla ya es otro Sinaloa? Todavía no. No hay una guerra abierta entre cárteles, y sus asesinatos están lejos de los de Sinaloa.",
+    "Pero tiene las señales que en otros estados llegaron antes de la violencia: un negocio enorme de robo, grupos nacionales tomando posiciones, y policías y alcaldes comprados.",
+    "En Guanajuato, el negocio del huachicol terminó en una guerra entre cárteles."
+   ]
+  },
+  {
+   "id": "outro",
+   "lead": 0.8,
+   "tail": 2.4,
+   "lines": [
+    "El futuro de Puebla depende de que se limpien las policías municipales, de que se castigue a los políticos coludidos y de que se corte el negocio del combustible y la carga robada.",
+    "Esta fue la historia de cómo el crimen organizado avanza en Puebla."
+   ]
+  }
+ ]
+}

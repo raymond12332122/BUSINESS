@@ -547,6 +547,29 @@ def night(d):
     return fade(norm(x) * 0.25, 0.5, 0.6)
 
 
+def pour(d):   # liquid pouring into a jerrycan
+    t = t_(d); x = fft_filter(noise(d), lo=250, hi=1800) * (0.55 + 0.45 * np.abs(np.sin(2 * np.pi * 5.3 * t) * np.sin(2 * np.pi * 1.7 * t + 1)))
+    n = int(0.06 * SR); k = np.arange(n) / SR
+    for _ in range(int(d * 9)):
+        i = int(rng.random() * max(1, len(t) - n)); f = 500 + 900 * rng.random()
+        x[i:i + n] += np.sin(2 * np.pi * (f + f * 5 * k) * k) * np.exp(-k * 60) * 0.6
+    return fade(norm(x) * 0.35, 0.3, 0.5)
+
+
+def hiss(d):   # gas escaping from a tapped pipeline
+    t = t_(d); x = fft_filter(noise(d), lo=2500, hi=9000) * (0.8 + 0.2 * np.sin(2 * np.pi * 0.7 * t))
+    return fade(norm(x) * 0.3, 0.4, 0.6)
+
+
+def camera(d):   # press photographers: shutter clicks
+    out = np.zeros(int(d * SR)); tt = 0.05
+    while tt < d - 0.2:
+        cd = 0.09; c = noise(cd) * env_exp(cd, 140) * 0.7 + np.sin(2 * np.pi * 1800 * t_(cd)) * env_exp(cd, 90) * 0.25
+        c2 = np.zeros(int(0.14 * SR)); c2[:len(c)] += c; j = int(0.05 * SR); c2[j:j + len(c)] += c[: len(c2) - j] * 0.6
+        i = int(tt * SR); x = c2[: len(out) - i]; out[i:i + len(x)] += x * (0.6 + 0.4 * rng.random()); tt += 0.16 + rng.random() * 0.4
+    return fade(norm(out) * 0.4, 0.01, 0.1)
+
+
 ONE = {'shot': shot, 'boom': lambda: boom(False), 'bigboom': lambda: boom(True), 'whoosh': whoosh, 'pop': pop, 'click': click,
        'thud': thud, 'creak': creak, 'sting': sting, 'sting2': sting2, 'tension': tension, 'beep': beep, 'tick': tick,
        'missile': missile, 'brakes': brakes, 'cheer': cheer, 'clank': clank, 'charge': charge, 'whistle': whistle, 'bell': bell, 'laugh': laugh,
@@ -555,7 +578,8 @@ ONE = {'shot': shot, 'boom': lambda: boom(False), 'bigboom': lambda: boom(True),
 LOOP = {'engine': engine, 'march': march, 'drone': drone, 'train': train, 'wind': wind, 'clock': clock,
         'plane': plane, 'siren': siren, 'waves': waves, 'factory': factory, 'bells': bells, 'crowd': crowd, 'mg': mg, 'fire': fire,
         'drums': drums, 'choir': choir, 'riser': riser, 'gunfire': gunfire, 'engines': engine, 'sirens': siren, 'typewriter': typewriter, 'traffic': traffic,
-        'swell': swell, 'jet': jet, 'heli': heli, 'harbor': harbor, 'bubbling': bubbling, 'birds': birds, 'night': night}
+        'swell': swell, 'jet': jet, 'heli': heli, 'harbor': harbor, 'bubbling': bubbling, 'birds': birds, 'night': night,
+        'pour': pour, 'hiss': hiss, 'camera': camera}
 
 sfx = np.zeros(N)
 cache = {}
@@ -723,8 +747,10 @@ def napo_march():
 # ------------------------------------------------------------------ documentary bed for the cartels video (D minor pads, pulse, piano)
 NARCO_MOODS = {'title': 'dark', 'origenes': 'suspense', 'guerra': 'tense', 'corrupcion': 'dark', 'impunidad': 'somber', 'negocio': 'tense', 'mapa': 'tense',
                'eeuu': 'suspense', 'amlo': 'calm', 'claudia': 'calm', 'criticas': 'somber', 'porque': 'tense', 'outro': 'hope'}
-def narco_bed():
-    bpm = 80; beat = 60 / bpm; bar = 4 * beat
+PUEBLA_MOODS = {'title': 'dark', 'corredor': 'suspense', 'huachicol': 'tense', 'carga': 'tense', 'enjambre': 'dark', 'municipios': 'suspense', 'carteles': 'tense',
+                'violencia': 'somber', 'gobierno': 'calm', 'focos': 'tense', 'veredicto': 'suspense', 'outro': 'hope'}
+def narco_bed(moods=NARCO_MOODS, bpm=80, key=0):
+    beat = 60 / bpm; bar = 4 * beat
     CH = {'Dm': [50, 53, 57], 'Bb': [46, 50, 53], 'Gm': [43, 46, 50], 'A': [45, 49, 52], 'F': [41, 45, 48], 'C': [48, 52, 55],
           'D': [50, 54, 57], 'G': [43, 47, 50], 'Bm': [47, 50, 54]}
     prog = {'dark': ['Dm', 'Dm', 'Bb', 'A'], 'suspense': ['Dm', 'Bb', 'Gm', 'A'], 'tense': ['Dm', 'Dm', 'Bb', 'A'], 'somber': ['Dm', 'F', 'Gm', 'Dm'],
@@ -757,8 +783,10 @@ def narco_bed():
         return memo(('tr', m, round(d, 3)), mk)
     def mood_at(t):
         for sc in TL['scenes']:
-            if sc['start'] <= t < sc['start'] + sc['dur']: return NARCO_MOODS.get(sc['id'], 'tense')
+            if sc['start'] <= t < sc['start'] + sc['dur']: return moods.get(sc['id'], 'tense')
         return 'dark'
+    CH = {k: [n + key for n in v] for k, v in CH.items()}
+    lament = [[(n + key if n else 0, du) for (n, du) in bar_] for bar_ in lament]
     nb = int(TOTAL / bar) + 1
     for b in range(nb):
         t0 = b * bar; m = mood_at(t0 + bar / 2); pr = prog[m]; ch = CH[pr[b % len(pr)]]
@@ -806,8 +834,11 @@ if VIDEO == 'napo':
 if VIDEO == 'narco':
     musL, musR = narco_bed(); t_all = np.arange(N) / SR
     sc_ = 0.15 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
+if VIDEO == 'puebla':
+    musL, musR = narco_bed(PUEBLA_MOODS, bpm=76, key=2); t_all = np.arange(N) / SR
+    sc_ = 0.15 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
 BPM = 84; beat = 60 / BPM
-if VIDEO not in ('mx', 'napo', 'narco'):
+if VIDEO not in ('mx', 'napo', 'narco', 'puebla'):
     prog = [[146.8, 174.6, 220.0], [116.5, 146.8, 174.6], [174.6, 220.0, 261.6], [130.8, 164.8, 196.0]]  # Dm Bb F C
     bar = 4 * beat
     musL, musR = np.zeros(N), np.zeros(N)
