@@ -9,6 +9,10 @@ import edge_tts.communicate as comm
 CA = '/root/.ccr/ca-bundle.crt'  # outbound HTTPS here goes through a proxy with its own CA
 if os.path.exists(CA):
     comm._SSL_CTX = ssl.create_default_context(cafile=CA)
+# Since Oct 2026 the legacy speech.platform.bing.com host answers 403; Edge now synthesizes through
+# api.msedgeservices.com with the same client key (see rany2/edge-tts#490 / #491).
+import edge_tts.constants as C
+comm.WSS_URL = C.WSS_URL = f"wss://api.msedgeservices.com/tts/cognitiveservices/websocket/v1?Ocp-Apim-Subscription-Key={C.TRUSTED_CLIENT_TOKEN}"
 
 
 async def main(voice, rate, text, out):

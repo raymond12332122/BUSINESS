@@ -11,7 +11,7 @@ const W = 1920, H = 1080;
 async function boot() {
   const QP = new URLSearchParams(location.search);
   const renderer = new THREE.WebGLRenderer({ antialias: QP.get('aa') !== '0', preserveDrawingBuffer: true });
-  renderer.setSize(W, H); renderer.setPixelRatio(1);
+  renderer.setSize(W, H); renderer.setPixelRatio(Math.min(1, window.devicePixelRatio || 1));
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = QP.get('soft') === '0' ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.0;
   document.body.prepend(renderer.domElement);

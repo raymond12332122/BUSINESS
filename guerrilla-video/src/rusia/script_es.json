@@ -1,0 +1,134 @@
+{
+ "scenes": [
+  {
+   "id": "title",
+   "lead": 1.4,
+   "tail": 1.3,
+   "gaps": {
+    "1": 0.6
+   },
+   "lines": [
+    "En marzo de mil novecientos diecisiete, el zar de Rusia, dueño absoluto del país más grande del mundo, renunció al trono dentro de un vagón de tren.",
+    "Ocho meses después, el partido de Lenin, los bolcheviques, tomó el poder en una sola noche.",
+    "Así nació la Unión Soviética. Esta es la historia de la Revolución rusa."
+   ]
+  },
+  {
+   "id": "zar",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "A principios del siglo veinte, Rusia tenía ciento veinticinco millones de habitantes, y ocho de cada diez eran campesinos pobres.",
+    "Los gobernaba el zar Nicolás Segundo como dueño absoluto: sin constitución, sin parlamento y sin elecciones.",
+    "En las ciudades crecían fábricas enormes, y en la clandestinidad nacían partidos revolucionarios, como los bolcheviques de Vladímir Lenin."
+   ]
+  },
+  {
+   "id": "domingo",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "En mil novecientos cinco, tras perder una guerra contra Japón, una marcha pacífica de obreros fue a pedirle ayuda al zar frente al Palacio de Invierno.",
+    "Las tropas dispararon y murieron entre cien y doscientas personas: fue el Domingo Sangriento.",
+    "Vinieron huelgas, motines y nacieron los sóviets, consejos de obreros. El zar prometió un parlamento, la Duma, pero nunca soltó el poder de verdad."
+   ]
+  },
+  {
+   "id": "guerra",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "En mil novecientos catorce, Rusia entró a la Primera Guerra Mundial y movilizó a unos quince millones de hombres, mal armados y peor dirigidos.",
+    "Murieron cerca de dos millones de soldados rusos, y el zar, que tomó el mando del ejército, cargó con cada derrota.",
+    "En la capital mandaba la zarina, aconsejada por el místico Rasputín, hasta que unos nobles lo asesinaron. Y en el invierno de mil novecientos diecisiete faltaban pan y carbón."
+   ]
+  },
+  {
+   "id": "febrero",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "El ocho de marzo de mil novecientos diecisiete, Día de la Mujer, las obreras de Petrogrado salieron a pedir pan. En pocos días, la huelga paralizó la ciudad.",
+    "Los soldados se unieron a la multitud, y el zar abdicó en su tren, detenido en Pskov. Terminaban trescientos cuatro años de la dinastía Románov.",
+    "Como Rusia usaba otro calendario, se le llamó Revolución de Febrero. Quedaron dos poderes: un Gobierno Provisional, que luego encabezó Kérenski, y el Sóviet de obreros y soldados."
+   ]
+  },
+  {
+   "id": "lenin",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "En abril volvió Lenin, que estaba exiliado en Suiza. Cruzó Alemania, el país enemigo, con permiso alemán: Berlín quería sacar a Rusia de la guerra.",
+    "Su mensaje era sencillo: paz, pan y tierra, y todo el poder a los sóviets.",
+    "Kérenski siguió en la guerra, y en agosto el general Kornílov marchó sobre la capital. Para frenarlo, Kérenski armó a los obreros y liberó a líderes bolcheviques como Trotski."
+   ]
+  },
+  {
+   "id": "octubre",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "La noche del veinticinco de octubre, los Guardias Rojos, organizados por Trotski, ocuparon puentes, estaciones y el telégrafo de Petrogrado, casi sin resistencia.",
+    "El crucero Aurora disparó un cañonazo de fogueo, y de madrugada cayó el Palacio de Invierno, casi sin combate. La gran batalla de las películas es una recreación posterior.",
+    "Lenin formó un nuevo gobierno y decretó la paz y el reparto de la tierra. Por el viejo calendario, la Revolución de Octubre fue, en realidad, el siete de noviembre."
+   ]
+  },
+  {
+   "id": "poder",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Pero los bolcheviques no tenían a la mayoría. En la elección de la Asamblea Constituyente sacaron cerca del veinticuatro por ciento, contra cuarenta de los socialistas revolucionarios.",
+    "Lenin la disolvió al día siguiente de reunirse, en enero de mil novecientos dieciocho.",
+    "Y en marzo firmó la paz con Alemania en Brest-Litovsk, cediendo tierras donde vivía un tercio de la población del imperio."
+   ]
+  },
+  {
+   "id": "romanov",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "La noche del dieciséis al diecisiete de julio de mil novecientos dieciocho, en Ekaterimburgo, los bolcheviques fusilaron al zar, a la zarina, a sus cinco hijos y a cuatro sirvientes.",
+    "Por décadas se dijo que Anastasia había sobrevivido, pero el ADN demostró que no."
+   ]
+  },
+  {
+   "id": "civil",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Para entonces ya había guerra civil: el bando rojo contra el blanco, formado por generales del zar, conservadores y liberales, con apoyo de tropas extranjeras.",
+    "Trotski creó el Ejército Rojo, que llegó a casi cinco millones de hombres. Hubo terror en los dos bandos, y la Checa, la policía política, fusiló a decenas de miles.",
+    "El bando rojo ganó, pero entre combates, tifus y hambruna murieron entre ocho y diez millones de personas."
+   ]
+  },
+  {
+   "id": "urss",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "En mil novecientos veintiuno, Lenin aplastó la rebelión de los marinos de Kronstadt, que pedían sóviets libres, y permitió algo de comercio privado.",
+    "En diciembre de mil novecientos veintidós nació la Unión Soviética, y en enero de mil novecientos veinticuatro murió Lenin.",
+    "En su testamento pidió apartar a Stalin por ser demasiado grosero. Nadie le hizo caso: Stalin se quedó con el poder y expulsó del país a Trotski."
+   ]
+  },
+  {
+   "id": "mexico",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Trotski acabó en México. En mil novecientos treinta y siete, Lázaro Cárdenas le dio asilo, y vivió en Coyoacán, recibido por Frida Kahlo y Diego Rivera.",
+    "Sobrevivió a un ataque encabezado por el pintor Siqueiros, pero en agosto de mil novecientos cuarenta un agente de Stalin, Ramón Mercader, lo mató con un piolet."
+   ]
+  },
+  {
+   "id": "outro",
+   "lead": 0.8,
+   "tail": 2.4,
+   "lines": [
+    "La Unión Soviética duró hasta mil novecientos noventa y uno. Los historiadores aún discuten si Octubre fue el golpe de una minoría o una revolución popular.",
+    "Lo que nadie discute es que cambió el siglo veinte. Esta fue la historia de la Revolución rusa."
+   ]
+  }
+ ]
+}

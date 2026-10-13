@@ -1,0 +1,26 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}.l{position:absolute;transform:translate(-50%,0);font:700 15px Inter;color:#fff;background:rgba(0,0,0,.6);padding:2px 6px;border-radius:4px}</style></head><body><div id="ui" style="position:absolute;inset:0"></div>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+import * as THREE from 'three';
+import * as C from '../lib/chars.js';
+import * as K from './kit.js';
+import { stage } from '../lib/stage.js';
+try {
+  const W = 1600, H = 900, q = new URLSearchParams(location.search);
+  const r = new THREE.WebGLRenderer({ antialias: true }); r.setSize(W, H); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(r.domElement);
+  const scene = stage({ skyTop: '#5d8ad0', skyHor: '#efe3c8', groundA: '#c9b58a', groundB: '#b9a477', sunPos: [4, 9, 8], shadow: 10, hemiGround: '#9a8460' });
+  await C.loadCast();
+  const sets = {
+    a: [['oguri', 'soldadoZar'], ['doto', 'soldadoInvierno'], ['helios', 'cosaco'], ['tamamo', 'oficialZar'], ['suzuka', 'cadete'], ['daiwa', 'marinero']],
+    b: [['mcqueen', 'obrero'], ['cafe', 'obrera'], ['oguri', 'campesino'], ['doto', 'campesina'], ['helios', 'guardiaRoja'], ['tamamo', 'ejercitoRojo']],
+    c: [['suzuka', 'blanco'], ['daiwa', 'chekista'], ['mcqueen', 'cura'], ['cafe', 'duquesa'], ['oguri', 'zarChibi'], ['doto', 'leninChibi']],
+  }[q.get('s') || 'a'];
+  const ui = document.getElementById('ui');
+  const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 500);
+  const az = +(q.get('az') || 0), cy = +(q.get('cy') || 1.0);
+  cam.position.set(Math.sin(az) * 7.6, cy, Math.cos(az) * 7.6); cam.lookAt(0, 0.62, 0); cam.updateMatrixWorld();
+  sets.forEach(([who, o], i) => { const c = K.person(scene, who, o, (i - 2.5) * 1.15, 0, 0); c.apply({ ...C.idle(0.3, i), gun: c.gun ? 'low' : 'none' }); c.setFace('open', 'smile');
+    const v = new THREE.Vector3((i - 2.5) * 1.15, 0, 0).project(cam); const d = document.createElement('div'); d.className = 'l'; d.textContent = o; d.style.left = ((v.x + 1) / 2 * W) + 'px'; d.style.top = ((1 - v.y) / 2 * H + 8) + 'px'; ui.appendChild(d); });
+  r.render(scene, cam); window.__ready = true;
+} catch (e) { window.__error = String(e.stack || e); }
+</script></body></html>
