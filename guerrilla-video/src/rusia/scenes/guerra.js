@@ -70,7 +70,7 @@ export function build(ctx) {
       const u = t - tB;
       column.forEach((m, i) => { m.root.position.z = m.z0 - u * 0.36; K.pose(m, A.march(t, (i % 3) * 0.1, 0.5)); m.setFace(C.blinkEye(t, i), 'neutral'); });
       offR.root.position.z = offR.z0 - u * 0.36; K.pose(offR, C.walk(t, 0.5, 2)); offR.setFace('open', 'neutral');
-      return U.film(t) + U.counter(t, tQuince - 0.25, tC, 110, 620, 15, 'millones de movilizados', { from: 2, dur: 1.2, color: '#ffcf6a', suffix: ' mill.', w: 520 });
+      return U.film(t) + U.counter(t, tQuince - 0.25, tC, 110, 620, 15, 'millones de movilizados', { from: 2, dur: 1.2, color: '#ffcf6a', w: 520 });
     } },
     { t0: tC, set: T, p0: [-5.6, 0.95, 0.05], l0: [2, 0.7, 0], p1: [-5.0, 0.92, 0.05], l1: [2, 0.7, 0], fov0: 44, act: (t) => {
       T.tick(t);
@@ -79,7 +79,7 @@ export function build(ctx) {
     } },
     { t0: tD, set: G, p0: [2.5, 3.2, -6], l0: [0, 1.2, 10], p1: [2.0, 2.6, -4.5], l1: [0, 1.2, 10], fov0: 42, act: (t) => {
       G.tick(t);
-      return U.film(t) + U.counterD(t, tDos - 0.3, tE, 1240, 130, 2, 'millones de soldados rusos muertos', { from: 0.2, dur: 1.0, color: '#ff8a6a', prefix: '≈ ', suffix: ' mill.', w: 560, dec: 0 })
+      return U.film(t) + U.counterD(t, tDos - 0.3, tE, 1240, 130, 2, 'millones de soldados rusos muertos', { from: 0.2, dur: 1.0, color: '#ff8a6a', prefix: '≈ ', w: 560, dec: 0 })
         + U.source(t, tDos + 0.5, tE, 'Estimaciones: entre 1,7 y 2,2 millones');
     } },
     { t0: tE, set: Sk, p0: [0.95, 1.05, 1.3], l0: [0, 0.48, -1.3], p1: [0.7, 0.98, 0.9], l1: [0, 0.5, -1.35], fov0: 44, act: (t) => {

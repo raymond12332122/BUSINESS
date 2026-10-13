@@ -86,7 +86,7 @@ export function build(ctx) {
       K.pose(tro, A.orate(t, 1)); tro.setFace(C.blinkEye(t, 1), C.talkMouth(t, 1));
       army.forEach((a, i) => { K.pose(a, i % 4 === 0 ? A.rally(t, i) : A.guard(t, i)); a.setFace(C.blinkEye(t, i), 'neutral'); });
       return U.film(t) + U.nameplate(ctx, [2.2, 1.25, -9.0], NAMES.trotskiRojo[0], 'Crea el Ejército Rojo', tTro - 0.15, tCinco - 0.2)
-        + U.counterD(t, tCinco - 0.3, tE, 1230, 150, 5, 'millones de soldados en el Ejército Rojo', { from: 0.5, dur: 1.0, color: '#ff7a5a', prefix: 'casi ', suffix: ' mill.', w: 600, dec: 0 });
+        + U.counterD(t, tCinco - 0.3, tE, 1230, 150, 5, 'millones de soldados en el Ejército Rojo', { from: 0.5, dur: 1.0, color: '#ff7a5a', prefix: 'casi ', w: 600, dec: 0 });
     } },
     { t0: tE, set: Ch, p0: [1.0, 0.95, 1.2], l0: [0.3, 0.5, -1.4], p1: [0.8, 0.92, 0.9], l1: [0.3, 0.5, -1.4], fov0: 44, act: (t) => {
       K.pose(chek, A.sign(t, 1)); chek.setFace(C.blinkEye(t, 1), 'neutral');
