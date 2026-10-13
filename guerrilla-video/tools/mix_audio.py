@@ -418,7 +418,7 @@ def paper():
     d = 0.7; t = t_(d); out = np.zeros(len(t))
     for k in range(5):
         a = rng.uniform(0, d - 0.15); L = int(rng.uniform(0.05, 0.14) * SR); i = int(a * SR)
-        out[i:i + L] += fft_filter(noise(L / SR), lo=1800, hi=8000)[:L] * np.hanning(L) * rng.uniform(0.4, 1)
+        seg = fft_filter(noise((L + 0.5) / SR), lo=1800, hi=8000)[:L]; out[i:i + len(seg)] += seg * np.hanning(len(seg)) * rng.uniform(0.4, 1)
     return fade(norm(out) * 0.38, 0.005, 0.08)
 
 
@@ -749,6 +749,8 @@ NARCO_MOODS = {'title': 'dark', 'origenes': 'suspense', 'guerra': 'tense', 'corr
                'eeuu': 'suspense', 'amlo': 'calm', 'claudia': 'calm', 'criticas': 'somber', 'porque': 'tense', 'outro': 'hope'}
 PUEBLA_MOODS = {'title': 'dark', 'corredor': 'suspense', 'huachicol': 'tense', 'carga': 'tense', 'enjambre': 'dark', 'municipios': 'suspense', 'carteles': 'tense',
                 'violencia': 'somber', 'gobierno': 'calm', 'focos': 'tense', 'veredicto': 'suspense', 'outro': 'hope'}
+RUSIA_MOODS = {'title': 'dark', 'zar': 'somber', 'domingo': 'tense', 'guerra': 'dark', 'febrero': 'suspense', 'lenin': 'suspense', 'octubre': 'tense',
+               'poder': 'dark', 'romanov': 'somber', 'civil': 'tense', 'urss': 'dark', 'mexico': 'suspense', 'outro': 'hope'}
 def narco_bed(moods=NARCO_MOODS, bpm=80, key=0):
     beat = 60 / bpm; bar = 4 * beat
     CH = {'Dm': [50, 53, 57], 'Bb': [46, 50, 53], 'Gm': [43, 46, 50], 'A': [45, 49, 52], 'F': [41, 45, 48], 'C': [48, 52, 55],
@@ -837,8 +839,11 @@ if VIDEO == 'narco':
 if VIDEO == 'puebla':
     musL, musR = narco_bed(PUEBLA_MOODS, bpm=76, key=2); t_all = np.arange(N) / SR
     sc_ = 0.15 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
+if VIDEO == 'rusia':
+    musL, musR = narco_bed(RUSIA_MOODS, bpm=72, key=-2); t_all = np.arange(N) / SR
+    sc_ = 0.15 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
 BPM = 84; beat = 60 / BPM
-if VIDEO not in ('mx', 'napo', 'narco', 'puebla'):
+if VIDEO not in ('mx', 'napo', 'narco', 'puebla', 'rusia'):
     prog = [[146.8, 174.6, 220.0], [116.5, 146.8, 174.6], [174.6, 220.0, 261.6], [130.8, 164.8, 196.0]]  # Dm Bb F C
     bar = 4 * beat
     musL, musR = np.zeros(N), np.zeros(N)

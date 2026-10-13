@@ -29,10 +29,11 @@ export function build(ctx) {
   const offR = K.person(R, 'mcqueen', 'oficialZar', 1.9, -1.4, Math.PI); offR.z0 = -1.4;
   // ---- 3. In the trench, winter
   const T = S.trenchSet('snow', { snowing: true });
-  const tr = [K.person(T, 'doto', 'soldadoInvierno', -1.4, 0.15, Math.PI / 2), K.person(T, 'oguri', 'soldadoInvierno', 0.2, -0.3, Math.PI), K.person(T, 'helios', 'soldadoZar', -3.2, 0.2, Math.PI / 2 + 0.3), K.person(T, 'tamamo', 'soldadoZar', 1.6, 0.25, -Math.PI / 2)];
+  const tr = [K.person(T, 'doto', 'soldadoInvierno', -1.6, 0.2, -Math.PI / 2 + 0.35), K.person(T, 'oguri', 'soldadoInvierno', 0.4, -0.3, Math.PI), K.person(T, 'helios', 'soldadoZar', -3.0, -0.2, -Math.PI / 2 - 0.3), K.person(T, 'tamamo', 'soldadoZar', 1.8, -0.25, Math.PI)];
   tr[2].gun && (tr[2].gun.visible = false);
   // ---- 4. A field of graves
   const G = S.trenchSet('snow', { snowing: true });
+  G.maxim.visible = false;
   const crosses = []; for (let r = 0; r < 7; r++) for (let c = 0; c < 12; c++) { const x = -7 + c * 1.25 + (r % 2) * 0.6, z = 3 + r * 1.6; const k = P.orthCross(r * 12 + c, 1.15); k.position.set(x, G.Y, z); G.add(k); crosses.push(k); }
   // ---- 5. Stavka: the tsar takes command
   const Sk = S.stavka();

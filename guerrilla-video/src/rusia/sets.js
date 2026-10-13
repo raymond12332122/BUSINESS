@@ -266,8 +266,8 @@ export function trenchSet(light = 'snow', { snowing = false } = {}) {
   s.Y = Y; return s;
 }
 // ------------------------------------------------------------ Stavka (army HQ, Mogilev): map table
-export function stavka() {
-  const s = room({ w: 9, d: 7, h: 2.8, wall: '#8a6a48', lower: '#5a3a24', lowerH: 0.8, floor: '#5a3a24', ceil: '#e8dcc0', hemi: 0.85, sunI: 0.7, trim: '#5a3a24', lights: [[0, 2.4, 0, 4]] });
+export function stavka({ wall = '#8a6a48', lower = '#5a3a24', icon = true } = {}) {
+  const s = room({ w: 9, d: 7, h: 2.8, wall, lower, lowerH: 0.8, floor: '#5a3a24', ceil: '#e8dcc0', hemi: 0.85, sunI: 0.7, trim: '#5a3a24', lights: [[0, 2.4, 0, 4]] });
   for (const x of [-2.6, 2.6]) wallWindow(s, x, 1.5, -3.49, { w: 1.1, h: 1.3, out: '#dfe6ee', curtain: '#6a2a24', glow: true });
   const map = P.canvasTex(1024, 640, (x, W, H) => { x.fillStyle = '#e9e0c8'; x.fillRect(0, 0, W, H); x.strokeStyle = '#7aa0c0'; x.lineWidth = 6;
     for (const k of [0, 1, 2]) { x.beginPath(); x.moveTo(80 + k * 300, 0); x.bezierCurveTo(140 + k * 300, 200, 40 + k * 300, 400, 120 + k * 300, H); x.stroke(); }
@@ -279,7 +279,7 @@ export function stavka() {
   const mp = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 2.0), new THREE.MeshStandardMaterial({ map, roughness: 0.9 })); mp.rotation.x = -Math.PI / 2; mp.position.y = 0.885; t.add(mp);
   t.scale.setScalar(0.5); t.position.set(0, 0, -1.0); s.add(t); s.mapTable = t; s.mapTop = 0.445;
   const l = P.deskLamp(true); l.position.set(0.7, 0.445, -1.4); s.add(l);
-  const ic = P.icon(2); ic.children[1].visible = false; ic.scale.setScalar(0.7); ic.position.set(-4.0, 0.0, -3.0); ic.rotation.y = Math.PI / 4; s.add(ic);
+  if (icon) { const ic = P.icon(2); ic.children[1].visible = false; ic.scale.setScalar(0.7); ic.position.set(-4.0, 0.0, -3.0); ic.rotation.y = Math.PI / 4; s.add(ic); }
   return s;
 }
 // ------------------------------------------------------------ the empress's mauve boudoir (Alexander Palace)
@@ -595,5 +595,57 @@ export function fieldCamp(light = 'day') {
   const cart = new THREE.Group(); cart.add(at(box(2.2, 0.15, 1.4, '#6b4a2f'), 0, 0.8, 0)); for (const sx of [-1, 1]) cart.add(at(cyl(0.45, 0.45, 0.08, '#4a3220', 14), sx * 0.75, 0.45, 0.75, Math.PI / 2, 0, 0)), cart.add(at(cyl(0.45, 0.45, 0.08, '#4a3220', 14), sx * 0.75, 0.45, -0.75, Math.PI / 2, 0, 0));
   cart.position.set(0, 0, -4); s.add(cart); s.cart = cart; s.cartTop = 0.88;
   LP.scatter(s, (r, i) => (i % 3 ? LP.birch(1.3 + r() * 0.5, i) : LP.pine(1.4 + r() * 0.5, '#2f4a3a', i)), 50, [-70, -80, 70, -18], 512);
+  return s;
+}
+// ------------------------------------------------------------ spring countryside with a railway along x (the "sealed train", April 1917)
+export function railLand(light = 'day') {
+  const s = rStage(light, ['#8aa05a', '#7c9250'], { seed: 521, bumps: 0.5 });
+  const tr = P.track(260); tr.rotation.y = Math.PI / 2; s.add(tr);
+  const train = P.trainSet(3, i => ({ color: '#3f5a40', lit: false, band: '#d9c9a0' })); train.rotation.y = Math.PI / 2; s.add(train); s.train = train;
+  LP.scatter(s, (r, i) => (i % 3 ? LP.birch(1.3 + r() * 0.5, i) : LP.pine(1.5 + r() * 0.5, '#2f4a3a', i)), 90, [-90, -70, 90, 50], 522, [[0, 0, 7], [-40, 0, 7], [40, 0, 7], [80, 0, 7], [-80, 0, 7], [-5, 9, 8], [0, 12, 9]]);
+  for (let i = 0; i < 6; i++) { const h = NP.izba(i + 40); h.position.set(-30 + i * 13, 0, -16 - (i % 2) * 4); h.rotation.y = 0.2 * (i % 3); s.add(h); }
+  const tg = MX.telegraph(16, 9); tg.position.set(-70, 0, -4.5); s.add(tg);
+  return s;
+}
+// ------------------------------------------------------------ treaty table (Brest-Litovsk, 3 March 1918)
+export function treatyRoom() {
+  const s = room({ w: 9, d: 7, h: 2.8, wall: '#d6cdb6', lower: '#7a6a50', lowerH: 0.8, floor: '#6a4a30', ceil: '#efe6d0', hemi: 0.9, sunI: 0.7, trim: '#7a6a50', lights: [[0, 2.4, 0, 4], [2.2, 1.2, -1.0, 3, '#ffe2c0', 6]] });
+  for (const x of [-2.6, 2.6]) wallWindow(s, x, 1.5, -3.49, { w: 1.1, h: 1.3, out: '#dfe6ee', curtain: '#5a4a3a', glow: true });
+  const tb = P.tableCloth(4.4, 1.3, '#2f5a3a', 0.78, 0.5); tb.position.set(0, 0, -1.0); s.add(tb); s.table = tb;
+  for (let i = 0; i < 4; i++) for (const sz of [-1, 1]) { const c = P.chairR('#4a3020', '#5a4a3a'); c.position.set(-1.0 + i * 0.66, 0, -1.0 + sz * 0.66); c.rotation.y = sz > 0 ? Math.PI : 0; s.add(c); }
+  for (const [x, z, n] of [[-0.45, -1.0, 5], [0.4, -0.95, 3]]) { const f = P.papers(n, x * 10 | 0); f.position.set(x, tb.top, z); s.add(f); }
+  const ink = new THREE.Group(); ink.add(at(cyl(0.025, 0.025, 0.03, '#1a1a1a', 10), 0, 0.015, 0)); ink.add(at(cyl(0.003, 0.003, 0.09, '#e8e2d4', 4), 0.015, 0.05, 0, 0, 0, 0.4)); ink.position.set(0, tb.top, -1.05); s.add(ink);
+  s.seats = (i, side) => [-1.0 + i * 0.66, 0.08, -1.0 + side * 0.6];
+  return s;
+}
+// Polling station in a village school (Constituent Assembly election, November 1917).
+export function pollingStation() {
+  const s = room({ w: 8, d: 6, h: 2.6, wall: '#cfc4a8', lower: '#7a5a3a', lowerH: 0.7, floor: '#6a4a30', ceil: '#e8dcc0', hemi: 0.95, sunI: 0.8, trim: '#7a5a3a', lights: [[0, 2.2, 0.5, 3]] });
+  for (const x of [-2.4, 2.4]) wallWindow(s, x, 1.45, -2.99, { w: 1.0, h: 1.2, out: '#e6ecf2', curtain: null, glow: true });
+  const tb = P.tableCloth(2.4, 1.0, '#8a1f1f', 0.78); tb.position.set(0, 0, -1.6); s.add(tb); s.table = tb;
+  const bx = MX.ballotBox(); bx.scale.setScalar(0.6); bx.position.set(0, tb.top, -1.6); s.add(bx); s.box = bx;
+  const sg = P.signBoard('ВЫБОРЫ ВЪ УЧРЕДИТЕЛЬНОЕ СОБРАНІЕ', { w: 4.4, h: 0.4, bg: '#efe6d0', fg: '#7a1f1f', border: '#7a1f1f' }); sg.position.set(0, 2.15, -2.98); s.add(sg);
+  return s;
+}
+
+// The Ipatiev House basement room: empty, a bare bulb, two chairs (non-graphic memorial framing).
+export function ipatievBasement() {
+  const wp = P.canvasTex(256, 256, (x, W, H) => { x.fillStyle = '#d9cfb8'; x.fillRect(0, 0, W, H); for (let i = 0; i < 16; i++) { x.fillStyle = i % 2 ? 'rgba(150,130,100,.18)' : 'rgba(255,255,255,.08)'; x.fillRect(i * 16, 0, 8, H); } });
+  wp.wrapS = wp.wrapT = THREE.RepeatWrapping; wp.repeat.set(4, 1);
+  const s = room({ w: 6, d: 5, h: 2.1, wallTex: wp, floor: '#5a4636', ceil: '#cfc4ae', hemi: 0.35, sunI: 0.1, bg: '#050505', lights: [[0, 1.85, -0.6, 3.5, '#ffd9a0', 6]] });
+  s.add(at(LP.mesh(new THREE.SphereGeometry(0.05, 10, 8), new THREE.MeshBasicMaterial({ color: '#fff2c8' })), 0, 1.9, -0.6)); s.add(at(cyl(0.006, 0.006, 0.2, '#2a2a2a', 4), 0, 2.0, -0.6));
+  wallWindow(s, 1.6, 1.65, -2.49, { w: 0.7, h: 0.5, out: '#0c1220', bars: true, frame: '#5a4a3a' });
+  for (const [x, z, r] of [[-0.35, -1.4, 0.25], [0.4, -1.5, -0.2]]) { const c = P.chairR('#4a3020', '#6a4a3a'); c.position.set(x, 0, z); c.rotation.y = r; s.add(c); }
+  return s;
+}
+// ------------------------------------------------------------ Mexican presidential office (Lázaro Cárdenas, 1936)
+export function mxOffice() {
+  const s = room({ w: 8, d: 6, h: 2.8, wall: '#e9dfc8', lower: '#6a4a30', lowerH: 0.8, floor: '#7a5234', ceil: '#f2ead8', hemi: 1.0, sunI: 0.9, trim: '#c9a227', lights: [[0, 2.4, 0.5, 3.5]] });
+  for (const x of [-2.4, 2.4]) wallWindow(s, x, 1.5, -2.99, { w: 1.1, h: 1.4, out: '#d8ecff', curtain: '#7a1f2a', glow: true });
+  const d = P.desk(2.0, 0.9, '#5a3a24'); d.position.set(0, 0, -1.6); s.add(d); s.desk = d;
+  const ch = P.chairR('#5a3a24', '#7a1f2a'); ch.position.set(0, 0, -2.05); s.add(ch); s.seat = [0, ch.top - 0.12, -2.0];
+  const f = MX.flag('mx', 2.2, 0.9, 0.56); f.position.set(1.4, 0, -2.6); s.add(f); s.flag = f;
+  const pp = P.papers(4, 3); pp.position.set(-0.15, d.top, -1.55); s.add(pp);
+  const l = P.deskLamp(true, '#2f6a3a'); l.position.set(0.32, d.top, -1.7); s.add(l);
   return s;
 }

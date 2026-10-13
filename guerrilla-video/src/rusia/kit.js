@@ -49,6 +49,7 @@ export const PAL = {
   overall: { dark: '#1e2632', mid: '#3e5068', light: '#e9e2d0', gold: '#8a7a55' },
   raincoat: { dark: '#4a3e2c', mid: '#a8956e', light: '#e2d6b8', gold: '#6a5a3a' },
   general: { dark: '#24261c', mid: '#5a5e40', light: '#ece2c6', gold: '#e2bd45' },
+  feldgrau: { dark: '#2e302c', mid: '#6a6e64', light: '#c9c8bc', gold: '#c9a227' },
 };
 const uni = (r, p) => uniformize(r, PAL[p] || p);
 
@@ -106,11 +107,12 @@ export function platok(color = '#a8342e', pattern = '#e8d9b0') {
 }
 // Tall fur hat (papakha); grey for soldiers, black with a red top for Cossacks.
 export function papakhaR(furCol = '#4a4239', top = '#6a6256', h = 0.24) {
-  const g = new THREE.Group();
-  const geo = new THREE.CylinderGeometry(0.285, 0.275, h, 30, 4), p = geo.attributes.position;
-  for (let i = 0; i < p.count; i++) { const a = Math.atan2(p.getZ(i), p.getX(i)), y = p.getY(i); const k = 1 + 0.035 * Math.sin(a * 13 + y * 37) * Math.cos(a * 5); p.setX(i, p.getX(i) * k); p.setZ(i, p.getZ(i) * k); }
-  geo.computeVertexNormals(); const f = mesh(geo, std(furCol, { roughness: 1 })); f.position.y = h / 2; g.add(f);
-  g.add(at(mesh(new THREE.CircleGeometry(0.27, 28), std(top, { side: THREE.DoubleSide })), 0, h + 0.002, 0, -Math.PI / 2, 0, 0));
+  const g = new THREE.Group(); h = Math.min(h, 0.19);            // lower, rounded fur hat (a tall straight cylinder reads as a stovepipe on chibis)
+  const prof = [[0.0, h + 0.012], [0.16, h + 0.01], [0.24, h - 0.012], [0.282, h - 0.05], [0.29, h * 0.45], [0.284, 0.02], [0.27, 0]];
+  const geo = new THREE.LatheGeometry(prof.map(([r, y]) => new THREE.Vector2(r, y)), 32), p = geo.attributes.position;
+  for (let i = 0; i < p.count; i++) { const a = Math.atan2(p.getZ(i), p.getX(i)), y = p.getY(i); const k = 1 + 0.03 * Math.sin(a * 13 + y * 37) * Math.cos(a * 5); p.setX(i, p.getX(i) * k); p.setZ(i, p.getZ(i) * k); }
+  geo.computeVertexNormals(); const f = mesh(geo, std(furCol, { roughness: 1, side: THREE.DoubleSide })); g.add(f);
+  g.add(at(mesh(new THREE.CircleGeometry(0.2, 28), std(top, { side: THREE.DoubleSide })), 0, h + 0.014, 0, -Math.PI / 2, 0, 0));
   return g;
 }
 // Fur hat with ear flaps (ushanka).
@@ -154,6 +156,7 @@ export const OUTFITS = {
   campesino: r => { generic(r, '#3a2a20'); uni(r, 'peasant'); hat(r, pick(r, [kartuz('#3a3530'), ushanka()]), CAP); return r; },
   campesina: r => { generic(r, '#4a3428'); uni(r, 'peasant'); hat(r, platok(pick(r, ['#c0392b', '#d9a23a', '#2f5a8a'])), { scale: 0.86, y: 0.9, tilt: -0.02 }); return r; },
   marinero: r => { generic(r, '#1d1916'); uni(r, 'sailor'); hat(r, beskozyrka('АВРОРА'), CAP); r.attach('chest', cananas(), [0, 0.39, 0]); rifle(r); return r; },
+  soldadoRevolucion: r => { OUTFITS.soldadoInvierno(r); r.attach('chest', redBow(), [0.07, 0.46, 0.115]); return r; },
   guardiaRoja: r => { OUTFITS.obrero(r); r.attach('chest', redBow(), [0.07, 0.46, 0.115]); rifle(r); return r; },
   ejercitoRojo: r => { generic(r, '#2a221a'); uni(r, 'redArmy'); hat(r, budenovka('#646646'), { scale: 0.88, y: 0.84, tilt: -0.04, cap: true }); rifle(r); return r; },
   blanco: r => { generic(r, '#2a221a'); uni(r, 'white'); hat(r, furazhka({ crown: '#efe6cc', band: '#1a1a1a' }), CAP); r.attach('chest', epaulettes('#e0bb4c'), [0, 0.475, -0.01]); rifle(r); return r; },
@@ -178,6 +181,7 @@ export const OUTFITS = {
   diegoChibi: r => { generic(r, '#2a2018'); uni(r, 'overall'); hat(r, tophat('#4a3a2a'), { scale: 0.86, y: 0.9, tilt: -0.04 }); return r; },
   cardenasChibi: r => { generic(r, '#1d1612'); uni(r, 'suit'); hideEars(r); flattenAhoge(r); return r; },
   mercaderChibi: r => { generic(r, '#2a1e16'); uni(r, 'raincoat'); hideEars(r); flattenAhoge(r); return r; },
+  oficialAleman: r => { generic(r, '#3a2a20'); uni(r, 'feldgrau'); hat(r, furazhka({ crown: '#6a6e64', band: '#8a2a24', cockade: ['#141414', '#f2ede2', '#b8241e'] }), CAP); r.attach('chest', epaulettes('#c9c8bc'), [0, 0.475, -0.01]); return r; },
   soldadoBlanco: r => { generic(r, '#2a221a'); uni(r, 'white'); hat(r, furazhka({ crown: '#efe6cc', band: '#1a1a1a' }), CAP); rifle(r); return r; },
   camuflaje: r => { generic(r, '#2a221a'); uni(r, { dark: '#9aa4aa', mid: '#e6eaec', light: '#f6f8f8', gold: '#c8cfd2' }); hat(r, ushanka('#e8ecee', '#d0d6da'), CAP); rifle(r); return r; },
 };

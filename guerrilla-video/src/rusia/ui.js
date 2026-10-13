@@ -67,3 +67,10 @@ export function ofTen(t, a, b, n, label, { x = 960, y = 150, col = '#e0a63a' } =
   return `<div style="position:absolute;left:${x}px;top:${y}px;transform:translateX(-50%);padding:22px 32px 18px;${PANEL};opacity:${k};text-align:center">
     <div style="display:flex;gap:8px;justify-content:center">${icons}</div><div style="font:900 40px 'Inter Display',Inter;color:#fff;margin-top:10px"><span style="color:${col}">${n} de cada 10</span> ${label}</div></div>`;
 }
+// "Dual power": a header and two compact cards (left/right). l/r: [title, sub, appearAt, colour]
+export function dual(t, a, b, header, l, r, { top = 120 } = {}) {
+  const k = K(t, a, b); if (k <= 0) return '';
+  const card = ([title, sub, ta, col], side) => { const o = ss(ta, ta + 0.4, t); return `<div style="position:absolute;${side}:110px;top:${top + 70}px;width:560px;padding:20px 26px;${PANEL};border-top:7px solid ${col};opacity:${o};transform:translateY(${(1 - o) * 18}px)">
+    <div style="font:900 38px 'Inter Display',Inter;color:${col}">${title}</div><div style="font:700 23px/1.3 Inter;color:#e9e6df;margin-top:6px">${sub}</div></div>`; };
+  return `<div style="opacity:${k}"><div style="position:absolute;left:0;right:0;top:${top}px;text-align:center;font:900 46px 'Inter Display',Inter;color:#fff;text-shadow:0 4px 20px rgba(0,0,0,.7);letter-spacing:.06em">${header}</div>${card(l, 'left')}${card(r, 'right')}</div>`;
+}

@@ -77,7 +77,7 @@ export const CITY = {
   'Ekaterimburgo': [60.6, 56.84], 'Omsk': [73.37, 54.99], 'Irkutsk': [104.3, 52.29], 'Vladivostok': [131.89, 43.12], 'Arcángel': [40.54, 64.54],
   'Múrmansk': [33.08, 68.97], 'Kronstadt': [29.77, 59.99], 'Pskov': [28.33, 57.82], 'Tsaritsin': [44.51, 48.71], 'Samara': [50.15, 53.2], 'Kazán': [49.12, 55.79],
   'Oriol': [36.06, 52.97], 'Berlín': [13.4, 52.52], 'Viena': [16.37, 48.21], 'Mogilev': [30.33, 53.9], 'Port Arthur': [121.25, 38.8], 'Tokio': [139.69, 35.69],
-  'Constantinopla': [28.98, 41.01], 'Novorosíisk': [37.77, 44.72], 'Chita': [113.5, 52.03], 'Jabárovsk': [135.07, 48.48], 'Cheliábinsk': [61.4, 55.16],
+  'Constantinopla': [28.98, 41.01], 'Zúrich': [8.54, 47.37], 'Estocolmo': [18.07, 59.33], 'Sassnitz': [13.64, 54.52], 'Tornio': [24.15, 65.85], 'Luga': [29.85, 58.74], 'Novorosíisk': [37.77, 44.72], 'Chita': [113.5, 52.03], 'Jabárovsk': [135.07, 48.48], 'Cheliábinsk': [61.4, 55.16],
 };
 // Trans-Siberian railway (simplified) and the main pre-war line St Petersburg - Moscow.
 export const TRANSSIB = [[37.62, 55.75], [39.9, 57.63], [44.0, 56.33], [49.12, 55.79], [56.25, 58.0], [60.6, 56.84], [65.53, 57.15], [69.0, 56.1], [73.37, 54.99],
