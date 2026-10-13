@@ -10,7 +10,7 @@ DUR=$(python3 -c "print($N / 24)")
 VB=$(python3 -c "print(int((29.5*8*1024*1024/$DUR - 96000)*0.985))")
 VF="hqdn3d=3:2.5:6:5"
 echo "duration $DUR s; video bitrate $VB"
-ffmpeg -y -loglevel error -framerate 24 -i $F/f_%05d.jpg -vf "$VF" -c:v libx264 -preset slow -tune animation -b:v $VB -pass 1 -passlogfile /tmp/rusia720 -an -f mp4 /dev/null
+ffmpeg -y -loglevel error -framerate 24 -i $F/f_%05d.jpg -vf "$VF" -c:v libx264 -preset slow -tune animation -b:v $VB -pass 1 -passlogfile /tmp/rusia720 -pix_fmt yuv420p -an -f mp4 /dev/null
 ffmpeg -y -loglevel error -framerate 24 -i $F/f_%05d.jpg -i $A -vf "$VF" -c:v libx264 -preset slow -tune animation -b:v $VB -pass 2 -passlogfile /tmp/rusia720 -pix_fmt yuv420p -c:a aac -b:a 96k -shortest -movflags +faststart $O/tmp_rusia.mp4
 mv $O/tmp_rusia.mp4 $O/revolucion-rusa.mp4
 ls -la $O/revolucion-rusa.mp4
