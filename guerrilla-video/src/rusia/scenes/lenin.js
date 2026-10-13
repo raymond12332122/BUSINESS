@@ -16,6 +16,8 @@ const fade = RM.fade;
 const ROUTE = [[8.54, 47.37], [8.75, 49.0], [10.5, 51.0], [13.4, 52.52], [13.64, 54.52], [13.16, 55.38], [15.5, 57.2], [18.07, 59.33], [19.5, 62.5], [22.2, 65.3], [24.15, 65.85], [25.47, 65.01], [24.6, 62.6], [24.78, 60.74], [28.74, 60.71], [30.31, 59.94]];
 const KORNILOV = [[30.33, 53.9], [30.2, 55.2], [30.0, 57.2], [29.85, 58.74], [30.15, 59.5]];
 
+const fz = (arr, poseFn, keep = () => false, face = 'neutral') => arr.forEach((c, i) => { if (keep(i)) return; c.setFace('open', face); K.freeze(c, poseFn(i)); });
+
 export function build(ctx) {
   const L = ctx.L;
   const tAbr = wt(L[0], 'abril'), tLenin = wt(L[0], 'lenin'), tSuiza = wt(L[0], 'suiza'), tCruzo = wt(L[0], 'cruzo'), tPerm = wt(L[0], 'permiso'), tBerlin = wt(L[0], 'berlin');
@@ -33,10 +35,12 @@ export function build(ctx) {
   const lenin = leader(Fs, 'lenin', 0.55, -6.15, 0.3); lenin.root.position.y = Fs.car.top * 1.25 + 0.02;
   const crowd = K.crowd(Fs, ['obrero', 'marinero', 'soldadoRevolucion', 'obrera', 'obrero'], 36, [-6, -3.6, 6, 3.5], { seed: 81, yaw: Math.PI });
   crowd.forEach(c => { c.root.rotation.y = Math.atan2(0.55 - c.root.position.x, -6.15 - c.root.position.z); });
+  fz(crowd, i => i % 4 === 0 ? { ...A.guard(0.3, i), gun: 'port' } : C.idle(0.3 + i * 0.1, i), i => i % 2 === 1);
   // ---- 4. Kerensky addresses the troops (summer 1917)
   const Fc = S.fieldCamp('day');
   const ker = leader(Fc, 'kerenski', 0, -4, 0); ker.root.position.y = Fc.cartTop;
   const troops = K.crowd(Fc, ['soldadoZar', 'soldadoZar', 'cosaco', 'soldadoZar'], 24, [-4, -2.6, 4, 2.6], { seed: 82, yaw: Math.PI });
+  fz(troops, i => A.guard(0.3 + i * 0.1, i, 'port'));
   // ---- 5. Map: Kornilov marches on the capital
   const Mk = RM.russiaMap({ period: 1914 });
   const kor = RM.arrow(Mk, KORNILOV, '#4a4e58', 0.3);
@@ -45,6 +49,7 @@ export function build(ctx) {
   const F = S.factory('grey', { snow: false, strike: true });
   const crates = [[-1.2, -3.2], [0.4, -3.4], [1.9, -3.1]].map(([x, z]) => { const c = N.gunCrate(true); c.scale.setScalar(0.55); c.position.set(x, 0, z); F.add(c); return c; });
   const armed = K.crowd(F, ['guardiaRoja', 'guardiaRoja', 'obrera', 'guardiaRoja'], 14, [-3.2, -1.8, 3.2, 2.0], { seed: 83, yaw: Math.PI });
+  fz(armed, i => i % 3 === 0 ? { ...A.guard(0.3, i), gun: 'port' } : { ...C.offer(0.3, i, 0.8), gun: 'none' }, () => false, 'open');
   // ---- 7. Trotsky walks out of Kresty prison
   const Pg = S.prisonGate('overcast');
   const tro = leader(Pg, 'trotski', 0, -10.4, 0);
@@ -99,6 +104,7 @@ export function build(ctx) {
     } },
   ];
   const inst = { scene: Mp, scenes: [Mp, Rl, Fs, Fc, Mk, F, Pg], sfx };
+  S.bakeAll(inst.scenes);
   inst.update = t => runShots(inst, ctx, shots, t);
   return inst;
 }

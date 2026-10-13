@@ -12,6 +12,8 @@ import { leader, NAMES } from '../leaders.js';
 export async function preload() {}
 const vote = (t, seed) => { const p = A.sit(t, seed); p.armR = [-15, 0, -25]; p.elbR = [0, 0, -70]; return p; };
 
+const fz = (arr, poseFn, keep = () => false, face = 'neutral') => arr.forEach((c, i) => { if (keep(i)) return; c.setFace('open', face); K.freeze(c, poseFn(i)); });
+
 export function build(ctx) {
   const L = ctx.L;
   const tJap = wt(L[0], 'japon'), tMarcha = wt(L[0], 'marcha'), tPal = wt(L[0], 'palacio');
@@ -36,15 +38,18 @@ export function build(ctx) {
   const F = S.factory('grey', { snow: true, strike: true });
   const strikers = K.crowd(F, ['obrero', 'obrero', 'obrera'], 14, [-3.5, -8.5, 3.5, -4.5], { seed: 51 });
   const stB = P.banner('СТАЧКА!', { w: 3.0, h: 0.6, poleH: 1.7 }); stB.position.set(0, 0, -6.2); F.add(stB);
+  fz(strikers, i => i % 3 ? A.proud(0.3, i) : A.rally(0.3, i), () => false, 'open');
   // ---- 6. A workers' soviet
   const Sv = S.hall('soviet');
   const deps = []; for (let r = 0; r < 6; r++) for (let i = 0; i < 6; i++) for (const sd of [-1, 1]) { if ((r * 7 + i * 3 + (sd > 0)) % 4 === 0) continue; const [x, y, z] = Sv.seatsAt(r, i, sd);
     const d = K.person(Sv, ['doto', 'oguri', 'helios', 'suzuka', 'mcqueen', 'daiwa', 'cafe', 'tamamo'][(r * 6 + i + (sd > 0 ? 3 : 0)) % 8], ['obrero', 'obrera', 'soldadoZar', 'obrero', 'marinero'][(r + i * 2) % 5], x, z, Math.PI); d.root.position.y = y; deps.push(d); }
   const speaker = K.person(Sv, 'helios', 'delegado', 0, -7.05, 0); speaker.root.position.y = 0.36;
+  fz(deps, i => A.sit(0.4, i), i => i % 3 === 0);
   // ---- 7. The Duma
   const Du = S.hall('duma');
   const deputies = []; for (let r = 0; r < 6; r++) for (let i = 0; i < 6; i++) for (const sd of [-1, 1]) { if ((r * 5 + i * 3 + (sd > 0)) % 5 === 0) continue; const [x, y, z] = Du.seatsAt(r, i, sd);
     const d = K.person(Du, ['doto', 'oguri', 'helios', 'suzuka', 'mcqueen', 'daiwa', 'cafe', 'tamamo'][(r * 6 + i + (sd > 0 ? 5 : 0)) % 8], ['delegado', 'delegado', 'campesino', 'delegado'][(r + i) % 4], x, z, Math.PI); d.root.position.y = y; deputies.push(d); }
+  fz(deputies, i => A.sit(0.4, i));
   // ---- 8. The tsar keeps the power
   const Th = S.throneHall();
   const tsar = leader(Th, 'nicolas', Th.seat[0], Th.seat[2], 0); tsar.root.position.y = Th.seat[1];
@@ -108,6 +113,7 @@ export function build(ctx) {
     } },
   ];
   const inst = { scene: Sb, scenes: [Sb, Ps, F, Sv, Du, Th], sfx };
+  S.bakeAll(inst.scenes);
   inst.update = t => runShots(inst, ctx, shots, t);
   return inst;
 }

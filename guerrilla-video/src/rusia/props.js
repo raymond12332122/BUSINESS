@@ -88,7 +88,7 @@ export function petroBuilding(w = 8, h = 9, color = '#d9b46a', seed = 0, { lit =
 export function banner(text, { w = 3.2, h = 0.7, bg = '#b8241e', fg = '#f6efe0', poles = true, poleH = 2.6 } = {}) {
   const g = new THREE.Group();
   const tex = canvasTex(1024, 224, (x, W, H) => { x.fillStyle = bg; x.fillRect(0, 0, W, H); x.fillStyle = fg; let fs = 130; x.font = `900 ${fs}px Inter`; while (x.measureText(text).width > W - 60 && fs > 30) { fs -= 6; x.font = `900 ${fs}px Inter`; } x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(text, W / 2, H / 2 + 6); });
-  const cloth = plane(w, h, tex); cloth.position.y = poleH - h / 2 - 0.05; g.add(cloth); g.cloth = cloth;
+  const cloth = plane(w, h, tex); cloth.position.y = poleH - h / 2 - 0.05; g.add(cloth); g.cloth = cloth; g.userData.dynamic = true;
   if (poles) for (const s of [-1, 1]) g.add(at(cyl(0.025, 0.025, poleH, '#6a4a2f', 6), s * (w / 2 + 0.03), poleH / 2, 0));
   const base = cloth.geometry.attributes.position.array.slice();
   g.wave = (t, amp = 0.06) => { const p = cloth.geometry.attributes.position; for (let i = 0; i < p.count; i++) { const x = base[i * 3], y = base[i * 3 + 1]; p.setZ(i, amp * Math.sin(x * 2.6 + t * 3.1) * (0.6 + 0.4 * Math.cos(y * 3))); } p.needsUpdate = true; };
@@ -98,7 +98,7 @@ export function banner(text, { w = 3.2, h = 0.7, bg = '#b8241e', fg = '#f6efe0',
 export function redFlag(poleH = 2.6, w = 1.1, h = 0.7, color = '#c0272d') {
   const g = new THREE.Group(); g.add(at(cyl(0.025, 0.025, poleH, '#6a4a2f', 6), 0, poleH / 2, 0));
   const geo = new THREE.PlaneGeometry(w, h, 12, 4); geo.translate(w / 2, 0, 0);
-  const cloth = new THREE.Mesh(geo, std(color, { side: THREE.DoubleSide, roughness: 0.7 })); cloth.position.y = poleH - h / 2; cloth.castShadow = true; g.add(cloth);
+  const cloth = new THREE.Mesh(geo, std(color, { side: THREE.DoubleSide, roughness: 0.7 })); cloth.position.y = poleH - h / 2; cloth.castShadow = true; g.add(cloth); g.userData.dynamic = true;
   const base = geo.attributes.position.array.slice();
   g.wave = (t, amp = 0.09) => { const p = geo.attributes.position; for (let i = 0; i < p.count; i++) { const x = base[i * 3]; p.setZ(i, amp * (x / w) * Math.sin(x * 4 - t * 4.2)); p.setY(i, base[i * 3 + 1] - 0.04 * (x / w)); } p.needsUpdate = true; geo.computeVertexNormals(); };
   return g;
@@ -111,11 +111,11 @@ export function icon(seed = 0) {
   return g;
 }
 // Gas street lamp (St Petersburg style).
-export function gasLamp(lit = false, h = 3.4) {
+export function gasLamp(lit = false, h = 3.4, light = true) {
   const g = new THREE.Group(); g.add(at(cyl(0.06, 0.09, h, '#2a2c2e', 8), 0, h / 2, 0));
   g.add(at(mesh(new THREE.CylinderGeometry(0.2, 0.12, 0.4, 6), std(lit ? '#ffe2a0' : '#d8d4c8', lit ? { emissive: '#ffcc70', emissiveIntensity: 1.4 } : {})), 0, h + 0.2, 0));
   g.add(at(mesh(new THREE.ConeGeometry(0.26, 0.2, 6), '#2a2c2e'), 0, h + 0.5, 0));
-  if (lit) { const l = new THREE.PointLight('#ffc878', 6, 9, 1.6); l.position.set(0, h + 0.1, 0); g.add(l); }
+  if (lit && light) { const l = new THREE.PointLight('#ffc878', 7, 10, 1.6); l.position.set(0, h + 0.1, 0); g.add(l); }
   return g;
 }
 
@@ -364,7 +364,7 @@ export function platform(len = 40, { w = 4, h = 0.62, canopy = true, snow = fals
   if (canopy) { for (let z = -len / 2 + 2; z < len / 2; z += 4.5) { g.add(at(cyl(0.07, 0.09, 3.6, '#2e3a34', 8), 0.4, h + 1.8, z)); g.add(at(box(2.8, 0.06, 0.08, '#2e3a34'), 0.4, h + 3.55, z)); }
     const roof = box(w + 0.6, 0.1, len, '#5a6660'); roof.position.set(0.3, h + 3.7, 0); roof.rotation.z = -0.06; g.add(roof);
     if (snow) { const sn = box(w + 0.6, 0.08, len, '#eef2f5'); sn.position.set(0.3, h + 3.79, 0); sn.rotation.z = -0.06; g.add(sn); } }
-  g.lamps = []; for (let i = 0; i < lamps; i++) { const l = gasLamp(true, 2.6); l.position.set(-w / 2 + 0.5, h, -len / 2 + (i + 0.5) * len / lamps); g.add(l); g.lamps.push(l); }
+  g.lamps = []; for (let i = 0; i < lamps; i++) { const l = gasLamp(true, 2.6, i % 2 === 0); l.position.set(-w / 2 + 0.5, h, -len / 2 + (i + 0.5) * len / lamps); g.add(l); g.lamps.push(l); }
   g.top = h; return g;
 }
 // Station building with a clock pediment and a name board (pre-1918 spelling).
@@ -395,7 +395,7 @@ export function woodpile(len = 4, h = 1.2, seed = 0) {
 }
 // Bonfire: logs, rising flame sprites and a flickering light. .update(t)
 export function bonfire(s = 1, seed = 0) {
-  const g = new THREE.Group(), r = rng(seed + 7);
+  const g = new THREE.Group(), r = rng(seed + 7); g.userData.dynamic = true;
   for (let i = 0; i < 6; i++) { const l = cyl(0.06 * s, 0.07 * s, 0.9 * s, '#4a3220', 6); l.rotation.set(Math.PI / 2 - 0.5, i * 1.05 + r() * 0.3, 0, 'YXZ'); l.position.y = 0.18 * s; g.add(l); }
   g.add(at(mesh(new THREE.CircleGeometry(0.7 * s, 16), std('#2a2420')), 0, 0.02, 0, -Math.PI / 2, 0, 0));
   const fire = MX.fireSprites(g, 12, { size: 0.9 * s, rise: 1.3 * s, spread: 0.5 * s, life: 0.8 });

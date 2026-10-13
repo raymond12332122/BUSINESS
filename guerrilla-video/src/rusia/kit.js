@@ -5,7 +5,7 @@ import * as P from '../lib/props.js';
 import * as G from '../lib/gear.js';
 import * as C_ from '../lib/chars.js';
 import { mesh, box, cyl, at, rng } from '../lib/props.js';
-import { hideEars, flattenAhoge, generic, wearHat, epaulettes, crossbelts, glasses, cananas } from '../mx/kit.js';
+import { hideEars, flattenAhoge, generic, wearHat, epaulettes, crossbelts, glasses, cananas, pose as applyPose } from '../mx/kit.js';
 import { uniformize, papakha, musket, sabre, dropHairBits, tiara, tophat } from '../napo/kit.js';
 export { pose } from '../mx/kit.js';
 export { hideEars, generic };
@@ -198,7 +198,51 @@ let seedCounter = 0;
 export function person(parent, who, outfit = who, x = 0, z = 0, yaw = 0) {
   const key = CASTING[who] || who;
   const r = C_.spawn(key); r.seed = (seedCounter++ * 1.37) % 10; OUTFITS[outfit](r);
-  r.root.position.set(x, 0, z); r.root.rotation.y = yaw; parent.add(r.root); r.who = who; return r;
+  r.root.position.set(x, 0, z); r.root.rotation.y = yaw; r.root.userData.dynamic = true; parent.add(r.root); r.who = who;
+  r.root.traverse(o => { if (o.isMesh && o.material?.normalMap) { o.material.normalMap = null; o.material.needsUpdate = true; } });   // normal maps cost ~25% of render time and are invisible at 720p
+  // frustum-cull skinned parts with a padded bind-pose sphere (off-screen extras are otherwise skinned every frame)
+  r.root.traverse(o => { if (!o.isSkinnedMesh) return; if (!o.geometry.boundingSphere) o.geometry.computeBoundingSphere(); o.boundingSphere = o.geometry.boundingSphere.clone(); o.boundingSphere.radius *= 1.6; o.frustumCulled = true; });
+  return r;
+}
+// Soft round contact shadow (crowds use it instead of shadow-mapped shadows: skinning them twice is the main render cost).
+let BLOB = null;
+function blobTex() {
+  if (BLOB) return BLOB; const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d');
+  const g = x.createRadialGradient(32, 32, 0, 32, 32, 31); g.addColorStop(0, 'rgba(0,0,0,0.55)'); g.addColorStop(0.6, 'rgba(0,0,0,0.3)'); g.addColorStop(1, 'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0, 0, 64, 64);
+  BLOB = new THREE.CanvasTexture(c); return BLOB;
+}
+export function blobShadow(r, size = 0.62) {
+  r.root.traverse(o => { if (o.isMesh) o.castShadow = false; });
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(size, size * 0.8), new THREE.MeshBasicMaterial({ map: blobTex(), transparent: true, depthWrite: false, fog: true }));
+  m.rotation.x = -Math.PI / 2; m.position.y = 0.012; m.renderOrder = 1; r.root.add(m); r.blob = m; return r;
+}
+// Freeze a character in its current pose: skinned meshes become static meshes (no per-frame skinning), so they can be
+// batched with the set. Use for background extras that only need a static pose (seated delegates, far crowds).
+const _M = new THREE.Matrix4(), _T = new THREE.Matrix4(), _v = new THREE.Vector3(), _n = new THREE.Vector3(), _N3 = new THREE.Matrix3();
+export function freeze(r, p) {
+  if (p) applyPose(r, p);
+  r.root.updateMatrixWorld(true);
+  const list = []; r.root.traverse(o => { if (o.isSkinnedMesh) list.push(o); });
+  for (const sm of list) {
+    if (!sm.visible) { sm.parent.remove(sm); continue; }
+    const g = sm.geometry, pos = g.attributes.position, nor = g.attributes.normal, si = g.attributes.skinIndex, sw = g.attributes.skinWeight, sk = sm.skeleton;
+    sk.update();
+    const P = new Float32Array(pos.count * 3), Nn = nor ? new Float32Array(pos.count * 3) : null, bm = sk.boneMatrices;
+    for (let i = 0; i < pos.count; i++) {
+      const e = _M.elements; e.fill(0);
+      for (let k = 0; k < 4; k++) { const w = sw.getComponent(i, k); if (!w) continue; _T.fromArray(bm, si.getComponent(i, k) * 16); const te = _T.elements; for (let q = 0; q < 16; q++) e[q] += w * te[q]; }
+      _T.multiplyMatrices(sm.bindMatrixInverse, _M).multiply(sm.bindMatrix);
+      _v.fromBufferAttribute(pos, i).applyMatrix4(_T); P[i * 3] = _v.x; P[i * 3 + 1] = _v.y; P[i * 3 + 2] = _v.z;
+      if (Nn) { _N3.setFromMatrix4(_T); _n.fromBufferAttribute(nor, i).applyMatrix3(_N3).normalize(); Nn[i * 3] = _n.x; Nn[i * 3 + 1] = _n.y; Nn[i * 3 + 2] = _n.z; }
+    }
+    const ng = new THREE.BufferGeometry(); ng.setAttribute('position', new THREE.BufferAttribute(P, 3)); if (Nn) ng.setAttribute('normal', new THREE.BufferAttribute(Nn, 3));
+    if (g.attributes.uv) ng.setAttribute('uv', g.attributes.uv); if (g.index) ng.setIndex(g.index); for (const gr of g.groups) ng.addGroup(gr.start, gr.count, gr.materialIndex);
+    const m = new THREE.Mesh(ng, sm.material); m.position.copy(sm.position); m.quaternion.copy(sm.quaternion); m.scale.copy(sm.scale);
+    m.castShadow = sm.castShadow; m.receiveShadow = sm.receiveShadow; m.renderOrder = sm.renderOrder; m.frustumCulled = true; m.name = sm.name;
+    sm.parent.add(m); sm.parent.remove(sm);
+  }
+  r.frozen = true; r.apply = () => {}; r.setFace = () => {}; r.root.userData.dynamic = false;
+  return r;
 }
 export function crowd(parent, outfit, n, [x0, z0, x1, z1], { seed = 1, yaw = 0, cast = ['doto', 'oguri', 'suzuka', 'helios', 'tamamo', 'mcqueen', 'daiwa', 'cafe'] } = {}) {
   const r = rng(seed), out = [];
@@ -207,7 +251,7 @@ export function crowd(parent, outfit, n, [x0, z0, x1, z1], { seed = 1, yaw = 0, 
     const cx = i % cols, cz = Math.floor(i / cols), rows = Math.ceil(n / cols);
     const x = x0 + (cx + 0.5) / cols * (x1 - x0) + (r() - 0.5) * 0.35, z = z0 + (cz + 0.5) / rows * (z1 - z0) + (r() - 0.5) * 0.35;
     const o = Array.isArray(outfit) ? outfit[i % outfit.length] : outfit;
-    out.push(person(parent, cast[i % cast.length], o, x, z, yaw + (r() - 0.5) * 0.4));
+    out.push(blobShadow(person(parent, cast[i % cast.length], o, x, z, yaw + (r() - 0.5) * 0.4)));
   }
   return out;
 }

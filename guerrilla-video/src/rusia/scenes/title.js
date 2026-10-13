@@ -11,6 +11,8 @@ import { leader, NAMES } from '../leaders.js';
 
 export async function preload() {}
 
+const fz = (arr, poseFn, keep = () => false, face = 'neutral') => arr.forEach((c, i) => { if (keep(i)) return; c.setFace('open', face); K.freeze(c, poseFn(i)); });
+
 export function build(ctx) {
   const L = ctx.L;
   const tMarzo = wt(L[0], 'marzo'), tRen = wt(L[0], 'renuncio'), tVag = wt(L[0], 'vagon');
@@ -29,6 +31,7 @@ export function build(ctx) {
   const lenin = leader(Sm, 'lenin', 0, -16.0, 0); lenin.root.position.y = 0.8;
   const reds = K.crowd(Sm, ['guardiaRoja', 'marinero', 'guardiaRoja', 'obrero'], 18, [-5, -13.2, 5, -7.5], { seed: 11, yaw: Math.PI });
   const smFlags = [[-3.5, -9.5], [3.2, -10.5]].map(([x, z], i) => { const f = P.redFlag(3.4, 1.3, 0.85); f.position.set(x, 0, z); Sm.add(f); return f; });
+  fz(reds, i => i % 3 ? { ...A.rally(0.3 + i * 0.17, i), gun: 'back' } : { ...A.guard(0.3, i), gun: 'port' }, i => i % 3 === 1, 'open');
   // ---- 4. Palace Square, night of 25 October: Red Guards cross to the palace
   const Ps = S.palaceSquare('snowNight', { barricade: true });
   const runners = K.crowd(Ps, ['guardiaRoja', 'marinero', 'guardiaRoja', 'ejercitoRojo'], 12, [-5, -6, 5, 0], { seed: 23, yaw: Math.PI });
@@ -72,6 +75,7 @@ export function build(ctx) {
     } },
   ];
   const inst = { scene: St, scenes: [St, Sa, Sm, Ps, Kr], sfx };
+  S.bakeAll(inst.scenes);
   inst.update = t => runShots(inst, ctx, shots, t);
   return inst;
 }

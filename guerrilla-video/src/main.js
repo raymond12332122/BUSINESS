@@ -74,7 +74,7 @@ async function boot() {
     TL.scenes.forEach((s, i) => { for (const e of (built[i]?.sfx || [])) ev.push({ ...e, t: +(s.start + e.t).toFixed(3) }); });
     return ev;
   };
-  window.TL = TL;
+  window.TL = TL; window.__built = built; window.__renderer = renderer;
   window.__ready = true;
 }
 

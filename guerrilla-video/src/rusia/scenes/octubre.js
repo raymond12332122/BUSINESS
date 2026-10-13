@@ -16,6 +16,8 @@ const sepia = k => k > 0 ? `<div style="position:absolute;inset:0;background:#70
   <div style="position:absolute;left:0;right:0;top:0;height:58px;background:#0b0b0b;opacity:${k}">${[...Array(14)].map((_, i) => `<div style="position:absolute;top:16px;left:${30 + i * 140}px;width:44px;height:26px;border-radius:5px;background:#e8e2d0"></div>`).join('')}</div>
   <div style="position:absolute;left:0;right:0;bottom:0;height:58px;background:#0b0b0b;opacity:${k}">${[...Array(14)].map((_, i) => `<div style="position:absolute;top:16px;left:${30 + i * 140}px;width:44px;height:26px;border-radius:5px;background:#e8e2d0"></div>`).join('')}</div>` : '';
 
+const fz = (arr, poseFn, keep = () => false, face = 'neutral') => arr.forEach((c, i) => { if (keep(i)) return; c.setFace('open', face); K.freeze(c, poseFn(i)); });
+
 export function build(ctx) {
   const L = ctx.L;
   const tNoche = wt(L[0], 'noche'), tGuard = wt(L[0], 'guardias'), tTro = wt(L[0], 'trotski'), tOcup = wt(L[0], 'ocuparon'), tPuen = wt(L[0], 'puentes'), tEst = wt(L[0], 'estaciones'), tTel = wt(L[0], 'telegrafo'), tCasi = wt(L[0], 'casi');
@@ -26,6 +28,7 @@ export function build(ctx) {
   const Sm = S.smolny();
   const reds = K.crowd(Sm, ['guardiaRoja', 'marinero', 'soldadoRevolucion', 'guardiaRoja'], 22, [-6, -12, 6, -5], { seed: 91 });
   reds.forEach((r, i) => { r.root.rotation.y = i % 2 ? Math.PI * 0.85 : -0.4; });
+  fz(reds, i => i % 3 ? { ...A.guard(0.3 + i * 0.1, i), gun: 'port' } : A.talk(0.3 + i * 0.1, i));
   // ---- 2. Trotsky at the map (Military Revolutionary Committee)
   const Mr = S.stavka({ wall: '#e3dccb', lower: '#a89a7c', icon: false });
   const tro = leader(Mr, 'trotski', 0, -1.85, 0);
@@ -33,6 +36,7 @@ export function build(ctx) {
   // ---- 3. A bridge taken by Red Guards
   const Br = S.nevaNight({ aurora: false });
   const post = K.crowd(Br, ['guardiaRoja', 'marinero', 'guardiaRoja'], 9, [-29, -11, -23, -5], { seed: 92 }); post.forEach(p => p.root.position.y = 0.6);
+  fz(post, i => ({ ...A.guard(0.3 + i * 0.1, i), gun: i % 2 ? 'port' : 'low' }));
   // ---- 4. The Aurora's bow gun
   const Dk = S.auroraDeck();
   const crew = [K.person(Dk, 'doto', 'marinero', -1.1, 4.6, 0.4), K.person(Dk, 'oguri', 'marinero', 1.2, 4.4, -0.4), K.person(Dk, 'tamamo', 'marinero', 0.4, 2.8, 0.1)];
@@ -51,6 +55,7 @@ export function build(ctx) {
   const lenin = leader(Hs, 'leninBare', 0, -7.05, 0); lenin.root.position.y = 0.36;
   const delegates = []; for (let r = 0; r < 6; r++) for (let i = 0; i < 6; i++) for (const sd of [-1, 1]) { if ((r * 5 + i * 7 + (sd > 0)) % 4 === 0) continue; const [x, y, z] = Hs.seatsAt(r, i, sd);
     const d = K.person(Hs, ['doto', 'oguri', 'helios', 'suzuka', 'mcqueen', 'daiwa', 'cafe', 'tamamo'][(r * 6 + i + (sd > 0 ? 3 : 0)) % 8], ['obrero', 'soldadoRevolucion', 'marinero', 'obrera', 'campesino'][(r + i * 2) % 5], x, z, Math.PI); d.root.position.y = y; delegates.push(d); }
+  fz(delegates, i => A.sit(0.4, i));
   // ---- 8. Old calendar vs new
   const Sq = S.smolny();
 
@@ -113,6 +118,7 @@ export function build(ctx) {
     } },
   ];
   const inst = { scene: Sm, scenes: [Sm, Mr, Br, Dk, Ps, Pm, Hs, Sq], sfx };
+  S.bakeAll(inst.scenes);
   inst.update = t => runShots(inst, ctx, shots, t);
   return inst;
 }

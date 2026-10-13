@@ -30,6 +30,8 @@ const LOW = ['dusk', 'golden', 'sunrise', 'snowDusk', 'dawn'];
 export function rStage(light = 'snow', ground = SNOW, extra = {}) {
   const L = LIGHT[light];
   const s = stage({ ...L, groundA: ground ? ground[0] : null, groundB: ground ? ground[1] : null, shadow: 18, sunPos: LOW.includes(light) ? [-12, 7, 6] : [7, 14, 8], seed: 7, ...extra });
+  s.userData.sun.shadow.mapSize.set(1536, 1536);
+  if (isNight(light)) s.userData.sun.castShadow = false;           // moonlight shadows are barely visible and cost ~40% of a frame
   ticker(s); return s;
 }
 export function stars(s, n = 600) {
@@ -39,6 +41,38 @@ export function stars(s, n = 600) {
 }
 // Point a beam group (beam built along -y) along dir.
 export function aimBeam(g, dir) { g.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), dir.clone().normalize()); }
+// Merge the static meshes of each set into one mesh per material (SwiftShader is bound by draw calls).
+// Skips skinned/instanced meshes, maps, anything under an object flagged userData.dynamic or exposing wave/update/aim/set.
+const isDyn = o => { for (let p = o; p; p = p.parent) { const u = p.userData; if (u && u.dynamic) return true; if (p !== o && (typeof p.wave === 'function' || typeof p.update === 'function' || typeof p.aim === 'function' || typeof p.set === 'function')) return true; } return false; };
+export function bake(s) {
+  if (!s || s.mapGroup || s.userData.baked) return s;
+  s.updateMatrixWorld(true);
+  const groups = new Map();
+  s.traverse(o => {
+    if (!o.isMesh || o.isSkinnedMesh || o.isInstancedMesh || Array.isArray(o.material) || !o.visible || o.renderOrder || isDyn(o)) return;
+    const m = o.material, g = o.geometry;
+    if (!m || !m.isMaterial || m.isShaderMaterial || !g.attributes.position || !g.attributes.normal || g.morphAttributes?.position) return;
+    if (g.attributes.color && !m.vertexColors) return;
+    const attrs = Object.keys(g.attributes).sort().join(',');
+    const uniq = Object.prototype.hasOwnProperty.call(m, 'onBeforeCompile') || m.map?.isCanvasTexture === false && /Mouth|Eyes/.test(m.name) ? m.uuid : '';
+    const key = [uniq, m.type, m.color?.getHexString(), m.emissive?.getHexString(), m.emissiveIntensity, m.roughness, m.metalness, m.map?.uuid, m.side, m.transparent, m.opacity, m.flatShading, m.vertexColors, m.depthWrite, m.blending, o.castShadow, o.receiveShadow, attrs, !!g.index].join('|');
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(o);
+  });
+  let removed = 0, added = 0;
+  for (const list of groups.values()) {
+    if (list.length < 2) continue;
+    const geos = list.map(o => { const g = o.geometry.clone(); g.applyMatrix4(o.matrixWorld); for (const k of Object.keys(g.attributes)) if (!['position', 'normal', 'uv', 'color'].includes(k)) g.deleteAttribute(k); g.clearGroups(); return g; });
+    const merged = mergeGeo(geos, false); if (!merged) continue;
+    const mm = new THREE.Mesh(merged, list[0].material); mm.castShadow = list[0].castShadow; mm.receiveShadow = list[0].receiveShadow; mm.frustumCulled = false;
+    s.add(mm); added++;
+    for (const o of list) { o.parent.remove(o); removed++; }
+    geos.forEach(g => g.dispose());
+  }
+  s.userData.baked = true; s.userData.bakeStats = [removed, added];
+  return s;
+}
+export function bakeAll(scenes) { scenes.forEach(bake); }
 // Things scenes should tick every frame: s.tick(t) runs them all.
 function ticker(s) { s.ticks = s.ticks || []; s.tick = t => s.ticks.forEach(f => f(t)); return s.ticks; }
 function smokeFrom(s, origin, opts) { const f = MX.smokeTrail(s, opts.n || 12, opts); ticker(s).push(t => f(t, origin, 1)); }
@@ -57,7 +91,7 @@ export function room({ w = 10, d = 8, h = 3.2, wall = '#6a4a32', lower = null, l
   if (lower) { s.add(at(box(w, lowerH, 0.06, lower), 0, lowerH / 2, -d / 2 + 0.03)); for (const sx of [-1, 1]) s.add(at(box(0.06, lowerH, d, lower), sx * (w / 2 - 0.03), lowerH / 2, 0)); }
   if (trim) { s.add(at(box(w, 0.18, 0.1, trim), 0, h - 0.2, -d / 2 + 0.05)); for (const sx of [-1, 1]) s.add(at(box(0.1, 0.18, d, trim), sx * (w / 2 - 0.05), h - 0.2, 0)); }
   for (const [x, y, z, i = 5, c = '#ffd9a0', dist = 14] of lights) { const l = new THREE.PointLight(c, i, dist, 1.4); l.position.set(x, y, z); s.add(l); }
-  s.userData = { sun, hemi: hl, interior: true }; ticker(s);
+  s.userData = { sun, hemi: hl, interior: true }; ticker(s); if (sunI < 0.4) sun.castShadow = false;
   return s;
 }
 // Window in a back wall (plane facing +z) showing a flat outside colour, with frame, cross bars and curtains.
@@ -88,7 +122,7 @@ export function palaceSquare(light = 'snow', { lit = false, barricade = false, s
   s.add(at(box(76, 0.4, 1.6, '#eef2f5'), 0, 0.2, -31.2));
   for (const x of [-38, 38]) s.add(at(box(0.4, 0.2, 8, '#eef2f5'), x, 0.1, -36));
   const col = P.alexanderColumn(22); col.position.set(-10, 0, -15); s.add(col); s.column = col;
-  for (let i = 0; i < 7; i++) { const l = P.gasLamp(night, 3.4); l.position.set(-27 + i * 9, 0, -28.6); s.add(l); }
+  for (let i = 0; i < 7; i++) { const l = P.gasLamp(night, 3.4, i % 3 === 0); l.position.set(-27 + i * 9, 0, -28.6); s.add(l); }
   // General Staff building with its arch (seen in reverse shots)
   const gs = new THREE.Group(); gs.position.set(0, 0, 44); gs.rotation.y = Math.PI; s.add(gs);
   gs.add(at(box(90, 9, 8, '#e3c27a'), 0, 4.5, 0)); gs.add(at(box(90.4, 0.4, 8.4, '#f3ead6'), 0, 9, 0));
@@ -126,7 +160,7 @@ export function petroStreet(light = 'snow', { lit = 0, bakery = true, snowing = 
     s.add(at(box(0.1, 1.9, 2.6, '#3a2a20'), -6.98, 1.2, -4.3)); s.add(at(new THREE.Mesh(new THREE.BoxGeometry(0.1, 1.5, 2.2), std(night ? '#ffd690' : '#2b3644', night ? { emissive: '#ffbe66', emissiveIntensity: 0.8 } : { roughness: 0.3 })), -6.94, 1.25, -4.3));
     s.bakery = new THREE.Vector3(-6.4, 0, -4.3);
   }
-  for (let i = 0; i < 8; i++) for (const sx of [-1, 1]) { const l = P.gasLamp(night, 3.4); l.position.set(sx * 4.4, 0, 8 - i * 9); s.add(l); }
+  for (let i = 0; i < 8; i++) for (const sx of [-1, 1]) { const l = P.gasLamp(night, 3.4, (i + (sx > 0 ? 1 : 0)) % 3 === 0 && i < 5); l.position.set(sx * 4.4, 0, 8 - i * 9); s.add(l); }
   if (snowing) { const sn = P.snowfall(s, { area: [-12, 0, -30, 12, 12, 12] }); ticker(s).push(t => sn.update(t)); }
   return s;
 }
@@ -260,7 +294,7 @@ export function trenchSet(light = 'snow', { snowing = false } = {}) {
   for (let i = 0; i < 22; i++) { const c = P.crater(0.8 + r() * 1.4); c.position.set((r() - 0.5) * 60, Y, -10 - r() * 40); s.add(c); }
   for (let i = 0; i < 9; i++) { const t = deadTree(1 + r() * 0.6, i); t.position.set((r() - 0.5) * 70, Y, -16 - r() * 40); s.add(t); }
   for (let i = 0; i < 6; i++) { const t = deadTree(0.9 + r() * 0.5, i + 20); t.position.set((r() - 0.5) * 60, Y, 8 + r() * 30); s.add(t); }
-  const mg = P.maxim(); mg.position.set(2.5, Y + 0.18, -1.15); s.add(mg); s.maxim = mg;
+  const mg = P.maxim(); mg.position.set(2.5, Y + 0.18, -1.15); mg.userData.dynamic = true; s.add(mg); s.maxim = mg;
   for (const [x, z] of [[-30, -60], [12, -70], [40, -55]]) smokeFrom(s, new THREE.Vector3(x, Y + 0.5, z), { n: 10, color: '#6a6660', size: 2.4, rise: 14, drift: [4, 0, 0], life: 6, opacity: 0.55 });
   if (snowing) { const sn = P.snowfall(s, { area: [-16, 0, -24, 16, 12, 12] }); ticker(s).push(t => sn.update(t)); }
   s.Y = Y; return s;
@@ -309,7 +343,7 @@ export function seaBattle() {
 // Flat animated water plane. s.sea.wave(t)
 function waterPlane(s, { color = '#1e3344', y = -1.0, size = 400, x = 0, z = 0, w = null, d = null } = {}) {
   const geo = new THREE.PlaneGeometry(w || size, d || size, 60, 60); geo.rotateX(-Math.PI / 2);
-  const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color, roughness: 0.22, metalness: 0.25 })); m.position.set(x, y, z); m.receiveShadow = true; s.add(m);
+  const m = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ color, roughness: 0.22, metalness: 0.25 })); m.position.set(x, y, z); m.receiveShadow = true; m.userData.dynamic = true; s.add(m);
   const base = geo.attributes.position.array.slice();
   m.wave = t => { const p = geo.attributes.position; for (let i = 0; i < p.count; i++) { const X = base[i * 3], Z = base[i * 3 + 2]; p.setY(i, 0.08 * Math.sin(X * 0.35 + t * 1.3) + 0.06 * Math.sin(Z * 0.5 - t * 1.1)); } p.needsUpdate = true; geo.computeVertexNormals(); };
   m.wave(0); s.sea = m; ticker(s).push(t => m.wave(t)); return m;
@@ -329,11 +363,11 @@ export function finlandSquare() {
   const s = rStage('night', ['#4a4c50', '#43454a'], { seed: 381 }); stars(s);
   const st = P.stationHouse('ФИНЛЯНДСКІЙ ВОКЗАЛЪ', { w: 34, h: 8, lit: 0.85, color: '#d6c8a6' }); st.position.set(0, 0, -22); s.add(st); s.station = st;
   const car = P.armouredCar('#3e4434'); car.scale.setScalar(1.25); car.position.set(0.5, 0, -6); car.rotation.y = 0.35; s.add(car); s.car = car;
-  s.beams = [[-12, -30], [14, -29]].map(([x, z], i) => { const g = new THREE.Group(); g.position.set(x, 9, z); s.add(g); const b = P.beam(60, 0.35, 6, '#eaf0ff', 0.45); g.add(b); g.add(at(cyl(0.5, 0.5, 0.8, '#2a2a2a', 12), 0, 0, 0));
+  s.beams = [[-12, -30], [14, -29]].map(([x, z], i) => { const g = new THREE.Group(); g.position.set(x, 9, z); g.userData.dynamic = true; s.add(g); const b = P.beam(60, 0.35, 6, '#eaf0ff', 0.45); g.add(b); g.add(at(cyl(0.5, 0.5, 0.8, '#2a2a2a', 12), 0, 0, 0));
     g.aim = (t) => aimBeam(g, new THREE.Vector3((i ? -0.35 : 0.35) + 0.25 * Math.sin(t * 0.4 + i * 2), 0.9, 0.25 + 0.15 * Math.cos(t * 0.3 + i))); g.aim(0); ticker(s).push(t => g.aim(t)); return g; });
   s.flags = [[-6, -12], [7, -11], [-11, -4], [12, -3]].map(([x, z], i) => { const f = P.redFlag(4.2, 1.6, 1.0); f.position.set(x, 0, z); s.add(f); ticker(s).push(t => f.wave(t + i)); return f; });
   const bn = P.banner('ВСЯ ВЛАСТЬ СОВѢТАМЪ', { w: 7, h: 1.0, poleH: 4.4 }); bn.position.set(-2, 0, -14); s.add(bn); ticker(s).push(t => bn.wave(t)); s.bannerA = bn;
-  for (let i = 0; i < 6; i++) { const l = P.gasLamp(true, 3.6); l.position.set(-20 + i * 8, 0, -15); s.add(l); }
+  for (let i = 0; i < 6; i++) { const l = P.gasLamp(true, 3.6, i % 2 === 0); l.position.set(-20 + i * 8, 0, -15); s.add(l); }
   const fl = new THREE.PointLight('#cfd8ff', 25, 30, 1.2); fl.position.set(0, 8, -2); s.add(fl);
   return s;
 }
@@ -348,14 +382,14 @@ export function nevaNight({ aurora = true, frozen = false } = {}) {
   const pal = P.winterPalace({ len: 76, lit: true }); pal.position.set(20, 0, -76); pal.rotation.y = 0; s.add(pal); s.palace = pal;
   const pp = new THREE.Group(); pp.add(at(box(6, 14, 6, '#e8d49a'), 0, 7, 0)); pp.add(at(box(4, 6, 4, '#e8d49a'), 0, 17, 0)); pp.add(at(LP.mesh(new THREE.ConeGeometry(1.4, 24, 8), std('#d4af37', { metalness: 0.7, roughness: 0.3 })), 0, 32, 0)); pp.position.set(-70, 0, -90); s.add(pp);
   const br = new THREE.Group(); br.position.set(-26, 0, -34); s.add(br); br.add(at(box(9, 0.6, 66, '#3a3e44'), 0, 0.3, 0)); for (const sx of [-1, 1]) br.add(at(box(0.15, 0.7, 66, '#2a2c30'), sx * 4.4, 0.95, 0));
-  for (let z = -28; z <= 28; z += 14) { br.add(at(box(3, 3, 6, '#5a5650'), 0, -1.6, z)); for (const sx of [-1, 1]) { const l = P.gasLamp(true, 3.2); l.position.set(sx * 4.2, 0.6, z); br.add(l); } }
+  for (let z = -28; z <= 28; z += 14) { br.add(at(box(3, 3, 6, '#5a5650'), 0, -1.6, z)); for (const sx of [-1, 1]) { const l = P.gasLamp(true, 3.2, z === 0 && sx > 0); l.position.set(sx * 4.2, 0.6, z); br.add(l); } }
   s.bridge = br;
   if (aurora) { const a = P.aurora(); a.scale.setScalar(2.4); a.position.set(6, -1.6, -26); a.rotation.y = -Math.PI / 2 + 0.25; s.add(a); s.aurora = a;
     for (const [x, y, z] of [[0, 6, 4], [0, 6, -4], [0, 9, 0]]) { const l = new THREE.PointLight('#ffd9a0', 8, 14, 1.4); l.position.set(x, y, z); a.add(l); }
     for (let i = 0; i < 14; i++) for (const sx of [-1, 1]) { const w = LP.mesh(new THREE.CircleGeometry(0.07, 8), new THREE.MeshBasicMaterial({ color: '#ffd690' })); w.position.set(sx * (1.46 + 0.01), 1.3, -5.5 + i * 0.8); w.rotation.y = sx * Math.PI / 2; a.add(w); }
-    const sl = new THREE.Group(); sl.position.set(4, 9.5, -27); s.add(sl); sl.add(P.beam(70, 0.3, 7, '#eaf0ff', 0.5)); aimBeam(sl, new THREE.Vector3(0.3, 0.05, -1)); s.searchlight = sl; }
+    const sl = new THREE.Group(); sl.position.set(4, 9.5, -27); sl.userData.dynamic = true; s.add(sl); sl.add(P.beam(70, 0.3, 7, '#eaf0ff', 0.5)); aimBeam(sl, new THREE.Vector3(0.3, 0.05, -1)); s.searchlight = sl; }
   const moon = new THREE.DirectionalLight('#9fb4ff', 0.9); moon.position.set(-20, 30, 10); s.add(moon);
-  for (let i = 0; i < 10; i++) { const l = P.gasLamp(true, 3.4); l.position.set(-40 + i * 12, 0, 1.5); s.add(l); }
+  for (let i = 0; i < 10; i++) { const l = P.gasLamp(true, 3.4, i % 3 === 1); l.position.set(-40 + i * 12, 0, 1.5); s.add(l); }
   return s;
 }
 // Close-up: the Aurora's forecastle with the bow gun (blank shot at 21:40, 25 Oct / 7 Nov 1917).
@@ -395,7 +429,7 @@ export function ipatievNight() {
 export function steppe(light = 'snow', { snowing = false } = {}) {
   const s = rStage(light, SNOW, { seed: 421, bumps: 0.6 });
   s.add(P.track(240, { snow: true }));
-  const tr = new THREE.Group(); tr.position.set(0, 0, 6); s.add(tr); s.train = tr;
+  const tr = new THREE.Group(); tr.position.set(0, 0, 6); tr.userData.dynamic = true; s.add(tr); s.train = tr;
   const lo = P.locomotive({ color: '#2f3a2c', trim: '#3f4a36' }); tr.add(lo); lo.add(at(box(2.2, 1.9, 5.2, '#3f4a36'), 0, 2.0, 0.6));
   const star = P.canvasTex(256, 256, (x) => { x.fillStyle = '#c0272d'; x.beginPath(); for (let i = 0; i < 10; i++) { const a = -Math.PI / 2 + i * Math.PI / 5, r = i % 2 ? 48 : 118; x.lineTo(128 + Math.cos(a) * r, 136 + Math.sin(a) * r); } x.closePath(); x.fill(); });
   const sp = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 1.4), new THREE.MeshStandardMaterial({ map: star, transparent: true })); sp.position.set(0, 2.1, 3.57); lo.add(sp);
@@ -458,9 +492,9 @@ export function redSquare(light = 'snowDusk', { year = 1924 } = {}) {
   const sb = P.stBasil(); sb.position.set(44, 0, -4); sb.rotation.y = -0.4; s.add(sb);
   const sen = new THREE.Group(); sen.add(at(box(26, 8, 10, '#e3c27a'), 0, 4, 0)); sen.add(at(cyl(5, 5, 3, '#efe6d0', 24), 0, 9.5, 0)); sen.add(at(LP.mesh(new THREE.SphereGeometry(5.2, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2), std('#3f6a4a', { roughness: 0.5 })), 0, 11, 0));
   const pole = cyl(0.08, 0.08, 6, '#2a2a2a', 6); pole.position.set(0, 18, 0); sen.add(pole);
-  const fg = new THREE.Mesh(new THREE.PlaneGeometry(3, 2, 10, 4), new THREE.MeshStandardMaterial({ map: P.sovietTex(), side: THREE.DoubleSide })); fg.position.set(1.55, 20, 0); sen.add(fg); s.sovietFlag = fg;
+  const fg = new THREE.Mesh(new THREE.PlaneGeometry(3, 2, 10, 4), new THREE.MeshStandardMaterial({ map: P.sovietTex(), side: THREE.DoubleSide })); fg.position.set(1.55, 20, 0); fg.userData.dynamic = true; sen.add(fg); s.sovietFlag = fg;
   sen.position.set(0, 0, -40); s.add(sen); s.senate = sen;
-  const mz = P.woodenMausoleum(); mz.position.set(0, 0, -19.5); s.add(mz); s.mausoleum = mz;
+  const mz = P.woodenMausoleum(); mz.position.set(0, 0, -19.5); mz.userData.dynamic = true; s.add(mz); s.mausoleum = mz;
   s.fires = [[-14, -8], [-4, -2], [8, -4], [18, -10], [-20, 0]].map(([x, z], i) => { const f = P.bonfire(1, i + 3); f.position.set(x, 0, z); s.add(f); ticker(s).push(t => f.update(t)); return f; });
   return s;
 }
@@ -526,7 +560,7 @@ export function trotskyFort(light = 'night') {
   s.add(at(box(80, 0.02, 7, '#5a554c'), 0, 0.011, 6));
   const h = P.trotskyHouse(); h.position.set(0, 0, -2); s.add(h); s.house = h;
   const holes = P.canvasTex(512, 256, (x, W, H) => { const r = LP.rng(5); for (let i = 0; i < 70; i++) { const px = W * 0.2 + r() * W * 0.6, py = H * 0.2 + r() * H * 0.6; x.fillStyle = 'rgba(30,24,20,0.85)'; x.beginPath(); x.arc(px, py, 3 + r() * 4, 0, 7); x.fill(); x.strokeStyle = 'rgba(120,110,96,0.6)'; x.lineWidth = 2; x.beginPath(); x.arc(px, py, 7 + r() * 4, 0, 7); x.stroke(); } });
-  const hp = new THREE.Mesh(new THREE.PlaneGeometry(9, 4.2), new THREE.MeshStandardMaterial({ map: holes, transparent: true, roughness: 0.9 })); hp.position.set(-1.5, 2.6, -1.68); s.add(hp); s.holes = hp; hp.visible = false;
+  const hp = new THREE.Mesh(new THREE.PlaneGeometry(9, 4.2), new THREE.MeshStandardMaterial({ map: holes, transparent: true, roughness: 0.9 })); hp.position.set(-1.5, 2.6, -1.68); hp.userData.dynamic = true; s.add(hp); s.holes = hp; hp.visible = false;
   const l = P.gasLamp(night, 3.8); l.position.set(-9, 0, 3.2); s.add(l);
   LP.scatter(s, (r, i) => (i % 3 ? P.jacaranda(1.1 + r() * 0.3, i) : P.palm(1.2, i)), 14, [-40, -30, 40, -6], 482, [[0, -2, 11]]);
   return s;
@@ -601,7 +635,7 @@ export function fieldCamp(light = 'day') {
 export function railLand(light = 'day') {
   const s = rStage(light, ['#8aa05a', '#7c9250'], { seed: 521, bumps: 0.5 });
   const tr = P.track(260); tr.rotation.y = Math.PI / 2; s.add(tr);
-  const train = P.trainSet(3, i => ({ color: '#3f5a40', lit: false, band: '#d9c9a0' })); train.rotation.y = Math.PI / 2; s.add(train); s.train = train;
+  const train = P.trainSet(3, i => ({ color: '#3f5a40', lit: false, band: '#d9c9a0' })); train.rotation.y = Math.PI / 2; train.userData.dynamic = true; s.add(train); s.train = train;
   LP.scatter(s, (r, i) => (i % 3 ? LP.birch(1.3 + r() * 0.5, i) : LP.pine(1.5 + r() * 0.5, '#2f4a3a', i)), 90, [-90, -70, 90, 50], 522, [[0, 0, 7], [-40, 0, 7], [40, 0, 7], [80, 0, 7], [-80, 0, 7], [-5, 9, 8], [0, 12, 9]]);
   for (let i = 0; i < 6; i++) { const h = NP.izba(i + 40); h.position.set(-30 + i * 13, 0, -16 - (i % 2) * 4); h.rotation.y = 0.2 * (i % 3); s.add(h); }
   const tg = MX.telegraph(16, 9); tg.position.set(-70, 0, -4.5); s.add(tg);

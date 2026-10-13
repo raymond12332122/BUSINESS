@@ -12,6 +12,8 @@ import { leader, NAMES } from '../leaders.js';
 export async function preload() {}
 const fade = (t, a, b, f = 0.35) => ss(a, a + f, t) * (1 - ss(b - f, b, t));
 
+const fz = (arr, poseFn, keep = () => false, face = 'neutral') => arr.forEach((c, i) => { if (keep(i)) return; c.setFace('open', face); K.freeze(c, poseFn(i)); });
+
 export function build(ctx) {
   const L = ctx.L;
   const tOcho = wt(L[0], 'ocho'), tMujer = wt(L[0], 'mujer'), tPan = wt(L[0], 'pan'), tPocos = wt(L[0], 'pocos'), tHuelga = wt(L[0], 'huelga');
@@ -27,10 +29,12 @@ export function build(ctx) {
   const St2 = S.petroStreet('snow', { bakery: false });
   const mass = K.crowd(St2, ['obrero', 'obrera', 'obrero', 'obrera', 'campesino', 'guardiaRoja'], 46, [-4.2, -16, 4.2, -2], { seed: 72 });
   const flags2 = [[-2.6, -5], [1.8, -8], [-0.6, -11.5], [2.9, -13.5], [-3.2, -14.5]].map(([x, z], i) => { const f = P.redFlag(2.2, 0.9, 0.55); f.position.set(x, 0, z); St2.add(f); return f; });
+  fz(mass, i => i % 3 === 0 ? A.rally(0.2 + i * 0.13, i) : i % 3 === 1 ? C.idle(0.3, i) : A.proud(0.3, i), () => false, 'open');
   // ---- 3. Soldiers join the crowd
   const St3 = S.petroStreet('snow', { bakery: false });
   const joined = K.crowd(St3, ['soldadoRevolucion', 'obrero', 'soldadoRevolucion', 'obrera', 'soldadoRevolucion'], 24, [-3.6, -9, 3.6, -2.5], { seed: 73 });
   const flags3 = [[-1.8, -4.2], [2.2, -6.5]].map(([x, z]) => { const f = P.redFlag(2.2, 0.9, 0.55); f.position.set(x, 0, z); St3.add(f); return f; });
+  fz(joined, i => i % 5 !== 1 && i % 5 !== 3 ? (i % 2 ? { ...A.rally(0.4 + i * 0.1, i), gun: 'back' } : { ...C.cheer(0.4 + i * 0.1, i), gun: 'back' }) : C.cheer(0.3 + i * 0.1, i), i => i % 2 === 0, 'open');
   // ---- 4. Pskov: the imperial train
   const Ps = S.pskovStation();
   const guards = [[3.3, -6.2, 0.3], [3.5, -11.2, 0.5]].map(([x, z, y], i) => { const g = K.person(Ps, ['oguri', 'doto'][i], 'soldadoInvierno', x, z, y); g.root.position.y = Ps.platform.top; return g; });
@@ -46,6 +50,7 @@ export function build(ctx) {
   const deps = []; for (let r = 0; r < 6; r++) for (let i = 0; i < 6; i++) for (const sd of [-1, 1]) { if ((r * 7 + i * 3 + (sd > 0)) % 4 === 0) continue; const [x, y, z] = Sv.seatsAt(r, i, sd);
     const d = K.person(Sv, ['doto', 'oguri', 'helios', 'suzuka', 'mcqueen', 'daiwa', 'cafe', 'tamamo'][(r * 6 + i + (sd > 0 ? 3 : 0)) % 8], ['obrero', 'soldadoRevolucion', 'obrera', 'marinero', 'soldadoRevolucion'][(r + i * 2) % 5], x, z, Math.PI); d.root.position.y = y; deps.push(d); }
   const orator = K.person(Sv, 'helios', 'soldadoRevolucion', 0, -7.05, 0); orator.root.position.y = 0.36;
+  fz(deps, i => A.sit(0.4, i));
 
   const tB = tPocos - 0.3, tC = L[1].t0 - 0.3, tD = tZar - 0.3, tE = tTerm - 0.4, tF = L[2].t0 - 0.3, tG = tDos - 0.5, tH = tSov - 0.6;
   const sfx = [{ t: 0.0, type: 'crowd', dur: tD, vol: 0.38 }, { t: 0.5, type: 'wind', dur: tB, vol: 0.25 }, { t: tB, type: 'drums', dur: tC - tB, vol: 0.3 }, { t: tC + 0.3, type: 'cheer', vol: 0.45 },
@@ -98,6 +103,7 @@ export function build(ctx) {
     } },
   ];
   const inst = { scene: St, scenes: [St, St2, St3, Ps, Th, Sq, Du, Sv], sfx };
+  S.bakeAll(inst.scenes);
   inst.update = t => runShots(inst, ctx, shots, t);
   return inst;
 }

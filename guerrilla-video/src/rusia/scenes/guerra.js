@@ -14,6 +14,8 @@ export { preload } from '../rmap.js';
 const fade = RM.fade;
 const FRONT = [[24.1, 57.2], [24.6, 56.6], [26.4, 55.6], [26.6, 54.6], [26.2, 53.4], [25.8, 52.3], [26.3, 51.5], [25.4, 50.6], [25.6, 49.6], [25.9, 48.4], [26.6, 47.7]];
 
+const fz = (arr, poseFn, keep = () => false, face = 'neutral') => arr.forEach((c, i) => { if (keep(i)) return; c.setFace('open', face); K.freeze(c, poseFn(i)); });
+
 export function build(ctx) {
   const L = ctx.L;
   const tPrim = wt(L[0], 'primera'), tMov = wt(L[0], 'movilizo'), tQuince = wt(L[0], 'quince'), tMal = wt(L[0], 'mal');
@@ -48,6 +50,7 @@ export function build(ctx) {
   // ---- 8. Bread line in the snow
   const St = S.petroStreet('snow', { snowing: true });
   const queue = K.crowd(St, ['obrera', 'obrera', 'campesina', 'obrera'], 12, [-5.9, -3.4, -5.1, 6.5], { seed: 61, yaw: Math.PI });
+  fz(queue, i => A.cold(0.3 + i * 0.07, i), i => i < 3, 'wavy');
 
   const tB = tMov - 0.35, tC = tMal - 0.35, tD = L[1].t0 - 0.3, tE = tZar - 0.35, tF = L[2].t0 - 0.3, tG = tNob - 0.35, tH = tInv - 0.6;
   const sfx = [{ t: 0.2, type: 'whoosh', vol: 0.4 }, { t: tPrim, type: 'boom', vol: 0.4 }, { t: tB, type: 'march', dur: tC - tB, vol: 0.45 }, { t: tQuince, type: 'pop', vol: 0.4 },
@@ -101,6 +104,7 @@ export function build(ctx) {
     } },
   ];
   const inst = { scene: Mp, scenes: [Mp, R, T, G, Sk, Z, Nv, St], sfx };
+  S.bakeAll(inst.scenes);
   inst.update = t => runShots(inst, ctx, shots, t);
   return inst;
 }

@@ -21,6 +21,8 @@ const WHITE = {
   west: [[26.8, 57.6], [28.2, 59.4], [29.6, 59.0], [29.0, 57.8]],
 };
 
+const fz = (arr, poseFn, keep = () => false, face = 'neutral') => arr.forEach((c, i) => { if (keep(i)) return; c.setFace('open', face); K.freeze(c, poseFn(i)); });
+
 export function build(ctx) {
   const L = ctx.L;
   const tGuerra = wt(L[0], 'guerra'), tRojo = wt(L[0], 'rojo'), tBlanco = wt(L[0], 'blanco'), tGen = wt(L[0], 'generales'), tCons = wt(L[0], 'conservadores'), tLib = wt(L[0], 'liberales'), tApoyo = wt(L[0], 'apoyo'), tExt = wt(L[0], 'extranjeras');
@@ -35,11 +37,13 @@ export function build(ctx) {
   Wh.train.visible = false;
   const gen = leader(Wh, 'blanco', 0, -1.5, 0.15);
   const whites = K.crowd(Wh, ['soldadoBlanco', 'cosaco', 'oficialZar', 'soldadoBlanco'], 14, [-3.2, -5.5, 3.2, -2.5], { seed: 111 });
+  fz(whites, i => A.guard(0.3 + i * 0.1, i));
   // ---- 4. Trotsky and the Red Army by the armoured train
   const Rt = S.steppe('snow', { snowing: true });
   const tro = leader(Rt, 'trotskiRojo', 2.2, -9.0, Math.PI / 2 - 0.2);
   const army = K.crowd(Rt, ['ejercitoRojo', 'ejercitoRojo', 'ejercitoRojo', 'guardiaRoja'], 20, [3.8, -13.5, 8.6, -5.5], { seed: 112 });
   army.forEach(a => { a.root.rotation.y = Math.atan2(2.2 - a.root.position.x, -9.0 - a.root.position.z); });
+  fz(army, i => A.guard(0.3 + i * 0.1, i), i => i % 4 === 0);
   // ---- 5. The Cheka
   const Ch = S.chekaOffice();
   const chek = K.person(Ch, 'oguri', 'chekista', Ch.seat[0], Ch.seat[2], 0); chek.root.position.y = Ch.seat[1];
@@ -102,6 +106,7 @@ export function build(ctx) {
     } },
   ];
   const inst = { scene: Mp, scenes: [Mp, Wh, Rt, Ch, Mw, V], sfx };
+  S.bakeAll(inst.scenes);
   inst.update = t => runShots(inst, ctx, shots, t);
   return inst;
 }

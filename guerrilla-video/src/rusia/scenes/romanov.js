@@ -41,6 +41,7 @@ export function build(ctx) {
     } },
   ];
   const inst = { scene: H, scenes: [H, B], sfx };
+  S.bakeAll(inst.scenes);
   inst.update = t => runShots(inst, ctx, shots, t);
   return inst;
 }

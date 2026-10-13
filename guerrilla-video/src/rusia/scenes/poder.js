@@ -13,6 +13,8 @@ import { leader, NAMES } from '../leaders.js';
 export { preload } from '../rmap.js';
 const fade = RM.fade;
 
+const fz = (arr, poseFn, keep = () => false, face = 'neutral') => arr.forEach((c, i) => { if (keep(i)) return; c.setFace('open', face); K.freeze(c, poseFn(i)); });
+
 export function build(ctx) {
   const L = ctx.L;
   const tMay = wt(L[0], 'mayoria'), tElec = wt(L[0], 'eleccion'), tAsam = wt(L[0], 'asamblea'), tVein = wt(L[0], 'veinticuatro'), tCuar = wt(L[0], 'cuarenta'), tSoc = wt(L[0], 'socialistas');
@@ -29,6 +31,7 @@ export function build(ctx) {
     const d = K.person(Ca, ['doto', 'oguri', 'helios', 'suzuka', 'mcqueen', 'daiwa', 'cafe', 'tamamo'][(r * 6 + i + (sd > 0 ? 5 : 0)) % 8], ['delegado', 'campesino', 'delegado', 'obrero'][(r + i) % 4], x, z, Math.PI); d.root.position.y = y; d.seat = [x, y, z]; deps.push(d); }
   const sailors = [[-3.4, 2.6], [3.4, 2.4], [-3.6, -1.0], [3.6, -1.4]].map(([x, z], i) => K.person(Ca, ['doto', 'oguri', 'tamamo', 'helios'][i], 'marinero', x, z, x < 0 ? Math.PI / 2 : -Math.PI / 2));
   const chief = K.person(Ca, 'suzuka', 'marinero', 0.2, -6.9, 0); chief.root.position.y = 0.36;
+  fz(deps, i => A.sit(0.4, i), i => i % 3 === 0);
   // ---- 4. Brest-Litovsk: the treaty
   const Tr = S.treatyRoom();
   const ger = [0, 1, 2, 3].map(i => { const [x, y, z] = Tr.seats(i, -1); const g = K.person(Tr, ['mcqueen', 'daiwa', 'suzuka', 'tamamo'][i], 'oficialAleman', x, z, 0); g.root.position.y = y; return g; });
@@ -80,6 +83,7 @@ export function build(ctx) {
     } },
   ];
   const inst = { scene: Vo, scenes: [Vo, Ca, Tr, Mp], sfx };
+  S.bakeAll(inst.scenes);
   inst.update = t => runShots(inst, ctx, shots, t);
   return inst;
 }

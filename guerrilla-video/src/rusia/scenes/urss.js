@@ -14,6 +14,8 @@ export { preload } from '../rmap.js';
 const fade = RM.fade;
 const EXILE = [[37.62, 55.75], [33.5, 51.5], [30.73, 46.48], [30.2, 43.6], [28.98, 41.01]];
 
+const fz = (arr, poseFn, keep = () => false, face = 'neutral') => arr.forEach((c, i) => { if (keep(i)) return; c.setFace('open', face); K.freeze(c, poseFn(i)); });
+
 export function build(ctx) {
   const L = ctx.L;
   const tVein = wt(L[0], 'veintiuno'), tLen = wt(L[0], 'lenin'), tApl = wt(L[0], 'aplasto'), tKron = wt(L[0], 'kronstat'), tLibres = wt(L[0], 'libres'), tPerm = wt(L[0], 'permitio'), tCom = wt(L[0], 'comercio');
@@ -28,11 +30,13 @@ export function build(ctx) {
   const Nm = S.nepMarket('overcast');
   const buyers = K.crowd(Nm, ['obrera', 'obrero', 'campesina', 'delegado', 'campesino'], 16, [-2.6, -14, 2.6, 0], { seed: 122 });
   buyers.forEach((b, i) => { b.root.rotation.y = i % 2 ? Math.PI / 2 : -Math.PI / 2; });
+  fz(buyers, i => i % 3 === 0 ? C.offer(0.3, i, 0.6) : A.talk(0.3 + i * 0.1, i));
   // ---- 3. Map: the USSR (30 December 1922)
   const Mp = RM.russiaMap({ period: 1922 });
   // ---- 4. Red Square, January 1924
   const Rs = S.redSquare('snowDusk');
   const mourners = K.crowd(Rs, ['obrero', 'obrera', 'soldadoRevolucion', 'ejercitoRojo', 'campesino'], 36, [-12, -14, 6, -4], { seed: 123, yaw: Math.PI });
+  fz(mourners, i => A.cold(0.3 + i * 0.07, i), () => false, 'flat');
   const mflags = [[-9, -9], [-3, -12], [3, -8]].map(([x, z], i) => { const f = P.redFlag(2.4, 0.9, 0.55); f.position.set(x, 0, z); Rs.add(f); const band = LP_band(); band.position.set(0.04, 2.4 - 0.05, 0); f.add(band); return f; });
   // ---- 5. Lenin's testament (the Kremlin at night)
   const Kn = S.kremlinNight({ snowing: true });
@@ -85,6 +89,7 @@ export function build(ctx) {
     } },
   ];
   const inst = { scene: Kr, scenes: [Kr, Nm, Mp, Rs, Kn, So, Me], sfx };
+  S.bakeAll(inst.scenes);
   inst.update = t => runShots(inst, ctx, shots, t);
   return inst;
 }
