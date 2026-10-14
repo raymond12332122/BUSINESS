@@ -179,8 +179,6 @@ export function battery(light = 'overcast', { n = 3 } = {}) {
   s.guns = [];
   for (let i = 0; i < n; i++) { const h = P.howitzer(); h.position.set(-8 + i * 8, 0, -4 - (i % 2) * 2); h.rotation.y = -Math.PI / 2 + 0.15; h.userData.dynamic = true; s.add(h); s.guns.push(h);
     for (let k = 0; k < 5; k++) s.add(at(cyl(0.11, 0.11, 0.5, '#8a7a3a', 10), -8 + i * 8 + 1.6 + (k % 3) * 0.26, 0.25, -2.2 - Math.floor(k / 3) * 0.3)); s.add(at(box(0.9, 0.4, 0.5, '#5a4a32'), -8 + i * 8 - 1.8, 0.2, -2.4)); }
-  const net = mesh(new THREE.PlaneGeometry(30, 10, 10, 4), std('#5a5a3c', { side: THREE.DoubleSide, transparent: true, opacity: 0.85 })); net.rotation.x = -Math.PI / 2 + 0.1; net.position.set(0, 3.2, -5); s.add(net);
-  for (let k = 0; k < 6; k++) s.add(at(cyl(0.06, 0.06, 3.2, '#5a4a32', 6), -14 + k * 5.6, 1.6, -8));
   LP.scatter(s, (rr, i) => deadTree(0.8 + rr() * 0.5, i), 16, [-60, -80, 60, -20], 822);
   return s;
 }
@@ -250,7 +248,8 @@ export function gallipoli(light = 'morning') {
   s.sea = water(s, { color: '#3f7a90', y: -0.05, z: 60, d: 110 });
   const cliffs = new THREE.Group(); s.add(cliffs);
   const r = rng(1032);
-  for (let i = 0; i < 14; i++) { const h = 9 + r() * 8; const m = mesh(new THREE.ConeGeometry(6 + r() * 5, h, 7), std(i % 2 ? '#b89a6a' : '#a88a5c', { flatShading: true })); m.position.set(-50 + i * 7.5, h / 2 - 1, -10 - r() * 6); m.scale.z = 0.6; cliffs.add(m); }
+  for (let i = 0; i < 26; i++) { const h = 5 + r() * 5; const m = mesh(new THREE.IcosahedronGeometry(1, 1), std(['#b89a6a', '#a88a5c', '#9a8a5a'][i % 3], { flatShading: true })); m.scale.set(6 + r() * 4, h, 4 + r() * 2); m.position.set(-60 + i * 4.8, h * 0.45 - 0.5, -13 - r() * 5); m.rotation.y = r() * 3; cliffs.add(m); }
+  for (let i = 0; i < 12; i++) { const m = mesh(new THREE.IcosahedronGeometry(1, 1), std('#6a7a44', { flatShading: true })); m.scale.set(3 + r() * 3, 2 + r() * 2, 2); m.position.set(-55 + i * 10, 7 + r() * 3, -17 - r() * 3); cliffs.add(m); }
   LP.scatter(s, (rr, i) => LP.bush(0.8 + rr() * 0.6, '#6a7a44', i), 70, [-50, -16, 50, -5], 1033);
   s.boats = [];
   for (let i = 0; i < 4; i++) { const b = NP.rowboat ? NP.rowboat('#5a4632') : box(3, 0.6, 1.2, '#5a4632'); b.position.set(-9 + i * 6, 0.05, 10 + (i % 2) * 3); b.rotation.y = Math.PI / 2; b.userData.dynamic = true; s.add(b); s.boats.push(b); }
@@ -293,6 +292,7 @@ export function room40() {
     const pp = RP.papers(6, x * 3 | 0); pp.position.set(x, t.top, z + 0.05); s.add(pp); }
   const cb = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.0), new THREE.MeshStandardMaterial({ map: P.cipherTex(), roughness: 0.9 })); cb.position.set(-4.95, 1.6, -0.5); cb.rotation.y = Math.PI / 2; s.add(cb);
   s.seatsAt = (i) => { const t = s.tables[i % 2]; return [t.position.x + (Math.floor(i / 2) - 0.5) * 0.9, 0.08, t.position.z + 0.62]; };
+  for (let i = 0; i < 4; i++) { const [x, , z] = s.seatsAt(i); const c = RP.chairR('#4a3020', '#5a4a3a'); c.position.set(x, 0, z + 0.05); c.rotation.y = Math.PI; s.add(c); }
   return s;
 }
 // The US Congress: rostrum with flags and an eagle, rows of desks.

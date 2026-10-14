@@ -58,3 +58,13 @@ export function pin(ctx, pos, title, sub = '', k = 1, col = '#ffb627') {
   return `<div style="position:absolute;left:${x}px;top:${y}px;transform:translate(-50%,-100%) translateY(-10px) scale(${0.85 + 0.15 * k});opacity:${k};text-align:center;padding:7px 15px;border-radius:10px;background:rgba(20,22,28,.9);border-bottom:4px solid ${col};white-space:nowrap">
     <div style="font:900 25px 'Inter Display',Inter;color:#fff">${title}</div>${sub ? `<div style="font:700 18px Inter;color:#e6e0d4;margin-top:2px">${sub}</div>` : ''}</div>`;
 }
+// Single calendar page (label above).
+export function datePage(t, a, b, label, mon, day, yr, { x = 960, y = 120, accent = '#7a2a24', w = 280 } = {}) {
+  const k = K(t, a, b); if (k <= 0) return '';
+  return `<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;transform:translateX(-50%) translateY(${(1 - k) * 20}px);opacity:${k}">
+    ${label ? `<div style="font:800 22px Inter;color:#f2ede2;text-align:center;margin-bottom:10px;letter-spacing:.04em;text-shadow:0 2px 10px rgba(0,0,0,.6)">${label}</div>` : ''}
+    <div style="background:#f3ead6;border-radius:12px;overflow:hidden;box-shadow:0 14px 34px rgba(0,0,0,.4)">
+      <div style="background:${accent};color:#fff;font:900 28px Inter;letter-spacing:.18em;text-align:center;padding:10px 0">${mon}</div>
+      <div style="font:900 112px/1.05 'Inter Display',Inter;color:#1f1a16;text-align:center;padding-top:4px">${day}</div>
+      <div style="font:800 28px Inter;color:#6b5a48;text-align:center;padding-bottom:14px">${yr}</div></div></div>`;
+}
