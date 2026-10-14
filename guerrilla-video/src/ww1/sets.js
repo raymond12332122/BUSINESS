@@ -8,6 +8,7 @@ import * as RP from '../rusia/props.js';
 import * as RS from '../rusia/sets.js';
 import * as W2 from '../ww2/kit.js';
 import * as P from './props.js';
+import { mood } from '../lib/stage.js';
 
 export const { bake, bakeAll, room, rStage, stars, aimBeam, isNight } = RS;
 export { RS };
@@ -341,16 +342,17 @@ export function cemetery(light = 'golden', { rows = 9, cols = 15 } = {}) {
 // Spring 1918 / Amiens: open rolling field with mist, for advancing tanks and stormtroopers.
 export function openField(light = 'morning', { mist = false, green = 0.5 } = {}) {
   const s = craterField(light, { n: 70, size: 160, stumps: 20, green, depth: 0.35, color: ['#7a6a4e', '#6a5a42'], seed: 1111 });
-  if (mist) s.fog = new THREE.Fog('#d8d0c0', 8, 60);
+  if (mist) mood(s, { skyTop: '#aeb4b4', skyHor: '#d6d2c6', fog: ['#d6d2c6', 7, 48] });
   return s;
 }
 // Forest of Compiègne: the railway carriage in the clearing (track along x).
 export function compiegne(light = 'dawn') {
-  const s = stage(light === 'dawn' ? 'morning' : light, ['#6a7a48', '#5e6e40'], { seed: 1121 });
+  const night = isNight(light);
+  const s = stage(light === 'dawn' ? 'morning' : light, night ? ['#2e3626', '#283020'] : ['#6a7a48', '#5e6e40'], { seed: 1121 });
   const tr = RP.track(80); tr.rotation.y = Math.PI / 2; s.add(tr);
   const car = RP.railCar({ color: '#3a2a20', len: 11, lit: true, band: '#c9a227' }); car.rotation.y = Math.PI / 2; s.add(car); s.car = car;
   LP.scatter(s, (r, i) => (i % 2 ? LP.pine(2.0 + r() * 0.6, '#2f4a32', i) : LP.roundTree(2.0 + r() * 0.5, '#3f5a32', i)), 140, [-60, -50, 60, 40], 1122, [[0, 0, 9], [-10, 0, 8], [10, 0, 8], [0, 9, 8]]);
-  s.fog = new THREE.Fog('#c8ccc0', 10, 70);
+  s.fog = night ? new THREE.Fog('#10141e', 9, 46) : new THREE.Fog('#c8ccc0', 10, 70);
   return s;
 }
 // Inside Foch's carriage: long table with green cloth, both delegations.
@@ -358,8 +360,12 @@ export function wagonInterior() {
   const s = room({ w: 9, d: 3.2, h: 2.3, wall: '#6a4a30', lower: '#3a2618', lowerH: 0.8, floor: '#4a3020', ceil: '#e8dcc0', hemi: 0.8, sunI: 0.4, bg: '#0c0a08', trim: '#c9a227',
     lights: [[-2.0, 2.0, 0.2, 2.2, '#ffd9a0', 8], [2.0, 2.0, 0.2, 2.2, '#ffd9a0', 8]] });
   for (const x of [-3, -1, 1, 3]) wallWindow(s, x, 1.3, -1.59, { w: 0.8, h: 0.7, out: '#8a9aa8', frame: '#3a2618' });
+  // the room() box is open towards +z: close the carriage with its corridor-side wall
+  s.add(at(box(9, 2.3, 0.06, '#6a4a30'), 0, 1.15, 1.63)); s.add(at(box(9, 0.8, 0.04, '#3a2618'), 0, 0.4, 1.59)); s.add(at(box(9, 0.06, 0.04, '#c9a227'), 0, 2.12, 1.59));
+  for (const x of [-3, -1, 1, 3]) wallWindow(s, x, 1.3, 1.585, { w: 0.8, h: 0.7, out: '#5a6878', frame: '#3a2618', ry: Math.PI });
   const tb = RP.tableCloth(4.2, 1.1, '#2f5a3a', 0.78, 0.5); tb.position.set(0, 0, -0.5); s.add(tb); s.table = tb;
   const pp = RP.papers(4, 7); pp.position.set(0, tb.top, -0.45); s.add(pp);
+  for (let i = 0; i < 4; i++) for (const sd of [-1, 1]) { const c = RP.chairR('#3a2618', '#6a2a24'); c.position.set(-1.2 + i * 0.8, 0, -0.5 + sd * 0.6); c.rotation.y = sd > 0 ? Math.PI : 0; s.add(c); }
   s.seats = (i, side) => [-1.2 + i * 0.8, 0.08, -0.5 + side * 0.55];
   return s;
 }
@@ -369,7 +375,7 @@ export function portFrance(light = 'overcast') {
   water(s, { color: '#5f7f8a', y: -0.6, z: -30, d: 50 });
   s.add(at(box(200, 0.6, 1.2, '#8a8478'), 0, -0.3, -5.6));
   const sh = MX.steamship('#3a3e44', { funnels: 2, funnel: '#3a3e44' }); sh.rotation.y = Math.PI / 2; sh.scale.setScalar(2.2); sh.position.set(2, -1.0, -10); s.add(sh); s.ship = sh;
-  for (let k = 0; k < 2; k++) { const g = new THREE.Group(); g.add(at(box(0.9, 0.06, 4.6, '#6a5a44'), 0, 0.9, -2.3, 0.35, 0, 0)); g.position.set(-2 + k * 6, 0, -3.4); s.add(g); }
+  { const g = new THREE.Group(); g.add(at(box(0.9, 0.06, 4.6, '#6a5a44'), 0, 0.9, -2.3, 0.35, 0, 0)); g.position.set(-2, 0, -3.4); s.add(g); }
   for (let k = 0; k < 6; k++) s.add(at(box(1.2, 0.9, 0.9, '#7a6a4a'), -14 + k * 2.4, 0.45, 2.6 + (k % 2)));
   for (let k = 0; k < 4; k++) { const c = box(0.5, 6, 0.5, '#3a3a3a'); c.position.set(-20 + k * 14, 3, -4.6); s.add(c); s.add(at(box(6, 0.4, 0.4, '#3a3a3a'), -20 + k * 14 + 2.5, 6, -4.6)); }
   s.flags = [P.FLAGS.usa, P.FLAGS.fra].map((f, i) => { const fl = P.flagPole(f, { h: 3.4, w: 1.2, fh: 0.8 }); fl.position.set(-6 + i * 12, 0, 1.0); s.add(fl); return fl; });

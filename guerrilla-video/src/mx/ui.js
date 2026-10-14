@@ -27,13 +27,13 @@ export function shout(t, text, a, b, top = 300) {
   return `<div class="shout" style="top:${top}px;opacity:${k};transform:scale(${sc})">${text}</div>`;
 }
 // Newspaper front page spinning in (classic newsreel trope).
-export function newspaper(t, a, b, { mast = 'EL IMPARCIAL', date = '', head = '', sub = '', x = 50 } = {}) {
+export function newspaper(t, a, b, { mast = 'EL IMPARCIAL', date = '', head = '', sub = '', x = 50, price = 'Precio: 1 centavo' } = {}) {
   const k = ss(a, a + 0.6, t), o = k * (1 - ss(b - 0.3, b, t)); if (o <= 0) return '';
   const rot = (1 - k) * 540 - 4, sc = 0.15 + 0.85 * k;
   return `<div style="position:absolute;left:${x}%;top:46%;width:700px;padding:26px 34px 30px;background:#efe6cf;color:#1f1a16;box-shadow:0 18px 50px rgba(0,0,0,.45);
     transform:translate(-50%,-50%) rotate(${rot}deg) scale(${sc});opacity:${o};font-family:Georgia,'Times New Roman',serif">
     <div style="text-align:center;font:900 64px/1 Georgia,serif;letter-spacing:.04em;border-bottom:4px double #1f1a16;padding-bottom:10px">${mast}</div>
-    <div style="display:flex;justify-content:space-between;font:italic 600 18px Georgia,serif;border-bottom:2px solid #1f1a16;padding:6px 0;margin-bottom:14px"><span>${date}</span><span>Precio: 1 centavo</span></div>
+    <div style="display:flex;justify-content:space-between;font:italic 600 18px Georgia,serif;border-bottom:2px solid #1f1a16;padding:6px 0;margin-bottom:14px"><span>${date}</span><span>${price}</span></div>
     <div style="text-align:center;font:900 76px/1.02 Georgia,serif">${head}</div>
     <div style="text-align:center;font:italic 600 26px/1.3 Georgia,serif;margin-top:12px">${sub}</div>
     <div style="display:flex;gap:16px;margin-top:16px">${[0, 1, 2].map(() => `<div style="flex:1">${'<div style="height:7px;background:#b9ad93;margin:7px 0"></div>'.repeat(5)}</div>`).join('')}</div></div>`;

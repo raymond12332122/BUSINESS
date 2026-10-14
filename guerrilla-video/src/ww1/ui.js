@@ -48,7 +48,7 @@ export function clock(t, a, b, hh, mm, { x = 1560, y = 170, size = 220 } = {}) {
 // Red diagonal strike-through over a label-like card (fallen empires).
 export function struck(t, a, b, items, tStrike, { top = 150 } = {}) {
   const k = K(t, a, b); if (k <= 0) return '';
-  return `<div style="position:absolute;left:0;right:0;top:${top}px;display:flex;justify-content:center;gap:18px;opacity:${k}">${items.map(([txt, tt], i) => { const o = ss(tt, tt + 0.3, t), st = ss(tStrike + i * 0.25, tStrike + i * 0.25 + 0.3, t);
+  return `<div style="position:absolute;left:0;right:0;top:${top}px;display:flex;justify-content:center;gap:18px;opacity:${k}">${items.map(([txt, tt, ts = tStrike + i * 0.25], i) => { const o = ss(tt, tt + 0.3, t), st = ss(ts, ts + 0.3, t);
     return `<div style="position:relative;padding:12px 22px;${PANEL};opacity:${o};transform:translateY(${(1 - o) * 12}px)"><div style="font:900 30px 'Inter Display',Inter;color:#f2ede2;opacity:${1 - 0.45 * st}">${txt}</div>
       <div style="position:absolute;left:10px;right:10px;top:50%;height:6px;background:#d4362a;transform:scaleX(${st});transform-origin:left;border-radius:3px"></div></div>`; }).join('')}</div>`;
 }
