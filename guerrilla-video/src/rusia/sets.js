@@ -43,7 +43,7 @@ export function stars(s, n = 600) {
 export function aimBeam(g, dir) { g.quaternion.setFromUnitVectors(new THREE.Vector3(0, -1, 0), dir.clone().normalize()); }
 // Merge the static meshes of each set into one mesh per material (SwiftShader is bound by draw calls).
 // Skips skinned/instanced meshes, maps, anything under an object flagged userData.dynamic or exposing wave/update/aim/set.
-const isDyn = o => { for (let p = o; p; p = p.parent) { const u = p.userData; if (u && u.dynamic) return true; if (p !== o && (typeof p.wave === 'function' || typeof p.update === 'function' || typeof p.aim === 'function' || typeof p.set === 'function')) return true; } return false; };
+const isDyn = o => { for (let p = o; p; p = p.parent) { const u = p.userData; if (u && u.dynamic) return true; if (p !== o && !p.visible) return true; if (p !== o && (typeof p.wave === 'function' || typeof p.update === 'function' || typeof p.aim === 'function' || typeof p.set === 'function')) return true; } return false; };
 export function bake(s) {
   if (!s || s.mapGroup || s.userData.baked) return s;
   s.updateMatrixWorld(true);

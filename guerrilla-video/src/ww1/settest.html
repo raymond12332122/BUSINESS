@@ -1,0 +1,46 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style></head><body>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+// Set viewer for QA: window.show(name, [px,py,pz], [lx,ly,lz], fov, extras) builds (and caches) a set from sets.js and renders it.
+// extras: 'probe' adds two chibis; 'c=who/outfit/x/z/yaw/pose' adds one; 't=1.5' ticks animated bits to that time.
+import * as THREE from 'three';
+import * as C from '../lib/chars.js';
+import * as K from "./kit.js";
+import * as S from './sets.js';
+import * as A from './anim.js';
+import * as WM from './wmap.js';
+
+try {
+  const W = 1280, H = 720;
+  const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); r.setSize(W, H); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(r.domElement);
+  await C.loadCast(); await WM.preload();
+  const cache = {};
+  const cam = new THREE.PerspectiveCamera(38, W / H, 0.1, 900);
+  window.show = (name, p, l, fov = 38, extras = 'probe') => {
+    const key = name + '|' + extras;
+    if (!cache[key]) {
+      const [head, opt] = name.split('~'); const [fn, ...args] = head.split(':');
+      const A = args.map(a => (a === 'true' ? true : a === 'false' ? false : isNaN(+a) ? a : +a)); if (opt) A.push(JSON.parse(opt));
+      const s = fn === 'map' ? WM.europeMap({ period: A[0] || 1914 }) : S[fn](...A);
+      if (fn === 'map' && A[1]) { const sts = String(A[1]).split('+'); for (const st of sts) { const [n, c] = st.split('='); s.tintState(A[0] || 1914, n, '#' + c, 1, 0.85); } }
+      if (fn === 'map') { for (const k of Object.keys(WM.FRONT)) { const f = WM.front(s, WM.FRONT[k]); f.set(1); } for (const k of Object.keys(WM.ARROW)) { const a = WM.arrow(s, WM.ARROW[k], '#b8432f'); a.set(1); } }
+      if (extras.includes('probe')) {
+        const a = K.person(s, 'doto', 'tommy', -0.7, 0, 0); K.pose(a, C.idle(0.3, 1)); a.setFace('open', 'neutral');
+        const b = K.person(s, 'oguri', 'aleman', 0.7, 0, 0); K.pose(b, C.idle(0.3, 2)); b.setFace('open', 'smile');
+      }
+      for (const it of extras.split(',')) if (it.startsWith('c=')) { const [who, outfit, x, z, yaw, ps, y] = it.slice(2).split('/'); const c = K.person(s, who, outfit, +x || 0, +z || 0, +yaw || 0);
+        if (y) c.root.position.y = +y; K.pose(c, (A[ps] || C[ps || 'idle'] || C.idle)(0.3, 1)); c.setFace('open', 'smile');
+        if (extras.includes('dbg')) { c.root.updateMatrixWorld(true); const v = new THREE.Vector3(); const out = {}; for (const [k, J] of Object.entries(c.j)) { J.bone.getWorldPosition(v); out[k] = v.toArray().map(n => +n.toFixed(3)); } const bb = new THREE.Box3().setFromObject(c.root); console.log('BONES ' + ps + ' ' + JSON.stringify(out) + ' BOX ' + JSON.stringify([bb.min.toArray().map(n => +n.toFixed(3)), bb.max.toArray().map(n => +n.toFixed(3))])); } }
+      const tm = /t=([\d.]+)/.exec(extras); if (s.tick) s.tick(tm ? +tm[1] : 1.0);
+      if (s.sea?.wave) s.sea.wave(1.0);
+      cache[key] = s;
+    }
+    const s = cache[key];
+    cam.fov = fov; cam.position.set(...p); cam.lookAt(...l); cam.updateProjectionMatrix();
+    if (s.userData.sky) s.userData.sky.position.copy(cam.position);
+    r.render(s, cam);
+    return true;
+  };
+  window.__ready = true;
+} catch (e) { window.__error = String(e.stack || e); }
+</script></body></html>

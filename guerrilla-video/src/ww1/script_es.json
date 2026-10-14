@@ -1,0 +1,138 @@
+{
+ "scenes": [
+  {
+   "id": "title",
+   "lead": 1.4,
+   "tail": 1.3,
+   "gaps": {
+    "1": 0.6
+   },
+   "lines": [
+    "El veintiocho de junio de mil novecientos catorce, en Sarajevo, un estudiante de diecinueve años mató a tiros al heredero del trono de Austria-Hungría.",
+    "Cinco semanas después, las grandes potencias de Europa estaban en guerra, y en cuatro años morirían millones de personas.",
+    "Esta es la historia de la Primera Guerra Mundial."
+   ]
+  },
+  {
+   "id": "europa",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "En mil novecientos catorce, unos cuantos imperios europeos dominaban buena parte del planeta y competían por colonias, fábricas y barcos de guerra.",
+    "Estaban divididos en dos bloques: la Triple Entente, de Francia, Rusia y Gran Bretaña, y la Triple Alianza, de Alemania, Austria-Hungría e Italia.",
+    "Y en los Balcanes, de donde el Imperio otomano se retiraba, Serbia y Austria-Hungría se disputaban la región. Era un barril de pólvora."
+   ]
+  },
+  {
+   "id": "sarajevo",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "El archiduque Francisco Fernando, heredero austrohúngaro, visitó Sarajevo, la capital de Bosnia, con su esposa Sofía.",
+    "Un primer atentado con bomba falló. Más tarde, su chofer tomó una calle equivocada y frenó justo frente a Gavrilo Princip, un joven nacionalista serbio de Bosnia.",
+    "Princip disparó dos veces. El archiduque y su esposa murieron poco después."
+   ]
+  },
+  {
+   "id": "julio",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Austria-Hungría, con el apoyo de Alemania, culpó a Serbia y le declaró la guerra el veintiocho de julio.",
+    "Rusia movilizó su ejército para defender a Serbia. Alemania le declaró la guerra a Rusia y, dos días después, a Francia.",
+    "Para llegar rápido a París, Alemania invadió Bélgica, que era neutral, y el cuatro de agosto Gran Bretaña entró en la guerra. Las alianzas habían arrastrado a todos."
+   ]
+  },
+  {
+   "id": "marne",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Todos creían que la guerra terminaría antes de Navidad. En septiembre, los alemanes estaban a menos de cincuenta kilómetros de París.",
+    "Franceses y británicos los frenaron en la batalla del Marne. París mandó refuerzos al frente hasta en taxis.",
+    "Entonces los dos bandos cavaron trincheras, y pronto una línea de más de setecientos kilómetros cruzó Europa, del mar del Norte hasta Suiza."
+   ]
+  },
+  {
+   "id": "trincheras",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "La vida en las trincheras era lodo, ratas, piojos y frío. Entre las dos líneas quedaba la tierra de nadie: alambre de púas, cráteres y cadáveres.",
+    "Atacar era salir a campo abierto contra ametralladoras que disparaban cientos de balas por minuto.",
+    "Aun así, en la Navidad de mil novecientos catorce, en algunos tramos del frente, británicos y alemanes salieron a cantar e intercambiar regalos. Fue la tregua de Navidad."
+   ]
+  },
+  {
+   "id": "armas",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Para romper el empate llegaron armas nuevas. En abril de mil novecientos quince, en Ypres, Alemania usó gas venenoso a gran escala.",
+    "Aparecieron los aviones de combate, los zepelines, los submarinos y, en mil novecientos dieciséis, los primeros tanques, británicos.",
+    "Pero la que más mataba era la artillería: los cañones causaron la mayoría de las heridas."
+   ]
+  },
+  {
+   "id": "verdun",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Mil novecientos dieciséis fue el año de las grandes matanzas. En Verdún, franceses y alemanes pelearon diez meses, con unos setecientos mil muertos, heridos y desaparecidos.",
+    "En el Somme, solo el primer día, el ejército británico tuvo cincuenta y siete mil bajas, casi veinte mil muertos.",
+    "Cuando la batalla terminó, en noviembre, los aliados habían avanzado apenas unos diez kilómetros."
+   ]
+  },
+  {
+   "id": "mundo",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Pero la guerra era mundial. En el este, Rusia peleaba contra Alemania y Austria-Hungría, y el Imperio otomano se unió a los alemanes.",
+    "En Galípoli, los aliados intentaron invadir Turquía y fracasaron. Italia se pasó a los aliados, y Japón tomó colonias alemanas en Asia.",
+    "Llegaron soldados de los imperios de todo el mundo: de la India, de África, de Australia y de Canadá. Y en Arabia, las tribus se rebelaron contra los otomanos."
+   ]
+  },
+  {
+   "id": "telegrama",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "En el mar, los submarinos alemanes hundían barcos sin aviso. En mil novecientos quince hundieron el Lusitania, y murieron mil ciento noventa y ocho personas, ciento veintiocho de ellas estadounidenses.",
+    "Y en enero de mil novecientos diecisiete, el ministro alemán Arthur Zimmermann le ofreció a México una alianza secreta: si Estados Unidos entraba en la guerra, México recuperaría Texas, Nuevo México y Arizona.",
+    "Los británicos descifraron el telegrama y Estados Unidos lo publicó. Venustiano Carranza rechazó la oferta y México se mantuvo neutral, pero en abril Estados Unidos le declaró la guerra a Alemania."
+   ]
+  },
+  {
+   "id": "fin",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Ese mismo año, Rusia se hundió en la revolución, y en marzo de mil novecientos dieciocho firmó la paz con Alemania.",
+    "Alemania lanzó una última gran ofensiva en Francia, pero ya llegaban diez mil soldados estadounidenses al día, al mando del general Pershing, el mismo que había perseguido a Pancho Villa.",
+    "En agosto, los aliados contraatacaron con tanques, los socios de Alemania se rindieron y el káiser huyó a los Países Bajos.",
+    "El once de noviembre de mil novecientos dieciocho se firmó el armisticio en un vagón de tren. A las once de la mañana, los cañones callaron."
+   ]
+  },
+  {
+   "id": "versalles",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "En junio de mil novecientos diecinueve, en el Palacio de Versalles, Alemania firmó la paz que le impusieron los vencedores.",
+    "Perdió territorio y todas sus colonias, su ejército quedó limitado a cien mil hombres, y tuvo que aceptar la culpa de la guerra y pagar enormes reparaciones.",
+    "Cuatro imperios desaparecieron: el alemán, el austrohúngaro, el ruso y el otomano. Y nacieron países nuevos, como Polonia, Checoslovaquia y Yugoslavia."
+   ]
+  },
+  {
+   "id": "outro",
+   "lead": 0.8,
+   "tail": 1.6,
+   "lines": [
+    "Murieron cerca de diez millones de soldados y millones de civiles. Y la gripe de mil novecientos dieciocho mató a decenas de millones más.",
+    "La llamaron la Gran Guerra, la guerra que acabaría con todas las guerras.",
+    "Pero el rencor de Alemania y la crisis que vino después prepararon algo peor: veinte años más tarde empezó la Segunda Guerra Mundial."
+   ]
+  }
+ ]
+}
