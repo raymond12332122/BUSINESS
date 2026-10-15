@@ -23,7 +23,11 @@ export function build(ctx) {
   const V = S.craterField('verdun', { fort: true, n: 190, seed: 771 });
   const hole = V.craters.filter(c => c[2] > 1.9).reduce((b, c) => (Math.hypot(c[0], c[1] - 3) < Math.hypot(b[0], b[1] - 3) ? c : b));
   const [hx, hz, hr] = hole, hy = V.heightAt(hx, hz);
-  const poil = [[-0.45, -0.42], [0.1, -0.5], [0.55, -0.38]].map(([dx, dz], i) => { const x = hx + dx * hr, z = hz + dz * hr; const c = K.person(V, ['oguri', 'doto', 'helios'][i], 'poilu', x, z, Math.PI + (i - 1) * 0.25); c.root.position.y = V.heightAt(x, z) + 0.02; return c; });
+  // camera inside the shell hole, across from the three poilus
+  // (the two outer men shelter against the wall facing into the hole; the middle one watches over the rim)
+  const cx1 = hx + hr * 0.15, cz1 = hz + hr * 0.62, zl = hz - 0.45 * hr;
+  const cam1 = [cx1, V.heightAt(cx1, cz1) + 0.5, cz1], look1 = [hx, V.heightAt(hx, zl) + 0.85, zl];
+  const poil = [[-0.45, -0.42], [0.1, -0.5], [0.55, -0.38]].map(([dx, dz], i) => { const x = hx + dx * hr, z = hz + dz * hr; const c = K.person(V, ['oguri', 'doto', 'helios'][i], 'poilu', x, z, i === 1 ? Math.PI : (1 - i) * 0.35); c.root.position.y = V.heightAt(x, z) + 0.02; return c; });
   for (const [x, z] of [[-12, -18], [6, -24], [16, -12], [-20, -30]]) S.smokeFrom(V, new THREE.Vector3(x, 0.5, z), { n: 10, color: '#4a4440', size: 2.6, rise: 12, drift: [3, 0, 0], life: 6, opacity: 0.55 });
   // ---- 3. the Somme, 1 July 1916: walking into no man's land
   const Sm = S.craterField('morning', { green: 0.7, depth: 0.32, n: 60, stumps: 14, seed: 781 });
@@ -47,7 +51,7 @@ export function build(ctx) {
       V.tick(t);
       return U.film(t) + U.big(t, tMil - 0.2, tB + 0.3, '1916', { top: 120, size: 110 }) + U.big(t, tMat - 0.3, tB + 0.3, 'el año de las grandes matanzas', { top: 260, size: 46 });
     } },
-    { t0: tB, set: V, p0: [hx + hr * 0.75, hy + 1.9, hz + hr * 0.85], l0: [hx, hy + 0.55, hz - hr * 0.55], p1: [hx + hr * 0.6, hy + 1.75, hz + hr * 0.7], l1: [hx, hy + 0.55, hz - hr * 0.55], fov0: 46, act: (t) => {
+    { t0: tB, set: V, p0: [cam1[0], cam1[1], cam1[2]], l0: look1, p1: [cam1[0] - 0.15, cam1[1] - 0.05, cam1[2] + 0.2], l1: look1, fov0: 46, act: (t) => {
       V.tick(t);
       poil.forEach((c, i) => { K.pose(c, i === 1 ? { ...A.guard(t, i), gun: 'aim' } : A.cower(t, i)); c.setFace(C.blinkEye(t, i), 'frown'); });
       return U.film(t) + U.badge(t, 'Verdún · febrero–diciembre de 1916', 'Franceses contra alemanes', 'diez meses de combate', tVer - 0.2, tSet - 0.4)
@@ -61,7 +65,7 @@ export function build(ctx) {
         + U.counter(t, tCin - 0.3, tD + 0.3, 1230, 130, 57470, 'bajas británicas el primer día', { from: 0, dur: 1.2, color: '#ffcf6a', w: 560 })
         + U.counter(t, tCasi - 0.2, tD + 0.3, 1230, 330, 19240, 'muertos', { from: 0, dur: 1.0, color: '#ff8a6a', w: 560 });
     } },
-    { t0: tD, set: Mp, p0: [-13.25, 2.0, 0.2], l0: [-13.3, 0, -1.25], p1: [-13.2, 1.6, -0.1], l1: [-13.25, 0, -1.25], fov0: 40, act: (t) => {
+    { t0: tD, set: Mp, p0: [-13.25, 2.0, 0.45], l0: [-13.3, 0, -1.0], p1: [-13.2, 1.7, 0.2], l1: [-13.25, 0, -1.0], fov0: 40, act: (t) => {
       Mp.paint(1914); s1.set(1); s2.set(ss(tTerm - 0.2, tAv, t));
       return U.film(t) + somDots.map(([n, lo, la], i) => WM.label(ctx, WM.wpos(lo, la, WM.H + 0.08), n, 'c', fade(t, tD + 0.2 + i * 0.15, ctx.dur + 1))).join('')
         + U.pin(ctx, WM.wpos(2.62, 50.2, WM.H + 0.05), '1 de julio', 'línea británica', fade(t, tD + 0.2, ctx.dur + 1), '#6f9be0')

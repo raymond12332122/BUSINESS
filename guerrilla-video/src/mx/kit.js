@@ -12,7 +12,7 @@ export function hideEars(rig, s = 0.06) {
   rig.model.traverse(o => { if (o.isBone && /^Sp_He_Ear0_[LR]_00/.test(o.name)) o.scale.setScalar(s); });
 }
 // Hide antenna-like hair strands that would poke through a hat.
-export function flattenAhoge(rig, s = 0.2, re = /^Sp_He_Hair[01]_C_00/) {
+export function flattenAhoge(rig, s = 0.2, re = /^Sp_He_Hair([01]|3)_C_00/) {
   rig.model.traverse(o => { if (o.isBone && re.test(o.name)) o.scale.setScalar(s); });
 }
 // Anonymous extras: give clones a darker hair tint so crowds don't read as copies of the leaders.

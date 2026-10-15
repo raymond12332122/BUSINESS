@@ -39,8 +39,8 @@ export function build(ctx) {
     .map(([w, o, n, emp, ta], i) => { const c = K.person(Pd, w, o, -2.7 + i * 1.8, 0, 0); c.lab = [n, emp, ta]; return c; });
   // ---- the Arab Revolt on the Hejaz railway
   const Hj = S.desertRail('golden');
-  const arabs = [0, 1, 2, 3].map(i => K.person(Hj, ['cafe', 'daiwa', 'oguri', 'doto'][i], 'arabe', -2 + i * 1.3, 5.5 + (i % 2) * 0.8, Math.PI + 0.3));
-  const blast = new F.Explosion(Hj, [1.0, 0.2, 0], tReb, 1.6, 61, { fire: 0.7, smokeColor: '#8a7a66' });
+  const arabs = [0, 1, 2, 3].map(i => K.person(Hj, ['cafe', 'daiwa', 'oguri', 'doto'][i], 'arabe', -2.6 + i * 1.2, 4.6 + (i % 2) * 0.7, Math.PI + 0.3));
+  const blast = new F.Explosion(Hj, [3.0, 0.2, 0], tReb, 1.6, 61, { fire: 0.7, smokeColor: '#8a7a66' });
 
   const tB = tEste - 0.35, tC = tImp - 0.35, tD = L[1].t0 - 0.35, tE = tIta - 0.35, tF = tJap - 0.35, tG = L[2].t0 - 0.35, tH = tArab - 0.35;
   const sfx = [{ t: 0.2, type: 'whoosh', vol: 0.35 }, { t: tB, type: 'drums', dur: tD - tB, vol: 0.25 }, { t: tUnio, type: 'pop', vol: 0.35 },
@@ -84,11 +84,11 @@ export function build(ctx) {
         + WO.wlabel(ctx, 146, -4, 'Nueva Guinea alemana', fade(t, tAsia - 0.4, ctx.dur + 1));
     } },
     { t0: tG, set: Pd, p0: [0.4, 1.0, 6.2], l0: [0.4, 0.62, 0], p1: [0.2, 0.95, 5.4], l1: [0.2, 0.62, 0], fov0: 40, act: (t) => {
-      pdFlags.forEach((f, i) => { f.wave(t + i); f.visible = t > troops[i].lab[2] - 0.25; }); troops.forEach((c, i) => { const ta = c.lab[2]; const k = ss(ta - 0.25, ta + 0.1, t); c.root.visible = k > 0.01; c.root.position.y = (1 - k) * -0.3;
+      pdFlags.forEach((f, i) => { f.wave(t + i); f.visible = i === 0 || t > troops[i].lab[2] - 0.25; }); troops.forEach((c, i) => { const ta = i === 0 ? tG - 1 : c.lab[2]; const k = ss(ta - 0.25, ta + 0.1, t); c.root.visible = k > 0.01; c.root.position.y = (1 - k) * -0.3;
         K.pose(c, { ...C.salute(t, i), gun: 'none' }); c.setFace(C.blinkEye(t, i), 'neutral'); });
       return U.film(t) + troops.map(c => U.pin(ctx, [c.root.position.x, 1.35, 0], c.lab[0], 'Imperio ' + (c.lab[1] === 'Francia' ? 'francés' : 'británico'), ss(c.lab[2] - 0.1, c.lab[2] + 0.2, t))).join('');
     } },
-    { t0: tH, set: Hj, p0: [-6, 1.6, 9], l0: [1, 1.0, 0], p1: [-5, 1.5, 8], l1: [1, 1.0, 0], fov0: 44, act: (t) => {
+    { t0: tH, set: Hj, p0: [-6, 1.15, 1.5], l0: [2, 0.95, 4.5], p1: [-5.6, 1.12, 1.6], l1: [2, 0.95, 4.5], fov0: 46, act: (t) => {
       Hj.tick(t); blast.update(t); Hj.train.position.x = 8 - Math.min(5, (t - tH) * 1.5);
       arabs.forEach((c, i) => { K.pose(c, t > tReb + 0.2 ? C.cheer(t, i) : { ...A.guard(t, i), gun: 'aim' }); c.setFace(C.blinkEye(t, i), t > tReb ? 'smile' : 'frown'); });
       return U.film(t) + U.badge(t, 'Hiyaz · 1916–1918', 'La rebelión árabe', 'con apoyo británico (T. E. Lawrence)', tArab - 0.2, ctx.dur + 1);

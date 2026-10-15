@@ -21,7 +21,7 @@ export function build(ctx) {
 
   // ---- 1. August 1914: troops leave for the front
   const St = S.station1914('summer', { chalk: 'NACH PARIS!' });
-  const sold = [0, 1, 2, 3, 4, 5].map(i => K.person(St, ['doto', 'oguri', 'helios', 'tamamo', 'suzuka', 'mcqueen'][i], 'aleman14', -6 + i * 1.3, 2.4 + (i % 2) * 0.5, Math.PI + (i % 3 - 1) * 0.3));
+  const sold = [0, 1, 2, 3, 4, 5].map(i => K.person(St, ['doto', 'oguri', 'helios', 'tamamo', 'suzuka', 'mcqueen'][i], 'aleman14', -7.2 + i * 1.2, 2.4 + (i % 2) * 0.5, Math.PI + (i % 3 - 1) * 0.3));
   sold.forEach(c => { c.root.position.y = 0.62; });
   const fans = K.crowd(St, ['civilMujer', 'civil'], 10, [-14, 4.9, -7, 5.6], { seed: 21, yaw: Math.PI });
   fans.forEach(c => { c.root.position.y = 0.62; });
@@ -34,7 +34,7 @@ export function build(ctx) {
   const paris = WM.pulse(Mp, 2.35, 48.86, '#2a5a9a', 1.4);
   // ---- 3. the Marne: French (still in red trousers) and British counter-attack
   const Fd = S.digField('summer');
-  const atk = K.crowd(Fd, ['poilu14', 'poilu14', 'tommyCap'], 12, [-5, 4, 5, 10], { seed: 23, yaw: Math.PI, jitter: 0.5 });
+  const atk = K.crowd(Fd, ['poilu14', 'poilu14', 'tommyCap'], 12, [-6.5, 6, 0.8, 12], { seed: 23, yaw: Math.PI, jitter: 0.5 });
   atk.forEach(c => { c.z0 = c.root.position.z; });
   // ---- 4. the taxis of the Marne
   const Rd = S.marneRoad('golden');
@@ -52,12 +52,12 @@ export function build(ctx) {
     ...[0, 0.9, 1.8, 2.7].map(x => ({ t: tE + 0.4 + x, type: 'thud', vol: 0.25 })), { t: tF, type: 'riser', dur: ctx.dur - tF, vol: 0.25 }, { t: tSui, type: 'sting2', vol: 0.4 }];
 
   const shots = [
-    { t0: 0, set: St, p0: [3.6, 1.55, 4.6], l0: [-4.5, 1.3, 1.2], p1: [3.0, 1.5, 4.4], l1: [-5.0, 1.3, 1.2], fov0: 42, act: (t) => {
+    { t0: 0, set: St, p0: [3.6, 1.75, 4.6], l0: [-4.5, 1.3, 1.2], p1: [3.0, 1.7, 4.4], l1: [-5.0, 1.3, 1.2], fov0: 42, act: (t) => {
       St.tick(t);
       sold.forEach((c, i) => { K.pose(c, i % 2 ? C.wave(t, i) : C.cheer(t, i)); c.setFace(C.blinkEye(t, i), 'smile'); });
       fans.forEach((c, i) => { if (c.frozen) return; K.pose(c, C.wave(t, i)); c.setFace(C.blinkEye(t, i), 'smile'); });
       return U.film(t) + U.badge(t, 'Agosto de 1914', '¡A París!', 'Los soldados parten entre aplausos', 0.3, tNav - 0.3)
-        + U.quote(t, ['«Todo habrá terminado', 'antes de Navidad»'], 'lo que creían en 1914', tNav - 0.4, tB + 0.3, 70);
+        + U.quote(t, [['«Todo habrá terminado', tNav - 0.4], ['antes de Navidad»', tNav - 0.1]], 'lo que creían en 1914', tNav - 0.4, tB + 0.3, 70);
     } },
     { t0: tB, set: Mp, p0: [-11, 22, 13], l0: [-11.5, 0, -0.5], p1: [-12.5, 17, 10], l1: [-12.5, 0, 0], fov0: 42, act: (t) => {
       Mp.paint(1914); Mp.tintState(1914, 'GER', WM.COL.CENTRAL, 1, 0.75); Mp.tintState(1914, 'FRA', WM.COL.ENTENTE, 1, 0.6);
@@ -66,7 +66,7 @@ export function build(ctx) {
         + U.badge(t, 'Septiembre de 1914', 'El avance alemán', 'a través de Bélgica', tSep - 0.2, tCin - 0.3);
     } },
     { t0: tC, set: Fd, p0: [3.2, 1.0, -2.0], l0: [-1, 0.9, 8], p1: [2.6, 1.0, -1.2], l1: [-1, 0.9, 7], fov0: 44, act: (t) => {
-      const u = t - tC; atk.forEach((c, i) => { c.root.position.z = c.z0 - u * 1.9; K.pose(c, A.charge(t, i, 1.0)); c.setFace(C.blinkEye(t, i), 'open'); });
+      const u = t - tC; atk.forEach((c, i) => { c.root.position.z = c.z0 - u * 1.3; K.pose(c, A.charge(t, i, 1.0)); c.setFace(C.blinkEye(t, i), 'open'); });
       return U.film(t) + U.badge(t, '6–12 de septiembre de 1914', 'Batalla del Marne', 'Franceses y británicos frenan a Alemania', tFren - 0.3, tD);
     } },
     { t0: tD, set: Rd, p0: [3.0, 1.2, 3.2], l0: [-6, 0.8, -0.6], p1: [2.4, 1.15, 2.8], l1: [-7, 0.8, -0.6], fov0: 42, act: (t) => {

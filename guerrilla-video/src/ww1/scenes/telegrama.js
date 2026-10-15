@@ -86,7 +86,7 @@ export function build(ctx) {
         + MK.stateLabel(ctx, -111.7, 34.2, 'ARIZONA', fade(t, tAri - 0.2, ctx.dur + 1)) + MK.stateLabel(ctx, -102.5, 24.5, 'MÉXICO', fade(t, tE, ctx.dur + 1))
         + U.card(t, tSi - 0.2, tF + 0.3, 'La oferta secreta de Alemania', 'Si EE. UU. entraba en la guerra…', 'México «recuperaría» lo perdido en 1848', { left: 1220, top: 90, width: 620, accent: '#3f8a5a' });
     } },
-    { t0: tF, set: R40, p0: [0, 1.6, 2.4], l0: [0, 0.7, -1.2], p1: [0.3, 1.5, 2.0], l1: [0, 0.7, -1.2], fov0: 46, act: (t) => {
+    { t0: tF, set: R40, p0: [0, 1.75, 2.6], l0: [0, 0.75, -1.2], p1: [0.3, 1.65, 2.2], l1: [0, 0.75, -1.2], fov0: 46, act: (t) => {
       cods.forEach((c, i) => { K.pose(c, A.write(t, i)); c.setFace(C.blinkEye(t, i), 'neutral'); });
       return U.film(t) + U.badge(t, 'Sala 40 · Londres', 'Descifradores británicos', 'interceptan y descifran el telegrama', tBri - 0.2, tPub - 0.3)
         + U.telegram(t, tDes - 0.6, tPub - 0.1, tDes + 0.3, '«…haremos la guerra juntos… México reconquistará el territorio perdido de Texas, Nuevo México y Arizona…»', { x: 1200, y: 130, w: 640 })
@@ -98,7 +98,7 @@ export function build(ctx) {
       return U.film(t) + U.nameplate(ctx, [0, 1.25, -2.0], NAMES.carranza[0], NAMES.carranza[1], tVen - 0.2, tH)
         + U.stamp(t, 'RECHAZADA', tRech, tH + 0.2, { x: 1350, y: 480, rot: -8 }) + U.big(t, tNeu - 0.3, tH + 0.2, 'México se mantiene neutral', { top: 110, size: 56 });
     } },
-    { t0: tH, set: Cp, p0: [1.8, 2.5, 3.6], l0: [0, 1.45, -3.2], p1: [1.3, 2.3, 2.6], l1: [0, 1.5, -3.2], fov0: 42, act: (t) => {
+    { t0: tH, set: Cp, p0: [1.2, 1.95, 0.7], l0: [0, 1.4, -3.2], p1: [0.9, 1.85, 0.1], l1: [0, 1.4, -3.2], fov0: 42, act: (t) => {
       K.pose(wil, A.orate(t, 1, 0.6)); wil.setFace(C.blinkEye(t, 1), C.talkMouth(t, 1));
       return U.film(t) + U.datePage(t, tAbr - 0.2, ctx.dur + 1, 'Estados Unidos entra en la guerra', 'ABRIL', '6', '1917', { x: 1560, y: 110, accent: '#2a4a7a' })
         + U.nameplate(ctx, [0, 2.35, -3.2], NAMES.wilson[0], NAMES.wilson[1], tH + 0.2, tDecl);

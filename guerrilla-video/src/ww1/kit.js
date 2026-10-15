@@ -212,7 +212,7 @@ export function keffiyeh(color = '#f4efe2', check = null) {
   if (tex) tex.repeat.set(3, 3), tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
   const mat = tex ? new THREE.MeshStandardMaterial({ map: tex, roughness: 0.95, side: THREE.DoubleSide }) : std(color, { side: THREE.DoubleSide, roughness: 0.95 });
   const cap = mesh(new THREE.SphereGeometry(0.29, 30, 12, 0, Math.PI * 2, 0, Math.PI * 0.5), mat); cap.position.y = -0.02; cap.scale.set(1.06, 1.0, 1.06); g.add(cap);
-  const drape = mesh(new THREE.CylinderGeometry(0.31, 0.4, 0.44, 30, 1, true, 0.85, Math.PI * 2 - 1.7), mat); drape.position.y = -0.23; g.add(drape);
+  const drape = mesh(new THREE.CylinderGeometry(0.31, 0.34, 0.27, 30, 1, true, 0.85, Math.PI * 2 - 1.7), std(color, { side: THREE.DoubleSide, roughness: 0.95 })); drape.position.y = -0.145; g.add(drape);
   const agal = mesh(new THREE.TorusGeometry(0.29, 0.022, 6, 28), std('#141414')); agal.rotation.x = Math.PI / 2; agal.position.y = 0.1; g.add(agal);
   return g;
 }

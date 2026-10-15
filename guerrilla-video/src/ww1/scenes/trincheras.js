@@ -73,7 +73,7 @@ export function build(ctx) {
         K.pose(c, A.overTop(t, s, i)); c.setFace(C.blinkEye(t, i), 'open'); });
       return U.film(t);
     } },
-    { t0: tD, set: T1, p0: [1.1, Y + 0.75, -34.6], l0: [0.0, Y + 0.25, -20], p1: [1.15, Y + 0.75, -34.5], l1: [0.0, Y + 0.25, -20], fov0: 46, shake: t => mgOn(t) ? 0.01 : 0, act: (t) => {
+    { t0: tD, set: T1, p0: [1.9, Y + 0.55, -31.4], l0: [0.3, Y + 0.42, -33.0], p1: [1.75, Y + 0.53, -31.6], l1: [0.3, Y + 0.42, -33.0], fov0: 46, shake: t => mgOn(t) ? 0.01 : 0, act: (t) => {
       T1.tick(t); const k = mgK(t); mgFlash.intensity = 25 * k; mgSpr.visible = k > 0.5; mgSpr.scale.setScalar(0.35 + 0.25 * Math.random());
       K.pose(gunner, { ...C.crouch(t, 1, 0.6), armL: [-70, -10, -50], armR: [-70, 10, 50], elbL: [0, -30, 0], elbR: [0, 30, 0], gun: 'none' }); gunner.setFace('open', 'frown');
       return U.film(t) + U.counter(t, tCien - 0.3, tE, 1240, 140, 500, 'disparos por minuto (ametralladora MG 08)', { from: 0, dur: 1.0, color: '#ff8a6a', prefix: '≈ ', w: 560 });

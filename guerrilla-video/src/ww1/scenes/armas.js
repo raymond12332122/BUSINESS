@@ -20,7 +20,7 @@ export function build(ctx) {
   // ---- 1-2. Ypres, April 1915: the gas cloud
   const G = S.trenchWF('gas', { seed: 751 }); const Y = G.Y;
   const cloud = P.gasCloud(G, { n: 50, w: 30, size: 3.8, opacity: 0.78, color: '#c6cf5a' });
-  const masked = [['oguri', 'poiluMask', -1.6], ['doto', 'tommyMask', -0.5], ['helios', 'poiluMask', 0.6], ['suzuka', 'tommyMask', 1.7]].map(([w, o, x], i) => { const c = K.person(G, w, o, x, -0.62, Math.PI); c.root.position.y = 0.8; return c; });
+  const masked = [['oguri', 'poiluMask', -1.6], ['doto', 'tommyMask', -0.5], ['helios', 'poiluMask', 0.6], ['suzuka', 'tommyMask', 1.7]].map(([w, o, x], i) => { const c = K.person(G, w, o, x, -0.62, Math.PI); c.root.position.y = 1.0; return c; });
   // ---- 3. dogfight
   const Sk = S.skyStage('day');
   const fok = P.warplane({ kind: 'tri', color: '#b8241e', cross: true }), sop = P.warplane({ kind: 'biplane', color: '#8a7a4a' });
@@ -55,7 +55,7 @@ export function build(ctx) {
       return U.film(t) + U.big(t, tArm - 0.3, tB + 0.3, 'Armas nuevas', { top: 110, size: 66 });
     } },
     { t0: tB, set: G, p0: [2.0, 1.85, -3.6], l0: [0.0, 1.3, -0.6], p1: [1.7, 1.8, -3.2], l1: [0.0, 1.3, -0.6], fov0: 46, act: (t) => {
-      G.tick(t); const u = t - tB; cloud.update(t, -2.5 + u * 0.7, 1);
+      G.tick(t); const u = t - tB; cloud.update(t, -2.5 + u * 0.7, 0.6);
       masked.forEach((c, i) => { K.pose(c, { ...C.idle(t, i, 0.3), gun: 'port', head: [-4, 0, 0] }); });
       return U.film(t) + U.tint('#b8c46a', 0.18 + 0.18 * ss(tGas, tEsc, t)) + U.badge(t, 'Ypres · 22 de abril de 1915', 'Gas de cloro', 'El primer ataque con gas a gran escala', tYp - 0.3, tC);
     } },

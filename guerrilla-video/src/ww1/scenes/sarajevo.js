@@ -98,9 +98,9 @@ export function build(ctx) {
     { t0: tF, set: Sa, p0: [0.55, 0.92, 4.85], l0: [-0.45, 0.68, 6.4], p1: [0.4, 0.9, 5.05], l1: [-0.45, 0.7, 6.4], fov0: 36, act: (t) => {
       Sa.tick(t); arrowG.visible = false; car.position.set(-30, 0, 1.9);
       K.pose(pr, A.drawGun(t, ss(tJov, tG, t) * 0.4, 2)); pr.setFace(C.blinkEye(t, 2), 'frown');
-      return U.film(t) + U.nameplate(ctx, [-0.4, 1.32, 6.4], NAMES.princip[0], NAMES.princip[1], tGav - 0.2, tG);
+      return U.film(t) + U.nameplate(ctx, [-1.0, 1.0, 6.45], NAMES.princip[0], NAMES.princip[1], tGav - 0.2, tG);
     } },
-    { t0: tG, set: Sa, p0: [-0.95, 1.12, 7.45], l0: [CAR[0], 0.85, CAR[1]], p1: [-0.9, 1.1, 7.35], l1: [CAR[0], 0.85, CAR[1]], fov0: 42, act: (t) => {
+    { t0: tG, set: Sa, p0: [-0.3, 1.32, 7.55], l0: [0.9, 0.72, 4.4], p1: [-0.25, 1.3, 7.45], l1: [0.9, 0.72, 4.4], fov0: 42, act: (t) => {
       Sa.tick(t); car.position.set(CAR[0], 0, CAR[1]); car.rotation.y = CAR[2];
       K.pose(pr, A.shoot(t, shotsT, 2)); pr.setFace('open', 'frown');
       const fl = shotsT.reduce((m, ts) => Math.max(m, t >= ts ? 1 - (t - ts) / 0.12 : 0), 0); flash.intensity = 60 * Math.max(0, fl);

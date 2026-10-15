@@ -49,7 +49,7 @@ export function build(ctx) {
     { t0: 0, set: Of, p0: [0.9, 1.0, 1.0], l0: [0, 0.62, -1.75], p1: [0.7, 0.95, 0.75], l1: [0, 0.62, -1.75], fov0: 40, act: (t) => {
       K.pose(fj, A.write(t, 1)); fj.setFace(C.blinkEye(t, 1), 'frown'); Of.flag.wave(t);
       return U.film(t) + U.nameplate(ctx, [0, 1.25, -1.8], NAMES.franciscoJose[0], NAMES.franciscoJose[1], 0.4, tB)
-        + U.card(t, tApoyo - 0.3, tB + 0.2, 'Berlín', 'Alemania le da su apoyo total', '«cheque en blanco» · 5 de julio', { left: 80, top: 90, width: 600, accent: '#e8735a' });
+        + U.card(t, tApoyo - 0.3, tB + 0.2, '5 de julio de 1914', 'Alemania le da su apoyo total', 'el «cheque en blanco» del káiser', { left: 80, top: 90, width: 600, accent: '#e8735a' });
     } },
     { t0: tB, set: Dm, p0: [-1.12, 0.6, -0.68], l0: [-0.5, 0.56, -1.0], p1: [-1.05, 0.6, -0.7], l1: [-0.45, 0.56, -1.0], fov0: 40, act: (t) => {
       tickDom(t);

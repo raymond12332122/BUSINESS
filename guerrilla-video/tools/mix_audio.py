@@ -38,7 +38,7 @@ def sweep(f0, f1, d, shape='sine'):
 
 
 def fade(x, a=0.01, b=0.05):
-    n = len(x); ia, ib = int(a * SR), int(b * SR)
+    n = len(x); ia, ib = min(int(a * SR), n // 2), min(int(b * SR), n // 2)   # short clips: fades take at most half each
     if ia: x[:ia] *= np.linspace(0, 1, ia)
     if ib: x[-ib:] *= np.linspace(1, 0, ib)
     return x
@@ -751,6 +751,8 @@ PUEBLA_MOODS = {'title': 'dark', 'corredor': 'suspense', 'huachicol': 'tense', '
                 'violencia': 'somber', 'gobierno': 'calm', 'focos': 'tense', 'veredicto': 'suspense', 'outro': 'hope'}
 RUSIA_MOODS = {'title': 'dark', 'zar': 'somber', 'domingo': 'tense', 'guerra': 'dark', 'febrero': 'suspense', 'lenin': 'suspense', 'octubre': 'tense',
                'poder': 'dark', 'romanov': 'somber', 'civil': 'tense', 'urss': 'dark', 'mexico': 'suspense', 'outro': 'hope'}
+WW1_MOODS = {'title': 'dark', 'europa': 'suspense', 'sarajevo': 'tense', 'julio': 'tense', 'marne': 'dark', 'trincheras': 'somber', 'armas': 'tense',
+             'verdun': 'dark', 'mundo': 'suspense', 'telegrama': 'suspense', 'fin': 'tense', 'versalles': 'calm', 'outro': 'somber'}
 def narco_bed(moods=NARCO_MOODS, bpm=80, key=0):
     beat = 60 / bpm; bar = 4 * beat
     CH = {'Dm': [50, 53, 57], 'Bb': [46, 50, 53], 'Gm': [43, 46, 50], 'A': [45, 49, 52], 'F': [41, 45, 48], 'C': [48, 52, 55],
@@ -843,7 +845,10 @@ if VIDEO == 'rusia':
     musL, musR = narco_bed(RUSIA_MOODS, bpm=72, key=-2); t_all = np.arange(N) / SR
     sc_ = 0.15 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
 BPM = 84; beat = 60 / BPM
-if VIDEO not in ('mx', 'napo', 'narco', 'puebla', 'rusia'):
+if VIDEO == 'ww1':
+    musL, musR = narco_bed(WW1_MOODS, bpm=70, key=-3); t_all = np.arange(N) / SR
+    sc_ = 0.15 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
+if VIDEO not in ('mx', 'napo', 'narco', 'puebla', 'rusia', 'ww1'):
     prog = [[146.8, 174.6, 220.0], [116.5, 146.8, 174.6], [174.6, 220.0, 261.6], [130.8, 164.8, 196.0]]  # Dm Bb F C
     bar = 4 * beat
     musL, musR = np.zeros(N), np.zeros(N)
