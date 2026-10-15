@@ -920,7 +920,13 @@ function openScript(){const s=buildScript();openModal(`<h3>Script</h3><p class="
 /* =====================================================================
    EXPORT
    ===================================================================== */
-function downloadBlob(blob,name){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.rel='noopener';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);}
+/* Inside the Android app, window.HeliNative saves files through Android (pictures → Pictures/HELIRUBY, other files → Download/HELIRUBY). */
+const NATIVE=(typeof window.HeliNative==='object'&&window.HeliNative)?window.HeliNative:null;
+function blobToB64(b){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(',')[1]||'');r.onerror=()=>rej(r.error);r.readAsDataURL(b);});}
+async function nativeSave(blob,name){const err=NATIVE.begin(name,blob.type||'application/octet-stream');if(err)throw new Error(err);
+  try{const CH=786432;for(let o=0;o<blob.size;o+=CH){if(!NATIVE.write(await blobToB64(blob.slice(o,o+CH))))throw new Error('Could not write the file to your phone storage.');}}
+  catch(e){NATIVE.abort();throw e;}const where=NATIVE.finish();if(where.startsWith('ERR:'))throw new Error(where.slice(4));return where;}
+async function downloadBlob(blob,name){if(NATIVE)return nativeSave(blob,name);const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.rel='noopener';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);return 'Downloads';}
 function canvasBlob(c,mime,q){return new Promise((res,rej)=>{try{c.toBlob(b=>b?res(b):rej(new Error('The browser could not create the image (it may be too large for this phone). Try a smaller size.')),mime,q);}catch(e){rej(e);}});}
 async function shareFiles(files){if(!(navigator.canShare&&navigator.canShare({files})))throw new Error('Sharing files is not supported in this browser — use Download instead.');try{await navigator.share({files,title:project.title});}catch(e){if(e.name!=='AbortError')throw e;}}
 async function pageCanvas(pg,scale){await ensureImgs(pageImgIds(pg));let s=scale;while(pg.w*s*pg.h*s>36e6||Math.max(pg.w,pg.h)*s>16000)s*=.85;const c=document.createElement('canvas');c.width=Math.round(pg.w*s);c.height=Math.round(pg.h*s);const x=c.getContext('2d');x.scale(s,s);renderPage(x,pg,{});return c;}
@@ -934,7 +940,7 @@ function openExport(pid=ui.pageId,what='page'){pid=project.pages[pid]?pid:allPag
   <label class="f">Format</label><div class="seg"><label><input type="radio" name="exFmt" value="png" checked> PNG — best quality</label><label><input type="radio" name="exFmt" value="jpeg"> JPEG — smaller file</label></div>
   <label class="f">JPEG quality <output id="exQo">90</output></label><input type="range" id="exQ" min="50" max="100" value="90">
   <label class="f">Size</label><select id="exScale"><option value="1">Normal (${pg.w}×${pg.h})</option><option value="2">Large 2× (for print)</option><option value="0.5">Small ½ (quick sharing)</option></select>
-  <p class="muted small">On Android, files go to your <b>Downloads</b> folder. When several pages download, Chrome may ask to allow multiple downloads — tap Allow.${canShare?' “Share” sends the images straight to another app.':''}</p>
+  <p class="muted small">${NATIVE?'Images are saved to your gallery in <b>Pictures/HELIRUBY</b>.':'On Android, files go to your <b>Downloads</b> folder. When several pages download, Chrome may ask to allow multiple downloads — tap Allow.'}${canShare?' “Share” sends the images straight to another app.':''}</p>
   <div class="row end"><button class="btn" data-act="closeModal">Cancel</button>${canShare?`<button class="btn" id="exShare">${I('share')} Share</button>`:''}<button class="btn primary" id="exGo">${I('download')} Download</button></div>`);
   $('#exWhat',m).value=what;$('#exQ',m).addEventListener('input',e=>{$('#exQo',m).textContent=e.target.value;});
   const go=async share=>{const o={what:$('#exWhat',m).value,fmt:m.querySelector('[name=exFmt]:checked').value,q:+$('#exQ',m).value/100,scale:+$('#exScale',m).value};closeModal();
@@ -943,9 +949,9 @@ function openExport(pid=ui.pageId,what='page'){pid=project.pages[pid]?pid:allPag
 async function doExport(pid,o,share){const ch=chapterOf(pid);const ids=o.what==='page'?[pid]:o.what==='all'?allPageIds():ch.pages.slice();if(!ids.length)throw new Error('No pages to export.');
   const mime=o.fmt==='jpeg'?'image/jpeg':'image/png',ext=o.fmt==='jpeg'?'jpg':'png';
   if(o.what==='strip'){toast('Building the tall image…');const c=await stripCanvas(ids,o.scale);const b=await canvasBlob(c,mime,o.q);const name=`${slug(project.title,24)}_${ch.code}_strip.${ext}`;
-    if(share)await shareFiles([new File([b],name,{type:mime})]);else{downloadBlob(b,name);toast('Exported '+name,'ok');}return;}
+    if(share)await shareFiles([new File([b],name,{type:mime})]);else{const w=await downloadBlob(b,name);toast(`Exported ${name} to ${w}.`,'ok');}return;}
   const files=[];for(let i=0;i<ids.length;i++){toast(`Rendering page ${i+1} of ${ids.length}…`);const c=await pageCanvas(project.pages[ids[i]],o.scale);const b=await canvasBlob(c,mime,o.q);files.push(new File([b],exportName(ids[i],ext),{type:mime}));}
-  if(share){await shareFiles(files);return;}for(const f of files){downloadBlob(f,f.name);await sleep(500);}toast(`Exported ${files.length} image(s) to Downloads.`,'ok');}
+  if(share){await shareFiles(files);return;}let w='';for(const f of files){w=await downloadBlob(f,f.name);if(!NATIVE)await sleep(500);}toast(`Exported ${files.length} image(s) to ${w}.`,'ok');}
 
 /* =====================================================================
    MORE TAB (save / open / settings / guide)
@@ -954,7 +960,7 @@ function renderMore(){const nP=allPageIds().length,nPn=Object.values(project.pag
   $('#tab-more').innerHTML=`<div class="wrapin">
   <div class="card"><h2>Project</h2>${F.txt('Comic title','project:title',project.title)}
    <p class="muted small">${project.refs.length} reference image(s) · ${project.chapters.length} chapters · ${nP} page(s) · ${nPn} panel(s)</p>
-   <p class="small" id="storageInfo">${db?'Autosave is on: your work is stored in this browser on this device.':'<b>Autosave is OFF</b> — this browser is blocking storage for this file. Use “Save project file” often.'}</p></div>
+   <p class="small" id="storageInfo">${db?(NATIVE?'Autosave is on: your work is stored inside the HELIRUBY Studio app. Uninstalling the app deletes it, so keep project files as backups.':'Autosave is on: your work is stored in this browser on this device.'):'<b>Autosave is OFF</b> — this browser is blocking storage for this file. Use “Save project file” often.'}</p></div>
   <div class="card"><h3>Save & open</h3><p class="muted small">Browser storage can be wiped if you clear Chrome's data or the phone runs low on space. A project file keeps <b>everything</b> (pages, notes and all your images). Save one regularly and keep a copy in Google Drive or similar.</p>
    <div class="list"><button class="btn primary" data-act="saveFile">${I('save')} Save project file (.json)</button><button class="btn" data-act="openFile">${I('folder')} Open project file…</button>
    <button class="btn" data-act="persist">${I('lock')} Ask the browser to keep my data</button><button class="btn" data-act="cleanImages">${I('trash')} Clean unused images</button><button class="btn danger" data-act="newProject">Start a new empty project…</button></div></div>
@@ -1004,6 +1010,7 @@ const HELP=`<h3>${I('help')} How to use HELIRUBY Studio</h3>
 <li>Export one page, a whole chapter as separate images, a chapter as <b>one tall image</b> (good for vertical scrolling posts), or the whole comic.</li>
 <li>PNG keeps the best quality; JPEG makes smaller files. “Large 2×” is for print.</li></ul></details>
 <details><summary>Working offline & on Android</summary><ul>
+<li><b>Android app:</b> exported pages and pose images go to your gallery (<b>Pictures/HELIRUBY</b>); project files and scripts go to <b>Download/HELIRUBY</b>. To move to a new phone, save a project file and open it there.</li>
 <li>This is a single HTML file with nothing to download from the internet, so it works offline.</li>
 <li>Best on Android: open it in <b>Chrome</b> from a web address (for example GitHub Pages), then use Chrome's menu → <b>Add to Home screen</b> so it opens like an app.</li>
 <li>Keyboard shortcuts on a computer: <kbd>Ctrl</kbd>+<kbd>Z</kbd> undo, <kbd>Ctrl</kbd>+<kbd>Y</kbd> redo, <kbd>Delete</kbd> removes the selection.</li></ul></details>
@@ -1060,7 +1067,7 @@ const ACT={
   refToPuppet:b=>{const r=project.refs.find(x=>x.id===b.dataset.id);if(!r)return;ui.puppetChar=r.charId;addPartImage({id:r.imgId,w:r.w,h:r.h},r.label||'Part');commit();while(modals.length)closeModal();setTab('puppet');
     if(r.source==='official')toast('Tip: puppet parts work best as separate transparent PNG pieces.');},
   refTrace:b=>{const r=project.refs.find(x=>x.id===b.dataset.id);if(!r)return;ui.puppetChar=r.charId;const rig=curRig();rig.trace=r.imgId;rig.showTrace=true;commit();while(modals.length)closeModal();setTab('puppet');toast('Trace image set (faint, behind the parts; never exported).');},
-  refDownload:b=>{const r=project.refs.find(x=>x.id===b.dataset.id);const d=r&&memImages.get(r.imgId);if(!d)return toast('Image missing.','err');const blob=dataURLtoBlob(d);downloadBlob(blob,slug(r.label||'reference')+'.'+((blob.type.split('/')[1]||'png').replace('jpeg','jpg')));},
+  refDownload:b=>{const r=project.refs.find(x=>x.id===b.dataset.id);const d=r&&memImages.get(r.imgId);if(!d)return toast('Image missing.','err');const blob=dataURLtoBlob(d);downloadBlob(blob,slug(r.label||'reference')+'.'+((blob.type.split('/')[1]||'png').replace('jpeg','jpg'))).then(w=>toast('Saved to '+w+'.','ok'),reportErr);},
   refDelete:async b=>{const r=project.refs.find(x=>x.id===b.dataset.id);if(!r)return;if(!await ask({title:'Delete this reference?',msg:`“${esc(r.label||'Untitled')}” will be removed from your references. Copies already placed in panels stay. You can undo.`,ok:'Delete',danger:true}))return;
     project.refs.splice(project.refs.indexOf(r),1);project.characters.forEach(c=>{if(c.avatar===r.imgId&&!project.refs.some(x=>x.imgId===r.imgId))c.avatar=null;});commit();
     if(VW){VW.ids=VW.ids.filter(i=>i!==r.id);if(!VW.ids.length){closeModal();return;}VW.idx=Math.min(VW.idx,VW.ids.length-1);drawViewer();}renderRefGrid();},
@@ -1085,7 +1092,7 @@ const ACT={
   pupTrace:async()=>{const pick=await pickImage('Choose a trace image');if(!pick)return;const rig=curRig();rig.trace=pick.imgId;rig.showTrace=true;commit();closeModal();openStage();pupView.draw();},
   pupTraceClear:()=>{const rig=curRig();rig.trace=null;commit();closeModal();openStage();pupView.draw();},
   pupClear:async()=>{const rig=curRig();if(!rig.parts.length)return toast('The stage is already empty.');if(!await ask({title:'Remove all parts?',msg:'Saved poses are kept but will have nothing to move. You can undo.',ok:'Remove all',danger:true}))return;rig.parts=[];PUP.sel=null;commit();closeModal();renderPuppet();},
-  pupExport:async()=>{const rig=curRig();if(!rig.parts.length)return toast('Add some parts first.','err');const c=await rigCanvas(rig,false);const b=await canvasBlob(c,'image/png');downloadBlob(b,`${slug(charById(ui.puppetChar).name)}_pose.png`);toast('Pose image saved to Downloads.','ok');},
+  pupExport:async()=>{const rig=curRig();if(!rig.parts.length)return toast('Add some parts first.','err');const c=await rigCanvas(rig,false);const b=await canvasBlob(c,'image/png');const w=await downloadBlob(b,`${slug(charById(ui.puppetChar).name)}_pose.png`);toast(`Pose image saved to ${w}.`,'ok');},
   pupToRefs:async()=>{const rig=curRig();if(!rig.parts.length)return toast('Add some parts first.','err');const c=await rigCanvas(rig,true);const im=await canvasToImage(c);
     project.refs.push({id:uid('ref'),charId:ui.puppetChar,imgId:im.id,w:im.w,h:im.h,label:'Puppet pose '+new Date().toLocaleString(),cat:'pose',source:'puppet',tags:'puppet',notes:'',fav:false,added:Date.now()});commit();toast(`Saved to ${charById(ui.puppetChar).name} → Pose (marked “Puppet”).`,'ok');},
   pupToPanel:async()=>{const rig=curRig();if(!rig.parts.length)return toast('Add some parts first.','err');if(!curPage())return toast('Create a page first.','err');const c=await rigCanvas(rig,true);const im=await canvasToImage(c);
@@ -1128,7 +1135,7 @@ const ACT={
   readChapter:b=>{const ch=project.chapters.find(c=>c.id===b.dataset.ch);if(ch)openReader(ch.pages,0);},
   script:()=>openScript(),
   copyScript:async()=>{const s=buildScript();try{await navigator.clipboard.writeText(s);toast('Script copied.','ok');}catch(e){const t=document.createElement('textarea');t.value=s;document.body.appendChild(t);t.select();let ok=false;try{ok=document.execCommand('copy');}catch(_){}t.remove();toast(ok?'Script copied.':'Copy is blocked here — use “Save .txt”.',ok?'ok':'err');}},
-  dlScript:()=>downloadBlob(new Blob([buildScript()],{type:'text/plain;charset=utf-8'}),`${slug(project.title)}_script.txt`),
+  dlScript:async()=>{const w=await downloadBlob(new Blob([buildScript()],{type:'text/plain;charset=utf-8'}),`${slug(project.title)}_script.txt`);toast(`Script saved to ${w}.`,'ok');},
   addChapter:async()=>{const t=await ask({title:'New chapter',input:'',ph:'Chapter title',ok:'Add'});if(t===null)return;project.chapters.push({id:uid('ch'),code:'C'+(project.chapters.length+1),title:t||'Untitled',notes:'',pages:[]});commit();renderStory();},
   addPage:b=>{const ch=project.chapters.find(c=>c.id===b.dataset.ch)||project.chapters[0];if(!ch)return;const pg=addPageTo(ch);ui.pageId=pg.id;ED.sel=null;commit();saveUI();while(modals.length)closeModal();
     if(ui.tab==='story'){renderStory();toast(`Added ${pageLabel(pg.id)}. Tap it to edit.`);}else renderTab(ui.tab);},
@@ -1153,7 +1160,7 @@ const ACT={
   theme:b=>{ui.theme=b.dataset.v;saveUI();applyTheme();renderMore();},
   saveFile:async()=>{await saveNow();const ids=[...referencedImageIds()];const parts=['{"app":"heliruby-studio","version":1,"saved":',String(Date.now()),',"project":',JSON.stringify(project),',"images":{'];let first=true;
     for(const id of ids){const d=memImages.get(id);if(!d)continue;parts.push((first?'':',')+JSON.stringify(id)+':'+JSON.stringify(d));first=false;}parts.push('}}');
-    const blob=new Blob(parts,{type:'application/json'});downloadBlob(blob,`heliruby-project-${dateStr()}.json`);toast(`Project file saved to Downloads (${(blob.size/1048576).toFixed(1)} MB). Keep a copy somewhere safe!`,'ok');},
+    const blob=new Blob(parts,{type:'application/json'});const w=await downloadBlob(blob,`heliruby-project-${dateStr()}.json`);toast(`Project file saved to ${w} (${(blob.size/1048576).toFixed(1)} MB). Keep a copy somewhere safe!`,'ok');},
   openFile:async()=>{const[f]=await pickFiles({accept:'',multiple:false});if(!f)return;let data;try{toast('Reading project file…');data=JSON.parse(await f.text());}catch(e){return toast('That file is not a HELIRUBY Studio project file (it could not be read as JSON).','err');}
     if(!data||data.app!==APP_ID||!data.project)return toast("This doesn't look like a HELIRUBY Studio project file.",'err');
     if(!await ask({title:'Open this project?',msg:'It will <b>replace</b> the project currently stored in this browser. Save a project file first if you want to keep the current one.',ok:'Replace & open',danger:true}))return;
@@ -1162,7 +1169,7 @@ const ACT={
   cleanImages:async()=>{const used=referencedImageIds();const snaps=hist.undo.concat(hist.redo).join('\n');const junk=[...memImages.keys()].filter(id=>!used.has(id)&&!snaps.includes(id));
     if(!junk.length)return toast('No unused images found.');if(!await ask({title:`Remove ${junk.length} unused image(s)?`,msg:'These images are not used by any reference, panel or puppet.',ok:'Remove',danger:true}))return;
     for(const id of junk){try{await deleteImage(id);}catch(e){}}toast(`Removed ${junk.length} unused image(s).`,'ok');renderMore();},
-  persist:async()=>{if(!(navigator.storage&&navigator.storage.persist))return toast('This browser does not support that option. Keep saving project files.');try{const ok=await navigator.storage.persist();toast(ok?'The browser will try to keep your data.':'The browser declined (common until a site is bookmarked or installed). Keep saving project files.',ok?'ok':'');}catch(e){reportErr(e);}}
+  persist:async()=>{if(NATIVE)return toast('In the app, your work is kept until you uninstall it. Still save project files as a backup.','ok');if(!(navigator.storage&&navigator.storage.persist))return toast('This browser does not support that option. Keep saving project files.');try{const ok=await navigator.storage.persist();toast(ok?'The browser will try to keep your data.':'The browser declined (common until a site is bookmarked or installed). Keep saving project files.',ok?'ok':'');}catch(e){reportErr(e);}}
 };
 
 /* ---------- delegated events ---------- */
