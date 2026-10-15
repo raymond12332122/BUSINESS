@@ -1,0 +1,1234 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#1c1e23">
+<title>HELIRUBY Studio</title>
+<style>
+:root{
+  --bg:#f4f2ee;--surface:#ffffff;--surface2:#e9e6df;--ink:#1c1e23;--muted:#666a72;--line:#d6d2c8;
+  --accent:#2d5bd0;--accent-ink:#ffffff;--helios:#e2a012;--ruby:#a51f3b;--danger:#c23a2b;--ok:#2f8a57;
+  --c1:#e4e4e4;--c2:#ffffff;--r:12px;--tabh:62px;color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){--bg:#14161a;--surface:#1e2127;--surface2:#2a2e35;--ink:#eceae4;--muted:#a1a4ab;--line:#373b43;--accent:#7395ff;--accent-ink:#0b0e1a;--danger:#ff7a6b;--c1:#2b2b2b;--c2:#363636;color-scheme:dark}
+}
+:root[data-theme="dark"]{--bg:#14161a;--surface:#1e2127;--surface2:#2a2e35;--ink:#eceae4;--muted:#a1a4ab;--line:#373b43;--accent:#7395ff;--accent-ink:#0b0e1a;--danger:#ff7a6b;--c1:#2b2b2b;--c2:#363636;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-tap-highlight-color:transparent}
+body{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer;touch-action:manipulation}
+h2{font-size:20px;margin:0 0 6px}h3{font-size:18px;margin:0 0 10px}h4{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:16px 0 6px}
+p{margin:6px 0}
+.i{width:20px;height:20px;flex:none}
+.muted{color:var(--muted)}.small{font-size:13px}.grow{flex:1;min-width:0}.center{text-align:center}
+.topbar{flex:none;display:flex;align-items:center;gap:6px;min-height:54px;padding:4px 8px 4px 12px;padding-top:calc(4px + env(safe-area-inset-top));background:var(--surface);border-bottom:1px solid var(--line)}
+.brand{flex:1;min-width:0;font-weight:800;font-size:15px;letter-spacing:.03em;line-height:1.15}
+.brand small{display:block;font-weight:500;font-size:11.5px;color:var(--muted);letter-spacing:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.status{border:0;font-size:12px;font-weight:600;padding:6px 9px;border-radius:99px;background:var(--surface2);color:var(--muted);white-space:nowrap}
+.status.ok{color:var(--ok)}.status.warn{background:#fbe3bf;color:#6f4300}
+main{flex:1;min-height:0;position:relative}
+.tab{position:absolute;inset:0;overflow:auto;padding:12px 12px 32px;display:none;-webkit-overflow-scrolling:touch}
+.tab.active{display:block}
+.tab .wrapin{max-width:880px;margin:0 auto}
+.tabbar{flex:none;display:grid;grid-template-columns:repeat(5,1fr);background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+.tabbar button{height:var(--tabh);border:0;background:none;color:var(--muted);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;font-size:11.5px;font-weight:650;position:relative}
+.tabbar button .i{width:24px;height:24px}
+.tabbar button.active{color:var(--accent)}
+.tabbar button.active::after{content:"";position:absolute;top:0;left:25%;right:25%;height:3px;border-radius:0 0 3px 3px;background:var(--accent)}
+.btn{min-height:46px;padding:0 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-weight:600;font-size:15px;display:inline-flex;align-items:center;justify-content:center;gap:6px;white-space:nowrap;user-select:none}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.danger{color:var(--danger)}
+.btn.solid.danger{background:var(--danger);border-color:var(--danger);color:#fff}
+.btn.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn.sm{min-height:40px;padding:0 10px;font-size:14px}
+.btn.icon{width:46px;padding:0}.btn.sm.icon{width:40px}
+.btn.wide{width:100%}
+.btn:disabled{opacity:.35;pointer-events:none}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.row.end{justify-content:flex-end;margin-top:14px}
+.row.nowrap{flex-wrap:nowrap}
+.scrollx{display:flex;gap:8px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none}
+.scrollx::-webkit-scrollbar{display:none}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px;margin-bottom:12px}
+.note{background:var(--surface2);border-radius:10px;padding:10px 12px;font-size:14px;margin:8px 0}
+.chip{flex:none;min-height:42px;padding:0 14px;border-radius:99px;border:1px solid var(--line);background:var(--surface);font-weight:600;font-size:14px;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;position:relative}
+.chip.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip .cnt{font-size:12px;opacity:.65}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block;flex:none;box-shadow:0 0 0 1px rgba(0,0,0,.15)}
+.inp,select,textarea{width:100%;min-height:46px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:10px 12px;font:inherit;font-size:16px}
+textarea{resize:vertical;min-height:70px}
+.inp:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
+input[type=color].inp{padding:4px;height:46px}
+input[type=range]{width:100%;height:36px;accent-color:var(--accent)}
+input[type=checkbox]{width:22px;height:22px;accent-color:var(--accent)}
+label.f{display:flex;justify-content:space-between;font-size:13px;font-weight:650;color:var(--muted);margin:10px 0 4px}
+label.f output{color:var(--ink);font-variant-numeric:tabular-nums}
+label.ck{display:flex;align-items:center;gap:10px;min-height:44px;font-size:15px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:0 8px}
+.wrapbtns{margin:6px 0}
+details>summary{cursor:pointer;min-height:44px;display:flex;align-items:center;font-weight:650;list-style:none}
+details>summary::-webkit-details-marker{display:none}
+details>summary::after{content:"▾";margin-left:auto;color:var(--muted)}
+details[open]>summary::after{content:"▴"}
+/* references */
+.profile summary{gap:12px}
+.avatar{width:54px;height:54px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;overflow:hidden;background:var(--surface2);border:3px solid var(--line);font-weight:800;color:var(--muted)}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.pal{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.sw{width:46px;height:46px;border-radius:10px;border:1px solid var(--line)}
+.addcol{position:relative;overflow:hidden}
+.addcol input{position:absolute;inset:0;opacity:0;width:100%;height:100%;cursor:pointer}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--th,108px),1fr));gap:8px;margin-top:10px}
+.thumbs.size-s{--th:78px}.thumbs.size-m{--th:108px}.thumbs.size-l{--th:160px}
+.thumb{position:relative;display:flex;flex-direction:column;padding:0;border:1px solid var(--line);border-radius:10px;background:var(--surface);overflow:hidden;text-align:left}
+.ti{aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;background:conic-gradient(var(--c1) 25%,var(--c2) 0 50%,var(--c1) 0 75%,var(--c2) 0);background-size:16px 16px}
+.ti img{width:100%;height:100%;object-fit:contain;display:block}
+.ti em{font-size:12px;color:var(--muted);padding:6px;text-align:center}
+.thumb .tl{font-size:12.5px;font-weight:650;padding:5px 7px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.thumb .tc{font-size:11px;color:var(--muted);padding:0 7px 6px}
+.badge{position:absolute;top:5px;left:5px;font-size:10px;font-weight:800;padding:2px 6px;border-radius:6px;background:#555;color:#fff;letter-spacing:.04em;text-transform:uppercase}
+.b-official{background:#1d5fbf}.b-mine{background:#2f8a57}.b-puppet{background:#7a4fb5}
+.thumb .fav{position:absolute;top:3px;right:6px;color:#f2b400;font-size:18px;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.empty{text-align:center;padding:28px 14px;color:var(--muted);border:2px dashed var(--line);border-radius:var(--r);margin-top:12px}
+/* workspaces */
+.tab.ws.active{display:flex;flex-direction:column;padding:0;overflow:hidden}
+.ws .pane-top{flex:none;padding:8px 10px 2px;background:var(--surface);border-bottom:1px solid var(--line)}
+.toolstrip{flex:none;padding:8px 10px;background:var(--surface);border-bottom:1px solid var(--line)}
+.tool{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-width:62px;height:58px;padding:0 6px;border:1px solid var(--line);border-radius:10px;background:var(--surface);font-size:11.5px;font-weight:650}
+.tool .i{width:22px;height:22px}
+.tool.sep{margin-left:6px}
+.cwrap{flex:1 1 auto;min-height:180px;overflow:auto;display:flex;background:var(--surface2);padding:10px;position:relative}
+.cwrap canvas{margin:auto;display:block;box-shadow:0 1px 4px rgba(0,0,0,.3);touch-action:none;flex:none}
+.props{flex:none;max-height:42%;overflow:auto;background:var(--surface);border-top:1px solid var(--line)}
+.props.collapsed{max-height:none}
+.props.collapsed .pbody{display:none}
+.phead{position:sticky;top:0;z-index:2;display:flex;align-items:center;gap:8px;min-height:52px;padding:4px 10px 4px 14px;background:var(--surface);border-bottom:1px solid var(--line)}
+.phead b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pbody{padding:4px 14px 20px}
+.list{display:flex;flex-direction:column;gap:6px}
+.lrow{display:flex;align-items:center;gap:6px;min-height:48px;padding:4px 6px 4px 4px;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.lrow.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.lmain{flex:1;min-width:0;display:flex;align-items:center;gap:8px;border:0;background:none;text-align:left;min-height:44px;padding:0 4px}
+.lmain span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lmain img{width:38px;height:38px;object-fit:contain;border-radius:6px;background:conic-gradient(var(--c1) 25%,var(--c2) 0 50%,var(--c1) 0 75%,var(--c2) 0);background-size:10px 10px;flex:none}
+.num{flex:none;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--accent-ink);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center}
+.pagesel{min-width:0;flex:1}
+@media (min-width:900px){
+  .tab.ws.active{display:grid;grid-template-columns:1fr 390px;grid-template-rows:auto auto 1fr}
+  .ws .pane-top,.ws .toolstrip{grid-column:1/-1}
+  .ws .cwrap{grid-column:1;grid-row:3}
+  .ws .props{grid-column:2;grid-row:3;max-height:none;border-top:0;border-left:1px solid var(--line)}
+}
+/* storyboard */
+.chhead{display:flex;gap:8px;align-items:center}
+.code{flex:none;font-weight:900;font-size:15px;padding:0 10px;height:46px;display:flex;align-items:center;border-radius:10px;background:var(--ink);color:var(--bg)}
+.chtitle{font-weight:700}
+.pages{display:grid;grid-template-columns:repeat(auto-fill,minmax(138px,1fr));gap:10px;margin:10px 0}
+.pcard{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--surface)}
+.pthumb{border:0;padding:8px;background:var(--surface2);display:flex;justify-content:center;align-items:flex-start;max-height:230px;overflow:hidden}
+.pthumb canvas{width:100%;height:auto;display:block;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.plabel{padding:6px 8px 2px;font-weight:700;font-size:14px}
+.plabel small{display:block;font-weight:500;color:var(--muted);font-size:12px}
+.pbtns{display:flex;justify-content:space-between;padding:4px}
+.pcard.add{align-items:center;justify-content:center;gap:6px;min-height:150px;border-style:dashed;color:var(--muted);font-weight:650}
+.pcard.add .i{width:28px;height:28px}
+/* modals */
+#modalRoot .modal{position:fixed;inset:0;z-index:50;background:rgba(10,12,16,.55);display:flex;align-items:flex-end;justify-content:center}
+.modal .sheet{background:var(--surface);color:var(--ink);width:100%;max-width:560px;max-height:92vh;max-height:92dvh;overflow:auto;border-radius:16px 16px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+.modal.dialog{align-items:center;padding:16px}
+.modal.dialog .sheet{border-radius:16px;max-width:430px}
+.modal.full .sheet{max-width:none;height:100vh;height:100dvh;max-height:none;border-radius:0;padding:0;display:flex;flex-direction:column}
+@media (min-width:700px){.modal{align-items:center!important}.modal:not(.full) .sheet{border-radius:16px}}
+.vhead{flex:none;display:flex;align-items:center;gap:8px;padding:8px;padding-top:calc(8px + env(safe-area-inset-top));border-bottom:1px solid var(--line);background:var(--surface)}
+.vscroll{flex:1;overflow:auto}
+.vimg{height:52vh;display:flex;align-items:center;justify-content:center;overflow:hidden;background:conic-gradient(var(--c1) 25%,var(--c2) 0 50%,var(--c1) 0 75%,var(--c2) 0);background-size:20px 20px;touch-action:pan-y}
+.vimg img{max-width:100%;max-height:100%;object-fit:contain;user-select:none;-webkit-user-drag:none}
+.vimg.zoom{overflow:auto;display:block;touch-action:auto}
+.vimg.zoom img{max-width:none;max-height:none}
+.vform{padding:10px 14px calc(24px + env(safe-area-inset-bottom))}
+.vnav{padding:8px 14px 0}
+.pickbody{padding:12px 14px 24px;overflow:auto;flex:1}
+.rbody{flex:1;overflow:auto;display:flex;background:#2a2c31;padding:8px;touch-action:pan-y}
+.rbody canvas{margin:auto;display:block;box-shadow:0 2px 10px rgba(0,0,0,.5)}
+.rfoot{flex:none;padding:8px;padding-bottom:calc(8px + env(safe-area-inset-bottom));background:var(--surface)}
+.lays{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:10px}
+.lay{border:1px solid var(--line);border-radius:10px;background:var(--surface);padding:8px;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;font-weight:650}
+.lay svg{width:100%;height:auto}
+.seg{display:flex;gap:8px;flex-wrap:wrap}
+.seg label{flex:1;min-height:46px;display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:10px;padding:0 12px;font-weight:600}
+pre.script{white-space:pre-wrap;font:13px/1.5 ui-monospace,Menlo,"Roboto Mono",monospace;background:var(--surface2);padding:12px;border-radius:10px;max-height:55vh;overflow:auto}
+.help h3{margin-top:4px}.help li{margin:4px 0}.help details{border-top:1px solid var(--line)}.help details:first-of-type{border-top:0}
+kbd{font:inherit;font-weight:700;background:var(--surface2);border-radius:5px;padding:0 5px}
+#toast{position:fixed;left:50%;transform:translateX(-50%) translateY(20px);bottom:calc(var(--tabh) + 14px + env(safe-area-inset-bottom));z-index:100;max-width:min(92vw,520px);background:#1c1e23;color:#fff;padding:12px 16px;border-radius:12px;font-size:14.5px;box-shadow:0 6px 20px rgba(0,0,0,.3);opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.err{background:#8f2318}#toast.ok{background:#245f3e}
+.welcome ol{padding-left:20px}.welcome li{margin:6px 0}
+</style>
+</head>
+<body>
+<noscript><p style="padding:20px">HELIRUBY Studio needs JavaScript. Please open this file in Chrome or another modern browser.</p></noscript>
+
+<header class="topbar">
+  <div class="brand">HELIRUBY Studio<small id="projTitle">Loading…</small></div>
+  <button id="saveStatus" class="status" data-act="tab" data-tab="more" title="Storage status">Loading…</button>
+  <button class="btn icon sm" id="undoBtn" data-act="undo" aria-label="Undo" title="Undo"></button>
+  <button class="btn icon sm" id="redoBtn" data-act="redo" aria-label="Redo" title="Redo"></button>
+</header>
+
+<main>
+  <section class="tab" id="tab-refs" aria-label="References"></section>
+
+  <section class="tab ws" id="tab-puppet" aria-label="Puppet workspace">
+    <div class="pane-top"><div class="scrollx" id="pupChars"></div></div>
+    <div class="toolstrip scrollx" id="pupTools"></div>
+    <div class="cwrap" id="pupWrap"><canvas id="pupCanvas" width="10" height="10"></canvas></div>
+    <div class="props" id="pupProps"></div>
+  </section>
+
+  <section class="tab ws" id="tab-pages" aria-label="Panel editor">
+    <div class="pane-top"><div class="row nowrap" style="padding-bottom:6px">
+      <button class="btn icon" data-act="pgPrev" aria-label="Previous page" id="pgPrevBtn"></button>
+      <select id="pageSel" class="pagesel" aria-label="Choose page"></select>
+      <button class="btn icon" data-act="pgNext" aria-label="Next page" id="pgNextBtn"></button>
+      <button class="btn icon" data-act="addPageHere" aria-label="Add page after this one" id="pgAddBtn"></button>
+      <button class="btn icon" data-act="pageSettings" aria-label="Page settings" id="pgSetBtn"></button>
+    </div></div>
+    <div class="toolstrip scrollx" id="edTools"></div>
+    <div class="cwrap" id="edWrap"><canvas id="edCanvas" width="10" height="10"></canvas></div>
+    <div class="props" id="edProps"></div>
+  </section>
+
+  <section class="tab" id="tab-story" aria-label="Storyboard"></section>
+  <section class="tab" id="tab-more" aria-label="Save, export and help"></section>
+</main>
+
+<nav class="tabbar" id="tabbar"></nav>
+<div id="modalRoot"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+'use strict';
+/* =====================================================================
+   HELIRUBY Studio — single-file comic workbench
+   Data lives in IndexedDB (project JSON + images as data URLs).
+   No network requests are made; everything works offline once loaded.
+   ===================================================================== */
+
+/* ---------- tiny helpers ---------- */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>Array.from(r.querySelectorAll(s));
+const uid=(p='id')=>p+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmtN=v=>String(Math.round(v*100)/100);
+const deep=o=>JSON.parse(JSON.stringify(o));
+const normDeg=d=>((d+180)%360+360)%360-180;
+function rotPt(cx,cy,lx,ly,r){const c=Math.cos(r),s=Math.sin(r);return{x:cx+lx*c-ly*s,y:cy+lx*s+ly*c};}
+function toLocal(cx,cy,r,p){const dx=p.x-cx,dy=p.y-cy,c=Math.cos(r),s=Math.sin(r);return{x:dx*c+dy*s,y:-dx*s+dy*c};}
+function initials(n){return String(n).split(/\s+/).map(w=>w[0]||'').join('').slice(0,2).toUpperCase();}
+function slug(s,max=32){return String(s).normalize('NFKD').replace(/[^\w]+/g,'-').slice(0,max).replace(/^-+|-+$/g,'')||'comic';}
+function dateStr(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function hashStr(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return (h>>>0)/4294967295;}
+function srand(seed,i){const x=Math.sin(seed*9301+i*49.297)*233280;return x-Math.floor(x);}
+function loadImage(src){return new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>rej(new Error('decode'));i.src=src;});}
+function readAsDataURL(f){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>rej(r.error);r.readAsDataURL(f);});}
+function fitInto(w,h,mw,mh){const k=Math.min(mw/w,mh/h);return{w:w*k,h:h*k};}
+function hex6(c){c=String(c||'');if(/^#[0-9a-f]{6}$/i.test(c))return c;if(/^#[0-9a-f]{3}$/i.test(c))return '#'+c.slice(1).split('').map(x=>x+x).join('');return '#000000';}
+function dataURLtoBlob(d){const i=d.indexOf(',');const meta=d.slice(5,i);const mime=meta.split(';')[0]||'application/octet-stream';const b64=/;base64/.test(meta);const s=b64?atob(d.slice(i+1)):decodeURIComponent(d.slice(i+1));const u=new Uint8Array(s.length);for(let k=0;k<s.length;k++)u[k]=s.charCodeAt(k);return new Blob([u],{type:mime});}
+function friendlyErr(e){if(!e)return 'Unknown error';const n=e.name||'';if(n==='QuotaExceededError'||/quota/i.test(e.message||''))return 'Storage is full on this device. Save a project file as a backup, then remove unused images (More → Clean unused images).';return e.message||String(e);}
+
+/* ---------- icons (simple line icons drawn for this tool) ---------- */
+const ICONS={
+  image:'<rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/>',
+  puppet:'<circle cx="12" cy="4.5" r="2.5"/><path d="M12 7v7M12 14l-3.5 7M12 14l3.5 7M12 9.5l-5.5 3M12 9.5l5.5-2.5"/><circle cx="12" cy="14" r=".6"/>',
+  layout:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 10h18M12 10v11"/>',
+  story:'<rect x="3" y="4" width="7" height="7" rx="1"/><rect x="14" y="4" width="7" height="7" rx="1"/><path d="M3 15h18M3 19h12"/>',
+  more:'<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  bubble:'<path d="M12 4c5 0 9 3 9 7s-4 7-9 7c-1 0-2-.1-3-.4L4 20l1.4-4C4 14.8 3 13 3 11c0-4 4-7 9-7z"/>',
+  cloud:'<circle cx="8" cy="10" r="4"/><circle cx="14" cy="8" r="4.5"/><circle cx="16.5" cy="13" r="3.5"/><circle cx="10" cy="14" r="3.5"/><circle cx="5" cy="19" r="1.3"/>',
+  shout:'<path d="M12 2l2.2 5 5.4-1.8-2.4 5.1L22 13l-5.5 1.2.6 5.6-5.1-3.3L7 20l.4-5.6L2 13l4.8-2.7L4.4 5.2 9.8 7z"/>',
+  caption:'<rect x="3" y="5" width="18" height="12" rx="1"/><path d="M7 9h10M7 13h6"/>',
+  zap:'<path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>',
+  bgimg:'<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 16l5-5 4 4 3-3 6 6"/><circle cx="16" cy="8" r="1.6"/>',
+  undo:'<path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/>',
+  redo:'<path d="M15 14l5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/>',
+  zin:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M11 8v6M8 11h6"/>',
+  zout:'<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11h6"/>',
+  fit:'<path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3"/>',
+  eye:'<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>',
+  eyeoff:'<path d="M17.9 17.9A10 10 0 0 1 12 20c-7 0-11-8-11-8a18 18 0 0 1 5.1-5.9M9.9 4.2A9 9 0 0 1 12 4c7 0 11 8 11 8a18 18 0 0 1-2.2 3.2M1 1l22 22"/>',
+  sliders:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/>',
+  upload:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/>',
+  trash:'<path d="M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6"/>',
+  play:'<path d="M7 4l13 8-13 8z"/>',
+  left:'<path d="M15 18l-6-6 6-6"/>',right:'<path d="M9 18l6-6-6-6"/>',
+  up:'<path d="M12 19V5M5 12l7-7 7 7"/>',down:'<path d="M12 5v14M19 12l-7 7-7-7"/>',
+  close:'<path d="M18 6L6 18M6 6l12 12"/>',
+  star:'<path d="M12 2l3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/>',
+  save:'<path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><path d="M17 21v-8H7v8M7 3v5h8"/>',
+  folder:'<path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>',
+  grid:'<rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>',
+  text:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h8"/>',
+  copy:'<rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>',
+  flip:'<path d="M12 3v18M8 7l-5 5 5 5M16 7l5 5-5 5"/>',
+  lock:'<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
+  unlock:'<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 7.9-1"/>',
+  layers:'<path d="M12 2l10 5-10 5L2 7z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>',
+  pose:'<path d="M5 3h11l3 3v15H5z"/><circle cx="12" cy="9" r="2"/><path d="M12 11v4M9 13l3-1 3 1M10 19l2-4 2 4"/>',
+  edit:'<path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  help:'<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01"/>',
+  share:'<circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.6 13.5l6.8 4M15.4 6.5l-6.8 4"/>'
+};
+const I=n=>`<svg class="i" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[n]||''}</svg>`;
+
+/* ---------- constants ---------- */
+const APP_ID='heliruby-studio';
+const DEFAULT_TITLE='HELIRUBY: THANK YOU, RUBY. GOODBYE.';
+const CHAPTER_PRESET=[['C1','SUNSHINEEE!!!'],['C2','SMALL THINGS.'],['C3','Keep It to yourself helios.'],['C4','distancing.'],['C5','thanks. tracen.']];
+const CATS=[['expression','Expression'],['pose','Pose'],['outfit','Outfit'],['emotion','Emotion'],['other','Other']];
+const SOURCES=[['other','Unlabeled / unsure'],['official','Official art'],['mine','My drawing'],['puppet','Puppet pose']];
+const SRC_BADGE={official:'Official',mine:'Mine',puppet:'Puppet'};
+const PRESETS=[['print','Comic page 2:3',1200,1800],['a4','A4 portrait',1240,1754],['square','Square',1500,1500],['webtoon','Vertical / webtoon',800,2400],['land','Landscape',1800,1200]];
+const BUBBLE_STYLES=[['speech','Speech'],['thought','Thought'],['shout','Shout'],['whisper','Whisper (dashed)'],['caption','Caption box']];
+const FONTS={comic:"'Comic Sans MS','Comic Neue','Chalkboard SE','Segoe Print',sans-serif",sans:"system-ui,-apple-system,Roboto,'Segoe UI',Arial,sans-serif",serif:"Georgia,'Noto Serif','Times New Roman',serif",impact:"Impact,'Arial Black','Roboto Condensed',sans-serif",mono:"ui-monospace,'Roboto Mono',Menlo,monospace"};
+const FONT_NAMES=[['comic','Comic'],['sans','Clean sans'],['serif','Serif'],['impact','Heavy / impact'],['mono','Typewriter']];
+const LAYOUTS=[
+  {id:'1',label:'1 big panel',rows:[[1,[1]]]},
+  {id:'2r',label:'2 rows',rows:[[1,[1]],[1,[1]]]},
+  {id:'2c',label:'2 columns',rows:[[1,[1,1]]]},
+  {id:'3r',label:'3 rows',rows:[[1,[1]],[1,[1]],[1,[1]]]},
+  {id:'1-2',label:'1 top, 2 below',rows:[[1.2,[1]],[1,[1,1]]]},
+  {id:'2-1',label:'2 top, 1 below',rows:[[1,[1,1]],[1.2,[1]]]},
+  {id:'2x2',label:'2 × 2 grid',rows:[[1,[1,1]],[1,[1,1]]]},
+  {id:'1-2-1',label:'1 / 2 / 1',rows:[[1,[1]],[1,[1,1]],[1,[1]]]},
+  {id:'2-1-2',label:'2 / 1 / 2',rows:[[1,[1,1]],[1.1,[1]],[1,[1,1]]]},
+  {id:'3x2',label:'6 panels',rows:[[1,[1,1]],[1,[1,1]],[1,[1,1]]]},
+  {id:'w3',label:'Wide + 3 small',rows:[[1.4,[1]],[1,[1,1,1]]]},
+  {id:'4r',label:'4 rows',rows:[[1,[1]],[1,[1]],[1,[1]],[1,[1]]]},
+  {id:'big-l',label:'Big + side stack',rows:[[1,[2,1]],[1,[1]]]}
+];
+
+/* ---------- UI prefs (per browser, not part of the project) ---------- */
+const ui=(()=>{const d={tab:'refs',charId:'helios',cat:'all',q:'',src:'all',grid:'m',pageId:null,puppetChar:'helios',theme:'auto',showOrder:true,seenWelcome:false,profileOpen:false};try{return Object.assign(d,JSON.parse(localStorage.getItem('heliruby-ui')||'{}'));}catch(e){return d;}})();
+function saveUI(){try{localStorage.setItem('heliruby-ui',JSON.stringify(ui));}catch(e){}}
+
+/* ---------- toast / errors ---------- */
+let toastT;
+function toast(msg,kind=''){const t=$('#toast');t.textContent=msg;t.className='show '+kind;clearTimeout(toastT);toastT=setTimeout(()=>{t.className='';},kind==='err'?6000:2800);}
+function reportErr(e){console.error(e);toast(friendlyErr(e),'err');}
+window.addEventListener('error',e=>{if(e.message&&!/ResizeObserver/.test(e.message))toast('Something went wrong: '+e.message,'err');});
+window.addEventListener('unhandledrejection',e=>{toast('Something went wrong: '+friendlyErr(e.reason),'err');});
+
+/* =====================================================================
+   STORAGE
+   ===================================================================== */
+let db=null;
+const memImages=new Map();   // imgId -> dataURL
+const urlCache=new Map();    // imgId -> blob: URL (cheap for <img>)
+const imgCache=new Map();    // imgId -> HTMLImageElement (for canvas)
+const alphaCache=new Map();  // imgId -> small alpha map for hit testing
+function openDB(){return new Promise((res,rej)=>{let r;try{r=indexedDB.open('heliruby-studio',1);}catch(e){rej(e);return;}
+  r.onupgradeneeded=()=>{const d=r.result;if(!d.objectStoreNames.contains('kv'))d.createObjectStore('kv');if(!d.objectStoreNames.contains('images'))d.createObjectStore('images');};
+  r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error||new Error('IndexedDB failed'));r.onblocked=()=>rej(new Error('Storage is blocked by another open tab.'));
+  setTimeout(()=>rej(new Error('Storage did not respond.')),6000);});}
+function idb(store,mode,fn){return new Promise((res,rej)=>{let tx;try{tx=db.transaction(store,mode);}catch(e){rej(e);return;}const st=tx.objectStore(store);let out;const r=fn(st);if(r)r.onsuccess=()=>{out=r.result;};tx.oncomplete=()=>res(out);tx.onerror=()=>rej(tx.error);tx.onabort=()=>rej(tx.error||new Error('Storage write aborted'));});}
+async function putImage(id,dataURL){memImages.set(id,dataURL);if(!db)return;try{await idb('images','readwrite',s=>s.put(dataURL,id));}catch(e){memImages.delete(id);throw new Error(friendlyErr(e));}}
+async function deleteImage(id){memImages.delete(id);const u=urlCache.get(id);if(u&&u.startsWith('blob:'))URL.revokeObjectURL(u);urlCache.delete(id);imgCache.delete(id);alphaCache.delete(id);if(db)await idb('images','readwrite',s=>s.delete(id));}
+async function loadAllImages(){if(!db)return;const keys=await idb('images','readonly',s=>s.getAllKeys());const vals=await idb('images','readonly',s=>s.getAll());keys.forEach((k,i)=>memImages.set(k,vals[i]));}
+function urlFor(id){let u=urlCache.get(id);if(u)return u;const d=memImages.get(id);if(!d)return '';try{u=URL.createObjectURL(dataURLtoBlob(d));}catch(e){u=d;}urlCache.set(id,u);return u;}
+let refreshT;
+function getImg(id){if(!id)return null;let im=imgCache.get(id);if(im)return(im.complete&&im.naturalWidth)?im:null;if(!memImages.has(id))return null;im=new Image();im.onload=()=>{clearTimeout(refreshT);refreshT=setTimeout(redrawAll,30);};im.src=urlFor(id);imgCache.set(id,im);return null;}
+async function ensureImgs(ids){await Promise.all(ids.map(id=>{getImg(id);const im=imgCache.get(id);if(!im||(im.complete&&im.naturalWidth))return null;return new Promise(r=>{im.addEventListener('load',r,{once:true});im.addEventListener('error',r,{once:true});setTimeout(r,8000);});}));}
+
+/* save state */
+let saveT=null,saving=false,dirty=false;
+function setStatus(t,kind=''){const s=$('#saveStatus');s.textContent=t;s.className='status '+kind;}
+function scheduleSave(){dirty=true;if(db)setStatus('Saving…');clearTimeout(saveT);saveT=setTimeout(saveNow,700);}
+async function saveNow(){clearTimeout(saveT);if(!db){setStatus('Not stored — save a file','warn');return;}if(!dirty)return;if(saving){saveT=setTimeout(saveNow,400);return;}
+  saving=true;dirty=false;try{await idb('kv','readwrite',s=>s.put(JSON.stringify(project),'project'));setStatus('Saved ✓','ok');}
+  catch(e){dirty=true;setStatus('Save failed','warn');toast('Autosave failed: '+friendlyErr(e),'err');}finally{saving=false;}}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveNow();});
+window.addEventListener('pagehide',()=>saveNow());
+
+/* =====================================================================
+   PROJECT MODEL
+   ===================================================================== */
+let project=null;
+function defaultChars(){return[
+  {id:'helios',name:'Daitaku Helios',color:'#e2a012',notes:'',palette:[],avatar:null,fixed:true},
+  {id:'ruby',name:'Daiichi Ruby',color:'#a51f3b',notes:'',palette:[],avatar:null,fixed:true},
+  {id:'bg',name:'Backgrounds & Props',color:'#5d7f6e',notes:'',palette:[],avatar:null,fixed:true}];}
+function newProject(){const p={app:APP_ID,version:1,title:DEFAULT_TITLE,created:Date.now(),characters:defaultChars(),refs:[],
+  chapters:CHAPTER_PRESET.map(([code,title])=>({id:uid('ch'),code,title,notes:'',pages:[]})),pages:{},puppets:{}};
+  const pg=makePage({});p.pages[pg.id]=pg;p.chapters[0].pages.push(pg.id);return p;}
+function panelDefaults(){return{id:uid('pn'),x:0,y:0,w:300,h:300,border:6,borderColor:'#111111',bg:'#ffffff',bgImg:null,bgFit:'cover',bgOpacity:1,radius:0,note:'',items:[]};}
+const ITEM_DEFAULTS={
+  image:()=>({x:0,y:0,w:100,h:100,rot:0,flip:false,opacity:1,clip:true,imgId:null}),
+  bubble:()=>({x:0,y:0,w:300,h:150,style:'speech',text:'',speaker:'',font:'comic',size:34,bold:false,italic:false,align:'center',tail:true,tx:0,ty:0,fill:'#ffffff',stroke:'#111111',textColor:'#111111',lineW:4,fit:true}),
+  sfx:()=>({x:0,y:0,text:'SFX',font:'impact',size:120,rot:0,color:'#111111',stroke:'#ffffff',strokeW:8})};
+function rigDefaults(){return{w:1000,h:1250,parts:[],poses:[],bg:'checker',grid:false,trace:null,traceOpacity:0.35,showTrace:true};}
+function partDefaults(){return{id:uid('pt'),name:'Part',imgId:null,w:100,h:100,x:500,y:600,px:.5,py:.5,scale:1,rot:0,flip:false,opacity:1,hidden:false,locked:false};}
+function makePage(o){const w=o.w||1200,h=o.h||1800;const pg={id:uid('pg'),name:'',w,h,bg:o.bg||'#ffffff',margin:o.margin??Math.round(w*.04),gutter:o.gutter??Math.round(w*.025),notes:'',panels:[]};
+  applyLayout(pg,LAYOUTS.find(l=>l.id===(h/w>1.9?'3r':'1-2')));return pg;}
+function layoutRects(pg,L){const m=pg.margin,g=pg.gutter,W=pg.w-2*m,H=pg.h-2*m;const tot=L.rows.reduce((a,r)=>a+r[0],0);const aH=H-g*(L.rows.length-1);let y=m;const out=[];
+  for(const[hw,cols]of L.rows){const rh=aH*hw/tot,tw=cols.reduce((a,b)=>a+b,0),aW=W-g*(cols.length-1);let x=m;for(const cw of cols){const w=aW*cw/tw;out.push({x:Math.round(x),y:Math.round(y),w:Math.round(w),h:Math.round(rh)});x+=w+g;}y+=rh+g;}return out;}
+function shiftItems(pn,dx,dy){for(const it of pn.items){it.x+=dx;it.y+=dy;if(it.type==='bubble'){it.tx+=dx;it.ty+=dy;}}}
+function applyLayout(pg,L){const rects=layoutRects(pg,L);const bw=Math.max(2,Math.round(pg.w/200));rects.forEach((r,i)=>{let pn=pg.panels[i];
+  if(pn){shiftItems(pn,r.x-pn.x,r.y-pn.y);Object.assign(pn,r);}else{pn=Object.assign(panelDefaults(),r,{border:bw});pg.panels.push(pn);}});return rects.length;}
+function normalize(p){
+  if(!p||typeof p!=='object')throw new Error('Not a project');
+  p.app=APP_ID;p.version=1;p.title=typeof p.title==='string'?p.title:DEFAULT_TITLE;
+  const chars=Array.isArray(p.characters)?p.characters.filter(c=>c&&c.id):[];
+  for(const d of defaultChars().reverse())if(!chars.some(c=>c.id===d.id))chars.unshift(d);
+  p.characters=chars.map(c=>Object.assign({name:'Character',color:'#777777',notes:'',palette:[],avatar:null,fixed:false},c,{color:hex6(c.color||'#777777'),palette:Array.isArray(c.palette)?c.palette.map(hex6):[]}));
+  p.refs=(Array.isArray(p.refs)?p.refs:[]).filter(r=>r&&r.id&&r.imgId).map(r=>Object.assign({charId:'helios',w:100,h:100,label:'',cat:'other',source:'other',tags:'',notes:'',fav:false,added:Date.now()},r));
+  p.pages=(p.pages&&typeof p.pages==='object')?p.pages:{};
+  for(const id of Object.keys(p.pages)){const pg=p.pages[id];if(!pg||typeof pg!=='object'){delete p.pages[id];continue;}
+    Object.assign(pg,Object.assign({name:'',w:1200,h:1800,bg:'#ffffff',margin:48,gutter:30,notes:'',panels:[]},pg,{id}));pg.bg=hex6(pg.bg);
+    pg.panels=(Array.isArray(pg.panels)?pg.panels:[]).filter(Boolean).map(pn=>{const n=Object.assign(panelDefaults(),pn);n.items=(Array.isArray(n.items)?n.items:[]).filter(it=>it&&ITEM_DEFAULTS[it.type]).map(it=>Object.assign(ITEM_DEFAULTS[it.type](),it,{id:it.id||uid('it')}));return n;});}
+  p.chapters=(Array.isArray(p.chapters)?p.chapters:[]).filter(Boolean).map(c=>Object.assign({id:uid('ch'),code:'C?',title:'',notes:'',pages:[]},c));
+  if(!p.chapters.length)p.chapters=CHAPTER_PRESET.map(([code,title])=>({id:uid('ch'),code,title,notes:'',pages:[]}));
+  const seen=new Set();for(const c of p.chapters){c.pages=(Array.isArray(c.pages)?c.pages:[]).filter(id=>p.pages[id]&&!seen.has(id)&&seen.add(id));}
+  for(const id of Object.keys(p.pages))if(!seen.has(id))p.chapters[0].pages.push(id);
+  p.puppets=(p.puppets&&typeof p.puppets==='object')?p.puppets:{};
+  for(const k of Object.keys(p.puppets)){const r=Object.assign(rigDefaults(),p.puppets[k]);r.parts=(Array.isArray(r.parts)?r.parts:[]).filter(q=>q&&q.imgId).map(q=>Object.assign(partDefaults(),q));r.poses=Array.isArray(r.poses)?r.poses:[];p.puppets[k]=r;}
+  return p;}
+const charById=id=>project.characters.find(c=>c.id===id);
+const allPageIds=()=>project.chapters.flatMap(c=>c.pages);
+const chapterOf=pid=>project.chapters.find(c=>c.pages.includes(pid));
+function pageLabel(pid){const ch=chapterOf(pid);const pg=project.pages[pid];if(!ch||!pg)return 'Page';return `${ch.code} · Page ${ch.pages.indexOf(pid)+1}${pg.name?' — '+pg.name:''}`;}
+function referencedImageIds(){const s=new Set();project.characters.forEach(c=>c.avatar&&s.add(c.avatar));project.refs.forEach(r=>s.add(r.imgId));
+  Object.values(project.pages).forEach(pg=>pg.panels.forEach(pn=>{if(pn.bgImg)s.add(pn.bgImg);pn.items.forEach(it=>it.imgId&&s.add(it.imgId));}));
+  Object.values(project.puppets).forEach(r=>{if(r.trace)s.add(r.trace);r.parts.forEach(q=>s.add(q.imgId));});return s;}
+function cloneWithIds(pg){const c=deep(pg);c.id=uid('pg');c.panels.forEach(pn=>{pn.id=uid('pn');pn.items.forEach(it=>it.id=uid('it'));});return c;}
+
+/* ---------- undo / redo (snapshots of project JSON; images are stored separately) ---------- */
+const hist={undo:[],redo:[],last:null,t:null};
+function commit(debounced){clearTimeout(hist.t);const go=()=>{const s=JSON.stringify(project);if(s===hist.last)return;if(hist.last!==null){hist.undo.push(hist.last);if(hist.undo.length>60)hist.undo.shift();}hist.last=s;hist.redo.length=0;updateUndoBtns();scheduleSave();};if(debounced)hist.t=setTimeout(go,500);else go();}
+function restoreSnap(s){project=JSON.parse(s);hist.last=s;updateUndoBtns();scheduleSave();updateTitle();renderTab(ui.tab);}
+function updateUndoBtns(){$('#undoBtn').disabled=!hist.undo.length;$('#redoBtn').disabled=!hist.redo.length;}
+
+/* =====================================================================
+   IMAGE IMPORT
+   ===================================================================== */
+function pickFiles({accept='image/*',multiple=true}={}){return new Promise(res=>{const i=document.createElement('input');i.type='file';if(accept)i.accept=accept;i.multiple=multiple;i.style.display='none';document.body.appendChild(i);i.addEventListener('change',()=>{res(Array.from(i.files||[]));i.remove();});i.click();});}
+async function importImageFile(file,{maxSide=2400}={}){
+  const name=file.name||'image';
+  if(/\.(heic|heif)$/i.test(name)||/hei[cf]/i.test(file.type))throw new Error(`"${name}" is a HEIC photo, which browsers can't open. Convert it to JPG or PNG first.`);
+  if(file.type&&!file.type.startsWith('image/'))throw new Error(`"${name}" is not an image file.`);
+  if(file.size>40e6)throw new Error(`"${name}" is larger than 40 MB. Please resize it first.`);
+  const url=URL.createObjectURL(file);let img;
+  try{img=await loadImage(url);}catch(e){URL.revokeObjectURL(url);throw new Error(`Couldn't open "${name}". It may be damaged or in an unsupported format.`);}
+  let w=img.naturalWidth,h=img.naturalHeight;if(!w||!h){URL.revokeObjectURL(url);throw new Error(`"${name}" has no size.`);}
+  const k=Math.min(1,maxSide/Math.max(w,h));const isJpeg=/jpe?g/i.test(file.type)||/\.jpe?g$/i.test(name);let dataURL;
+  try{
+    if(k===1&&file.size<=3e6&&/^image\/(png|jpeg|webp|gif)$/.test(file.type))dataURL=await readAsDataURL(file);
+    else{const c=document.createElement('canvas');c.width=Math.max(1,Math.round(w*k));c.height=Math.max(1,Math.round(h*k));c.getContext('2d').drawImage(img,0,0,c.width,c.height);dataURL=c.toDataURL(isJpeg?'image/jpeg':'image/png',.92);w=c.width;h=c.height;}
+  }finally{URL.revokeObjectURL(url);}
+  const id=uid('img');await putImage(id,dataURL);return{id,w,h,name:name.replace(/\.[^.]+$/,''),jpeg:isJpeg};}
+async function canvasToImage(c){const d=c.toDataURL('image/png');const id=uid('img');await putImage(id,d);return{id,w:c.width,h:c.height};}
+
+/* =====================================================================
+   MODALS (Android back button closes the top modal)
+   ===================================================================== */
+const modals=[];
+function openModal(html,{cls='',onClose}={}){const m=document.createElement('div');m.className='modal '+cls;m.innerHTML=`<div class="sheet" role="dialog" aria-modal="true">${html}</div>`;$('#modalRoot').appendChild(m);modals.push({el:m,onClose});
+  try{if(!(history.state&&history.state.heli))history.pushState({heli:1},'');}catch(e){}
+  m.addEventListener('pointerdown',e=>{m._downOnBackdrop=e.target===m;});m.addEventListener('click',e=>{if(e.target===m&&m._downOnBackdrop)closeModal();});return m;}
+function closeModal(){const r=modals.pop();if(!r)return;r.el.remove();try{r.onClose&&r.onClose();}catch(e){reportErr(e);}}
+window.addEventListener('popstate',()=>{if(modals.length){closeModal();if(modals.length){try{history.pushState({heli:1},'');}catch(e){}}}});
+function ask(o){return new Promise(res=>{let done=false;const fin=v=>{if(!done){done=true;res(v);}};const hasInp=o.input!=null;
+  const m=openModal(`<h3>${esc(o.title||'')}</h3>${o.msg?`<p>${o.msg}</p>`:''}${hasInp?`<input class="inp" id="askInp" value="${esc(o.input)}" placeholder="${esc(o.ph||'')}" maxlength="120">`:''}
+   <div class="row end">${o.cancel===false?'':`<button class="btn" data-r="0">${esc(o.cancel||'Cancel')}</button>`}<button class="btn ${o.danger?'solid danger':'primary'}" data-r="1">${esc(o.ok||'OK')}</button></div>`,{cls:'dialog',onClose:()=>fin(hasInp?null:false)});
+  const inp=m.querySelector('#askInp');if(inp){setTimeout(()=>{inp.focus();inp.select();},60);inp.addEventListener('keydown',e=>{if(e.key==='Enter')m.querySelector('[data-r="1"]').click();});}
+  m.querySelectorAll('[data-r]').forEach(b=>b.addEventListener('click',()=>{const ok=b.dataset.r==='1';fin(hasInp?(ok?inp.value.trim():null):ok);closeModal();}));});}
+
+function pickImage(title='Choose an image'){return new Promise(res=>{let done=false;const fin=v=>{if(!done){done=true;res(v);}};let filt=charById(ui.charId)?ui.charId:'all';
+  const m=openModal('',{cls:'full',onClose:()=>fin(null)});
+  const draw=()=>{const refs=project.refs.filter(r=>filt==='all'||r.charId===filt);
+    m.querySelector('.sheet').innerHTML=`<div class="vhead"><button class="btn icon" data-x="close" aria-label="Close">${I('close')}</button><b class="grow">${esc(title)}</b></div>
+    <div class="pickbody"><button class="btn primary wide" data-x="upload">${I('upload')} Upload from this device</button>
+    <p class="muted small" style="margin-top:12px">…or pick one of your references:</p>
+    <div class="scrollx"><button class="chip ${filt==='all'?'on':''}" data-x="filt" data-id="all">All</button>${project.characters.map(c=>`<button class="chip ${filt===c.id?'on':''}" data-x="filt" data-id="${c.id}"><i class="dot" style="background:${c.color}"></i>${esc(c.name)}</button>`).join('')}</div>
+    ${refs.length?`<div class="thumbs size-m">${refs.map(r=>refTile(r,'data-x="pick"')).join('')}</div>`:`<div class="empty">No references here yet.</div>`}</div>`;};
+  draw();
+  m.addEventListener('click',async e=>{const b=e.target.closest('[data-x]');if(!b)return;const x=b.dataset.x;
+    if(x==='close')closeModal();
+    else if(x==='filt'){filt=b.dataset.id;draw();}
+    else if(x==='pick'){const r=project.refs.find(r=>r.id===b.dataset.id);if(!r||!memImages.has(r.imgId))return toast('That image is missing.','err');fin({imgId:r.imgId,w:r.w,h:r.h});closeModal();}
+    else if(x==='upload'){const files=await pickFiles({multiple:false});if(!files.length)return;try{toast('Adding image…');const im=await importImageFile(files[0]);fin({imgId:im.id,w:im.w,h:im.h});closeModal();}catch(err){toast(err.message,'err');}}});});}
+
+/* =====================================================================
+   CANVAS VIEW (pan by dragging empty space, pinch / buttons to zoom)
+   ===================================================================== */
+class View{
+  constructor(wrap,canvas,o){this.wrap=wrap;this.c=canvas;this.ctx=canvas.getContext('2d');this.o=o;this.zoom=1;this.scale=1;this.dpr=1;this.pointers=new Map();this.mode=null;this.raf=0;
+    canvas.addEventListener('pointerdown',e=>this.pd(e));canvas.addEventListener('pointermove',e=>this.pm(e));canvas.addEventListener('pointerup',e=>this.pu(e,false));canvas.addEventListener('pointercancel',e=>this.pu(e,true));
+    canvas.addEventListener('contextmenu',e=>e.preventDefault());
+    wrap.addEventListener('wheel',e=>{if(e.ctrlKey){e.preventDefault();this.setZoom(this.zoom*(e.deltaY<0?1.12:.89),{x:e.clientX,y:e.clientY});}},{passive:false});
+    if(window.ResizeObserver)new ResizeObserver(()=>this.layout()).observe(wrap);else window.addEventListener('resize',()=>this.layout());}
+  layout(){const s=this.o.size();if(!s||!this.wrap.clientWidth||!this.wrap.clientHeight){this.drawNow();return;}
+    const fit=Math.min((this.wrap.clientWidth-22)/s.w,(this.wrap.clientHeight-22)/s.h);this.scale=Math.max(.02,fit)*this.zoom;
+    const cw=Math.max(1,Math.round(s.w*this.scale)),ch=Math.max(1,Math.round(s.h*this.scale));
+    this.dpr=Math.min(window.devicePixelRatio||1,2,4096/Math.max(cw,ch));this.c.style.width=cw+'px';this.c.style.height=ch+'px';
+    const bw=Math.max(1,Math.round(cw*this.dpr)),bh=Math.max(1,Math.round(ch*this.dpr));if(this.c.width!==bw||this.c.height!==bh){this.c.width=bw;this.c.height=bh;}this.drawNow();}
+  draw(){if(this.raf)return;this.raf=requestAnimationFrame(()=>{this.raf=0;this.drawNow();});}
+  drawNow(){const ctx=this.ctx;ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,this.c.width,this.c.height);const s=this.o.size();if(!s)return;const k=this.dpr*this.scale;ctx.setTransform(k,0,0,k,0,0);try{this.o.draw(ctx,this.scale);}catch(e){console.error(e);}}
+  toPage(e){const r=this.c.getBoundingClientRect();return{x:(e.clientX-r.left)/this.scale,y:(e.clientY-r.top)/this.scale};}
+  setZoom(z,anchor){z=clamp(z,.4,8);const r=this.c.getBoundingClientRect();if(!anchor){const w=this.wrap.getBoundingClientRect();anchor={x:w.left+w.width/2,y:w.top+w.height/2};}
+    const px=(anchor.x-r.left)/this.scale,py=(anchor.y-r.top)/this.scale;this.zoom=z;this.layout();const r2=this.c.getBoundingClientRect();
+    this.wrap.scrollLeft+=(r2.left+px*this.scale)-anchor.x;this.wrap.scrollTop+=(r2.top+py*this.scale)-anchor.y;}
+  pd(e){e.preventDefault();try{this.c.setPointerCapture(e.pointerId);}catch(_){}this.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(this.pointers.size===2){if(this.mode==='drag')this.o.up(this.toPage(e),this.moved,true);const[a,b]=[...this.pointers.values()];this.mode='pinch';this.pz={d:Math.hypot(a.x-b.x,a.y-b.y)||1,z:this.zoom};return;}
+    if(this.pointers.size>2)return;this.start={x:e.clientX,y:e.clientY,sl:this.wrap.scrollLeft,st:this.wrap.scrollTop};this.moved=false;
+    let handled=false;try{handled=this.o.down(this.toPage(e),e);}catch(err){reportErr(err);}this.mode=handled?'drag':'pan';}
+  pm(e){if(!this.pointers.has(e.pointerId))return;this.pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(this.mode==='pinch'){if(this.pointers.size<2)return;const[a,b]=[...this.pointers.values()];this.setZoom(this.pz.z*Math.hypot(a.x-b.x,a.y-b.y)/this.pz.d,{x:(a.x+b.x)/2,y:(a.y+b.y)/2});return;}
+    if(!this.mode)return;const dx=e.clientX-this.start.x,dy=e.clientY-this.start.y;if(!this.moved&&Math.hypot(dx,dy)>6)this.moved=true;
+    if(this.mode==='pan'){this.wrap.scrollLeft=this.start.sl-dx;this.wrap.scrollTop=this.start.st-dy;}else if(this.moved){try{this.o.move(this.toPage(e),e);}catch(err){reportErr(err);}}}
+  pu(e,cancel){if(!this.pointers.has(e.pointerId))return;this.pointers.delete(e.pointerId);if(this.mode==='pinch'){if(!this.pointers.size)this.mode=null;return;}
+    if(this.mode==='drag'){try{this.o.up(this.toPage(e),this.moved,cancel);}catch(err){reportErr(err);}}this.mode=null;}
+}
+
+/* =====================================================================
+   PAGE RENDERING (used for editing, thumbnails, preview and export)
+   ===================================================================== */
+const MC=document.createElement('canvas').getContext('2d'); // measuring context
+function rrPath(ctx,x,y,w,h,r){r=Math.max(0,Math.min(r,w/2,h/2));ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.arcTo(x+w,y,x+w,y+r,r);ctx.lineTo(x+w,y+h-r);ctx.arcTo(x+w,y+h,x+w-r,y+h,r);ctx.lineTo(x+r,y+h);ctx.arcTo(x,y+h,x,y+h-r,r);ctx.lineTo(x,y+r);ctx.arcTo(x,y,x+r,y,r);ctx.closePath();}
+function drawMissing(ctx,x,y,w,h,label){ctx.save();ctx.fillStyle='rgba(128,128,128,.15)';ctx.fillRect(x,y,w,h);ctx.strokeStyle='rgba(120,120,120,.8)';ctx.lineWidth=Math.max(2,w/150);ctx.setLineDash([10,8]);ctx.strokeRect(x,y,w,h);ctx.setLineDash([]);
+  ctx.fillStyle='rgba(90,90,90,.9)';ctx.font=`${Math.max(12,Math.min(w,h)/10)}px system-ui,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(label,x+w/2,y+h/2);ctx.restore();}
+function drawImageItem(ctx,it,o){const im=getImg(it.imgId);ctx.save();ctx.translate(it.x+it.w/2,it.y+it.h/2);ctx.rotate((it.rot||0)*Math.PI/180);
+  if(im){ctx.scale(it.flip?-1:1,1);ctx.globalAlpha=it.opacity??1;ctx.drawImage(im,-it.w/2,-it.h/2,it.w,it.h);}else if(o&&o.edit)drawMissing(ctx,-it.w/2,-it.h/2,it.w,it.h,memImages.has(it.imgId)?'Loading…':'Image missing');ctx.restore();}
+function drawPanelBg(ctx,pn){const im=getImg(pn.bgImg);if(!im)return;const k=(pn.bgFit==='contain'?Math.min:Math.max)(pn.w/im.naturalWidth,pn.h/im.naturalHeight);const w=im.naturalWidth*k,h=im.naturalHeight*k;ctx.save();ctx.globalAlpha=pn.bgOpacity??1;ctx.drawImage(im,pn.x+(pn.w-w)/2,pn.y+(pn.h-h)/2,w,h);ctx.restore();}
+function renderPage(ctx,pg,o={}){
+  ctx.save();ctx.fillStyle=pg.bg||'#ffffff';ctx.fillRect(0,0,pg.w,pg.h);
+  for(const pn of pg.panels){ctx.save();rrPath(ctx,pn.x,pn.y,pn.w,pn.h,pn.radius||0);ctx.clip();ctx.fillStyle=pn.bg||'#ffffff';ctx.fillRect(pn.x,pn.y,pn.w,pn.h);
+    if(pn.bgImg)drawPanelBg(ctx,pn);for(const it of pn.items)if(it.type==='image'&&it.clip!==false)drawImageItem(ctx,it,o);ctx.restore();
+    if(pn.border>0){const b=pn.border;ctx.save();ctx.lineWidth=b;ctx.strokeStyle=pn.borderColor||'#111';ctx.lineJoin='round';rrPath(ctx,pn.x+b/2,pn.y+b/2,pn.w-b,pn.h-b,Math.max(0,(pn.radius||0)-b/2));ctx.stroke();ctx.restore();}}
+  for(const pn of pg.panels)for(const it of pn.items){if(it.type==='image'){if(it.clip===false)drawImageItem(ctx,it,o);}else if(it.type==='bubble')drawBubble(ctx,it);else if(it.type==='sfx')drawSfx(ctx,it);}
+  ctx.restore();}
+const fontStr=(b,size)=>`${b.italic?'italic ':''}${b.bold?'700':'400'} ${size}px ${FONTS[b.font]||FONTS.comic}`;
+function wrapText(ctx,text,maxW){const lines=[];for(const para of String(text??'').split('\n')){const toks=para.match(/\S+\s*/g)||[''];let line='';
+  for(let tk of toks){if(ctx.measureText((line+tk).trimEnd()).width<=maxW){line+=tk;continue;}if(line){lines.push(line.trimEnd());line='';}
+    while(tk.length>1&&ctx.measureText(tk.trimEnd()).width>maxW){let n=tk.length-1;while(n>1&&ctx.measureText(tk.slice(0,n)).width>maxW)n--;lines.push(tk.slice(0,n));tk=tk.slice(n);}line=tk;}
+  lines.push(line.trimEnd());}return lines;}
+function bubbleInner(b){if(b.style==='caption'){const p=Math.max(6,b.size*.45);return{x:b.x+p,y:b.y+p,w:Math.max(10,b.w-2*p),h:Math.max(10,b.h-2*p)};}
+  const k=b.style==='shout'?.6:b.style==='thought'?.66:.72;const w=b.w*k,h=b.h*k;return{x:b.x+(b.w-w)/2,y:b.y+(b.h-h)/2,w,h};}
+function layoutBubbleText(ctx,b){const box=bubbleInner(b);let size=Math.max(6,b.size);for(;;){ctx.font=fontStr(b,size);const lines=wrapText(ctx,b.text,box.w);const lh=size*1.18;
+  const fits=lines.length*lh<=box.h+.5&&lines.every(l=>ctx.measureText(l).width<=box.w+.5);if(fits||b.fit===false||size<=10)return{lines,size,lh,box};size=Math.max(10,size-2);}}
+function drawBubble(ctx,b){
+  const cx=b.x+b.w/2,cy=b.y+b.h/2,rx=Math.max(4,b.w/2),ry=Math.max(4,b.h/2),lw=Math.max(0,b.lineW??4);
+  ctx.save();ctx.lineJoin='round';ctx.lineCap='round';ctx.fillStyle=b.fill||'#fff';ctx.strokeStyle=b.stroke||'#111';
+  const ndx=(b.tx-cx)/rx,ndy=(b.ty-cy)/ry;const tailOn=b.tail&&b.style!=='caption'&&(ndx*ndx+ndy*ndy)>1.05;const ang=Math.atan2(ndy,ndx);
+  const onE=(a,f)=>({x:cx+rx*f*Math.cos(a),y:cy+ry*f*Math.sin(a)});
+  const shapes=[];let extras=null;
+  if(b.style==='caption'){shapes.push(()=>{ctx.beginPath();ctx.rect(b.x,b.y,b.w,b.h);});}
+  else if(b.style==='thought'){const per=Math.PI*(rx+ry)*.86;const n=Math.max(8,Math.round(per/(Math.min(rx,ry)*.55)));const r=per/n*.62;
+    shapes.push(()=>{ctx.beginPath();for(let k=0;k<n;k++){const p=onE(k/n*Math.PI*2,.86);ctx.moveTo(p.x+r,p.y);ctx.arc(p.x,p.y,r,0,Math.PI*2);}});
+    shapes.push(()=>{ctx.beginPath();ctx.ellipse(cx,cy,rx*.86,ry*.86,0,0,Math.PI*2);});
+    if(tailOn){const e=onE(ang,1.02);const m=Math.min(rx,ry);extras=[.3,.6,.9].map((t,i)=>({x:e.x+(b.tx-e.x)*t,y:e.y+(b.ty-e.y)*t,r:m*(.17-i*.045)}));}}
+  else if(b.style==='shout'){const seed=hashStr(b.id||'x');const n=Math.max(12,Math.round((rx+ry)/16));
+    shapes.push(()=>{ctx.beginPath();for(let i=0;i<2*n;i++){const a=i/(2*n)*Math.PI*2;const f=i%2===0?1-srand(seed,i)*.07:.76+srand(seed,i)*.06;const p=onE(a,f);i?ctx.lineTo(p.x,p.y):ctx.moveTo(p.x,p.y);}ctx.closePath();});
+    if(tailOn)shapes.push(()=>{const p1=onE(ang-.2,.7),p2=onE(ang+.2,.7);ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(b.tx,b.ty);ctx.lineTo(p2.x,p2.y);ctx.closePath();});}
+  else{shapes.push(()=>{ctx.beginPath();ctx.ellipse(cx,cy,rx,ry,0,0,Math.PI*2);});
+    if(tailOn)shapes.push(()=>{const s=.26;const p1=onE(ang-s,.8),p2=onE(ang+s,.8);const mid={x:(p1.x+p2.x)/2,y:(p1.y+p2.y)/2};
+      ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.quadraticCurveTo(mid.x+(b.tx-mid.x)*.45,mid.y+(b.ty-mid.y)*.45,b.tx,b.ty);ctx.lineTo(p2.x,p2.y);ctx.closePath();});}
+  if(lw>0){ctx.lineWidth=lw*2;if(b.style==='whisper')ctx.setLineDash([lw*3,lw*2.6]);for(const s of shapes){s();ctx.stroke();}ctx.setLineDash([]);}
+  for(const s of shapes){s();ctx.fill();}
+  if(extras)for(const c of extras){ctx.beginPath();ctx.arc(c.x,c.y,Math.max(2,c.r),0,Math.PI*2);if(lw>0){ctx.lineWidth=lw;ctx.stroke();}ctx.fill();}
+  const L=layoutBubbleText(ctx,b);ctx.font=fontStr(b,L.size);ctx.fillStyle=b.textColor||'#111';ctx.textBaseline='middle';
+  const al=b.align||'center';ctx.textAlign=al;const x=al==='left'?L.box.x:al==='right'?L.box.x+L.box.w:L.box.x+L.box.w/2;
+  let y=L.box.y+L.box.h/2-(L.lines.length*L.lh)/2+L.lh/2;for(const l of L.lines){ctx.fillText(l,x,y);y+=L.lh;}
+  ctx.restore();}
+const sfxFont=s=>`900 ${Math.max(6,s.size)}px ${FONTS[s.font]||FONTS.impact}`;
+function sfxMetrics(s){MC.font=sfxFont(s);const lines=String(s.text||' ').split('\n');const w=Math.max(10,...lines.map(l=>MC.measureText(l).width));const lh=s.size*1.02;const sw=s.strokeW||0;return{lines,lh,w:w+sw*2,h:lines.length*lh+sw*2};}
+function drawSfx(ctx,s){const m=sfxMetrics(s);ctx.save();ctx.translate(s.x,s.y);ctx.rotate((s.rot||0)*Math.PI/180);ctx.font=sfxFont(s);ctx.textAlign='center';ctx.textBaseline='middle';ctx.lineJoin='round';
+  let y=-(m.lines.length-1)*m.lh/2;for(const l of m.lines){if(s.strokeW>0){ctx.lineWidth=s.strokeW*2;ctx.strokeStyle=s.stroke||'#fff';ctx.strokeText(l,0,y);}ctx.fillStyle=s.color||'#111';ctx.fillText(l,0,y);y+=m.lh;}ctx.restore();}
+function pageImgIds(pg){const a=[];pg.panels.forEach(pn=>{if(pn.bgImg)a.push(pn.bgImg);pn.items.forEach(it=>it.imgId&&a.push(it.imgId));});return a;}
+function drawOrderBadges(ctx,pg,u){pg.panels.forEach((pn,i)=>{const r=13*u,cx=pn.x+r+8*u,cy=pn.y+r+8*u;ctx.beginPath();ctx.arc(cx,cy,r,0,Math.PI*2);ctx.fillStyle='#2d5bd0';ctx.fill();ctx.lineWidth=2*u;ctx.strokeStyle='#fff';ctx.stroke();
+  ctx.fillStyle='#fff';ctx.font=`700 ${13*u}px system-ui,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(String(i+1),cx,cy+.5*u);});}
+function drawThumb(c,pg,W,numbers){if(!pg)return;const dpr=Math.min(2,window.devicePixelRatio||1);const k=W/pg.w;c.width=Math.round(W*dpr);c.height=Math.round(pg.h*k*dpr);
+  const x=c.getContext('2d');x.setTransform(k*dpr,0,0,k*dpr,0,0);renderPage(x,pg,{});if(numbers)drawOrderBadges(x,pg,1/k*1.4);}
+
+/* =====================================================================
+   PANEL EDITOR
+   ===================================================================== */
+const ED={sel:null,drag:null,cycle:null,propsOpen:true};
+let edView,pupView;
+function curPage(){let pg=project.pages[ui.pageId];if(!pg||!chapterOf(ui.pageId)){ui.pageId=allPageIds()[0]||null;pg=project.pages[ui.pageId];}return pg||null;}
+function selObjs(){const pg=curPage();if(!pg||!ED.sel)return null;const pn=pg.panels.find(p=>p.id===ED.sel.panelId);if(!pn)return null;if(ED.sel.kind==='panel')return{pg,pn,it:null};const it=pn.items.find(i=>i.id===ED.sel.itemId);return it?{pg,pn,it}:null;}
+const sameSel=(a,b)=>a&&b&&a.kind===b.kind&&a.panelId===b.panelId&&a.itemId===b.itemId;
+function itemGeom(it){if(it.type==='sfx'){const m=sfxMetrics(it);return{cx:it.x,cy:it.y,hw:m.w/2,hh:m.h/2,r:(it.rot||0)*Math.PI/180};}
+  return{cx:it.x+it.w/2,cy:it.y+it.h/2,hw:it.w/2,hh:it.h/2,r:it.type==='image'?(it.rot||0)*Math.PI/180:0};}
+function hitItem(it,p,tol){const g=itemGeom(it);const l=toLocal(g.cx,g.cy,g.r,p);return Math.abs(l.x)<=g.hw+tol&&Math.abs(l.y)<=g.hh+tol;}
+const inRect=(p,r,t=0)=>p.x>=r.x-t&&p.x<=r.x+r.w+t&&p.y>=r.y-t&&p.y<=r.y+r.h+t;
+function hitsAt(pg,p,tol){const hits=[];const P=pg.panels;
+  for(let i=P.length-1;i>=0;i--){const pn=P[i];for(let j=pn.items.length-1;j>=0;j--){const it=pn.items[j];if(it.type==='image'&&it.clip!==false)continue;if(hitItem(it,p,tol))hits.push({kind:'item',panelId:pn.id,itemId:it.id});}}
+  for(let i=P.length-1;i>=0;i--){const pn=P[i];if(!inRect(p,pn))continue;for(let j=pn.items.length-1;j>=0;j--){const it=pn.items[j];if(it.type==='image'&&it.clip!==false&&hitItem(it,p,0))hits.push({kind:'item',panelId:pn.id,itemId:it.id});}}
+  for(let i=P.length-1;i>=0;i--){if(inRect(p,P[i],tol))hits.push({kind:'panel',panelId:P[i].id});}return hits;}
+function handlesOf(so,scale){const off=38/scale,out=[];
+  if(!so.it){const pn=so.pn;return[{id:'nw',x:pn.x,y:pn.y},{id:'ne',x:pn.x+pn.w,y:pn.y},{id:'sw',x:pn.x,y:pn.y+pn.h},{id:'se',x:pn.x+pn.w,y:pn.y+pn.h}];}
+  const it=so.it,g=itemGeom(it),C=(sx,sy)=>rotPt(g.cx,g.cy,sx*g.hw,sy*g.hh,g.r);
+  if(it.type==='bubble'){out.push({id:'nw',...C(-1,-1)},{id:'ne',...C(1,-1)},{id:'sw',...C(-1,1)},{id:'se',...C(1,1)});if(it.tail&&it.style!=='caption')out.push({id:'tail',x:it.tx,y:it.ty});}
+  else if(it.type==='image'){out.push({id:'sc',...C(-1,-1)},{id:'sc',...C(1,-1)},{id:'sc',...C(-1,1)},{id:'sc',...C(1,1)},{id:'rot',...rotPt(g.cx,g.cy,0,-(g.hh+off),g.r),from:C(0,-1)});}
+  else{out.push({id:'sc',...C(1,1)},{id:'rot',...rotPt(g.cx,g.cy,0,-(g.hh+off),g.r),from:C(0,-1)});}return out;}
+function nearestHandle(hs,p,r){let best=null,bd=r;for(const h of hs){const d=Math.hypot(h.x-p.x,h.y-p.y);if(d<=bd){bd=d;best=h;}}return best;}
+function resizeRect(o,s,mode,dx,dy,min){let x1=s.x,y1=s.y,x2=s.x+s.w,y2=s.y+s.h;if(mode.includes('w'))x1=Math.min(x2-min,s.x+dx);if(mode.includes('e'))x2=Math.max(x1+min,s.x+s.w+dx);
+  if(mode.includes('n'))y1=Math.min(y2-min,s.y+dy);if(mode.includes('s'))y2=Math.max(y1+min,s.y+s.h+dy);o.x=Math.round(x1);o.y=Math.round(y1);o.w=Math.round(x2-x1);o.h=Math.round(y2-y1);}
+function drawHandle(ctx,h,u){ctx.beginPath();ctx.arc(h.x,h.y,(h.id==='tail'?10:9)*u,0,Math.PI*2);ctx.fillStyle=h.id==='tail'?'#f08a24':h.id==='rot'||h.id==='pivot'?'#2d5bd0':'#ffffff';ctx.fill();ctx.lineWidth=2.5*u;ctx.strokeStyle=h.id==='sc'||/^[ns][ew]$/.test(h.id)?'#2d5bd0':'#ffffff';ctx.stroke();}
+const edOpts={
+  size:()=>{const pg=curPage();return pg?{w:pg.w,h:pg.h}:null;},
+  draw:(ctx,s)=>{const pg=curPage();if(!pg)return;renderPage(ctx,pg,{edit:true});const u=1/s;ctx.save();
+    ctx.setLineDash([6*u,6*u]);ctx.strokeStyle='rgba(45,91,208,.35)';ctx.lineWidth=u;ctx.strokeRect(pg.margin,pg.margin,pg.w-2*pg.margin,pg.h-2*pg.margin);ctx.setLineDash([]);
+    for(const pn of pg.panels)if(!pn.items.length&&!pn.bgImg&&pn.w*s>90){ctx.fillStyle='rgba(0,0,0,.3)';ctx.font=`${13*u}px system-ui,sans-serif`;ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('Empty panel',pn.x+pn.w/2,pn.y+pn.h/2);}
+    if(ui.showOrder)drawOrderBadges(ctx,pg,u);
+    const so=selObjs();if(so){ctx.strokeStyle='#2d5bd0';
+      if(!so.it){ctx.lineWidth=3*u;ctx.strokeRect(so.pn.x,so.pn.y,so.pn.w,so.pn.h);}
+      else{ctx.lineWidth=u;ctx.setLineDash([4*u,4*u]);ctx.strokeRect(so.pn.x,so.pn.y,so.pn.w,so.pn.h);const g=itemGeom(so.it);ctx.save();ctx.translate(g.cx,g.cy);ctx.rotate(g.r);ctx.lineWidth=2*u;ctx.setLineDash([6*u,4*u]);ctx.strokeRect(-g.hw,-g.hh,g.hw*2,g.hh*2);ctx.restore();ctx.setLineDash([]);}
+      for(const h of handlesOf(so,s)){if(h.from){ctx.beginPath();ctx.moveTo(h.from.x,h.from.y);ctx.lineTo(h.x,h.y);ctx.lineWidth=2*u;ctx.strokeStyle='#2d5bd0';ctx.stroke();}drawHandle(ctx,h,u);}}
+    ctx.restore();},
+  down:(p)=>{const pg=curPage();if(!pg)return false;const s=edView.scale,so=selObjs();
+    if(so){const h=nearestHandle(handlesOf(so,s),p,24/s);if(h){ED.drag={mode:h.id,p0:p,s:deep(so.it||so.pn),g:so.it?itemGeom(so.it):null};ED.cycle=null;return true;}}
+    const hits=hitsAt(pg,p,8/s);
+    if(!hits.length){if(ED.sel){ED.sel=null;renderProps();edView.draw();}return false;}
+    const idx=hits.findIndex(h=>sameSel(h,ED.sel));if(idx>=0)ED.cycle={hits,idx};else{ED.sel=hits[0];ED.cycle=null;renderProps();}
+    const o=selObjs();ED.drag={mode:'move',p0:p,s:deep(o.it||o.pn),g:o.it?itemGeom(o.it):null};edView.draw();return true;},
+  move:(p)=>{const D=ED.drag,so=selObjs();if(!D||!so)return;const dx=p.x-D.p0.x,dy=p.y-D.p0.y,s=D.s;
+    if(!so.it){const pn=so.pn;if(D.mode==='move'){pn.x=Math.round(s.x+dx);pn.y=Math.round(s.y+dy);const ddx=pn.x-s.x,ddy=pn.y-s.y;
+        pn.items.forEach((it,i)=>{const si=s.items[i];if(!si)return;it.x=si.x+ddx;it.y=si.y+ddy;if(it.type==='bubble'){it.tx=si.tx+ddx;it.ty=si.ty+ddy;}});}
+      else resizeRect(pn,s,D.mode,dx,dy,40);}
+    else{const it=so.it,g=D.g;switch(D.mode){
+      case 'move':it.x=s.x+dx;it.y=s.y+dy;if(it.type==='bubble'){it.tx=s.tx+dx;it.ty=s.ty+dy;}break;
+      case 'nw':case 'ne':case 'sw':case 'se':resizeRect(it,s,D.mode,dx,dy,30);break;
+      case 'tail':it.tx=p.x;it.ty=p.y;break;
+      case 'sc':{const d0=Math.hypot(D.p0.x-g.cx,D.p0.y-g.cy)||1;const k=clamp(Math.hypot(p.x-g.cx,p.y-g.cy)/d0,.03,30);
+        if(it.type==='sfx')it.size=Math.max(8,Math.round(s.size*k));else{it.w=Math.max(8,s.w*k);it.h=Math.max(8,s.h*k);it.x=g.cx-it.w/2;it.y=g.cy-it.h/2;}break;}
+      case 'rot':{const a0=Math.atan2(D.p0.y-g.cy,D.p0.x-g.cx),a1=Math.atan2(p.y-g.cy,p.x-g.cx);let d=normDeg((s.rot||0)+(a1-a0)*180/Math.PI);const sn=Math.round(d/15)*15;if(Math.abs(sn-d)<3)d=sn;it.rot=Math.round(d*10)/10;break;}}}
+    edView.draw();},
+  up:(p,moved)=>{const D=ED.drag;ED.drag=null;if(!D)return;
+    if(moved){commit();renderProps();}
+    else if(D.mode==='move'&&ED.cycle&&ED.cycle.hits.length>1){ED.sel=ED.cycle.hits[(ED.cycle.idx+1)%ED.cycle.hits.length];renderProps();edView.draw();}
+    ED.cycle=null;}
+};
+function targetPanel(){const pg=curPage();if(!pg)return null;const so=selObjs();return so?so.pn:(pg.panels[0]||null);}
+function selectItem(pn,it){ED.sel={kind:'item',panelId:pn.id,itemId:it.id};}
+async function addImageToPanel(pick){const pn=targetPanel();if(!pn){toast('Add a panel first (tap “Panel”).','err');return false;}
+  pick=pick||await pickImage('Add an image to the panel');if(!pick)return false;const f=fitInto(pick.w,pick.h,pn.w*.9,pn.h*.9);
+  const it=Object.assign(ITEM_DEFAULTS.image(),{id:uid('it'),type:'image',imgId:pick.imgId,x:pn.x+(pn.w-f.w)/2,y:pn.y+(pn.h-f.h)/2,w:f.w,h:f.h});pn.items.push(it);selectItem(pn,it);commit();return true;}
+function addBubble(style){const pn=targetPanel();if(!pn)return toast('Add a panel first (tap “Panel”).','err');const pg=curPage();const k=pg.w/1200;
+  const cap=style==='caption';const w=Math.round(Math.min(pn.w*.8,(cap?420:380)*k)),h=Math.round(Math.min(pn.h*.6,(cap?110:190)*k));
+  const x=cap?pn.x+Math.round(16*k)+pn.border:pn.x+(pn.w-w)/2,y=cap?pn.y+Math.round(16*k)+pn.border:pn.y+Math.max(pn.border+8,pn.h*.08);
+  const b=Object.assign(ITEM_DEFAULTS.bubble(),{id:uid('it'),type:'bubble',style,x,y,w,h,text:cap?'Caption text':style==='shout'?'HELIOS!!':'Write the dialogue here',
+    size:Math.round((cap?28:34)*k),align:cap?'left':'center',tail:!cap,tx:x+w*.35,ty:y+h+Math.min(pn.h*.25,120*k),fill:cap?'#fffbe8':'#ffffff',lineW:Math.max(2,Math.round((cap?3:4)*k)),bold:style==='shout'});
+  pn.items.push(b);selectItem(pn,b);commit();ED.propsOpen=true;renderProps();edView.draw();
+  setTimeout(()=>{const t=$('#edProps textarea');if(t){t.focus();t.select();}},80);}
+function addSfx(){const pn=targetPanel();if(!pn)return toast('Add a panel first (tap “Panel”).','err');const k=curPage().w/1200;
+  const s=Object.assign(ITEM_DEFAULTS.sfx(),{id:uid('it'),type:'sfx',x:pn.x+pn.w/2,y:pn.y+pn.h/2,size:Math.round(110*k),strokeW:Math.round(8*k),rot:-8,text:'BA-DUM'});
+  pn.items.push(s);selectItem(pn,s);commit();ED.propsOpen=true;renderProps();edView.draw();setTimeout(()=>{const t=$('#edProps textarea');if(t){t.focus();t.select();}},80);}
+
+/* ----- editor UI ----- */
+function renderEditor(){const sel=$('#pageSel');const pg=curPage();
+  sel.innerHTML=project.chapters.map(ch=>`<optgroup label="${esc(ch.code+': '+ch.title)}">${ch.pages.map((pid,i)=>`<option value="${pid}" ${pid===ui.pageId?'selected':''}>${esc(ch.code)} · Page ${i+1}${project.pages[pid].name?' — '+esc(project.pages[pid].name):''}</option>`).join('')}</optgroup>`).join('')||'<option>No pages</option>';
+  const ids=allPageIds(),i=ids.indexOf(ui.pageId);$('#pgPrevBtn').disabled=i<=0;$('#pgNextBtn').disabled=i<0||i>=ids.length-1;
+  if(ED.sel&&!selObjs())ED.sel=null;renderProps();edView.layout();if(!pg)$('#edProps .pbody').innerHTML=`<div class="empty">There are no pages yet.<br><br><button class="btn primary" data-act="addPage" data-ch="${project.chapters[0]?.id||''}">${I('plus')} Add a page to ${esc(project.chapters[0]?.code||'C1')}</button></div>`;}
+const F={
+  num:(l,b,v,step=1,min)=>`<div><label class="f">${l}</label><input class="inp" type="number" inputmode="decimal" step="${step}" ${min!=null?`data-min="${min}"`:''} data-b="${b}" value="${fmtN(v)}"></div>`,
+  rng:(l,b,v,min,max,step=1,suf='',mul=1)=>`<div><label class="f">${l} <output>${fmtN(v*mul)}${suf}</output></label><input type="range" min="${min}" max="${max}" step="${step}" data-b="${b}" data-mul="${mul}" data-suf="${suf}" value="${v*mul}"></div>`,
+  col:(l,b,v)=>`<div><label class="f">${l}</label><input class="inp" type="color" data-b="${b}" value="${hex6(v)}"></div>`,
+  sel:(l,b,v,opts)=>`<div><label class="f">${l}</label><select data-b="${b}">${opts.map(([k,n])=>`<option value="${k}" ${k===v?'selected':''}>${esc(n)}</option>`).join('')}</select></div>`,
+  txt:(l,b,v,ph='',extra='')=>`<div><label class="f">${l}</label><input class="inp" data-b="${b}" value="${esc(v)}" placeholder="${esc(ph)}" ${extra}></div>`,
+  area:(l,b,v,ph='',rows=3)=>`<div><label class="f">${l}</label><textarea rows="${rows}" data-b="${b}" placeholder="${esc(ph)}">${esc(v)}</textarea></div>`,
+  chk:(l,b,v)=>`<label class="ck"><input type="checkbox" data-b="${b}" ${v?'checked':''}> ${l}</label>`};
+function itemName(it){if(it.type==='image')return 'Image';if(it.type==='sfx')return 'SFX: '+(it.text||'').slice(0,20);const t=(it.text||'').replace(/\s+/g,' ').slice(0,26);return(it.style==='caption'?'Caption':'Bubble')+(t?`: “${t}”`:'');}
+function panelSummary(pn){if(pn.note)return pn.note;const b=pn.items.find(i=>i.type==='bubble'&&i.text);if(b)return(b.speaker?b.speaker+': ':'')+b.text.replace(/\s+/g,' ');const n=pn.items.filter(i=>i.type==='image').length;return n?`${n} image(s)`:pn.bgImg?'Background only':'Empty panel';}
+function renderProps(){const box=$('#edProps');const pg=curPage();const so=selObjs();let title='Page',b='';
+  if(!pg){box.innerHTML=`<div class="phead"><b class="grow">No page</b></div><div class="pbody"></div>`;return;}
+  if(!so){title=pageLabel(pg.id);
+    b=`<div class="note">Tap a panel to select it. Tap the same spot again to reach what's underneath. Drag the grey area to scroll · pinch or use the zoom buttons.</div>
+    <h4>Panels on this page (reading order)</h4><div class="list">${pg.panels.map((pn,i)=>`<div class="lrow"><span class="num">${i+1}</span><button class="lmain" data-act="selPanel" data-id="${pn.id}"><span>${esc(panelSummary(pn))}</span></button></div>`).join('')||'<p class="muted">No panels. Tap “Layout” or “Panel”.</p>'}</div>
+    <div class="row wrapbtns" style="margin-top:10px"><button class="btn sm" data-act="layout">${I('layout')} Layout</button><button class="btn sm" data-act="panelOrder" data-id="${pg.id}">${I('layers')} Reading order</button><button class="btn sm" data-act="pageSettings">${I('sliders')} Page settings</button><button class="btn sm ${ui.showOrder?'on':''}" data-act="toggleOrder">Numbers ${ui.showOrder?'on':'off'}</button></div>
+    ${F.area('Page notes (plan, mood, beats)','page:notes',pg.notes,'e.g. Morning at Tracen. Helios bursts in, Ruby is calm.')}`;}
+  else if(!so.it){const pn=so.pn,i=pg.panels.indexOf(pn);title=`Panel ${i+1} of ${pg.panels.length}`;
+    b=`<div class="row wrapbtns"><button class="btn sm" data-act="panelUp" ${i===0?'disabled':''}>${I('up')} Earlier</button><button class="btn sm" data-act="panelDown" ${i===pg.panels.length-1?'disabled':''}>${I('down')} Later</button><button class="btn sm" data-act="panelDup">${I('copy')} Duplicate</button><button class="btn sm danger" data-act="panelDel">${I('trash')} Delete</button></div>
+    <h4>Contents</h4><div class="list">${pn.items.map(it=>`<div class="lrow"><button class="lmain" data-act="selItem" data-id="${it.id}">${it.type==='image'&&memImages.has(it.imgId)?`<img src="${urlFor(it.imgId)}" alt="">`:''}<span>${esc(itemName(it))}</span></button></div>`).join('')||'<p class="muted small">Empty. Use the toolbar above to add an image, bubble, caption or SFX to this panel.</p>'}</div>
+    ${F.area('Panel note / script','panel:note',pn.note,'What happens here? e.g. Close-up: Ruby looks away.',2)}
+    <h4>Size & position</h4><div class="grid4">${F.num('X','panel:x',pn.x)}${F.num('Y','panel:y',pn.y)}${F.num('Width','panel:w',pn.w,1,20)}${F.num('Height','panel:h',pn.h,1,20)}</div>
+    <h4>Look</h4><div class="grid2">${F.rng('Border','panel:border',pn.border,0,40)}${F.col('Border color','panel:borderColor',pn.borderColor)}${F.rng('Rounded corners','panel:radius',pn.radius,0,120)}${F.col('Fill color','panel:bg',pn.bg)}</div>
+    <h4>Background image</h4><div class="row"><button class="btn sm" data-act="panelBg">${I('bgimg')} ${pn.bgImg?'Change':'Choose'}</button>${pn.bgImg?`<button class="btn sm danger" data-act="panelBgClear">Remove</button>`:''}</div>
+    ${pn.bgImg?`<div class="grid2">${F.sel('Fit','panel:bgFit',pn.bgFit,[['cover','Fill panel (crop)'],['contain','Show whole image']])}${F.rng('Opacity','panel:bgOpacity',pn.bgOpacity,0,100,5,'%',100)}</div>`:''}`;}
+  else{const it=so.it,pn=so.pn,j=pn.items.indexOf(it);title=itemName(it);
+    const common=`<div class="row wrapbtns"><button class="btn sm" data-act="selPanel" data-id="${pn.id}">${I('layout')} Panel</button><button class="btn sm" data-act="itemUp" ${j===pn.items.length-1?'disabled':''} title="Bring forward">${I('up')} Forward</button><button class="btn sm" data-act="itemDown" ${j===0?'disabled':''} title="Send backward">${I('down')} Back</button><button class="btn sm" data-act="itemDup">${I('copy')}</button><button class="btn sm danger" data-act="itemDel">${I('trash')} Delete</button></div>`;
+    if(it.type==='image'){b=common+`<div class="row wrapbtns"><button class="btn sm" data-act="imgFill">Fill panel</button><button class="btn sm" data-act="imgFit">Fit inside</button><button class="btn sm" data-act="imgFlip">${I('flip')} Flip</button><button class="btn sm" data-act="imgReplace">Replace</button></div>
+      ${F.rng('Rotation','item:rot',it.rot,-180,180,1,'°')}${F.rng('Opacity','item:opacity',it.opacity,0,100,5,'%',100)}
+      ${F.chk('Keep inside the panel border (untick to let it break out of the frame)','item:clip',it.clip!==false)}
+      <div class="grid4">${F.num('X','item:x',it.x)}${F.num('Y','item:y',it.y)}${F.num('W','item:w',it.w,1,4)}${F.num('H','item:h',it.h,1,4)}</div>`;}
+    else if(it.type==='bubble'){const cap=it.style==='caption';
+      b=`${F.area(cap?'Caption text':'Dialogue','item:text',it.text,'Type the words…',3)}
+      ${cap?'':F.txt('Speaker (for the script)','item:speaker',it.speaker,'Helios / Ruby / …','list="speakerList" autocomplete="off"')}
+      <datalist id="speakerList">${project.characters.filter(c=>c.id!=='bg').map(c=>`<option value="${esc(c.name)}">`).join('')}</datalist>
+      <div class="grid2">${F.sel('Bubble type','item:style',it.style,BUBBLE_STYLES)}${F.sel('Font','item:font',it.font,FONT_NAMES)}</div>
+      ${F.rng('Text size','item:size',it.size,8,140)}
+      <div class="row">${F.chk('Bold','item:bold',it.bold)}${F.chk('Italic','item:italic',it.italic)}${F.chk('Shrink text to fit','item:fit',it.fit!==false)}</div>
+      ${F.sel('Align','item:align',it.align,[['center','Center'],['left','Left'],['right','Right']])}
+      ${cap?'':`<div class="row">${F.chk('Show tail (drag the orange dot)','item:tail',it.tail)}<button class="btn sm" data-act="tailReset">Reset tail</button></div>`}
+      ${common}
+      <h4>Colors & outline</h4><div class="grid2">${F.col('Fill','item:fill',it.fill)}${F.col('Outline','item:stroke',it.stroke)}${F.col('Text','item:textColor',it.textColor)}${F.rng('Outline width','item:lineW',it.lineW,0,16)}</div>
+      <div class="grid4">${F.num('X','item:x',it.x)}${F.num('Y','item:y',it.y)}${F.num('W','item:w',it.w,1,30)}${F.num('H','item:h',it.h,1,30)}</div>`;}
+    else{b=`${F.area('Sound effect text','item:text',it.text,'BAM / doki doki / …',2)}<div class="grid2">${F.sel('Font','item:font',it.font,FONT_NAMES)}${F.col('Color','item:color',it.color)}${F.col('Outline color','item:stroke',it.stroke)}${F.rng('Outline width','item:strokeW',it.strokeW,0,40)}</div>
+      ${F.rng('Size','item:size',it.size,10,500)}${F.rng('Rotation','item:rot',it.rot,-180,180,1,'°')}${common}`;}}
+  box.innerHTML=`<div class="phead"><b class="grow">${esc(title)}</b><button class="btn sm" data-act="toggleProps" data-view="ed">${ED.propsOpen?'Hide':'Show'}</button></div><div class="pbody">${b}</div>`;
+  box.classList.toggle('collapsed',!ED.propsOpen);}
+
+/* ----- layout & page settings modals ----- */
+function layoutSvg(pg,L){const rs=layoutRects(pg,L);return `<svg viewBox="0 0 ${pg.w} ${pg.h}" aria-hidden="true"><rect width="${pg.w}" height="${pg.h}" fill="#fff" stroke="#999" stroke-width="${pg.w/80}"/>${rs.map(r=>`<rect x="${r.x}" y="${r.y}" width="${r.w}" height="${r.h}" fill="#e8ecf8" stroke="#1c1e23" stroke-width="${pg.w/90}"/>`).join('')}</svg>`;}
+function openLayout(){const pg=curPage();if(!pg)return;const m=openModal(`<h3>Choose a panel layout</h3><p class="muted small">Your existing panels move into the new spots in reading order (their pictures and bubbles move with them). Extra panels stay where they are. You can undo.</p>
+  <div class="lays">${LAYOUTS.map(L=>`<button class="lay" data-l="${L.id}">${layoutSvg(pg,L)}${esc(L.label)}</button>`).join('')}</div><div class="row end"><button class="btn" data-act="closeModal">Cancel</button></div>`);
+  m.addEventListener('click',e=>{const b=e.target.closest('[data-l]');if(!b)return;const n=applyLayout(pg,LAYOUTS.find(l=>l.id===b.dataset.l));ED.sel=null;commit();closeModal();renderEditor();toast(`Layout applied (${n} panels). Undo if you change your mind.`);});}
+function openPageSettings(){const pg=curPage();if(!pg)return;const ch=chapterOf(pg.id);
+  const m=openModal(`<h3>Page settings — ${esc(pageLabel(pg.id))}</h3>
+  <label class="f">Page name (optional)</label><input class="inp" id="psName" value="${esc(pg.name)}" placeholder="e.g. Morning run">
+  <label class="f">Size</label><select id="psPreset">${PRESETS.map(p=>`<option value="${p[0]}" ${p[2]===pg.w&&p[3]===pg.h?'selected':''}>${esc(p[1])} (${p[2]}×${p[3]})</option>`).join('')}<option value="custom" ${PRESETS.some(p=>p[2]===pg.w&&p[3]===pg.h)?'':'selected'}>Custom</option></select>
+  <div class="grid2"><div><label class="f">Width (px)</label><input class="inp" type="number" id="psW" value="${pg.w}" min="200" max="6000"></div><div><label class="f">Height (px)</label><input class="inp" type="number" id="psH" value="${pg.h}" min="200" max="12000"></div></div>
+  <label class="ck"><input type="checkbox" id="psScale" checked> Scale panels & text with the new size</label>
+  <div class="grid2"><div><label class="f">Margin</label><input class="inp" type="number" id="psM" value="${pg.margin}" min="0"></div><div><label class="f">Gap between panels</label><input class="inp" type="number" id="psG" value="${pg.gutter}" min="0"></div></div>
+  <p class="muted small">Margin and gap are used next time you apply a layout.</p>
+  <label class="f">Paper color</label><input class="inp" type="color" id="psBg" value="${hex6(pg.bg)}">
+  <label class="f">Chapter</label><select id="psCh">${project.chapters.map(c=>`<option value="${c.id}" ${c===ch?'selected':''}>${esc(c.code+': '+c.title)}</option>`).join('')}</select>
+  <div class="row end"><button class="btn danger" id="psDel">${I('trash')} Delete page</button><button class="btn" data-act="closeModal">Cancel</button><button class="btn primary" id="psOk">Apply</button></div>`);
+  $('#psPreset',m).addEventListener('change',e=>{const p=PRESETS.find(p=>p[0]===e.target.value);if(p){$('#psW',m).value=p[2];$('#psH',m).value=p[3];}});
+  $('#psDel',m).addEventListener('click',async()=>{closeModal();await deletePage(pg.id);});
+  $('#psOk',m).addEventListener('click',()=>{const w=clamp(parseInt($('#psW',m).value)||pg.w,200,6000),h=clamp(parseInt($('#psH',m).value)||pg.h,200,12000);
+    if((w!==pg.w||h!==pg.h)&&$('#psScale',m).checked)scalePage(pg,w/pg.w,h/pg.h);pg.w=w;pg.h=h;pg.name=$('#psName',m).value.trim();pg.margin=Math.max(0,parseInt($('#psM',m).value)||0);pg.gutter=Math.max(0,parseInt($('#psG',m).value)||0);pg.bg=$('#psBg',m).value;
+    const to=project.chapters.find(c=>c.id===$('#psCh',m).value);if(to&&to!==ch){ch.pages.splice(ch.pages.indexOf(pg.id),1);to.pages.push(pg.id);}
+    commit();closeModal();renderEditor();toast('Page updated.');});}
+function scalePage(pg,sx,sy){const sf=Math.min(sx,sy);for(const pn of pg.panels){pn.x*=sx;pn.y*=sy;pn.w*=sx;pn.h*=sy;pn.border=Math.round(pn.border*sf);
+  for(const it of pn.items){if(it.type==='sfx'){it.x*=sx;it.y*=sy;it.size*=sf;it.strokeW*=sf;continue;}const cx=(it.x+it.w/2)*sx,cy=(it.y+it.h/2)*sy;
+    if(it.type==='image'){it.w*=sf;it.h*=sf;}else{it.w*=sx;it.h*=sy;it.tx*=sx;it.ty*=sy;it.size*=sf;it.lineW*=sf;}it.x=cx-it.w/2;it.y=cy-it.h/2;}}pg.margin=Math.round(pg.margin*sf);pg.gutter=Math.round(pg.gutter*sf);}
+async function deletePage(pid){const pg=project.pages[pid];if(!pg)return;const ok=await ask({title:'Delete this page?',msg:`${esc(pageLabel(pid))} and its ${pg.panels.length} panel(s) will be removed. You can undo right after.`,ok:'Delete page',danger:true});if(!ok)return;
+  const ids=allPageIds(),i=ids.indexOf(pid);const ch=chapterOf(pid);ch.pages.splice(ch.pages.indexOf(pid),1);delete project.pages[pid];if(ui.pageId===pid)ui.pageId=ids[i+1]||ids[i-1]||null;ED.sel=null;commit();renderTab(ui.tab);toast('Page deleted.');}
+function addPageTo(ch,afterPid){const ref=project.pages[afterPid]||project.pages[ch.pages[ch.pages.length-1]]||curPage();const pg=makePage(ref?{w:ref.w,h:ref.h,margin:ref.margin,gutter:ref.gutter,bg:ref.bg}:{});project.pages[pg.id]=pg;
+  const at=afterPid?ch.pages.indexOf(afterPid):-1;if(at>=0)ch.pages.splice(at+1,0,pg.id);else ch.pages.push(pg.id);return pg;}
+
+/* =====================================================================
+   PUPPET WORKSPACE
+   ===================================================================== */
+const PUP={sel:null,drag:null,cycle:null,propsOpen:true,pivotMode:false};
+function curRig(){if(!charById(ui.puppetChar))ui.puppetChar='helios';let r=project.puppets[ui.puppetChar];if(!r)r=project.puppets[ui.puppetChar]=rigDefaults();return r;}
+const curPart=()=>curRig().parts.find(q=>q.id===PUP.sel)||null;
+function partCorners(p){const fx=p.flip?-1:1,r=p.rot*Math.PI/180;return[[-p.px,-p.py],[1-p.px,-p.py],[1-p.px,1-p.py],[-p.px,1-p.py]].map(([u,v])=>rotPt(p.x,p.y,u*p.w*p.scale*fx,v*p.h*p.scale,r));}
+function partLocal(p,P){const l=toLocal(p.x,p.y,p.rot*Math.PI/180,P);const fx=p.flip?-1:1;return{u:p.px+l.x/(p.scale*fx)/p.w,v:p.py+l.y/p.scale/p.h};}
+function alphaAt(id,u,v){let a=alphaCache.get(id);if(a===undefined){const im=getImg(id);if(!im)return 255;try{const k=Math.min(1,200/Math.max(im.naturalWidth,im.naturalHeight));const w=Math.max(1,Math.round(im.naturalWidth*k)),h=Math.max(1,Math.round(im.naturalHeight*k));
+  const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d',{willReadFrequently:true});x.drawImage(im,0,0,w,h);a={w,h,d:x.getImageData(0,0,w,h).data};}catch(e){a=null;}alphaCache.set(id,a);}
+  if(!a)return 255;const X=Math.floor(u*a.w),Y=Math.floor(v*a.h);let best=0;for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++){const xx=X+dx,yy=Y+dy;if(xx<0||yy<0||xx>=a.w||yy>=a.h)continue;best=Math.max(best,a.d[(yy*a.w+xx)*4+3]);}return best;}
+function hitPart(p,P){const l=partLocal(p,P);if(l.u<0||l.u>1||l.v<0||l.v>1)return false;return alphaAt(p.imgId,l.u,l.v)>16;}
+function setPivot(p,P){const l=partLocal(p,P);p.px=l.u;p.py=l.v;p.x=P.x;p.y=P.y;}
+function pivotWorld(p,u,v){const fx=p.flip?-1:1;return rotPt(p.x,p.y,(u-p.px)*p.w*p.scale*fx,(v-p.py)*p.h*p.scale,p.rot*Math.PI/180);}
+function partHandles(p,s){const c=partCorners(p);const off=38/s;const r=p.rot*Math.PI/180;const mid={x:(c[0].x+c[1].x)/2,y:(c[0].y+c[1].y)/2};
+  const hs=c.map(q=>({id:'sc',...q}));hs.push({id:'rot',x:mid.x+Math.sin(r)*off,y:mid.y-Math.cos(r)*off,from:mid});if(PUP.pivotMode)hs.push({id:'pivot',x:p.x,y:p.y});return hs;}
+let checkerPat=null;
+function drawChecker(ctx,w,h){if(!checkerPat){const c=document.createElement('canvas');c.width=c.height=40;const x=c.getContext('2d');x.fillStyle='#ffffff';x.fillRect(0,0,40,40);x.fillStyle='#e3e3e3';x.fillRect(0,0,20,20);x.fillRect(20,20,20,20);checkerPat=ctx.createPattern(c,'repeat');}ctx.fillStyle=checkerPat;ctx.fillRect(0,0,w,h);}
+function drawPart(ctx,p,edit){const im=getImg(p.imgId);ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.scale(p.scale*(p.flip?-1:1),p.scale);ctx.globalAlpha=p.opacity??1;
+  if(im)ctx.drawImage(im,-p.px*p.w,-p.py*p.h,p.w,p.h);else if(edit)drawMissing(ctx,-p.px*p.w,-p.py*p.h,p.w,p.h,'Missing');ctx.restore();}
+function renderRig(ctx,rig,o={}){
+  if(o.edit){if(rig.bg==='white'){ctx.fillStyle='#fff';ctx.fillRect(0,0,rig.w,rig.h);}else drawChecker(ctx,rig.w,rig.h);
+    if(rig.trace&&rig.showTrace){const im=getImg(rig.trace);if(im){const f=fitInto(im.naturalWidth,im.naturalHeight,rig.w,rig.h);ctx.save();ctx.globalAlpha=rig.traceOpacity;ctx.drawImage(im,(rig.w-f.w)/2,(rig.h-f.h)/2,f.w,f.h);ctx.restore();}}
+    if(rig.grid){ctx.save();ctx.strokeStyle='rgba(45,91,208,.25)';ctx.lineWidth=1/(o.scale||1);const st=rig.w/10;for(let x=st;x<rig.w;x+=st){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,rig.h);ctx.stroke();}for(let y=st;y<rig.h;y+=st){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(rig.w,y);ctx.stroke();}ctx.restore();}}
+  else if(rig.bg==='white'){ctx.fillStyle='#fff';ctx.fillRect(0,0,rig.w,rig.h);}
+  for(const p of rig.parts)if(!p.hidden)drawPart(ctx,p,o.edit);}
+const pupOpts={
+  size:()=>{const r=curRig();return{w:r.w,h:r.h};},
+  draw:(ctx,s)=>{const rig=curRig();renderRig(ctx,rig,{edit:true,scale:s});const p=curPart();const u=1/s;
+    if(!rig.parts.length){ctx.fillStyle='rgba(0,0,0,.45)';ctx.font=`${15*u}px system-ui,sans-serif`;ctx.textAlign='center';ctx.fillText('Empty stage — add transparent PNG parts',rig.w/2,rig.h/2);}
+    if(p&&!p.hidden){const c=partCorners(p);ctx.beginPath();c.forEach((q,i)=>i?ctx.lineTo(q.x,q.y):ctx.moveTo(q.x,q.y));ctx.closePath();ctx.setLineDash([6*u,4*u]);ctx.lineWidth=2*u;ctx.strokeStyle=p.locked?'#888':'#2d5bd0';ctx.stroke();ctx.setLineDash([]);
+      ctx.beginPath();ctx.moveTo(p.x-10*u,p.y);ctx.lineTo(p.x+10*u,p.y);ctx.moveTo(p.x,p.y-10*u);ctx.lineTo(p.x,p.y+10*u);ctx.lineWidth=2*u;ctx.strokeStyle='#f08a24';ctx.stroke();
+      if(!p.locked)for(const h of partHandles(p,s)){if(h.from){ctx.beginPath();ctx.moveTo(h.from.x,h.from.y);ctx.lineTo(h.x,h.y);ctx.strokeStyle='#2d5bd0';ctx.lineWidth=2*u;ctx.stroke();}drawHandle(ctx,h,u);}}},
+  down:(P)=>{const rig=curRig(),s=pupView.scale,sp=curPart();
+    if(sp&&!sp.hidden&&!sp.locked){const h=nearestHandle(partHandles(sp,s),P,24/s);if(h){PUP.drag={mode:h.id,p0:P,s:{...sp}};PUP.cycle=null;return true;}}
+    const hits=[];for(let i=rig.parts.length-1;i>=0;i--){const q=rig.parts[i];if(!q.hidden&&!q.locked&&hitPart(q,P))hits.push(q.id);}
+    if(!hits.length){if(PUP.sel){PUP.sel=null;renderPupProps();pupView.draw();}return false;}
+    const idx=hits.indexOf(PUP.sel);if(idx>=0)PUP.cycle={hits,idx};else{PUP.sel=hits[0];PUP.cycle=null;renderPupProps();}
+    PUP.drag={mode:'move',p0:P,s:{...curPart()}};pupView.draw();return true;},
+  move:(P)=>{const D=PUP.drag,p=curPart();if(!D||!p)return;const s=D.s;
+    if(D.mode==='move'){p.x=s.x+P.x-D.p0.x;p.y=s.y+P.y-D.p0.y;}
+    else if(D.mode==='sc'){const d0=Math.hypot(D.p0.x-s.x,D.p0.y-s.y)||1;p.scale=clamp(s.scale*Math.hypot(P.x-s.x,P.y-s.y)/d0,.03,12);}
+    else if(D.mode==='rot'){const a0=Math.atan2(D.p0.y-s.y,D.p0.x-s.x),a1=Math.atan2(P.y-s.y,P.x-s.x);let d=normDeg(s.rot+(a1-a0)*180/Math.PI);const sn=Math.round(d/15)*15;if(Math.abs(sn-d)<2.5)d=sn;p.rot=Math.round(d*10)/10;}
+    else if(D.mode==='pivot'){Object.assign(p,s);setPivot(p,P);}
+    pupView.draw();},
+  up:(P,moved)=>{const D=PUP.drag;PUP.drag=null;if(!D)return;if(moved){commit();renderPupProps();}else if(D.mode==='move'&&PUP.cycle&&PUP.cycle.hits.length>1){PUP.sel=PUP.cycle.hits[(PUP.cycle.idx+1)%PUP.cycle.hits.length];renderPupProps();pupView.draw();}PUP.cycle=null;}
+};
+function renderPuppet(){$('#pupChars').innerHTML=project.characters.map(c=>`<button class="chip ${c.id===ui.puppetChar?'on':''}" data-act="pupChar" data-id="${c.id}"><i class="dot" style="background:${c.color}"></i>${esc(c.name)}</button>`).join('');
+  if(PUP.sel&&!curPart())PUP.sel=null;renderPupProps();pupView.layout();}
+function renderPupProps(){const box=$('#pupProps'),rig=curRig(),p=curPart(),ch=charById(ui.puppetChar);let b='';
+  if(!rig.parts.length)b+=`<div class="note"><b>Optional drawing aid.</b> Draw (or cut out) body parts as separate PNG files with transparent backgrounds — head, torso, upper arm, forearm, legs… Add them here, pose them, then trace over the result in your drawing app or drop it into a panel as a rough guide. Nothing here is generated; it only uses pictures you add.
+    <div class="row" style="margin-top:8px"><button class="btn primary" data-act="addParts">${I('upload')} Add part images</button><button class="btn" data-act="partsFromRefs">From references</button></div></div>`;
+  if(p){b+=`${F.txt('Part name','part:name',p.name,'e.g. left forearm')}
+    <div class="row wrapbtns"><button class="btn sm ${PUP.pivotMode?'on':''}" data-act="pivotMode">Move pivot: ${PUP.pivotMode?'ON':'off'}</button><button class="btn sm" data-act="partFlip">${I('flip')} Flip</button><button class="btn sm" data-act="partDup">${I('copy')} Duplicate</button><button class="btn sm danger" data-act="partDel">${I('trash')} Delete</button></div>
+    ${F.rng('Rotation','part:rot',p.rot,-180,180,1,'°')}
+    <div class="row"><button class="btn sm" data-act="partRot" data-d="-15">−15°</button><button class="btn sm" data-act="partRot" data-d="-1">−1°</button><button class="btn sm" data-act="partRot" data-d="0">0°</button><button class="btn sm" data-act="partRot" data-d="1">+1°</button><button class="btn sm" data-act="partRot" data-d="15">+15°</button></div>
+    ${F.rng('Size','part:scale',p.scale,3,400,1,'%',100)}${F.rng('Opacity','part:opacity',p.opacity,5,100,5,'%',100)}
+    <label class="f">Pivot (the joint it rotates around — orange cross)</label><div class="row"><button class="btn sm" data-act="partPivot" data-p=".5,.5">Center</button><button class="btn sm" data-act="partPivot" data-p=".5,.06">Top</button><button class="btn sm" data-act="partPivot" data-p=".5,.94">Bottom</button><button class="btn sm" data-act="partPivot" data-p=".06,.5">Left</button><button class="btn sm" data-act="partPivot" data-p=".94,.5">Right</button></div>`;}
+  if(rig.parts.length)b+=`<h4>Layers (top of the list = in front)</h4><div class="list">${[...rig.parts].reverse().map((q,ri)=>{const i=rig.parts.length-1-ri;return `<div class="lrow ${q.id===PUP.sel?'sel':''}"><button class="lmain" data-act="selPart" data-id="${q.id}">${memImages.has(q.imgId)?`<img src="${urlFor(q.imgId)}" alt="">`:''}<span>${esc(q.name)}</span></button>
+    <button class="btn sm icon" data-act="partHide" data-id="${q.id}" aria-label="${q.hidden?'Show':'Hide'}">${I(q.hidden?'eyeoff':'eye')}</button><button class="btn sm icon" data-act="partLock" data-id="${q.id}" aria-label="${q.locked?'Unlock':'Lock'}">${I(q.locked?'lock':'unlock')}</button>
+    <button class="btn sm icon" data-act="partMove" data-id="${q.id}" data-d="1" ${i===rig.parts.length-1?'disabled':''} aria-label="Bring forward">${I('up')}</button><button class="btn sm icon" data-act="partMove" data-id="${q.id}" data-d="-1" ${i===0?'disabled':''} aria-label="Send back">${I('down')}</button></div>`;}).join('')}</div>`;
+  box.innerHTML=`<div class="phead"><b class="grow">${p?esc(p.name||'Part'):esc(ch.name)+' — '+rig.parts.length+' part(s)'}</b><button class="btn sm" data-act="toggleProps" data-view="pup">${PUP.propsOpen?'Hide':'Show'}</button></div><div class="pbody">${b}</div>`;
+  box.classList.toggle('collapsed',!PUP.propsOpen);}
+function addPartImage(im,name){const rig=curRig();const k=Math.min(1,rig.w*.5/im.w,rig.h*.5/im.h);const n=rig.parts.length;
+  const p=Object.assign(partDefaults(),{name:name||'Part '+(n+1),imgId:im.id||im.imgId,w:im.w,h:im.h,scale:k,x:rig.w/2+(n%5)*20-40,y:rig.h/2+(n%5)*20-40});rig.parts.push(p);PUP.sel=p.id;return p;}
+async function rigCanvas(rig,trim){await ensureImgs(rig.parts.map(p=>p.imgId));const c=document.createElement('canvas');c.width=rig.w;c.height=rig.h;renderRig(c.getContext('2d'),rig,{});return trim&&rig.bg!=='white'?(trimCanvas(c)||c):c;}
+function trimCanvas(c){const x=c.getContext('2d');const{data,width:w,height:h}=x.getImageData(0,0,c.width,c.height);let x0=w,y0=h,x1=-1,y1=-1;
+  for(let y=0;y<h;y++)for(let i=0;i<w;i++)if(data[(y*w+i)*4+3]>8){if(i<x0)x0=i;if(i>x1)x1=i;if(y<y0)y0=y;if(y>y1)y1=y;}if(x1<0)return null;
+  const pad=6;x0=Math.max(0,x0-pad);y0=Math.max(0,y0-pad);x1=Math.min(w-1,x1+pad);y1=Math.min(h-1,y1+pad);const o=document.createElement('canvas');o.width=x1-x0+1;o.height=y1-y0+1;o.getContext('2d').drawImage(c,-x0,-y0);return o;}
+function openStage(){const rig=curRig();const m=openModal(`<h3>Stage & tracing — ${esc(charById(ui.puppetChar).name)}</h3>
+  <div class="grid2">${F.num('Stage width','rig:w',rig.w,10,200)}${F.num('Stage height','rig:h',rig.h,10,200)}</div>
+  ${F.sel('Background','rig:bg',rig.bg,[['checker','Transparent (checkerboard)'],['white','White']])}
+  ${F.chk('Show grid','rig:grid',rig.grid)}
+  <h4>Trace image</h4><p class="muted small">Put a reference faintly behind the parts to match a pose. It is never included in exports.</p>
+  <div class="row"><button class="btn sm" data-act="pupTrace">${I('image')} ${rig.trace?'Change':'Choose'}</button>${rig.trace?`<button class="btn sm danger" data-act="pupTraceClear">Remove</button>`:''}</div>
+  ${rig.trace?F.chk('Show trace image','rig:showTrace',rig.showTrace)+F.rng('Trace opacity','rig:traceOpacity',rig.traceOpacity,5,100,5,'%',100):''}
+  <h4>Reset</h4><button class="btn sm danger" data-act="pupClear">${I('trash')} Remove all parts from this stage</button>
+  <div class="row end"><button class="btn primary" data-act="closeModal">Done</button></div>`,{onClose:()=>{if(ui.tab==='puppet')renderPuppet();}});return m;}
+function openPoses(){const rig=curRig();const m=openModal('',{onClose:()=>{if(ui.tab==='puppet')renderPuppet();}});
+  const draw=()=>{m.querySelector('.sheet').innerHTML=`<h3>Saved poses — ${esc(charById(ui.puppetChar).name)}</h3><p class="muted small">A pose remembers where every part is. Load one to jump back to it.</p>
+    <button class="btn primary wide" data-x="save">${I('save')} Save current pose</button>
+    <div class="list" style="margin-top:10px">${rig.poses.map(ps=>`<div class="lrow"><span class="lmain"><span>${esc(ps.name)}</span></span><button class="btn sm" data-x="load" data-id="${ps.id}">Load</button><button class="btn sm icon danger" data-x="del" data-id="${ps.id}" aria-label="Delete pose">${I('trash')}</button></div>`).join('')||'<p class="muted">No poses saved yet.</p>'}</div>
+    <div class="row end"><button class="btn" data-act="closeModal">Close</button></div>`;};draw();
+  m.addEventListener('click',async e=>{const b=e.target.closest('[data-x]');if(!b)return;const x=b.dataset.x;
+    if(x==='save'){if(!rig.parts.length)return toast('Add some parts first.','err');const name=await ask({title:'Name this pose',input:`Pose ${rig.poses.length+1}`,ok:'Save'});if(!name)return;
+      const t={};rig.parts.forEach(q=>t[q.id]={x:q.x,y:q.y,px:q.px,py:q.py,scale:q.scale,rot:q.rot,flip:q.flip,opacity:q.opacity,hidden:q.hidden});rig.poses.push({id:uid('ps'),name,t});commit();draw();toast('Pose saved.');}
+    else if(x==='load'){const ps=rig.poses.find(z=>z.id===b.dataset.id);if(!ps)return;let n=0;rig.parts.forEach(q=>{if(ps.t[q.id]){Object.assign(q,ps.t[q.id]);n++;}});commit();pupView.draw();toast(`Loaded “${ps.name}” (${n} parts).`);}
+    else if(x==='del'){const ps=rig.poses.find(z=>z.id===b.dataset.id);if(!ps)return;if(!await ask({title:'Delete pose?',msg:esc(ps.name),ok:'Delete',danger:true}))return;rig.poses.splice(rig.poses.indexOf(ps),1);commit();draw();}});}
+
+/* =====================================================================
+   REFERENCES
+   ===================================================================== */
+function refsFiltered(){const q=ui.q.trim().toLowerCase();return project.refs.filter(r=>r.charId===ui.charId&&(ui.cat==='all'||(ui.cat==='fav'?r.fav:r.cat===ui.cat))&&(ui.src==='all'||r.source===ui.src)&&(!q||`${r.label} ${r.tags} ${r.notes}`.toLowerCase().includes(q)));}
+const catLabel=id=>(CATS.find(c=>c[0]===id)||['','Other'])[1];
+function refTile(r,attr){const has=memImages.has(r.imgId);return `<button class="thumb" ${attr} data-id="${r.id}"><span class="ti">${has?`<img src="${urlFor(r.imgId)}" alt="${esc(r.label)}" loading="lazy">`:'<em>Image missing</em>'}</span>${SRC_BADGE[r.source]?`<span class="badge b-${r.source}">${SRC_BADGE[r.source]}</span>`:''}${r.fav?'<b class="fav">★</b>':''}<span class="tl">${esc(r.label||'Untitled')}</span><span class="tc">${esc(catLabel(r.cat))}</span></button>`;}
+function renderRefs(){const ch=charById(ui.charId)||project.characters[0];ui.charId=ch.id;const all=project.refs.filter(r=>r.charId===ch.id);
+  const cnt=id=>id==='all'?all.length:id==='fav'?all.filter(r=>r.fav).length:all.filter(r=>r.cat===id).length;
+  const av=ch.avatar&&memImages.has(ch.avatar)?`<img src="${urlFor(ch.avatar)}" alt="">`:esc(initials(ch.name));
+  $('#tab-refs').innerHTML=`<div class="wrapin">
+  <div class="scrollx">${project.characters.map(c=>`<button class="chip ${c.id===ch.id?'on':''}" data-act="setChar" data-id="${c.id}"><i class="dot" style="background:${c.color}"></i><span class="nm">${esc(c.name)}</span></button>`).join('')}<button class="chip" data-act="addChar">${I('plus')} Add</button></div>
+  <details class="card profile" id="profileBox" ${ui.profileOpen?'open':''}><summary><span class="avatar" style="border-color:${ch.color}">${av}</span><span class="grow"><b class="pname">${esc(ch.name)}</b><br><span class="muted small">${all.length} reference image(s) · tap for profile & notes</span></span></summary>
+    ${F.txt('Name','char:name',ch.name,'',`data-id="${ch.id}"`)}
+    <div class="grid2"><div><label class="f">Tag color</label><input class="inp" type="color" data-b="char:color" data-id="${ch.id}" value="${ch.color}"></div><div><label class="f">Profile picture</label><p class="muted small" style="margin:4px 0">Open a reference and tap “Set as profile picture”.</p></div></div>
+    <label class="f">Character notes</label><textarea rows="4" data-b="char:notes" data-id="${ch.id}" placeholder="${ch.id==='bg'?'Locations, props, lighting notes…':'Hair, eyes, height, ear/tail details, uniform, how they talk, personality reminders…'}">${esc(ch.notes)}</textarea>
+    <label class="f">Color swatches (tap one to remove)</label><div class="pal">${ch.palette.map((c,i)=>`<button class="sw" style="background:${c}" data-act="palDel" data-id="${ch.id}" data-i="${i}" title="${c}" aria-label="Color ${c}"></button>`).join('')}<label class="chip addcol">${I('plus')} Color<input type="color" data-addcolor="${ch.id}" value="#888888" aria-label="Add color"></label></div>
+    ${ch.fixed?'':`<div class="row end"><button class="btn sm danger" data-act="delChar" data-id="${ch.id}">${I('trash')} Delete this profile</button></div>`}
+  </details>
+  <div class="row nowrap"><button class="btn primary grow" data-act="addRefs">${I('upload')} Add images to ${esc(ch.name)}</button><button class="btn icon" data-act="gridSize" aria-label="Change thumbnail size">${I('grid')}</button></div>
+  <div style="margin-top:10px"><input class="inp" type="search" id="refSearch" placeholder="Search labels, tags and notes…" value="${esc(ui.q)}" aria-label="Search references"></div>
+  <div class="scrollx" style="margin-top:8px">${[['all','All'],...CATS,['fav','★ Favorites']].map(([id,n])=>`<button class="chip ${ui.cat===id?'on':''}" data-act="setCat" data-id="${id}">${esc(n)} <span class="cnt">${cnt(id)}</span></button>`).join('')}</div>
+  <div class="row nowrap"><label class="muted small" for="srcSel" style="white-space:nowrap">Source</label><select id="srcSel"><option value="all">All sources</option>${SOURCES.map(([k,n])=>`<option value="${k}" ${ui.src===k?'selected':''}>${esc(n)}</option>`).join('')}</select></div>
+  <div id="refGrid"></div></div>`;renderRefGrid();}
+function renderRefGrid(){const g=$('#refGrid');if(!g)return;const list=refsFiltered();const anyForChar=project.refs.some(r=>r.charId===ui.charId);
+  g.innerHTML=list.length?`<div class="thumbs size-${ui.grid}">${list.map(r=>refTile(r,'data-act="openRef"')).join('')}</div>`:
+   `<div class="empty">${anyForChar?'No references match these filters.':`No reference images yet.<br>Tap <b>Add images</b> to upload official reference art or your own drawings from your phone.<br><br><span class="small">This tool never creates or includes character art — only pictures you add appear here.</span>`}</div>`;}
+async function addRefFiles(files){if(!files.length)return;const added=[],fails=[];const cat=CATS.some(c=>c[0]===ui.cat)?ui.cat:'other';
+  for(let i=0;i<files.length;i++){toast(`Adding image ${i+1} of ${files.length}…`);try{const im=await importImageFile(files[i]);
+    const r={id:uid('ref'),charId:ui.charId,imgId:im.id,w:im.w,h:im.h,label:im.name.slice(0,60),cat,source:'other',tags:'',notes:'',fav:false,added:Date.now()};project.refs.push(r);added.push(r);}catch(e){fails.push(e.message);}}
+  if(added.length)commit();renderRefs();
+  if(fails.length)toast((added.length?`Added ${added.length}. `:'')+`Problem: ${fails[0]}${fails.length>1?` (+${fails.length-1} more)`:''}`,'err');
+  else if(added.length===1)openViewer(added[0].id);else if(added.length)toast(`Added ${added.length} images. Tap one to label it and mark its source.`,'ok');}
+let VW=null;
+function openViewer(id){const ids=refsFiltered().map(r=>r.id);let idx=ids.indexOf(id);if(idx<0){ids.unshift(id);idx=0;}
+  const m=openModal('',{cls:'full',onClose:()=>{VW=null;if(ui.tab==='refs')renderRefs();}});VW={ids,idx,m,zoom:false};drawViewer();}
+function drawViewer(){if(!VW)return;const r=project.refs.find(x=>x.id===VW.ids[VW.idx]);if(!r){closeModal();return;}const has=memImages.has(r.imgId);
+  VW.m.querySelector('.sheet').innerHTML=`<div class="vhead"><button class="btn icon" data-act="closeModal" aria-label="Close">${I('close')}</button><div class="grow center"><b>${VW.idx+1} / ${VW.ids.length}</b></div><button class="btn icon ${r.fav?'on':''}" data-act="refFav" data-id="${r.id}" aria-label="Favorite">${I('star')}</button></div>
+  <div class="vscroll"><div class="vimg ${VW.zoom?'zoom':''}" id="vimg">${has?`<img src="${urlFor(r.imgId)}" alt="${esc(r.label)}" draggable="false">`:'<p class="muted">Image missing</p>'}</div>
+  <div class="row nowrap vnav"><button class="btn grow" data-act="vPrev" ${VW.idx===0?'disabled':''}>${I('left')} Prev</button><span class="muted small center" style="flex:1.2">Swipe to browse<br>tap image to zoom</span><button class="btn grow" data-act="vNext" ${VW.idx>=VW.ids.length-1?'disabled':''}>Next ${I('right')}</button></div>
+  <div class="vform">
+   <label class="f">Label</label><input class="inp" data-b="ref:label" data-id="${r.id}" value="${esc(r.label)}" placeholder="e.g. Helios grinning, 3/4 view">
+   <div class="grid2"><div><label class="f">Category</label><select data-b="ref:cat" data-id="${r.id}">${CATS.map(([k,n])=>`<option value="${k}" ${r.cat===k?'selected':''}>${n}</option>`).join('')}</select></div>
+   <div><label class="f">Source</label><select data-b="ref:source" data-id="${r.id}">${SOURCES.map(([k,n])=>`<option value="${k}" ${r.source===k?'selected':''}>${n}</option>`).join('')}</select></div></div>
+   <label class="f">Tags (comma separated)</label><input class="inp" data-b="ref:tags" data-id="${r.id}" value="${esc(r.tags)}" placeholder="smile, uniform, side view">
+   <label class="f">Profile</label><select data-b="ref:charId" data-id="${r.id}">${project.characters.map(c=>`<option value="${c.id}" ${r.charId===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>
+   <label class="f">Notes</label><textarea rows="3" data-b="ref:notes" data-id="${r.id}" placeholder="What to remember when drawing this…">${esc(r.notes)}</textarea>
+   <p class="muted small">${r.w}×${r.h}px</p>
+   <h4>Use this image</h4><div class="grid2" style="gap:8px">
+    <button class="btn sm" data-act="refToPanel" data-id="${r.id}">${I('layout')} Add to panel</button><button class="btn sm" data-act="refBg" data-id="${r.id}">${I('bgimg')} Panel background</button>
+    <button class="btn sm" data-act="refToPuppet" data-id="${r.id}">${I('puppet')} Puppet part</button><button class="btn sm" data-act="refTrace" data-id="${r.id}">${I('pose')} Puppet trace</button>
+    <button class="btn sm" data-act="refProfile" data-id="${r.id}">${I('star')} Profile picture</button><button class="btn sm" data-act="refDownload" data-id="${r.id}">${I('download')} Download</button></div>
+   <div class="row end"><button class="btn danger" data-act="refDelete" data-id="${r.id}">${I('trash')} Delete reference</button></div></div></div>`;
+  const v=$('#vimg',VW.m);let sx=0,sy=0,down=false;
+  v.addEventListener('pointerdown',e=>{down=true;sx=e.clientX;sy=e.clientY;});
+  v.addEventListener('pointerup',e=>{if(!down)return;down=false;const dx=e.clientX-sx,dy=e.clientY-sy;
+    if(!VW.zoom&&Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)){dx<0?ACT.vNext():ACT.vPrev();}else if(Math.hypot(dx,dy)<8){VW.zoom=!VW.zoom;v.classList.toggle('zoom',VW.zoom);}});}
+
+/* =====================================================================
+   STORYBOARD, READER, SCRIPT
+   ===================================================================== */
+function renderStory(){let h=`<div class="wrapin"><div class="card"><h2>Storyboard</h2><p class="muted small">Chapters run top to bottom; pages run left to right. Use the arrows to change the reading order, ▶ to read it like a finished comic.</p>
+  <div class="row"><button class="btn primary" data-act="readAll">${I('play')} Read whole comic</button><button class="btn" data-act="script">${I('text')} Script</button><button class="btn" data-act="addChapter">${I('plus')} Chapter</button></div></div>`;
+  project.chapters.forEach((ch,ci)=>{const pn=ch.pages.reduce((a,id)=>a+project.pages[id].panels.length,0);
+    h+=`<section class="card"><div class="chhead"><span class="code">${esc(ch.code)}</span><input class="inp chtitle" data-b="chapter:title" data-id="${ch.id}" value="${esc(ch.title)}" aria-label="Chapter title"></div>
+    <p class="muted small">${ch.pages.length} page(s) · ${pn} panel(s)${ch.notes?' · '+esc(ch.notes.slice(0,80))+(ch.notes.length>80?'…':''):''}</p>
+    <div class="pages">${ch.pages.map((pid,pi)=>{const pg=project.pages[pid];return `<div class="pcard"><button class="pthumb" data-act="openPage" data-id="${pid}" aria-label="Edit page ${pi+1}"><canvas data-thumb="${pid}"></canvas></button>
+      <div class="plabel">Page ${pi+1}${pg.name?' · '+esc(pg.name):''}<small>${pg.panels.length} panel(s)</small></div>
+      <div class="pbtns"><button class="btn sm icon" data-act="pgMove" data-id="${pid}" data-d="-1" ${pi===0?'disabled':''} aria-label="Move earlier">${I('left')}</button><button class="btn sm icon" data-act="pgPreview" data-id="${pid}" aria-label="Preview">${I('eye')}</button><button class="btn sm icon" data-act="pgMore" data-id="${pid}" aria-label="More options">${I('more')}</button><button class="btn sm icon" data-act="pgMove" data-id="${pid}" data-d="1" ${pi===ch.pages.length-1?'disabled':''} aria-label="Move later">${I('right')}</button></div></div>`;}).join('')}
+      <button class="pcard add" data-act="addPage" data-ch="${ch.id}">${I('plus')}<span>Add page</span></button></div>
+    <div class="row"><button class="btn sm" data-act="readChapter" data-ch="${ch.id}" ${ch.pages.length?'':'disabled'}>${I('play')} Read</button><button class="btn sm" data-act="exportChapter" data-ch="${ch.id}" ${ch.pages.length?'':'disabled'}>${I('download')} Export</button>
+    <button class="btn sm icon" data-act="chMove" data-ch="${ch.id}" data-d="-1" ${ci===0?'disabled':''} aria-label="Move chapter up">${I('up')}</button><button class="btn sm icon" data-act="chMove" data-ch="${ch.id}" data-d="1" ${ci===project.chapters.length-1?'disabled':''} aria-label="Move chapter down">${I('down')}</button><button class="btn sm" data-act="chMore" data-ch="${ch.id}">Notes & more…</button></div></section>`;});
+  $('#tab-story').innerHTML=h+'</div>';drawStoryThumbs();}
+function drawStoryThumbs(){$$('#tab-story canvas[data-thumb]').forEach(c=>drawThumb(c,project.pages[c.dataset.thumb],160));}
+function openPanelOrder(pid){const m=openModal('',{onClose:()=>renderTab(ui.tab)});
+  const draw=()=>{const pg=project.pages[pid];if(!pg){closeModal();return;}m.querySelector('.sheet').innerHTML=`<h3>Panel reading order</h3><p class="muted small">${esc(pageLabel(pid))}. Readers follow these numbers. Use the arrows to change the order (bubble order inside a panel follows the layers: “Back” items are read first).</p>
+    <div style="display:flex;justify-content:center;margin:8px 0"><canvas style="width:200px;height:auto;box-shadow:0 1px 4px rgba(0,0,0,.3)"></canvas></div>
+    <div class="list">${pg.panels.map((pn,i)=>`<div class="lrow"><span class="num">${i+1}</span><span class="lmain"><span>${esc(panelSummary(pn))}</span></span><button class="btn sm icon" data-po="-1" data-i="${i}" ${i===0?'disabled':''} aria-label="Earlier">${I('up')}</button><button class="btn sm icon" data-po="1" data-i="${i}" ${i===pg.panels.length-1?'disabled':''} aria-label="Later">${I('down')}</button></div>`).join('')||'<p class="muted">No panels.</p>'}</div>
+    <div class="row end"><button class="btn primary" data-act="closeModal">Done</button></div>`;drawThumb(m.querySelector('canvas'),pg,200,true);};draw();
+  m.addEventListener('click',e=>{const b=e.target.closest('[data-po]');if(!b)return;const pg=project.pages[pid],i=+b.dataset.i,j=i+(+b.dataset.po);if(j<0||j>=pg.panels.length)return;[pg.panels[i],pg.panels[j]]=[pg.panels[j],pg.panels[i]];commit();draw();});}
+function openPageMore(pid){const ch=chapterOf(pid);openModal(`<h3>${esc(pageLabel(pid))}</h3><div class="list">
+  <button class="btn" data-act="openPage" data-id="${pid}">${I('edit')} Edit page</button><button class="btn" data-act="panelOrder" data-id="${pid}">${I('layers')} Panel reading order</button>
+  <button class="btn" data-act="pgDup" data-id="${pid}">${I('copy')} Duplicate page</button><button class="btn" data-act="pgExport" data-id="${pid}">${I('download')} Export this page</button>
+  <label class="f">Move to chapter</label><select id="pgMoveSel">${project.chapters.map(c=>`<option value="${c.id}" ${c===ch?'selected':''}>${esc(c.code+': '+c.title)}</option>`).join('')}</select>
+  <button class="btn danger" data-act="pgDel" data-id="${pid}">${I('trash')} Delete page</button></div><div class="row end"><button class="btn" data-act="closeModal">Close</button></div>`,{onClose:()=>renderTab(ui.tab)});
+  $('#pgMoveSel').addEventListener('change',e=>{const to=project.chapters.find(c=>c.id===e.target.value),from=chapterOf(pid);if(!to||to===from)return;from.pages.splice(from.pages.indexOf(pid),1);to.pages.push(pid);commit();toast(`Moved to ${to.code} (last page).`);closeModal();});}
+function openChapterMore(cid){const ch=project.chapters.find(c=>c.id===cid);if(!ch)return;openModal(`<h3>${esc(ch.code)}: ${esc(ch.title)}</h3>
+  <div class="grid2">${F.txt('Chapter code','chapter:code',ch.code,'C1').replace('data-b="chapter:code"',`data-b="chapter:code" data-id="${ch.id}"`)}<div></div></div>
+  <label class="f">Chapter notes / synopsis</label><textarea rows="5" data-b="chapter:notes" data-id="${ch.id}" placeholder="What happens? Which feelings should the reader leave with?">${esc(ch.notes)}</textarea>
+  <div class="row" style="margin-top:12px"><button class="btn sm" data-act="addPage" data-ch="${ch.id}">${I('plus')} Add page</button><button class="btn sm" data-act="readChapter" data-ch="${ch.id}">${I('play')} Read</button><button class="btn sm danger" data-act="chDel" data-ch="${ch.id}">${I('trash')} Delete chapter</button></div>
+  <div class="row end"><button class="btn primary" data-act="closeModal">Done</button></div>`,{onClose:()=>renderTab(ui.tab)});}
+let RD=null;
+function openReader(ids,start=0){ids=ids.filter(id=>project.pages[id]);if(!ids.length)return toast('No pages to show yet.');
+  const m=openModal(`<div class="vhead"><button class="btn icon" data-act="closeModal" aria-label="Close">${I('close')}</button><b class="grow" id="rdLabel"></b><button class="btn sm" data-act="rdEdit">${I('edit')} Edit</button><button class="btn sm icon" data-act="rdExport" aria-label="Export">${I('download')}</button></div>
+  <div class="rbody" id="rdBody"><canvas id="rdCanvas"></canvas></div><div class="rfoot row nowrap"><button class="btn grow" data-act="rdPrev">${I('left')} Prev</button><span class="muted small" id="rdCount" style="min-width:54px;text-align:center"></span><button class="btn grow" data-act="rdNext">Next ${I('right')}</button></div>`,{cls:'full',onClose:()=>{RD=null;}});
+  RD={ids,idx:clamp(start,0,ids.length-1),m};const body=$('#rdBody',m);let sx=0,sy=0;
+  body.addEventListener('pointerdown',e=>{sx=e.clientX;sy=e.clientY;});body.addEventListener('pointerup',e=>{const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.3)dx<0?ACT.rdNext():ACT.rdPrev();});
+  requestAnimationFrame(drawReader);}
+async function drawReader(){if(!RD)return;const pid=RD.ids[RD.idx],pg=project.pages[pid];if(!pg)return;$('#rdLabel').textContent=pageLabel(pid);$('#rdCount').textContent=`${RD.idx+1} / ${RD.ids.length}`;
+  $$('[data-act="rdPrev"]',RD.m)[0].disabled=RD.idx===0;$$('[data-act="rdNext"]',RD.m)[0].disabled=RD.idx>=RD.ids.length-1;
+  const body=$('#rdBody'),c=$('#rdCanvas');const W=body.clientWidth-16,H=body.clientHeight-16;const k=pg.h/pg.w>2.2?W/pg.w:Math.min(W/pg.w,H/pg.h);const dpr=Math.min(2,window.devicePixelRatio||1);
+  const paint=()=>{c.style.width=Math.round(pg.w*k)+'px';c.style.height=Math.round(pg.h*k)+'px';c.width=Math.round(pg.w*k*dpr);c.height=Math.round(pg.h*k*dpr);const x=c.getContext('2d');x.setTransform(k*dpr,0,0,k*dpr,0,0);renderPage(x,pg,{});};
+  paint();body.scrollTop=0;await ensureImgs(pageImgIds(pg));if(RD&&RD.ids[RD.idx]===pid)paint();}
+function buildScript(){let out=project.title+'\n'+'='.repeat(Math.min(60,project.title.length))+'\n\n';
+  for(const ch of project.chapters){out+=`${ch.code}: ${ch.title}\n`;if(ch.notes)out+=`(${ch.notes.replace(/\n+/g,' ')})\n`;out+='\n';
+    ch.pages.forEach((pid,pi)=>{const pg=project.pages[pid];out+=`  PAGE ${pi+1}${pg.name?' — '+pg.name:''}\n`;
+      pg.panels.forEach((pn,ni)=>{out+=`    Panel ${ni+1}${pn.note?': '+pn.note.replace(/\n+/g,' '):''}\n`;
+        pn.items.forEach(it=>{if(it.type==='bubble'&&it.text.trim()){const who=it.style==='caption'?'CAPTION':(it.speaker||'?').toUpperCase();const how={thought:' (thought)',whisper:' (whisper)',shout:' (shout)'}[it.style]||'';out+=`      ${who}${how}: ${it.text.replace(/\s*\n\s*/g,' ')}\n`;}
+          else if(it.type==='sfx'&&it.text.trim())out+=`      SFX: ${it.text.replace(/\s*\n\s*/g,' ')}\n`;});});out+='\n';});}return out;}
+function openScript(){const s=buildScript();openModal(`<h3>Script</h3><p class="muted small">All dialogue and captions in reading order, built from your bubbles. Fill in “Speaker” on each bubble for a cleaner script.</p><pre class="script">${esc(s)}</pre>
+  <div class="row end"><button class="btn" data-act="copyScript">${I('copy')} Copy</button><button class="btn" data-act="dlScript">${I('download')} Save .txt</button><button class="btn primary" data-act="closeModal">Close</button></div>`);}
+
+/* =====================================================================
+   EXPORT
+   ===================================================================== */
+function downloadBlob(blob,name){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.rel='noopener';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),60000);}
+function canvasBlob(c,mime,q){return new Promise((res,rej)=>{try{c.toBlob(b=>b?res(b):rej(new Error('The browser could not create the image (it may be too large for this phone). Try a smaller size.')),mime,q);}catch(e){rej(e);}});}
+async function shareFiles(files){if(!(navigator.canShare&&navigator.canShare({files})))throw new Error('Sharing files is not supported in this browser — use Download instead.');try{await navigator.share({files,title:project.title});}catch(e){if(e.name!=='AbortError')throw e;}}
+async function pageCanvas(pg,scale){await ensureImgs(pageImgIds(pg));let s=scale;while(pg.w*s*pg.h*s>36e6||Math.max(pg.w,pg.h)*s>16000)s*=.85;const c=document.createElement('canvas');c.width=Math.round(pg.w*s);c.height=Math.round(pg.h*s);const x=c.getContext('2d');x.scale(s,s);renderPage(x,pg,{});return c;}
+async function stripCanvas(ids,scale){const pgs=ids.map(i=>project.pages[i]);for(const pg of pgs)await ensureImgs(pageImgIds(pg));let W=Math.max(...pgs.map(p=>p.w))*scale;let H=pgs.reduce((a,p)=>a+p.h*(W/p.w),0);
+  const f=Math.min(1,Math.sqrt(60e6/(W*H)),30000/H);if(f<1){W*=f;H*=f;toast('The strip was scaled down to fit this device’s image limits.');}const c=document.createElement('canvas');c.width=Math.round(W);c.height=Math.round(H);const x=c.getContext('2d');let y=0;
+  for(const pg of pgs){const k=W/pg.w;x.save();x.translate(0,y);x.scale(k,k);renderPage(x,pg,{});x.restore();y+=pg.h*k;}return c;}
+function exportName(pid,ext){const ch=chapterOf(pid);return `${slug(project.title,24)}_${ch?ch.code:'p'}_p${String((ch?ch.pages.indexOf(pid):0)+1).padStart(2,'0')}.${ext}`;}
+function openExport(pid=ui.pageId,what='page'){pid=project.pages[pid]?pid:allPageIds()[0];if(!pid)return toast('There are no pages to export yet.','err');const pg=project.pages[pid],ch=chapterOf(pid);const canShare=!!(navigator.canShare&&window.File);
+  const m=openModal(`<h3>Export comic pages</h3>
+  <label class="f">What to export</label><select id="exWhat"><option value="page">This page — ${esc(pageLabel(pid))}</option><option value="chapter">${esc(ch.code)}: every page, separate images (${ch.pages.length})</option><option value="strip">${esc(ch.code)}: one tall image (webtoon style)</option><option value="all">Whole comic: every page (${allPageIds().length})</option></select>
+  <label class="f">Format</label><div class="seg"><label><input type="radio" name="exFmt" value="png" checked> PNG — best quality</label><label><input type="radio" name="exFmt" value="jpeg"> JPEG — smaller file</label></div>
+  <label class="f">JPEG quality <output id="exQo">90</output></label><input type="range" id="exQ" min="50" max="100" value="90">
+  <label class="f">Size</label><select id="exScale"><option value="1">Normal (${pg.w}×${pg.h})</option><option value="2">Large 2× (for print)</option><option value="0.5">Small ½ (quick sharing)</option></select>
+  <p class="muted small">On Android, files go to your <b>Downloads</b> folder. When several pages download, Chrome may ask to allow multiple downloads — tap Allow.${canShare?' “Share” sends the images straight to another app.':''}</p>
+  <div class="row end"><button class="btn" data-act="closeModal">Cancel</button>${canShare?`<button class="btn" id="exShare">${I('share')} Share</button>`:''}<button class="btn primary" id="exGo">${I('download')} Download</button></div>`);
+  $('#exWhat',m).value=what;$('#exQ',m).addEventListener('input',e=>{$('#exQo',m).textContent=e.target.value;});
+  const go=async share=>{const o={what:$('#exWhat',m).value,fmt:m.querySelector('[name=exFmt]:checked').value,q:+$('#exQ',m).value/100,scale:+$('#exScale',m).value};closeModal();
+    try{await doExport(pid,o,share);}catch(e){reportErr(e);}};
+  $('#exGo',m).addEventListener('click',()=>go(false));const sb=$('#exShare',m);if(sb)sb.addEventListener('click',()=>go(true));}
+async function doExport(pid,o,share){const ch=chapterOf(pid);const ids=o.what==='page'?[pid]:o.what==='all'?allPageIds():ch.pages.slice();if(!ids.length)throw new Error('No pages to export.');
+  const mime=o.fmt==='jpeg'?'image/jpeg':'image/png',ext=o.fmt==='jpeg'?'jpg':'png';
+  if(o.what==='strip'){toast('Building the tall image…');const c=await stripCanvas(ids,o.scale);const b=await canvasBlob(c,mime,o.q);const name=`${slug(project.title,24)}_${ch.code}_strip.${ext}`;
+    if(share)await shareFiles([new File([b],name,{type:mime})]);else{downloadBlob(b,name);toast('Exported '+name,'ok');}return;}
+  const files=[];for(let i=0;i<ids.length;i++){toast(`Rendering page ${i+1} of ${ids.length}…`);const c=await pageCanvas(project.pages[ids[i]],o.scale);const b=await canvasBlob(c,mime,o.q);files.push(new File([b],exportName(ids[i],ext),{type:mime}));}
+  if(share){await shareFiles(files);return;}for(const f of files){downloadBlob(f,f.name);await sleep(500);}toast(`Exported ${files.length} image(s) to Downloads.`,'ok');}
+
+/* =====================================================================
+   MORE TAB (save / open / settings / guide)
+   ===================================================================== */
+function renderMore(){const nP=allPageIds().length,nPn=Object.values(project.pages).reduce((a,p)=>a+p.panels.length,0);
+  $('#tab-more').innerHTML=`<div class="wrapin">
+  <div class="card"><h2>Project</h2>${F.txt('Comic title','project:title',project.title)}
+   <p class="muted small">${project.refs.length} reference image(s) · ${project.chapters.length} chapters · ${nP} page(s) · ${nPn} panel(s)</p>
+   <p class="small" id="storageInfo">${db?'Autosave is on: your work is stored in this browser on this device.':'<b>Autosave is OFF</b> — this browser is blocking storage for this file. Use “Save project file” often.'}</p></div>
+  <div class="card"><h3>Save & open</h3><p class="muted small">Browser storage can be wiped if you clear Chrome's data or the phone runs low on space. A project file keeps <b>everything</b> (pages, notes and all your images). Save one regularly and keep a copy in Google Drive or similar.</p>
+   <div class="list"><button class="btn primary" data-act="saveFile">${I('save')} Save project file (.json)</button><button class="btn" data-act="openFile">${I('folder')} Open project file…</button>
+   <button class="btn" data-act="persist">${I('lock')} Ask the browser to keep my data</button><button class="btn" data-act="cleanImages">${I('trash')} Clean unused images</button><button class="btn danger" data-act="newProject">Start a new empty project…</button></div></div>
+  <div class="card"><h3>Export</h3><div class="list"><button class="btn" data-act="exportOpen">${I('download')} Export pages as PNG / JPEG…</button><button class="btn" data-act="readAll">${I('play')} Read whole comic</button><button class="btn" data-act="script">${I('text')} Script (all dialogue)</button></div></div>
+  <div class="card"><h3>Appearance</h3><div class="row">${[['auto','Auto'],['light','Light'],['dark','Dark']].map(([k,n])=>`<button class="chip ${ui.theme===k?'on':''}" data-act="theme" data-v="${k}">${n}</button>`).join('')}</div></div>
+  <div class="card help">${HELP}</div>
+  <p class="muted small center">HELIRUBY Studio is a personal fan-comic tool. Daitaku Helios and Daiichi Ruby are characters from Uma Musume: Pretty Derby (© Cygames). This tool contains no character artwork; every image comes from you.</p></div>`;
+  if(navigator.storage&&navigator.storage.estimate)navigator.storage.estimate().then(e=>{const el=$('#storageInfo');if(el&&e&&e.quota)el.innerHTML+=` <span class="muted">Using ${(e.usage/1048576).toFixed(1)} MB of about ${(e.quota/1048576).toFixed(0)} MB available.</span>`;}).catch(()=>{});}
+const HELP=`<h3>${I('help')} How to use HELIRUBY Studio</h3>
+<details open><summary>Quick start (5 steps)</summary><ol>
+<li><b>References:</b> pick Helios or Ruby at the top, tap <b>Add images</b>, then tap a picture to label it (category, source, tags).</li>
+<li><b>Storyboard:</b> your five chapters are ready. Tap <b>Add page</b> in a chapter, or tap a page to open it.</li>
+<li><b>Panels:</b> tap <b>Layout</b> to pick a panel arrangement, then add images, speech bubbles, captions and sound effects.</li>
+<li><b>Read it:</b> tap ▶ <b>Read</b> in the Storyboard to flip through pages like a reader.</li>
+<li><b>Export:</b> tap <b>Export</b> (Panels toolbar or More) to save PNG/JPEG images to your phone.</li></ol></details>
+<details><summary>Saving your work (important)</summary><ul>
+<li>Everything saves automatically in this browser. The chip at the top says <b>Saved ✓</b> when it's done.</li>
+<li>Use <b>More → Save project file</b> regularly. It's your backup and includes all images. Open it with <b>More → Open project file</b> on any phone or computer.</li>
+<li>If the chip says <b>Not stored</b>, your browser is blocking storage for this file (this can happen when an HTML file is opened straight from a file manager). Your work still exists until you close the tab, so save a project file before leaving, or open the tool from a web address instead.</li>
+<li>Undo / redo are the arrows in the top-right corner.</li></ul></details>
+<details><summary>References</summary><ul>
+<li>Each profile (Helios, Ruby, Backgrounds & Props, or one you add) has its own images, notes and color swatches. Tap the profile card to edit notes and colors.</li>
+<li>Filter with the category chips (Expression, Pose, Outfit, Emotion, Other, ★ Favorites), the Source menu, or search labels and tags.</li>
+<li>Mark each image's <b>Source</b> so you always know which pictures are official art and which are your own drawings. Tiles show a badge: <b>Official</b>, <b>Mine</b> or <b>Puppet</b>.</li>
+<li>In the viewer: swipe left/right to browse, tap the picture to zoom, ★ to favorite. From there you can drop the image into a panel, use it as a panel background, as a puppet part, or as a tracing guide.</li>
+<li>iPhone HEIC photos can't be opened by browsers; convert them to JPG/PNG first.</li></ul></details>
+<details><summary>Puppet (optional drawing aid)</summary><ul>
+<li>Draw or cut out parts (head, torso, upper arm, forearm, hand, legs…) as separate <b>PNG files with transparent backgrounds</b>. JPEGs can't be transparent.</li>
+<li>Tap a part to select it. Drag to move. The white corner dots resize; the blue dot on the stick rotates.</li>
+<li>Turn on <b>Move pivot</b> and drag the blue center dot to the joint (e.g. the shoulder) so the arm swings naturally. Pivot buttons give quick presets.</li>
+<li>Layers: the top of the list is in front. Hide (eye) or lock parts so you don't grab them by mistake. Tap the same spot twice to reach a part underneath.</li>
+<li><b>Stage</b> lets you put a reference faintly behind the parts to trace a pose. <b>Poses</b> saves and reloads arrangements.</li>
+<li>Use <b>PNG</b> to download the posed figure, <b>To refs</b> to save it as a Pose reference, or <b>To panel</b> to place it in a panel as a rough to draw over. It's a planning tool — the final art is yours.</li></ul></details>
+<details><summary>Panels, bubbles and captions</summary><ul>
+<li>Choose the page at the top (◀ ▶ switch pages, + adds a page, the sliders icon opens page settings: size, paper color, chapter).</li>
+<li><b>Tap</b> a panel or element to select it, <b>drag</b> to move it, use the <b>corner dots</b> to resize. Tap the same spot again to select what's underneath (e.g. the panel behind a picture).</li>
+<li>Drag the grey area (or empty space) to scroll. Pinch or use the zoom buttons. “Fit” shows the whole page.</li>
+<li>New images, bubbles, captions and SFX go into the selected panel (or panel 1). Edit their text and style in the box below the page; tap <b>Hide</b> to give the page more room.</li>
+<li>Drag the <b>orange dot</b> to aim a bubble's tail at the speaker. Set the <b>Speaker</b> so the Script lists who says what.</li>
+<li>Blue numbers show the reading order; change it with <b>Earlier / Later</b> or “Reading order”. Bubbles inside a panel are read from back to front.</li>
+<li>Images stay inside their panel border unless you untick “Keep inside the panel border” (great for characters breaking the frame).</li></ul></details>
+<details><summary>Storyboard & chapters</summary><ul>
+<li>Chapters run top to bottom; pages left to right. ◀ ▶ under a page change its position; ⋯ duplicates, moves it to another chapter, sets panel order, exports or deletes it.</li>
+<li>Edit chapter titles directly. “Notes & more…” holds a synopsis and lets you change the code or delete a chapter.</li>
+<li><b>Script</b> collects every caption and line of dialogue in reading order so you can proofread or share it.</li></ul></details>
+<details><summary>Exporting images</summary><ul>
+<li>Export one page, a whole chapter as separate images, a chapter as <b>one tall image</b> (good for vertical scrolling posts), or the whole comic.</li>
+<li>PNG keeps the best quality; JPEG makes smaller files. “Large 2×” is for print.</li></ul></details>
+<details><summary>Working offline & on Android</summary><ul>
+<li>This is a single HTML file with nothing to download from the internet, so it works offline.</li>
+<li>Best on Android: open it in <b>Chrome</b> from a web address (for example GitHub Pages), then use Chrome's menu → <b>Add to Home screen</b> so it opens like an app.</li>
+<li>Keyboard shortcuts on a computer: <kbd>Ctrl</kbd>+<kbd>Z</kbd> undo, <kbd>Ctrl</kbd>+<kbd>Y</kbd> redo, <kbd>Delete</kbd> removes the selection.</li></ul></details>
+<details><summary>Tips for a beginner comic artist</summary><ul>
+<li>Plan before you draw: rough layout → dialogue → stick figures (or a puppet pose) → final art. Changing a sketch is cheap; changing finished art isn't.</li>
+<li>One clear moment per panel. Vary shot size: a wide shot to show where they are, close-ups for feelings.</li>
+<li>Keep bubbles short (under ~25 words) and place them in reading order: top-to-bottom, left-to-right. Leave room for bubbles when drawing.</li>
+<li>For quiet, emotional beats (and this story has many), a wordless panel or extra white space can say more than dialogue.</li>
+<li>Keep your references open while drawing: same hair parting, ear accessories and uniform details every time.</li></ul></details>`;
+function showWelcome(){openModal(`<div class="welcome"><h3>Welcome to HELIRUBY Studio</h3><p>A workbench for <b>${esc(project.title)}</b>.</p><ol>
+  <li><b>References</b> — upload art for Helios and Ruby and label it.</li><li><b>Puppet</b> — optional: pose cut-out parts as a drawing guide.</li>
+  <li><b>Panels</b> — lay out pages with images, bubbles and captions.</li><li><b>Storyboard</b> — your 5 chapters, reading order and preview.</li><li><b>More</b> — save files, export images, full guide.</li></ol>
+  <p class="note">Your work autosaves in this browser. Also tap <b>More → Save project file</b> now and then: it's your backup.</p>
+  <div class="row end"><button class="btn" id="wHelp">Read the guide</button><button class="btn primary" data-act="closeModal">Start</button></div></div>`,{cls:'dialog',onClose:()=>{ui.seenWelcome=true;saveUI();}});
+  $('#wHelp').addEventListener('click',()=>{closeModal();setTab('more');setTimeout(()=>{const h=$('#tab-more .help');if(h)h.scrollIntoView({behavior:'smooth'});},60);});}
+async function replaceProject(p,images){for(const u of urlCache.values())if(u.startsWith('blob:'))URL.revokeObjectURL(u);memImages.clear();urlCache.clear();imgCache.clear();alphaCache.clear();
+  if(db){try{await idb('images','readwrite',s=>s.clear());}catch(e){reportErr(e);}}
+  let n=0,bad=0;for(const[id,d]of Object.entries(images||{})){if(typeof d!=='string'||!d.startsWith('data:image/')){bad++;continue;}try{await putImage(id,d);n++;}catch(e){bad++;}if(n%10===0)toast(`Restoring images… ${n}`);}
+  project=p;hist.undo=[];hist.redo=[];hist.last=JSON.stringify(project);ED.sel=null;PUP.sel=null;ui.pageId=null;dirty=true;await saveNow();updateUndoBtns();updateTitle();renderTab(ui.tab);
+  if(bad)toast(`${bad} image(s) could not be restored.`,'err');}
+
+/* =====================================================================
+   ACTIONS (every button routes through here)
+   ===================================================================== */
+const VIEWS=()=>({ed:edView,pup:pupView});
+const ACT={
+  tab:b=>setTab(b.dataset.tab),
+  closeModal:()=>closeModal(),
+  undo:()=>{commit();if(!hist.undo.length)return toast('Nothing to undo.');hist.redo.push(hist.last);restoreSnap(hist.undo.pop());toast('Undone.');},
+  redo:()=>{if(!hist.redo.length)return toast('Nothing to redo.');hist.undo.push(hist.last);restoreSnap(hist.redo.pop());toast('Redone.');},
+  zoomIn:b=>VIEWS()[b.dataset.view].setZoom(VIEWS()[b.dataset.view].zoom*1.3),
+  zoomOut:b=>VIEWS()[b.dataset.view].setZoom(VIEWS()[b.dataset.view].zoom/1.3),
+  zoomFit:b=>{const v=VIEWS()[b.dataset.view];v.zoom=1;v.layout();v.wrap.scrollTo(0,0);},
+  toggleProps:b=>{const ed=b.dataset.view==='ed';const S=ed?ED:PUP;S.propsOpen=!S.propsOpen;ed?renderProps():renderPupProps();},
+  /* references */
+  setChar:b=>{ui.charId=b.dataset.id;ui.cat='all';saveUI();renderRefs();},
+  addChar:async()=>{const n=await ask({title:'New profile',msg:'For another character, a location set, or anything you want to keep references for.',input:'',ph:'Name',ok:'Create'});if(!n)return;
+    const c={id:uid('c'),name:n,color:'#5b6b8c',notes:'',palette:[],avatar:null,fixed:false};project.characters.push(c);ui.charId=c.id;ui.cat='all';commit();renderRefs();},
+  delChar:async b=>{const c=charById(b.dataset.id);if(!c||c.fixed)return;const n=project.refs.filter(r=>r.charId===c.id).length;
+    if(!await ask({title:`Delete “${esc(c.name)}”?`,msg:`Its ${n} reference image(s) and puppet stage will be removed too.`,ok:'Delete',danger:true}))return;
+    project.characters.splice(project.characters.indexOf(c),1);project.refs=project.refs.filter(r=>r.charId!==c.id);delete project.puppets[c.id];ui.charId='helios';commit();renderRefs();},
+  palDel:async b=>{const c=charById(b.dataset.id);const i=+b.dataset.i;if(!c||!c.palette[i])return;if(!await ask({title:'Remove this color?',msg:`<span class="dot" style="background:${c.palette[i]};width:18px;height:18px;vertical-align:middle"></span> ${c.palette[i]}`,ok:'Remove'}))return;c.palette.splice(i,1);commit();renderRefs();},
+  setCat:b=>{ui.cat=b.dataset.id;saveUI();renderRefs();},
+  gridSize:()=>{ui.grid={s:'m',m:'l',l:'s'}[ui.grid]||'m';saveUI();renderRefGrid();},
+  addRefs:async()=>{const f=await pickFiles();await addRefFiles(f);},
+  openRef:b=>openViewer(b.dataset.id),
+  vPrev:()=>{if(VW&&VW.idx>0){VW.idx--;VW.zoom=false;drawViewer();}},
+  vNext:()=>{if(VW&&VW.idx<VW.ids.length-1){VW.idx++;VW.zoom=false;drawViewer();}},
+  refFav:b=>{const r=project.refs.find(x=>x.id===b.dataset.id);if(!r)return;r.fav=!r.fav;commit();drawViewer();},
+  refProfile:b=>{const r=project.refs.find(x=>x.id===b.dataset.id);const c=r&&charById(r.charId);if(!c)return;c.avatar=r.imgId;commit();toast(`Profile picture set for ${c.name}.`,'ok');},
+  refToPanel:async b=>{const r=project.refs.find(x=>x.id===b.dataset.id);if(!r)return;if(!curPage())return toast('Create a page first (Storyboard → Add page).','err');
+    if(await addImageToPanel({imgId:r.imgId,w:r.w,h:r.h})){while(modals.length)closeModal();setTab('pages');toast('Added to the panel. Drag it into place.');}},
+  refBg:b=>{const r=project.refs.find(x=>x.id===b.dataset.id);const pn=targetPanel();if(!r)return;if(!pn)return toast('Create a page with a panel first.','err');pn.bgImg=r.imgId;commit();while(modals.length)closeModal();setTab('pages');toast('Set as the background of the selected panel.');},
+  refToPuppet:b=>{const r=project.refs.find(x=>x.id===b.dataset.id);if(!r)return;ui.puppetChar=r.charId;addPartImage({id:r.imgId,w:r.w,h:r.h},r.label||'Part');commit();while(modals.length)closeModal();setTab('puppet');
+    if(r.source==='official')toast('Tip: puppet parts work best as separate transparent PNG pieces.');},
+  refTrace:b=>{const r=project.refs.find(x=>x.id===b.dataset.id);if(!r)return;ui.puppetChar=r.charId;const rig=curRig();rig.trace=r.imgId;rig.showTrace=true;commit();while(modals.length)closeModal();setTab('puppet');toast('Trace image set (faint, behind the parts; never exported).');},
+  refDownload:b=>{const r=project.refs.find(x=>x.id===b.dataset.id);const d=r&&memImages.get(r.imgId);if(!d)return toast('Image missing.','err');const blob=dataURLtoBlob(d);downloadBlob(blob,slug(r.label||'reference')+'.'+((blob.type.split('/')[1]||'png').replace('jpeg','jpg')));},
+  refDelete:async b=>{const r=project.refs.find(x=>x.id===b.dataset.id);if(!r)return;if(!await ask({title:'Delete this reference?',msg:`“${esc(r.label||'Untitled')}” will be removed from your references. Copies already placed in panels stay. You can undo.`,ok:'Delete',danger:true}))return;
+    project.refs.splice(project.refs.indexOf(r),1);project.characters.forEach(c=>{if(c.avatar===r.imgId&&!project.refs.some(x=>x.imgId===r.imgId))c.avatar=null;});commit();
+    if(VW){VW.ids=VW.ids.filter(i=>i!==r.id);if(!VW.ids.length){closeModal();return;}VW.idx=Math.min(VW.idx,VW.ids.length-1);drawViewer();}renderRefGrid();},
+  /* puppet */
+  pupChar:b=>{ui.puppetChar=b.dataset.id;PUP.sel=null;saveUI();renderPuppet();},
+  addParts:async()=>{const files=await pickFiles();if(!files.length)return;let n=0,jpg=false;const errs=[];
+    for(const f of files){try{toast(`Adding part ${n+1} of ${files.length}…`);const im=await importImageFile(f,{maxSide:1800});addPartImage(im,im.name);n++;if(im.jpeg)jpg=true;}catch(e){errs.push(e.message);}}
+    if(n)commit();renderPuppet();if(errs.length)toast(errs[0],'err');else if(jpg)toast('Note: JPEG images have no transparency. Save parts as PNG with a transparent background for best results.');else toast(`Added ${n} part(s).`,'ok');},
+  partsFromRefs:async()=>{const pick=await pickImage('Choose an image to use as a part');if(!pick)return;addPartImage({id:pick.imgId,w:pick.w,h:pick.h},'Part');commit();renderPuppet();},
+  selPart:b=>{PUP.sel=b.dataset.id;renderPupProps();pupView.draw();},
+  partHide:b=>{const p=curRig().parts.find(q=>q.id===b.dataset.id);if(!p)return;p.hidden=!p.hidden;commit();renderPupProps();pupView.draw();},
+  partLock:b=>{const p=curRig().parts.find(q=>q.id===b.dataset.id);if(!p)return;p.locked=!p.locked;commit();renderPupProps();pupView.draw();},
+  partMove:b=>{const rig=curRig();const i=rig.parts.findIndex(q=>q.id===b.dataset.id),j=i+(+b.dataset.d);if(i<0||j<0||j>=rig.parts.length)return;[rig.parts[i],rig.parts[j]]=[rig.parts[j],rig.parts[i]];commit();renderPupProps();pupView.draw();},
+  pivotMode:()=>{PUP.pivotMode=!PUP.pivotMode;renderPupProps();pupView.draw();if(PUP.pivotMode)toast('Drag the blue dot at the center cross to set the joint.');},
+  partFlip:()=>{const p=curPart();if(!p)return;p.flip=!p.flip;commit();pupView.draw();},
+  partDup:()=>{const p=curPart();if(!p)return;const rig=curRig();const c=Object.assign({},p,{id:uid('pt'),name:p.name+' copy',x:p.x+20,y:p.y+20});rig.parts.splice(rig.parts.indexOf(p)+1,0,c);PUP.sel=c.id;commit();renderPupProps();pupView.draw();},
+  partDel:async()=>{const p=curPart();if(!p)return;const rig=curRig();rig.parts.splice(rig.parts.indexOf(p),1);PUP.sel=null;commit();renderPupProps();pupView.draw();toast('Part removed. Undo to bring it back.');},
+  partRot:b=>{const p=curPart();if(!p)return;const d=+b.dataset.d;p.rot=d===0?0:normDeg(p.rot+d);commit();renderPupProps();pupView.draw();},
+  partPivot:b=>{const p=curPart();if(!p)return;const[u,v]=b.dataset.p.split(',').map(Number);setPivot(p,pivotWorld(p,u,v));commit();pupView.draw();},
+  pupStage:()=>openStage(),
+  pupPoses:()=>openPoses(),
+  pupTrace:async()=>{const pick=await pickImage('Choose a trace image');if(!pick)return;const rig=curRig();rig.trace=pick.imgId;rig.showTrace=true;commit();closeModal();openStage();pupView.draw();},
+  pupTraceClear:()=>{const rig=curRig();rig.trace=null;commit();closeModal();openStage();pupView.draw();},
+  pupClear:async()=>{const rig=curRig();if(!rig.parts.length)return toast('The stage is already empty.');if(!await ask({title:'Remove all parts?',msg:'Saved poses are kept but will have nothing to move. You can undo.',ok:'Remove all',danger:true}))return;rig.parts=[];PUP.sel=null;commit();closeModal();renderPuppet();},
+  pupExport:async()=>{const rig=curRig();if(!rig.parts.length)return toast('Add some parts first.','err');const c=await rigCanvas(rig,false);const b=await canvasBlob(c,'image/png');downloadBlob(b,`${slug(charById(ui.puppetChar).name)}_pose.png`);toast('Pose image saved to Downloads.','ok');},
+  pupToRefs:async()=>{const rig=curRig();if(!rig.parts.length)return toast('Add some parts first.','err');const c=await rigCanvas(rig,true);const im=await canvasToImage(c);
+    project.refs.push({id:uid('ref'),charId:ui.puppetChar,imgId:im.id,w:im.w,h:im.h,label:'Puppet pose '+new Date().toLocaleString(),cat:'pose',source:'puppet',tags:'puppet',notes:'',fav:false,added:Date.now()});commit();toast(`Saved to ${charById(ui.puppetChar).name} → Pose (marked “Puppet”).`,'ok');},
+  pupToPanel:async()=>{const rig=curRig();if(!rig.parts.length)return toast('Add some parts first.','err');if(!curPage())return toast('Create a page first.','err');const c=await rigCanvas(rig,true);const im=await canvasToImage(c);
+    if(await addImageToPanel({imgId:im.id,w:im.w,h:im.h})){setTab('pages');toast('Pose placed in the panel as a guide. Lower its opacity to draw over it.');}},
+  /* editor */
+  pgPrev:()=>{const ids=allPageIds(),i=ids.indexOf(ui.pageId);if(i>0){ui.pageId=ids[i-1];ED.sel=null;saveUI();renderEditor();}},
+  pgNext:()=>{const ids=allPageIds(),i=ids.indexOf(ui.pageId);if(i>=0&&i<ids.length-1){ui.pageId=ids[i+1];ED.sel=null;saveUI();renderEditor();}},
+  addPageHere:()=>{const ch=chapterOf(ui.pageId)||project.chapters[0];if(!ch)return toast('Create a chapter first.','err');const pg=addPageTo(ch,ui.pageId);ui.pageId=pg.id;ED.sel=null;commit();saveUI();renderEditor();toast('Added '+pageLabel(pg.id));},
+  pageSettings:()=>openPageSettings(),
+  layout:()=>openLayout(),
+  addPanel:()=>{const pg=curPage();if(!pg)return;const n=pg.panels.length;const w=Math.round((pg.w-2*pg.margin)*.6),h=Math.round(pg.h*.22);
+    const pn=Object.assign(panelDefaults(),{x:pg.margin+(n%4)*30,y:pg.margin+(n%4)*30,w,h,border:Math.max(2,Math.round(pg.w/200))});pg.panels.push(pn);ED.sel={kind:'panel',panelId:pn.id};commit();renderProps();edView.draw();toast('Panel added. Drag it; use the corner dots to resize.');},
+  addImage:()=>addImageToPanel().then(ok=>{if(ok){renderProps();edView.draw();}}),
+  addBubble:b=>addBubble(b.dataset.style),
+  addSfx:()=>addSfx(),
+  preview:()=>{const ids=allPageIds();openReader(ids,ids.indexOf(ui.pageId));},
+  exportOpen:()=>openExport(ui.pageId),
+  selPanel:b=>{ED.sel={kind:'panel',panelId:b.dataset.id};renderProps();edView.draw();},
+  selItem:b=>{const pg=curPage();const pn=pg&&pg.panels.find(p=>p.items.some(i=>i.id===b.dataset.id));if(!pn)return;ED.sel={kind:'item',panelId:pn.id,itemId:b.dataset.id};renderProps();edView.draw();},
+  toggleOrder:()=>{ui.showOrder=!ui.showOrder;saveUI();renderProps();edView.draw();},
+  panelOrder:b=>{if(b.closest('.modal'))closeModal();openPanelOrder(b.dataset.id||ui.pageId);},
+  panelUp:()=>{const so=selObjs();if(!so)return;const P=so.pg.panels,i=P.indexOf(so.pn);if(i<=0)return;[P[i-1],P[i]]=[P[i],P[i-1]];commit();renderProps();edView.draw();},
+  panelDown:()=>{const so=selObjs();if(!so)return;const P=so.pg.panels,i=P.indexOf(so.pn);if(i>=P.length-1)return;[P[i+1],P[i]]=[P[i],P[i+1]];commit();renderProps();edView.draw();},
+  panelDup:()=>{const so=selObjs();if(!so)return;const c=deep(so.pn);c.id=uid('pn');c.items.forEach(it=>it.id=uid('it'));const off=30;c.x+=off;c.y+=off;shiftItems(c,off,off);so.pg.panels.splice(so.pg.panels.indexOf(so.pn)+1,0,c);ED.sel={kind:'panel',panelId:c.id};commit();renderProps();edView.draw();},
+  panelDel:async()=>{const so=selObjs();if(!so||so.it)return;if(so.pn.items.length&&!await ask({title:'Delete this panel?',msg:`It contains ${so.pn.items.length} element(s). You can undo.`,ok:'Delete',danger:true}))return;so.pg.panels.splice(so.pg.panels.indexOf(so.pn),1);ED.sel=null;commit();renderProps();edView.draw();},
+  panelBg:async()=>{const pn=targetPanel();if(!pn)return toast('Add a panel first.','err');ED.sel={kind:'panel',panelId:pn.id};const pick=await pickImage('Choose a panel background');if(!pick)return;pn.bgImg=pick.imgId;commit();renderProps();edView.draw();},
+  panelBgClear:()=>{const so=selObjs();if(!so)return;so.pn.bgImg=null;commit();renderProps();edView.draw();},
+  itemUp:()=>{const so=selObjs();if(!so||!so.it)return;const A=so.pn.items,i=A.indexOf(so.it);if(i>=A.length-1)return;[A[i+1],A[i]]=[A[i],A[i+1]];commit();renderProps();edView.draw();},
+  itemDown:()=>{const so=selObjs();if(!so||!so.it)return;const A=so.pn.items,i=A.indexOf(so.it);if(i<=0)return;[A[i-1],A[i]]=[A[i],A[i-1]];commit();renderProps();edView.draw();},
+  itemDup:()=>{const so=selObjs();if(!so||!so.it)return;const c=deep(so.it);c.id=uid('it');c.x+=24;c.y+=24;if(c.type==='bubble'){c.tx+=24;c.ty+=24;}so.pn.items.push(c);selectItem(so.pn,c);commit();renderProps();edView.draw();},
+  itemDel:()=>{const so=selObjs();if(!so||!so.it)return;so.pn.items.splice(so.pn.items.indexOf(so.it),1);ED.sel={kind:'panel',panelId:so.pn.id};commit();renderProps();edView.draw();toast('Deleted. Undo to bring it back.');},
+  imgFill:()=>{const so=selObjs();if(!so||!so.it)return;const it=so.it,pn=so.pn;const k=Math.max(pn.w/it.w,pn.h/it.h);it.w*=k;it.h*=k;it.x=pn.x+(pn.w-it.w)/2;it.y=pn.y+(pn.h-it.h)/2;it.rot=0;commit();renderProps();edView.draw();},
+  imgFit:()=>{const so=selObjs();if(!so||!so.it)return;const it=so.it,pn=so.pn;const k=Math.min(pn.w/it.w,pn.h/it.h);it.w*=k;it.h*=k;it.x=pn.x+(pn.w-it.w)/2;it.y=pn.y+(pn.h-it.h)/2;it.rot=0;commit();renderProps();edView.draw();},
+  imgFlip:()=>{const so=selObjs();if(!so||!so.it)return;so.it.flip=!so.it.flip;commit();edView.draw();},
+  imgReplace:async()=>{const so=selObjs();if(!so||!so.it)return;const pick=await pickImage('Replace image');if(!pick)return;const it=so.it;const cx=it.x+it.w/2,cy=it.y+it.h/2;const f=fitInto(pick.w,pick.h,it.w,it.h);
+    it.imgId=pick.imgId;it.w=f.w;it.h=f.h;it.x=cx-f.w/2;it.y=cy-f.h/2;commit();renderProps();edView.draw();},
+  tailReset:()=>{const so=selObjs();if(!so||!so.it)return;const it=so.it;it.tail=true;it.tx=it.x+it.w*.35;it.ty=it.y+it.h+Math.min(so.pn.h*.25,120);commit();renderProps();edView.draw();},
+  /* storyboard */
+  readAll:()=>openReader(allPageIds(),0),
+  readChapter:b=>{const ch=project.chapters.find(c=>c.id===b.dataset.ch);if(ch)openReader(ch.pages,0);},
+  script:()=>openScript(),
+  copyScript:async()=>{const s=buildScript();try{await navigator.clipboard.writeText(s);toast('Script copied.','ok');}catch(e){const t=document.createElement('textarea');t.value=s;document.body.appendChild(t);t.select();let ok=false;try{ok=document.execCommand('copy');}catch(_){}t.remove();toast(ok?'Script copied.':'Copy is blocked here — use “Save .txt”.',ok?'ok':'err');}},
+  dlScript:()=>downloadBlob(new Blob([buildScript()],{type:'text/plain;charset=utf-8'}),`${slug(project.title)}_script.txt`),
+  addChapter:async()=>{const t=await ask({title:'New chapter',input:'',ph:'Chapter title',ok:'Add'});if(t===null)return;project.chapters.push({id:uid('ch'),code:'C'+(project.chapters.length+1),title:t||'Untitled',notes:'',pages:[]});commit();renderStory();},
+  addPage:b=>{const ch=project.chapters.find(c=>c.id===b.dataset.ch)||project.chapters[0];if(!ch)return;const pg=addPageTo(ch);ui.pageId=pg.id;ED.sel=null;commit();saveUI();while(modals.length)closeModal();
+    if(ui.tab==='story'){renderStory();toast(`Added ${pageLabel(pg.id)}. Tap it to edit.`);}else renderTab(ui.tab);},
+  openPage:b=>{ui.pageId=b.dataset.id;ED.sel=null;saveUI();while(modals.length)closeModal();setTab('pages');},
+  pgMove:b=>{const pid=b.dataset.id,ch=chapterOf(pid);const i=ch.pages.indexOf(pid),j=i+(+b.dataset.d);if(j<0||j>=ch.pages.length)return;[ch.pages[i],ch.pages[j]]=[ch.pages[j],ch.pages[i]];commit();renderStory();},
+  pgPreview:b=>{const ids=allPageIds();openReader(ids,ids.indexOf(b.dataset.id));},
+  pgMore:b=>openPageMore(b.dataset.id),
+  pgDup:b=>{const pg=project.pages[b.dataset.id];if(!pg)return;const c=cloneWithIds(pg);c.name=pg.name?pg.name+' (copy)':'';project.pages[c.id]=c;const ch=chapterOf(pg.id);ch.pages.splice(ch.pages.indexOf(pg.id)+1,0,c.id);commit();closeModal();toast('Page duplicated.');},
+  pgExport:b=>{closeModal();openExport(b.dataset.id,'page');},
+  pgDel:async b=>{closeModal();await deletePage(b.dataset.id);},
+  chMove:b=>{const C=project.chapters,i=C.findIndex(c=>c.id===b.dataset.ch),j=i+(+b.dataset.d);if(i<0||j<0||j>=C.length)return;[C[i],C[j]]=[C[j],C[i]];commit();renderStory();},
+  chMore:b=>openChapterMore(b.dataset.ch),
+  chDel:async b=>{const ch=project.chapters.find(c=>c.id===b.dataset.ch);if(!ch)return;if(project.chapters.length===1)return toast('Keep at least one chapter.','err');
+    if(!await ask({title:`Delete ${esc(ch.code)}: ${esc(ch.title)}?`,msg:`Its ${ch.pages.length} page(s) will be deleted too. You can undo right after.`,ok:'Delete chapter',danger:true}))return;
+    ch.pages.forEach(id=>delete project.pages[id]);project.chapters.splice(project.chapters.indexOf(ch),1);commit();while(modals.length)closeModal();renderTab(ui.tab);},
+  exportChapter:b=>{const ch=project.chapters.find(c=>c.id===b.dataset.ch);if(ch&&ch.pages.length)openExport(ch.pages[0],'chapter');},
+  rdPrev:()=>{if(RD&&RD.idx>0){RD.idx--;drawReader();}},
+  rdNext:()=>{if(RD&&RD.idx<RD.ids.length-1){RD.idx++;drawReader();}},
+  rdEdit:()=>{if(!RD)return;ui.pageId=RD.ids[RD.idx];ED.sel=null;saveUI();while(modals.length)closeModal();setTab('pages');},
+  rdExport:()=>{if(!RD)return;const pid=RD.ids[RD.idx];closeModal();openExport(pid,'page');},
+  /* more */
+  theme:b=>{ui.theme=b.dataset.v;saveUI();applyTheme();renderMore();},
+  saveFile:async()=>{await saveNow();const ids=[...referencedImageIds()];const parts=['{"app":"heliruby-studio","version":1,"saved":',String(Date.now()),',"project":',JSON.stringify(project),',"images":{'];let first=true;
+    for(const id of ids){const d=memImages.get(id);if(!d)continue;parts.push((first?'':',')+JSON.stringify(id)+':'+JSON.stringify(d));first=false;}parts.push('}}');
+    const blob=new Blob(parts,{type:'application/json'});downloadBlob(blob,`heliruby-project-${dateStr()}.json`);toast(`Project file saved to Downloads (${(blob.size/1048576).toFixed(1)} MB). Keep a copy somewhere safe!`,'ok');},
+  openFile:async()=>{const[f]=await pickFiles({accept:'',multiple:false});if(!f)return;let data;try{toast('Reading project file…');data=JSON.parse(await f.text());}catch(e){return toast('That file is not a HELIRUBY Studio project file (it could not be read as JSON).','err');}
+    if(!data||data.app!==APP_ID||!data.project)return toast("This doesn't look like a HELIRUBY Studio project file.",'err');
+    if(!await ask({title:'Open this project?',msg:'It will <b>replace</b> the project currently stored in this browser. Save a project file first if you want to keep the current one.',ok:'Replace & open',danger:true}))return;
+    let p;try{p=normalize(data.project);}catch(e){return toast('The project file is damaged: '+e.message,'err');}await replaceProject(p,data.images);toast('Project opened.','ok');},
+  newProject:async()=>{if(!await ask({title:'Start a new empty project?',msg:'Everything in this browser (pages, references, images) will be replaced. Save a project file first if you want to keep it.',ok:'Start new project',danger:true}))return;await replaceProject(newProject(),{});toast('New project ready.','ok');},
+  cleanImages:async()=>{const used=referencedImageIds();const snaps=hist.undo.concat(hist.redo).join('\n');const junk=[...memImages.keys()].filter(id=>!used.has(id)&&!snaps.includes(id));
+    if(!junk.length)return toast('No unused images found.');if(!await ask({title:`Remove ${junk.length} unused image(s)?`,msg:'These images are not used by any reference, panel or puppet.',ok:'Remove',danger:true}))return;
+    for(const id of junk){try{await deleteImage(id);}catch(e){}}toast(`Removed ${junk.length} unused image(s).`,'ok');renderMore();},
+  persist:async()=>{if(!(navigator.storage&&navigator.storage.persist))return toast('This browser does not support that option. Keep saving project files.');try{const ok=await navigator.storage.persist();toast(ok?'The browser will try to keep your data.':'The browser declined (common until a site is bookmarked or installed). Keep saving project files.',ok?'ok':'');}catch(e){reportErr(e);}}
+};
+
+/* ---------- delegated events ---------- */
+document.addEventListener('click',e=>{const b=e.target.closest('[data-act]');if(!b||b.disabled)return;const fn=ACT[b.dataset.act];if(!fn){console.warn('Unknown action',b.dataset.act);return;}
+  try{const r=fn(b,e);if(r&&r.catch)r.catch(reportErr);}catch(err){reportErr(err);}});
+const SCOPES={panel:()=>selObjs()?.pn,item:()=>selObjs()?.it,page:()=>curPage(),part:()=>curPart(),rig:()=>curRig(),project:()=>project,
+  ref:el=>project.refs.find(r=>r.id===el.dataset.id),char:el=>charById(el.dataset.id),chapter:el=>project.chapters.find(c=>c.id===el.dataset.id)};
+const AFTER={
+  panel:()=>edView.draw(),page:()=>edView.draw(),
+  item:(el,key,type)=>{edView.draw();if(type==='change'&&(el.tagName==='SELECT'||el.type==='checkbox'))renderProps();},
+  part:(el,key,type)=>{pupView.draw();if(type==='change'&&key==='name')renderPupProps();},
+  rig:(el,key)=>{if(key==='w'||key==='h')pupView.layout();else pupView.draw();},
+  ref:()=>renderRefGrid(),
+  char:(el,key)=>{if(key==='name'){$$(`[data-act="setChar"][data-id="${el.dataset.id}"] .nm`).forEach(n=>n.textContent=el.value);const pn=$('#profileBox .pname');if(pn)pn.textContent=el.value;}
+    if(key==='color'){$$(`[data-act="setChar"][data-id="${el.dataset.id}"] .dot`).forEach(d=>d.style.background=el.value);const a=$('#profileBox .avatar');if(a)a.style.borderColor=el.value;}},
+  chapter:()=>{},project:()=>updateTitle()};
+function onBind(e){const el=e.target;
+  if(el.id==='refSearch'){ui.q=el.value;renderRefGrid();return;}
+  if(el.id==='srcSel'){ui.src=el.value;saveUI();renderRefGrid();return;}
+  if(el.id==='pageSel'){if(e.type==='change'){ui.pageId=el.value;ED.sel=null;saveUI();renderEditor();}return;}
+  if(el.dataset&&el.dataset.addcolor){if(e.type!=='change')return;const c=charById(el.dataset.addcolor);if(c){c.palette.push(hex6(el.value));commit();renderRefs();}return;}
+  if(!el.dataset||!el.dataset.b)return;const[scope,key]=el.dataset.b.split(':');const obj=SCOPES[scope]&&SCOPES[scope](el);if(!obj)return;
+  let v;if(el.type==='checkbox')v=el.checked;else if(el.type==='number'||el.type==='range'){v=parseFloat(el.value);if(!isFinite(v))return;if(el.dataset.mul)v/=+el.dataset.mul;if(el.dataset.min!=null)v=Math.max(+el.dataset.min,v);}else v=el.value;
+  if(obj[key]===v&&e.type==='change')return;
+  if(scope==='panel'&&(key==='x'||key==='y')){const d=v-obj[key];shiftItems(obj,key==='x'?d:0,key==='y'?d:0);}
+  if(scope==='item'&&obj.type==='bubble'&&(key==='x'||key==='y')){const d=v-obj[key];if(key==='x')obj.tx+=d;else obj.ty+=d;}
+  if(scope==='rig'&&(key==='w'||key==='h'))v=clamp(Math.round(v),200,5000);
+  obj[key]=v;const out=el.type==='range'&&el.parentElement.querySelector('output');if(out)out.textContent=fmtN(v*(+el.dataset.mul||1))+(el.dataset.suf||'');
+  AFTER[scope]&&AFTER[scope](el,key,e.type);commit(e.type==='input');}
+document.addEventListener('input',onBind);document.addEventListener('change',onBind);
+document.addEventListener('toggle',e=>{if(e.target.id==='profileBox'){ui.profileOpen=e.target.open;saveUI();}},true);
+document.addEventListener('keydown',e=>{const typing=e.target.matches&&e.target.matches('input,textarea,select');
+  if(e.key==='Escape'&&modals.length){closeModal();return;}if(typing)return;
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?ACT.redo():ACT.undo();}
+  else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();ACT.redo();}
+  else if((e.key==='Delete'||e.key==='Backspace')&&!modals.length){if(ui.tab==='pages'&&ED.sel){ED.sel.kind==='panel'?ACT.panelDel():ACT.itemDel();}else if(ui.tab==='puppet'&&PUP.sel)ACT.partDel();}});
+window.addEventListener('resize',()=>{if(RD)drawReader();});
+
+/* ---------- tabs / chrome ---------- */
+const TABS=[['refs','References','image'],['puppet','Puppet','puppet'],['pages','Panels','layout'],['story','Storyboard','story'],['more','More','more']];
+function setTab(t){if(!TABS.some(x=>x[0]===t))t='refs';ui.tab=t;saveUI();$$('.tab').forEach(s=>s.classList.toggle('active',s.id==='tab-'+t));$$('#tabbar button').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));renderTab(t);}
+function renderTab(t){if(t==='refs')renderRefs();else if(t==='puppet')renderPuppet();else if(t==='pages')renderEditor();else if(t==='story')renderStory();else renderMore();}
+function redrawAll(){if(ui.tab==='pages')edView.draw();else if(ui.tab==='puppet')pupView.draw();else if(ui.tab==='story')drawStoryThumbs();if(RD)drawReader();}
+function updateTitle(){$('#projTitle').textContent=project.title||'Untitled';document.title='HELIRUBY Studio — '+(project.title||'');}
+function applyTheme(){const r=document.documentElement;if(ui.theme==='auto')r.removeAttribute('data-theme');else r.setAttribute('data-theme',ui.theme);}
+function buildChrome(){
+  $('#tabbar').innerHTML=TABS.map(([id,n,ic])=>`<button data-act="tab" data-tab="${id}" aria-label="${n}">${I(ic)}<span>${n}</span></button>`).join('');
+  $('#undoBtn').innerHTML=I('undo');$('#redoBtn').innerHTML=I('redo');$('#pgPrevBtn').innerHTML=I('left');$('#pgNextBtn').innerHTML=I('right');$('#pgAddBtn').innerHTML=I('plus');$('#pgSetBtn').innerHTML=I('sliders');
+  const tool=(act,ic,label,extra='')=>`<button class="tool" data-act="${act}" ${extra}>${I(ic)}<span>${label}</span></button>`;
+  $('#edTools').innerHTML=tool('layout','layout','Layout')+tool('addPanel','plus','Panel')+tool('addImage','image','Image')+tool('addBubble','bubble','Speech','data-style="speech"')+tool('addBubble','cloud','Thought','data-style="thought"')
+   +tool('addBubble','shout','Shout','data-style="shout"')+tool('addBubble','caption','Caption','data-style="caption"')+tool('addSfx','zap','SFX')+tool('panelBg','bgimg','Backgr.')
+   +tool('preview','eye','Preview')+tool('exportOpen','download','Export')+tool('zoomOut','zout','Zoom −','data-view="ed"')+tool('zoomFit','fit','Fit','data-view="ed"')+tool('zoomIn','zin','Zoom +','data-view="ed"');
+  $('#pupTools').innerHTML=tool('addParts','upload','Add parts')+tool('partsFromRefs','image','From refs')+tool('pupStage','sliders','Stage')+tool('pupPoses','pose','Poses')
+   +tool('pupExport','download','PNG')+tool('pupToRefs','save','To refs')+tool('pupToPanel','layout','To panel')+tool('zoomOut','zout','Zoom −','data-view="pup"')+tool('zoomFit','fit','Fit','data-view="pup"')+tool('zoomIn','zin','Zoom +','data-view="pup"');}
+
+/* ---------- boot ---------- */
+async function boot(){applyTheme();buildChrome();
+  try{db=await openDB();}catch(e){db=null;console.warn(e);}
+  let loaded=null;
+  if(db){try{const s=await idb('kv','readonly',st=>st.get('project'));if(s)loaded=JSON.parse(s);await loadAllImages();}catch(e){console.error(e);toast('Could not read the saved project: '+friendlyErr(e),'err');}}
+  try{project=normalize(loaded||newProject());}catch(e){toast('Saved project was damaged; starting fresh. Open a project file to restore.','err');project=newProject();}
+  hist.last=JSON.stringify(project);updateUndoBtns();updateTitle();
+  edView=new View($('#edWrap'),$('#edCanvas'),edOpts);pupView=new View($('#pupWrap'),$('#pupCanvas'),pupOpts);
+  if(db){if(!loaded){dirty=true;saveNow();}else setStatus('Saved ✓','ok');}else{setStatus('Not stored — save a file','warn');toast('This browser is blocking storage here, so autosave is off. Use More → Save project file to keep your work.','err');}
+  setTab(ui.tab);if(!ui.seenWelcome)showWelcome();}
+boot().catch(e=>{console.error(e);document.body.insertAdjacentHTML('afterbegin',`<p style="padding:16px;background:#fde;color:#600">HELIRUBY Studio failed to start: ${esc(friendlyErr(e))}. Try reloading, or use a recent version of Chrome.</p>`);});
+</script>
+</body>
+</html>
