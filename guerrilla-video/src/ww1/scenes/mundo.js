@@ -31,7 +31,7 @@ export function build(ctx) {
   const Ga = S.gallipoli('morning');
   const land = [0, 1, 2, 3, 4, 5].map(i => K.person(Ga, ['oguri', 'doto', 'helios', 'tamamo', 'suzuka', 'mcqueen'][i], 'anzac', -5 + i * 2.0, 4 + (i % 2) * 1.2, Math.PI));
   land.forEach(c => { c.x0 = c.root.position.x; c.z0 = c.root.position.z; });
-  const shellsG = [0, 1, 2].map(i => new F.Explosion(Ga, [-6 + i * 6, 0.1, 8 + i], tInv + i * 0.7, 0.8, 50 + i, { smokeColor: '#c8b898' }));
+  const shellsG = [0, 1, 2].map(i => new F.Explosion(Ga, [-6 + i * 6, 0.1, 8 + i], tInv + i * 0.7, 0.8, 50 + i, { smokeColor: '#c8b898', dull: true }));
   // ---- the empires' soldiers
   const Pd = S.stage('summer', ['#9aa86a', '#8c9a5e'], { seed: 1201 });
   const pdFlags = [P.FLAGS.gbr, P.FLAGS.fra, P.FLAGS.gbr, P.FLAGS.gbr].map((f, i) => { const fl = P.flagPole(f, { h: 2.4, w: 0.9, fh: 0.6 }); fl.position.set(-2.7 + i * 1.8 - 0.55, 0, -1.2); Pd.add(fl); return fl; });

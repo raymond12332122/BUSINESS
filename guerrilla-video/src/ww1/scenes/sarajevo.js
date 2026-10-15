@@ -39,7 +39,7 @@ export function build(ctx) {
   // the bomb thrower on the river side and the bomb
   const cab = leader(Sa, 'cabrinovic', -6.0, -1.7, 0.2);
   const bomb = K.bombGrenade(); bomb.scale.setScalar(1.6); bomb.visible = false; bomb.userData.dynamic = true; Sa.add(bomb);
-  const boom = new F.Explosion(Sa, [-11.8, 0.1, 1.9], tFallo - 0.05, 0.9, 41, { smokeColor: '#8a8680' });
+  const boom = new F.Explosion(Sa, [-11.8, 0.1, 1.9], tFallo - 0.05, 0.9, 41, { smokeColor: '#8a8680', dull: true });
   // Princip on the corner
   const CAR = [0.9, 4.4, -0.9];
   const pr = leader(Sa, 'princip', -0.4, 6.4, Math.atan2(CAR[0] + 0.4, CAR[1] - 6.4));
