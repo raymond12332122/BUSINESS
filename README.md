@@ -19,7 +19,7 @@ The full guide is inside the app under **More → How to use**.
 ### Android app (APK)
 
 `HELIRUBY-Studio.apk` is the same tool packaged as an Android app (Android 7.0+).
-It runs fully offline. It has no internet permission use, and every request outside the bundled page is blocked.
+It runs fully offline: the page is bundled inside the APK and every request to any other address is blocked.
 Exported pages and pose images go to **Pictures/HELIRUBY** (they show in the gallery);
 project files and scripts go to **Download/HELIRUBY**.
 

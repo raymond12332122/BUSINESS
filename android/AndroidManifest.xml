@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.heliruby.studio">
 
+    <!-- Some WebView versions only load https:// pages when this is granted. The page itself is served
+         from the APK and MainActivity blocks every request to any other host, so nothing goes online. -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- Only needed to save exports to the shared Pictures/Download folders on Android 9 and older. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />
 
