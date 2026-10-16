@@ -1,0 +1,141 @@
+{
+ "scenes": [
+  {
+   "id": "title",
+   "lead": 1.4,
+   "tail": 1.3,
+   "lines": [
+    "En mil setecientos setenta y cinco, ningún país de América era independiente: todo el continente pertenecía a imperios europeos.",
+    "Cincuenta años después ya había once naciones nuevas, desde Estados Unidos hasta Bolivia.",
+    "Esta es la historia de la independencia de las Américas, con un elenco muy especial."
+   ],
+   "gaps": {
+    "1": 0.6
+   }
+  },
+  {
+   "id": "colonias",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "España gobernaba desde California hasta la Patagonia, dividida en virreinatos como la Nueva España, el Perú y el Río de la Plata.",
+    "Portugal tenía Brasil; Gran Bretaña, Canadá y las trece colonias; y Francia, islas del Caribe como Saint-Domingue, la colonia más rica del mundo.",
+    "Mandaban los nacidos en España; los criollos, nacidos en América, se sentían relegados, y abajo estaban indígenas, mestizos y esclavizados."
+   ]
+  },
+  {
+   "id": "trece",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "La primera chispa saltó en las trece colonias británicas, que protestaban por impuestos sin representación. En Boston tiraron al mar más de trescientos cuarenta cofres de té.",
+    "En mil setecientos setenta y cinco estalló la guerra, y el cuatro de julio de mil setecientos setenta y seis aprobaron la Declaración de Independencia, redactada por Thomas Jefferson.",
+    "George Washington dirigió al ejército y, con ayuda de Francia y de España, venció en Yorktown en mil setecientos ochenta y uno. Dos años después, Gran Bretaña reconoció a los Estados Unidos."
+   ]
+  },
+  {
+   "id": "haiti",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "La segunda independencia fue la más radical. En Saint-Domingue, la colonia francesa del azúcar y el café, casi medio millón de personas vivían esclavizadas.",
+    "En mil setecientos noventa y uno se rebelaron, y un antiguo esclavo, Toussaint Louverture, llegó a gobernar la colonia.",
+    "Napoleón mandó un gran ejército para restablecer la esclavitud, y Toussaint murió preso en Francia. Pero Jean-Jacques Dessalines siguió la lucha.",
+    "El primero de enero de mil ochocientos cuatro nació Haití: el primer país independiente de América Latina, y el primero de América en abolir para siempre la esclavitud."
+   ]
+  },
+  {
+   "id": "napoleon",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "En mil ochocientos ocho, Napoleón invadió España, obligó a abdicar a los reyes en Bayona y puso en el trono a su hermano José.",
+    "Si el rey estaba preso, ¿quién mandaba en América? Las ciudades formaron juntas que gobernaban en nombre de Fernando Séptimo.",
+    "En mil ochocientos diez hubo juntas en Caracas, Buenos Aires, Bogotá y Santiago. Lo que empezó como lealtad al rey terminó en guerras de independencia."
+   ]
+  },
+  {
+   "id": "grito",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "En la Nueva España, un grupo de criollos conspiraba en Querétaro. Cuando los descubrieron, la corregidora Josefa Ortiz de Domínguez logró avisarles.",
+    "En la madrugada del dieciséis de septiembre de mil ochocientos diez, en Dolores, el cura Miguel Hidalgo llamó al pueblo a levantarse, y bajo el estandarte de la Virgen de Guadalupe, unos cientos se volvieron decenas de miles.",
+    "Tomaron Guanajuato y vencieron en el Monte de las Cruces, pero Hidalgo no entró a la capital. Derrotado en Puente de Calderón, fue capturado y fusilado en mil ochocientos once."
+   ]
+  },
+  {
+   "id": "morelos",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Otro cura, José María Morelos, tomó la estafeta. En Chilpancingo presentó los Sentimientos de la Nación: independencia, igualdad y fin de la esclavitud.",
+    "Morelos fue fusilado en mil ochocientos quince. Pero mujeres como Leona Vicario espiaron y financiaron a los insurgentes, y en las montañas del sur, Vicente Guerrero nunca se rindió."
+   ]
+  },
+  {
+   "id": "bolivar",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "En Sudamérica, Venezuela declaró su independencia en mil ochocientos once, pero la república cayó pronto, y Simón Bolívar, un criollo rico de Caracas, tuvo que empezar una y otra vez.",
+    "Desde su exilio en Jamaica soñó con una América unida, y Haití le dio barcos y armas a cambio de que liberara a los esclavizados.",
+    "En mil ochocientos diecinueve cruzó los Andes y sorprendió a los españoles en Boyacá. Nació la República de Colombia, y con las victorias de Carabobo y Pichincha se liberaron Venezuela y Ecuador."
+   ]
+  },
+  {
+   "id": "sanmartin",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Más al sur, el Río de la Plata declaró su independencia en Tucumán en mil ochocientos dieciséis, y en Mendoza, José de San Martín preparó el Ejército de los Andes.",
+    "En mil ochocientos diecisiete cruzó la cordillera con unos cinco mil hombres y diez mil mulas, venció en Chacabuco y, un año después, Chile proclamó su independencia.",
+    "Luego llegó por mar al Perú y en mil ochocientos veintiuno proclamó su independencia en Lima. En Guayaquil se reunió en secreto con Bolívar... y se retiró."
+   ]
+  },
+  {
+   "id": "iguala",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "En México, para mil ochocientos veinte la insurgencia parecía vencida. Entonces Agustín de Iturbide, un oficial realista enviado contra Guerrero, cambió de bando.",
+    "En mil ochocientos veintiuno proclamó el Plan de Iguala: religión, independencia y unión. Guerrero se le unió y, según la tradición, se abrazaron en Acatempan.",
+    "El veintisiete de septiembre, el Ejército Trigarante entró a la Ciudad de México. Al año siguiente, Iturbide fue coronado emperador, pero su imperio no duró ni un año."
+   ]
+  },
+  {
+   "id": "brasil",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "Brasil siguió otro camino. Huyendo de Napoleón, la corte portuguesa se mudó a Río de Janeiro en mil ochocientos ocho, y Río se volvió la capital de un imperio europeo.",
+    "Cuando el rey regresó a Lisboa, dejó como regente a su hijo Pedro. Portugal le ordenó volver, pero él decidió quedarse.",
+    "El siete de septiembre de mil ochocientos veintidós, junto al arroyo Ipiranga, Pedro gritó, según la tradición: ¡Independencia o muerte! Y se convirtió en emperador."
+   ]
+  },
+  {
+   "id": "ayacucho",
+   "lead": 0.8,
+   "tail": 1.1,
+   "lines": [
+    "El último bastión español era el Perú. En mil ochocientos veinticuatro, Bolívar ganó en Junín una batalla de caballería sin un solo disparo.",
+    "Y el nueve de diciembre, en Ayacucho, Antonio José de Sucre derrotó y capturó al virrey. Fue el fin del dominio español en Sudamérica.",
+    "Al año siguiente, el Alto Perú se independizó y tomó el nombre de su libertador: Bolivia."
+   ]
+  },
+  {
+   "id": "outro",
+   "lead": 0.8,
+   "tail": 2.2,
+   "lines": [
+    "En medio siglo, el mapa de América cambió por completo. Solo Cuba y Puerto Rico siguieron siendo españolas, hasta mil ochocientos noventa y ocho.",
+    "Pero no llegó la paz: la Gran Colombia y Centroamérica se dividieron, vinieron guerras civiles y caudillos, y la esclavitud siguió por décadas en Estados Unidos y Brasil.",
+    "Bolívar murió en mil ochocientos treinta, desilusionado. Aun así, de aquellos gritos nacieron casi todos los países de América.",
+    "Y gracias a nuestro elenco de umamusumes, que esta vez cambiaron la pista de carreras por los campos de batalla."
+   ],
+   "gaps": {
+    "3": 0.9
+   }
+  }
+ ]
+}

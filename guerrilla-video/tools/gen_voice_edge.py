@@ -16,7 +16,9 @@ OUT = os.path.join(ROOT, 'build', LANG) if VIDEO == 'guerrilla' else os.path.joi
 os.makedirs(os.path.join(OUT, 'voice'), exist_ok=True)
 # Phonetic respellings for the TTS only; subtitles keep the real spelling.
 SAY = {'Cu Chi': 'Ku Chi', 'Nelson': 'Nélson', 'Jena': 'Yena', 'Harfuch': 'Jarfuch', 'Sheinbaum': 'Shein-báum', 'Capos': 'Cápos', 'capos': 'cápos', 'Barrett': 'Bárret', 'gas LP': 'gas ele pe', 'Pskov': 'Pskof', 'Brest-Litovsk': 'Brest Litóvsk', 'Románov': 'Románoff', 'Kronstadt': 'Kronstat', 'piolet': 'piolé',
-       'Sarajevo': 'Sarayevo', 'Princip': 'Príntsip', 'Ypres': 'Ípres', 'Marne': 'Marn', 'Zimmermann': 'Tsímerman'}
+       'Sarajevo': 'Sarayevo', 'Princip': 'Príntsip', 'Ypres': 'Ípres', 'Marne': 'Marn', 'Zimmermann': 'Tsímerman',
+       'Saint-Domingue': 'San Domíng', 'Toussaint Louverture': 'Tusán Luvertúr', 'Toussaint': 'Tusán', 'Jean-Jacques Dessalines': 'Yan Yak Desalín',
+       'Yorktown': 'Yórktaun', 'Ipiranga': 'Ipiránga'}
 script = json.load(open(os.path.join(ROOT, 'src', f'script_{LANG}.json') if VIDEO == 'guerrilla' else os.path.join(ROOT, 'src', VIDEO, f'script_{LANG}.json')))
 
 
