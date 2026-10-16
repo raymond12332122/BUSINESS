@@ -200,10 +200,31 @@ export function zone(s, ring, color, { opacity = 0.5, y = H + 0.03 } = {}) {
 // 3D object standing on the map at lon/lat (scale in map units).
 export function placeOn(s, obj, lon, lat, scale = 1, y = H) { const [x, , z] = apos(lon, lat, y); obj.position.set(x, y, z); obj.scale.setScalar(scale); s.add(obj); return obj; }
 export function city(ctx, s, name, k = 1, cls = 'c', text = name) { const d = s.dots[name]; if (d) d.visible = k > 0.01; const [lo, la] = CITY[name]; return label(ctx, apos(lo, la, H + 0.5), text, cls, k); }
-export function areaLabel(ctx, lon, lat, text, k = 1, cls = 'st') { return label(ctx, apos(lon, lat, H + 0.05), text, cls, k); }
+export function areaLabel(ctx, lon, lat, text, k = 1, cls = 'st', size = 26) {
+  if (cls !== 'st') return label(ctx, apos(lon, lat, H + 0.05), text, cls, k);
+  if (k <= 0) return ''; const [x, y, ok] = ctx.project(apos(lon, lat, H + 0.05)); if (!ok) return '';
+  return `<div style="position:absolute;left:${x}px;top:${y}px;transform:translate(-50%,-50%) scale(${0.85 + 0.15 * k});opacity:${k};font:900 ${size}px Inter;letter-spacing:.16em;color:rgba(46,30,16,.9);white-space:nowrap;text-shadow:0 0 8px rgba(255,250,235,.95),0 0 3px rgba(255,250,235,.95)">${text}</div>`;
+}
 // Rich chip at a lon/lat: title + one line of detail, with a coloured underline.
 export function chip(ctx, lo, la, k, title, sub = '', col = '#c0392b', dy = 0.5) {
   if (k <= 0) return ''; const [x, y, ok] = ctx.project(apos(lo, la, H + dy)); if (!ok) return '';
   return `<div style="position:absolute;left:${x}px;top:${y}px;transform:translate(-50%,-100%) scale(${0.8 + 0.2 * k});opacity:${k};text-align:center;padding:7px 14px 8px;border-radius:12px;background:rgba(20,22,28,.9);border-bottom:4px solid ${col};box-shadow:0 8px 24px rgba(0,0,0,.35);white-space:nowrap">
     <div style="font:900 24px 'Inter Display',Inter;color:#fff">${title}</div>${sub ? `<div style="font:700 17px Inter;color:#e6e0d4;margin-top:2px">${sub}</div>` : ''}</div>`;
 }
+// The continent drawn on old paper (theatre backdrop): a canvas texture of the land polygons.
+export function paperMap(W = 1024, H = 1024, { paper = '#e8dcc0', land = '#d2bf94', ink = '#6a4a2a', title = '' } = {}) {
+  const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
+  g.fillStyle = paper; g.fillRect(0, 0, W, H);
+  const r = LPrng(5); for (let i = 0; i < 900; i++) { g.fillStyle = `rgba(120,90,50,${0.03 + r() * 0.05})`; g.fillRect(r() * W, r() * H, 2 + r() * 6, 2 + r() * 6); }
+  // fit the projected continent into the canvas
+  const pts = RD.land.flatMap(p => p[0]).filter(([lo, la]) => lo < -30 && lo > -170 && la > -58 && la < 72).map(([lo, la]) => aproj(lo, la));
+  const xs = pts.map(p => p[0]), zs = pts.map(p => p[1]), x0 = Math.min(...xs), x1 = Math.max(...xs), z0 = Math.min(...zs), z1 = Math.max(...zs);
+  const k = Math.min(W * 0.9 / (x1 - x0), H * 0.9 / (z1 - z0)), ox = W / 2 - k * (x0 + x1) / 2, oz = H / 2 - k * (z0 + z1) / 2;
+  g.fillStyle = land; g.strokeStyle = ink; g.lineWidth = 2.2; g.lineJoin = 'round';
+  for (const poly of RD.land) { const ring = poly[0]; if (!ring.some(([lo, la]) => lo < -30 && lo > -170 && la > -58)) continue;
+    g.beginPath(); ring.forEach(([lo, la], i) => { const [x, z] = aproj(lo, la); i ? g.lineTo(ox + x * k, oz + z * k) : g.moveTo(ox + x * k, oz + z * k); }); g.closePath(); g.fill(); g.stroke(); }
+  g.strokeStyle = 'rgba(106,74,42,.25)'; g.lineWidth = 1; for (let i = 1; i < 8; i++) { g.beginPath(); g.moveTo(0, i * H / 8); g.lineTo(W, i * H / 8); g.stroke(); g.beginPath(); g.moveTo(i * W / 8, 0); g.lineTo(i * W / 8, H); g.stroke(); }
+  if (title) { g.fillStyle = ink; g.font = `italic 700 ${W * 0.045}px Georgia`; g.textAlign = 'center'; g.fillText(title, W * 0.73, H * 0.12); }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; return t;
+}
+function LPrng(seed) { let a = seed >>> 0; return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }

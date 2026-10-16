@@ -51,6 +51,11 @@ export async function loadCast() {
   await Promise.all(Object.entries(CAST).filter(([k]) => !only || only.includes(k)).map(async ([k, file]) => {
     const g = await loader.loadAsync(`/models/${file}.glb`);
     if (BIG[k]) { g.scene.updateMatrixWorld(true); const sz = new THREE.Box3().setFromObject(g.scene).getSize(new THREE.Vector3()); g.scene.scale.multiplyScalar(BIG[k] / sz.y); }
+    // Several game rips carry the body twice on identical geometry: a plain/pale material X and the textured X_0.
+    // The pair z-fights (the outfit flickers between frames), so keep only X_0.
+    const ms = []; g.scene.traverse(o => { if (o.isMesh) ms.push(o); });
+    const vc = new Map(ms.map(o => [o.material.name, o]));
+    for (const o of ms) { const n = o.material.name || '', base = vc.get(n.slice(0, -2)); if (n.endsWith('_0') && base && base.geometry.attributes.position.count === o.geometry.attributes.position.count) base.parent.remove(base); }
     cache[k] = g.scene;
   }));
 }

@@ -11,7 +11,7 @@ try {
   const r = new THREE.WebGLRenderer({ antialias: true }); r.setSize(W, H); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(r.domElement);
   const scene = stage({ skyTop: '#5d8ad0', skyHor: '#efe3c8', groundA: '#c9b58a', groundB: '#b9a477', sunPos: [4, 9, 8], shadow: 10, hemiGround: '#9a8460' });
   const list = (q.get('list') || 'oguri:continental').split(',').map(s => s.split(':'));
-  C.castOnly([...new Set(list.map(([w]) => K.CASTING?.[w] || w))]); await C.loadCast();
+  C.castOnly([...new Set(list.map(([w]) => K.ROLES?.[w]?.[0] || w))]); await C.loadCast();
   const ui = document.getElementById('ui');
   const cam = new THREE.PerspectiveCamera(30, W / H, 0.1, 500);
   const n = list.length, sp = +(q.get('sp') || 1.15), az = +(q.get('az') || 0), cy = +(q.get('cy') || 1.0), dist = +(q.get('d') || 7.6), look = +(q.get('look') || 0.62);

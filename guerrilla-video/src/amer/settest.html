@@ -1,0 +1,22 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style></head><body>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+// Set QA: ?set=name&args=JSON-array&p=x,y,z&l=x,y,z&fov=38&t=1&c=who:outfit:x:z:yaw,...
+import * as THREE from 'three';
+import * as C from '../lib/chars.js';
+import * as K from './kit.js';
+import * as S from './sets.js';
+try {
+  const W = 1280, H = 720, q = new URLSearchParams(location.search);
+  const r = new THREE.WebGLRenderer({ antialias: true }); r.setSize(W, H); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(r.domElement);
+  const cs = (q.get('c') || '').split(',').filter(Boolean).map(x => x.split(':'));
+  C.castOnly([...new Set(cs.map(([w]) => K.ROLES[w]?.[0] || w))]); await C.loadCast();
+  const s = S[q.get('set')](...JSON.parse(q.get('args') || '[]'));
+  for (const [who, o, x, z, yaw] of cs) { const c = K.person(s, who, o || who, +x || 0, +z || 0, +yaw || 0); K.pose(c, C.idle(0.3, 1)); c.setFace('open', 'smile'); }
+  if (s.tick) s.tick(+(q.get('t') || 1)); if (s.sea?.wave) s.sea.wave(1);
+  const cam = new THREE.PerspectiveCamera(+(q.get('fov') || 38), W / H, 0.1, 900);
+  cam.position.set(...(q.get('p') || '0,1.6,8').split(',').map(Number)); cam.lookAt(...(q.get('l') || '0,1,0').split(',').map(Number));
+  if (s.userData.sky) s.userData.sky.position.copy(cam.position);
+  r.render(s, cam); window.__ready = true;
+} catch (e) { window.__error = String(e.stack || e); }
+</script></body></html>
