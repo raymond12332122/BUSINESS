@@ -1,0 +1,38 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>model test</title>
+<style>html,body{margin:0;background:#c9c2b4;overflow:hidden}canvas{display:block}
+.l{position:absolute;font:700 15px Inter,sans-serif;color:#222;background:#fff8;padding:2px 6px;border-radius:5px;transform:translateX(-50%)}</style>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head><body>
+<script type="module">
+// Raw model viewer: ?list=a,b,c (files in /models without .glb) &h=target height (0 = keep native size) &yaw=deg &cam=front|close
+import * as THREE from 'three';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+const q = new URLSearchParams(location.search);
+const list = (q.get('list') || '').split(',').filter(Boolean), H = +(q.get('h') ?? 1.2), yaw = +(q.get('yaw') || 0) * Math.PI / 180;
+const W = innerWidth, Hh = innerHeight;
+const r = new THREE.WebGLRenderer({ antialias: true }); r.setSize(W, Hh); r.setPixelRatio(1); r.outputColorSpace = THREE.SRGBColorSpace; document.body.appendChild(r.domElement);
+const s = new THREE.Scene(); s.background = new THREE.Color('#c9c2b4');
+s.add(new THREE.HemisphereLight('#ffffff', '#8a7a68', 1.6)); const d = new THREE.DirectionalLight('#ffffff', 2.0); d.position.set(3, 6, 8); s.add(d);
+const cam = new THREE.PerspectiveCamera(30, W / Hh, 0.01, 200);
+const loader = new GLTFLoader(); const gap = 1.0; const labels = [];
+let maxH = 0;
+const res = await Promise.all(list.map(n => loader.loadAsync(`/models/${n}.glb`).then(g => [n, g.scene]).catch(e => [n, null])));
+res.forEach(([n, m], i) => {
+  if (!m) { console.log('FAIL', n); return; }
+  m.updateMatrixWorld(true);
+  const box = new THREE.Box3().setFromObject(m), size = new THREE.Vector3(); box.getSize(size);
+  const k = H > 0 ? H / size.y : 1; m.scale.multiplyScalar(k); m.rotation.y = yaw;
+  const g = new THREE.Group(); g.add(m); g.position.x = (i - (list.length - 1) / 2) * gap; s.add(g);
+  g.updateMatrixWorld(true); const b2 = new THREE.Box3().setFromObject(g); g.position.y -= b2.min.y; maxH = Math.max(maxH, b2.max.y - b2.min.y);
+  m.traverse(o => { if (o.isMesh) { o.frustumCulled = false; } });
+  labels.push([n, g.position.x, size.y.toFixed(2)]);
+});
+const span = list.length * gap;
+const close = q.get('cam') === 'close';
+const dist = close ? 1.6 : Math.max(span * 1.25, maxH * 2.2) + 1;
+cam.position.set(0, maxH * (close ? 0.85 : 0.6), dist); cam.lookAt(0, maxH * (close ? 0.8 : 0.5), 0);
+r.render(s, cam);
+for (const [n, x, h] of labels) { const v = new THREE.Vector3(x, 0, 0).project(cam); const el = document.createElement('div'); el.className = 'l'; el.textContent = n + ' (' + h + ')'; el.style.left = ((v.x + 1) / 2 * W) + 'px'; el.style.top = ((1 - v.y) / 2 * Hh + 6) + 'px'; document.body.appendChild(el); }
+window.__ready = true;
+</script></body></html>

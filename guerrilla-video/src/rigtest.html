@@ -1,0 +1,19 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>rig test</title>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head><body>
+<script type="module">
+// Logs rest-pose measurements of every cast model (BONES lines) for tuning big-model support.
+import * as THREE from 'three';
+import * as C from './lib/chars.js';
+await C.loadCast();
+const keys = (new URLSearchParams(location.search).get('list') || Object.keys(C.CAST).join(',')).split(',');
+for (const k of keys) {
+  const r = C.spawn(k); r.root.updateMatrixWorld(true);
+  const wp = n => { const v = new THREE.Vector3(); r.j[n].bone.getWorldPosition(v); return v.toArray().map(x => +x.toFixed(3)); };
+  const ps = new THREE.Vector3(); r.j.hip.bone.parent.getWorldScale(ps);
+  const box = new THREE.Box3().setFromObject(r.root); const sz = box.getSize(new THREE.Vector3());
+  console.log('BONES ' + k + ' ' + JSON.stringify({ h: +sz.y.toFixed(3), hip: wp('hip'), chest: wp('chest'), neck: wp('neck'), head: wp('head'), shL: wp('shL'), armL: wp('armL'), elbL: wp('elbL'), wriL: wp('wriL'), thL: wp('thL'), knL: wp('knL'), anL: wp('anL'), pscale: +ps.x.toFixed(4), eye: !!r.eyeMap }));
+}
+window.__ready = true;
+</script></body></html>

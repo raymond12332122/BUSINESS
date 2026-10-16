@@ -1,0 +1,28 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>pose test</title>
+<style>html,body{margin:0;background:#c9c2b4;overflow:hidden}.l{position:absolute;font:700 14px Inter,sans-serif;background:#fff9;padding:1px 5px;border-radius:4px;transform:translateX(-50%)}</style>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head><body>
+<script type="module">
+// Pose matrix: rows = models (?who=a,b), columns = poses (?poses=idle,walk,...). Seated poses get a box seat.
+import * as THREE from 'three';
+import * as C from './lib/chars.js';
+import * as MA from './mx/anim.js';
+const q = new URLSearchParams(location.search);
+const who = (q.get('who') || 'rudolf,doto').split(','), poses = (q.get('poses') || 'idle,walk,sit,salute,point,cheer,orate').split(','), t = +(q.get('t') || 0.6);
+C.castOnly(who); await C.loadCast();
+const W = innerWidth, H = innerHeight;
+const r = new THREE.WebGLRenderer({ antialias: true }); r.setSize(W, H); r.outputColorSpace = THREE.SRGBColorSpace; document.body.appendChild(r.domElement);
+const s = new THREE.Scene(); s.background = new THREE.Color('#c9c2b4');
+s.add(new THREE.HemisphereLight('#ffffff', '#8a7a68', 1.5)); const d = new THREE.DirectionalLight('#ffffff', 2.0); d.position.set(2, 5, 6); s.add(d);
+const P = { idle: t => C.idle(t, 1), walk: t => C.walk(t, 0.6, 1), sit: t => MA.sit(t, 1), salute: t => C.salute(t, 1), point: t => C.point(t, 1, 0), cheer: t => C.cheer(t, 1),
+  orate: t => MA.orate(t, 1, 1), sign: t => MA.sign(t, 1), crouch: t => C.crouch(t, 1, 1), aim: t => C.aim(t, 0, 0), wave: t => C.wave(t, 1), proud: t => MA.proud(t, 1) };
+const gx = 0.9, gz = 1.0;
+who.forEach((w, row) => poses.forEach((p, col) => {
+  const g = C.spawn(w); g.root.position.set((col - (poses.length - 1) / 2) * gx, 0, -row * gz); s.add(g.root);
+  if (p === 'sit' || p === 'sign') { const sh = g.big ? 0.42 * g.unit / 1.9 : 0.2; const seat = new THREE.Mesh(new THREE.BoxGeometry(0.3, sh, 0.3), new THREE.MeshStandardMaterial({ color: '#6a4a30' })); seat.position.set(g.root.position.x, sh / 2, g.root.position.z - 0.05); s.add(seat); }
+  g.apply(P[p](t)); g.setFace(p === 'cheer' ? 'happy' : 'open', p === 'orate' ? 'open' : p === 'cheer' ? 'smile' : 'neutral');
+}));
+const cam = new THREE.PerspectiveCamera(28, W / H, 0.01, 50); cam.position.set(0, 1.4, 4.6 + who.length * 0.6); cam.lookAt(0, 0.6, -(who.length - 1) * gz / 2);
+r.render(s, cam); window.__ready = true;
+</script></body></html>

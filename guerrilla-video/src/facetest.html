@@ -1,0 +1,21 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>face test</title>
+<style>html,body{margin:0;background:#c9c2b4;overflow:hidden}</style>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+</head><body>
+<script type="module">
+// Facial-bone experiment for the full-proportion models: ?who=rudolf  shows neutral / eyes closed / mouth open / smile side by side.
+import * as THREE from 'three';
+import * as C from './lib/chars.js';
+const q = new URLSearchParams(location.search), who = q.get('who') || 'rudolf', k = +(q.get('k') || 0.9), mo = +(q.get('mo') || 1);
+C.castOnly([who]); await C.loadCast();
+const W = innerWidth, H = innerHeight;
+const r = new THREE.WebGLRenderer({ antialias: true }); r.setSize(W, H); r.outputColorSpace = THREE.SRGBColorSpace; document.body.appendChild(r.domElement);
+const s = new THREE.Scene(); s.background = new THREE.Color('#c9c2b4');
+s.add(new THREE.HemisphereLight('#ffffff', '#8a7a68', 1.6)); const d = new THREE.DirectionalLight('#ffffff', 2.0); d.position.set(1, 3, 4); s.add(d);
+const faces = ['neutral', 'closed', 'open', 'smile'];
+const rigs = faces.map((f, i) => { const g = C.spawn(who); g.root.position.x = (i - 1.5) * 0.36; s.add(g.root); g.root.updateMatrixWorld(true); g.setFace(f === 'closed' ? 'closed' : f === 'smile' ? 'happy' : 'open', f === 'open' ? 'open' : f === 'smile' ? 'smile' : 'neutral'); return g; });
+const head = new THREE.Vector3(); rigs[0].j.head.bone.getWorldPosition(head);
+const cam = new THREE.PerspectiveCamera(30, W / H, 0.01, 50); cam.position.set(0, head.y + 0.08, 1.4); cam.lookAt(0, head.y + 0.07, 0);
+r.render(s, cam); window.__ready = true;
+</script></body></html>

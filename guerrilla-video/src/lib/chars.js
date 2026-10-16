@@ -10,7 +10,20 @@ const D = THREE.MathUtils.DEG2RAD;
 export const CAST = {
   oguri: 'oguri_cap', tamamo: 'tamano_cross', cafe: 'manhattan_cafe', doto: 'doto',
   mcqueen: 'mejiro_mcqueen', daiwa: 'daiwa_scarlet', suzuka: 'silence_suzuka', helios: 'daitaku_helios',
+  spe: 'special_week', hishi: 'hishi_akebono', golshiB: 'gold_ship_bazooka',
+  // full-proportion game models (see BIG)
+  rudolf: 'symboli_rudolf', teio: 'tokai_teio', groove: 'air_groove', golshi: 'gold_ship', suzukaB: 'silence_suzuka_big', mcqueenB: 'mejiro_mcqueen_big',
+  grass: 'grass_wonder', opera: 'tm_opera_o', digital: 'agnes_digital', tamamoB: 'tamamo_cross_big', dia: 'satono_diamond', turbo: 'twin_turbo',
+  creek: 'super_creek', dotoB: 'meisho_doto_halloween',
 };
+// Full-proportion models are normalised to these heights (scene units; the chibis stand ~1.15-1.2 tall).
+export const BIG = {
+  rudolf: 1.45, teio: 1.33, groove: 1.45, golshi: 1.5, suzukaB: 1.42, mcqueenB: 1.40, grass: 1.42, opera: 1.38, digital: 1.27,
+  tamamoB: 1.25, dia: 1.42, turbo: 1.30, creek: 1.48, dotoB: 1.43,
+};
+let only = null;
+// Limit which models a page loads (each video needs a subset; loading all of them costs seconds per render chunk).
+export function castOnly(keys) { only = keys; }
 
 const JOINTS = {
   hip: 'Hip', waist: 'Waist', chest: 'Chest', neck: 'Neck', head: 'Head', tail: 'Tail_Ctrl',
@@ -31,10 +44,13 @@ const MOUTH = {
 };
 
 const cache = {};
+const CHIBI_ARM = new THREE.Vector3(0, 0.464, -0.024);   // chibi arm-root height/depth (all chibis share one skeleton)
+const CHIBI_J = { head: new THREE.Vector3(0, 0.545, -0.019), chest: new THREE.Vector3(0, 0.438, -0.018) };
 export async function loadCast() {
   const loader = new GLTFLoader();
-  await Promise.all(Object.entries(CAST).map(async ([k, file]) => {
+  await Promise.all(Object.entries(CAST).filter(([k]) => !only || only.includes(k)).map(async ([k, file]) => {
     const g = await loader.loadAsync(`/models/${file}.glb`);
+    if (BIG[k]) { g.scene.updateMatrixWorld(true); const sz = new THREE.Box3().setFromObject(g.scene).getSize(new THREE.Vector3()); g.scene.scale.multiplyScalar(BIG[k] / sz.y); }
     cache[k] = g.scene;
   }));
 }
@@ -89,6 +105,24 @@ export class Rig {
     }
     const hp = this.j.hip;
     hp.parentQi = hp.Ci.clone(); // to convert model-space offsets into hip-parent space
+    // Full-proportion models: pose offsets (hipY…) are authored for the chibi legs, so scale them by leg length,
+    // and divide by the hip parent's world scale (the game rips carry a 0.01 root scale).
+    this.big = !!BIG[key];
+    const ps = new THREE.Vector3(); hp.bone.parent.getWorldScale(ps); hp.parentScale = ps.x;
+    const yOf = k => { const v = new THREE.Vector3(); this.j[k].bone.getWorldPosition(v); return v.y; };
+    this.unit = this.big ? (yOf('thL') - yOf('anL')) / 0.196 : 1;
+    if (this.big) this.initFace(model);
+    // Map chibi model-space rest points (weapon holds, grips) onto this body: anchor at the arm roots, scale by arm length.
+    const wv = k => { const v = new THREE.Vector3(); this.j[k].bone.getWorldPosition(v); return v; };
+    const arm = wv('armL'), wri = wv('wriL');
+    this.ratio = this.big ? arm.distanceTo(wri) / 0.178 : 1;
+    this.anchor = new THREE.Vector3(0, arm.y, arm.z);
+    // Head/torso frames for wear(): chibi-space accessory placements mapped onto this body.
+    const hd = wv('head'), ch = wv('chest'), nk = wv('neck'), hpw = wv('hip');
+    this.wearMap = this.big ? {
+      head: { o: hd, s: new THREE.Vector3(1, 1, 1).multiplyScalar((BIG[key] - hd.y) / 0.705) },
+      chest: { o: ch, s: new THREE.Vector3(arm.x / 0.084, (nk.y - hpw.y) / 0.231, arm.x / 0.084) },
+    } : null;
     // Rest data for arm IK (model space).
     const wp = b => { const v = new THREE.Vector3(); b.getWorldPosition(v); return v; };
     const wq = b => { const q = new THREE.Quaternion(); b.getWorldQuaternion(q); return q; };
@@ -119,7 +153,7 @@ export class Rig {
       J.bone.quaternion.copy(J.Ci).multiply(this._q).multiply(J.C).multiply(J.rest);
     }
     const hp = this.j.hip;
-    this._v.set(pose.hipX || 0, pose.hipY || 0, pose.hipZ || 0).applyQuaternion(hp.parentQi);
+    this._v.set(pose.hipX || 0, pose.hipY || 0, pose.hipZ || 0).multiplyScalar(this.unit / hp.parentScale).applyQuaternion(hp.parentQi);
     hp.bone.position.copy(hp.restPos).add(this._v);
     // Weapon placement + IK hands
     let grips = null;
@@ -164,25 +198,66 @@ export class Rig {
   }
 
   // Give the rig a weapon with named holds: {name: {pos, dir, up, L, R}} in model-space rest coords.
+  mapPt(p) { const v = new THREE.Vector3(...p); return this.big ? v.sub(CHIBI_ARM).multiplyScalar(this.ratio).add(this.anchor) : v; }
   equip(obj, presets) {
     this.gun = obj; this.holder.add(obj);
+    if (this.big) obj.scale.multiplyScalar(this.ratio);
     for (const [k, p] of Object.entries(presets)) {
       const dir = new THREE.Vector3(...p.dir).normalize(), up = new THREE.Vector3(...(p.up || [0, 1, 0]));
       const m = new THREE.Matrix4().lookAt(new THREE.Vector3(), dir.clone().negate(), up);
-      const pos = new THREE.Vector3(...p.pos);
-      const grip = s => s == null ? null : pos.clone().addScaledVector(dir, s).add(new THREE.Vector3(0, -0.035, 0)).toArray();
-      this.gunPresets[k] = { pos, q: new THREE.Quaternion().setFromRotationMatrix(m), L: p.L !== undefined ? (Array.isArray(p.L) ? p.L : grip(p.L)) : null,
-        R: p.R !== undefined ? (Array.isArray(p.R) ? p.R : grip(p.R)) : null };
+      const pos = this.mapPt(p.pos);
+      const grip = s => s == null ? null : pos.clone().addScaledVector(dir, s * this.ratio).add(new THREE.Vector3(0, -0.035 * this.ratio, 0)).toArray();
+      this.gunPresets[k] = { pos, q: new THREE.Quaternion().setFromRotationMatrix(m), L: p.L !== undefined ? (Array.isArray(p.L) ? this.mapPt(p.L).toArray() : grip(p.L)) : null,
+        R: p.R !== undefined ? (Array.isArray(p.R) ? this.mapPt(p.R).toArray() : grip(p.R)) : null };
     }
   }
 
   setFace(eye = 'open', mouth = 'neutral') {
+    if (this.faceRig) return this.setFaceBones(eye, mouth);
     const e = EYES[eye] || EYES.open, m = MOUTH[mouth] || MOUTH.neutral;
     if (this.eyeMap) this.eyeMap.offset.set(e[0], e[1]);
     if (this.mouthMap) this.mouthMap.offset.set(m[0], m[1]);
   }
 
+  // Full-proportion game models have no expression atlas; their faces are driven by facial bones instead.
+  // Eyelids: upper-lid bones slide towards the lower lid. Mouth: lower-lip/chin bones drop, corners lift for a smile.
+  initFace(model) {
+    const bones = []; model.traverse(o => { if (o.isBone && !/_end$|_end_/.test(o.name)) bones.push(o); });
+    const pick = re => bones.filter(b => re.test(b.name));
+    const wpos = b => { const v = new THREE.Vector3(); b.getWorldPosition(v); return v; };
+    const cen = list => list.reduce((a, b) => a.add(wpos(b)), new THREE.Vector3()).multiplyScalar(1 / Math.max(1, list.length));
+    // world-space delta -> bone-parent local delta (rest)
+    const toLocal = (b, dw) => { const m = new THREE.Matrix4().copy(b.parent.matrixWorld).invert(); const o = new THREE.Vector3().applyMatrix4(m); return dw.clone().applyMatrix4(m).sub(o); };
+    const rig = { lids: [], lips: [], corners: [] };
+    for (const side of ['L', 'R']) {
+      const up = pick(new RegExp(`^Eye_up_\\d+_${side}(_\\d+)?$`)), lo = pick(new RegExp(`^Eye_bottom_\\d+_${side}(_\\d+)?$`));
+      if (!up.length || !lo.length) continue;
+      const dw = cen(lo).sub(cen(up)).multiplyScalar(0.92);
+      for (const b of up) rig.lids.push({ b, rest: b.position.clone(), d: toLocal(b, dw) });
+    }
+    const open = (BIG[this.key] || 1.4) * 0.0075;
+    for (const b of pick(/^(Mouth_bottom_\d+_[CLR]|Tooth_bottom(_[LR])?|Chin)(_\d+)?$/)) rig.lips.push({ b, rest: b.position.clone(), d: toLocal(b, new THREE.Vector3(0, -open, 0)) });
+    for (const b of pick(/^Mouth_[LR](_\d+)?$/)) { const sx = /_L/.test(b.name) ? 1 : -1; rig.corners.push({ b, rest: b.position.clone(), d: toLocal(b, new THREE.Vector3(sx * open * 0.25, open * 0.45, 0)) }); }
+    if (rig.lids.length) this.faceRig = rig;
+  }
+  setFaceBones(eye, mouth) {
+    const c = { blink: 1, closed: 1, happy: 0.8, flat: 0.45, squint: 0.55, dizzy: 0.7 }[eye] || 0;
+    const mo = { open: 0.8, shout: 1, scream: 1.1, big: 0.9, teeth: 0.45, grin: 0.35, tri: 0.7, wavy: 0.25, tongue: 0.5 }[mouth] || 0;
+    const sm = { smile: 1, grin: 1, cat: 0.8, teeth: 0.8, happy: 0.8 }[mouth] || 0;
+    for (const L of this.faceRig.lids) L.b.position.copy(L.rest).addScaledVector(L.d, c);
+    for (const L of this.faceRig.lips) L.b.position.copy(L.rest).addScaledVector(L.d, mo);
+    for (const L of this.faceRig.corners) L.b.position.copy(L.rest).addScaledVector(L.d, sm);
+  }
+
   attachRaw(jointKey, obj) { return this.attach(jointKey, obj); }
+  // Attach an accessory authored for the chibi body (model-space rest placement); full-proportion bodies map it
+  // from the chibi head/chest frame onto their own and scale it to fit.
+  wear(jointKey, obj, pos = [0, 0, 0], rot = [0, 0, 0]) {
+    const M = this.wearMap?.[jointKey];
+    if (!M) return this.attach(jointKey, obj, pos, rot);
+    const c = CHIBI_J[jointKey], v = new THREE.Vector3(...pos).sub(c).multiply(M.s).add(M.o);
+    const o = this.attach(jointKey, obj, v.toArray(), rot); o.scale.multiply(M.s); return o;
+  }
   // Attach a prop to a bone, giving its transform in model space for the rest pose.
   attach(jointKey, obj, pos = [0, 0, 0], rot = [0, 0, 0]) {
     const b = this.j[jointKey].bone;
