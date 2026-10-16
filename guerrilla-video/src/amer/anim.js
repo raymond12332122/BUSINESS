@@ -7,8 +7,8 @@ const { sin, cos, max, abs } = Math;
 
 // Pulling a bell rope with both hands (Dolores).
 export function ringBell(t, seed = 0, speed = 3.2) { const k = 0.5 + 0.5 * sin(t * speed + seed), p = C.idle(t, seed, 0.3);
-  p.armL = [-150 + 45 * k, 0, -90]; p.armR = [-150 + 45 * k, 0, 90]; p.elbL = [0, -20 - 20 * k, 0]; p.elbR = [0, 20 + 20 * k, 0];
-  p.chest = [-6 + 10 * k, 0, 0]; p.head = [-14 + 8 * k, 0, 0]; p.hipY = (p.hipY || 0) - 0.01 * k; return p; }
+  p.armL = [-84 + 26 * k, 0, -90]; p.armR = [-124 + 40 * k, 0, 90]; p.elbL = [0, -30 - 20 * k, 0]; p.elbR = [0, 16 + 20 * k, 0];
+  p.chest = [-2 + 8 * k, 0, 0]; p.head = [-2 + 6 * k, 0, 0]; p.hipY = (p.hipY || 0) - 0.01 * k; return p; }
 // Embrace: arms forward and around (k: 0..1 how closed the arms are).
 export function embrace(t, seed = 0, k = 1) { const p = C.idle(t, seed, 0.2);
   p.armL = [-70 * k, 0, -74 + 4 * k]; p.armR = [-70 * k, 0, 74 - 4 * k]; p.elbL = [0, -14 - 70 * k, 0]; p.elbR = [0, 14 + 70 * k, 0]; p.chest = [4 * k, 0, 0]; p.head = [6 * k, 0, 0]; return p; }
