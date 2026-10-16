@@ -1,0 +1,21 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style></head><body>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+// Map QA: ?period=1775&c=lon,lat&h=height&tilt=0.35&fov=38&zoom=1  (camera above c, tilted south)
+import * as THREE from 'three';
+import * as AM from './amap.js';
+try {
+  const W = 1280, H = 720, q = new URLSearchParams(location.search);
+  const r = new THREE.WebGLRenderer({ antialias: true }); r.setSize(W, H); r.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(r.domElement);
+  await AM.preload();
+  const per = q.get('period') || '1775', s = AM.americasMap({ period: isNaN(+per) ? per : +per });
+  s.zoom(+(q.get('zoom') || 1));
+  const [lo, la] = (q.get('c') || '-75,8').split(',').map(Number), h = +(q.get('h') || 260), tilt = +(q.get('tilt') || 0.35);
+  const [x, , z] = AM.apos(lo, la, 0);
+  const cam = new THREE.PerspectiveCamera(+(q.get('fov') || 38), W / H, 0.5, 3000);
+  cam.position.set(x, h, z + h * tilt); cam.lookAt(x, 0, z); cam.updateMatrixWorld();
+  if (s.userData.sky) s.userData.sky.position.copy(cam.position);
+  for (const n of (q.get('cities') || '').split(',').filter(Boolean)) if (s.dots[n]) s.dots[n].visible = true;
+  r.render(s, cam); window.__ready = true;
+} catch (e) { window.__error = String(e.stack || e); }
+</script></body></html>
