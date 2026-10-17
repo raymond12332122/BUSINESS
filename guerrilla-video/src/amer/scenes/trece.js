@@ -106,7 +106,7 @@ export function build(ctx) {
       Mp.paint(1775); Mp.zoom(0.9); aFra.set(ss(tFra - 0.2, tFra + 0.8, t)); aEsp.set(ss(tEsp - 0.2, tEsp + 0.6, t)); pYor.update(t, tFra + 0.6); pPen.update(t, tEsp + 0.4);
       return U.film(t) + AM.chip(ctx, -62, 37, fade(t, tFra - 0.1, ctx.dur + 1), 'Francia', 'aliada desde 1778: ejército y flota', '#2a4fa0', 0.6)
         + AM.chip(ctx, -87.2, 30.4, fade(t, tEsp - 0.1, ctx.dur + 1), 'España', 'Bernardo de Gálvez toma Pensacola (1781)', '#c9a227', 0.6)
-        + CARD(t, 'galvez', tEsp - 0.3, tG + 0.2, { side: 'l', top: 520, w: 600 });
+        + CARD(t, 'galvez', tEsp - 0.3, tG + 0.2, { side: 'r', top: 560, w: 600 });
     } },
     { t0: tG, set: Yt, p0: [2.6, 1.6, 4.2], l0: [0.4, 0.8, -1.2], p1: [2.2, 1.55, 3.6], l1: [0.4, 0.8, -1.2], fov0: 42, act: (t) => {
       Yt.tick && Yt.tick(t); usf.wave(t); frf.wave(t + 1);
