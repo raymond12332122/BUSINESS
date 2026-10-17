@@ -63,7 +63,7 @@ export function build(ctx) {
       K.pose(vir, sur > 0.5 ? A.kneel(t, 2) : C.idle(t, 2)); vir.setFace(C.blinkEye(t, 2, sur > 0.5 ? 'flat' : 'open'), 'frown');
       pats.forEach((c, i) => K.pose(c, sur > 0.5 ? C.cheer(t, i) : A.guard(t, i))); roys.forEach((c, i) => { K.pose(c, sur > 0.5 ? A.kneel(t, i + 9) : A.guard(t, i + 9)); c.setFace(C.blinkEye(t, i + 9), 'frown'); });
       return U.film(t) + U.datePage(t, tC + 0.2, tD + 0.2, 'Batalla de Ayacucho', 'DIC.', '9', '1824', { x: 1640, y: 90, accent: '#c8102e', w: 250 })
-        + CARD(t, 'sucre', tSuc - 0.4, tD + 0.2, { side: 'l' }) + U.bubble(ctx, [-1.0, 1.65, 0.6], '¡Paso Teio!', fade(t, tDer - 0.2, tCap + 0.4), { size: 26 })
+        + CARD(t, 'sucre', tSuc - 0.4, tD + 0.2, { side: 'l' }) + U.bubble(ctx, [-1.0, 1.36, 0.6], '¡Paso Teio!', fade(t, tDer - 0.2, tCap + 0.4), { size: 26 })
         + U.pin(ctx, [0.9, 1.15, 0.3], 'El virrey La Serna', 'capturado', fade(t, tVir - 0.2, tD + 0.2), '#c0392b');
     } },
     { t0: tD, set: Mp, p0: [px, 150, pz + 56], l0: [px, 0, pz - 6], p1: [px, 140, pz + 50], l1: [px, 0, pz - 6], fov0: 40, act: (t) => {
