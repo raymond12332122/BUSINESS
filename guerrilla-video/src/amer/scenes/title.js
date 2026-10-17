@@ -57,8 +57,10 @@ export function build(ctx) {
     } },
     { t0: tB, set: Mp, p0: [0, 300, 92], l0: [0, 0, -2], p1: [0, 290, 88], l1: [0, 0, -2], fov0: 40, act: (t) => {
       Mp.paint(1775, 1825, ss(tOnce - 0.3, tOnce + 1.3, t)); Mp.zoom(3.2);
-      const n = Math.round(11 * ss(tOnce - 0.2, tOnce + 1.4, t));
-      return U.film(t) + U.year(t, tB + 0.1, tC + 0.2, n >= 11 ? '1825' : String(1775 + Math.round(50 * ss(tCin - 0.2, tOnce + 1.4, t))), { x: 1660, top: 80, label: `países independientes: ${n}` })
+      // the count follows the year shown: USA 1776, Haiti 1804, Paraguay 1811, Río de la Plata 1816, Chile 1818, Gran Colombia 1819,
+      // Mexico, Central America and Peru 1821, Brazil 1822, Bolivia 1825
+      const yr = 1775 + Math.round(50 * ss(tCin - 0.2, tOnce + 1.4, t)), n = [1776, 1804, 1811, 1816, 1818, 1819, 1821, 1821, 1821, 1822, 1825].filter(y => y <= yr).length;
+      return U.film(t) + U.year(t, tB + 0.1, tC + 0.2, String(yr), { x: 1660, top: 80, label: `países independientes: ${n}` })
         + NEW.map(([st, nm, lo, la], i) => AM.areaLabel(ctx, lo, la, nm, fade(t, tOnce + i * 0.14, tC + 0.3), 'st')).join('');
     } },
     { t0: tC, set: Th, p0: [0, 1.75, 6.2], l0: [0, 1.15, -2.4], p1: [0, 1.65, 5.5], l1: [0, 1.12, -2.4], fov0: 50, act: (t) => {
