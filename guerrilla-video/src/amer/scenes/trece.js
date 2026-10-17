@@ -69,7 +69,7 @@ export function build(ctx) {
     { t0: 0, set: Ld, p0: [0.9, 1.8, 2.6], l0: [0, 1.5, -2.4], p1: [0.6, 1.75, 1.8], l1: [0, 1.5, -2.4], fov0: 40, act: (t) => {
       const sipK = 0.5 + 0.5 * Math.sin(t * 1.4); K.pose(king, A.sip(t, 1, sipK)); king.setFace(C.blinkEye(t, 1, sipK > 0.8 ? 'closed' : 'open'), sipK > 0.8 ? 'smile' : 'neutral');
       return U.film(t) + CARD(t, 'jorge3', 0.5, tB, { side: 'l' })
-        + U.quote(t, ['«Ningún impuesto ', 'sin representación»'], 'Lema de los colonos', tImp - 0.3, tB + 0.2, 60);
+        + U.quote(t, [['Ningún impuesto', tImp - 0.2], ['sin representación', tRep - 0.2]], 'Lema de los colonos', tImp - 0.3, tB + 0.2, 72);
     } },
     { t0: tB, set: Bo, p0: [7.2, 2.3, -7.4], l0: [-0.4, 1.0, -11.6], p1: [6.2, 2.1, -7.8], l1: [-0.6, 1.0, -11.6], fov0: 44, act: (t) => {
       Bo.sea.wave(t);
