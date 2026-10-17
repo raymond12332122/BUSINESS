@@ -61,9 +61,9 @@ export function build(ctx) {
       K.pose(itu, sw > 0.5 ? A.diva(t, 1) : A.proud(t, 1)); itu.setFace(C.blinkEye(t, 1), sw > 0.5 ? 'grin' : 'neutral'); roy.forEach((c, i) => K.pose(c, A.guard(t, i)));
       return U.film(t) + CARD(t, 'iturbide', tAgu - 0.4, tC + 0.2, { side: 'l' }) + U.bubble(ctx, [0, 1.78, 0.4], '¡Ja, ja, ja! ¡Cambio de bando con estilo!', fade(t, tCam, tC), { size: 24 });
     } },
-    { t0: tC, set: Ro, p0: [-1.2, 2.1, 1.8], l0: [-1.5, 2.3, -0.5], p1: [-1.0, 2.0, 1.4], l1: [-1.5, 2.3, -0.5], fov0: 40, act: (t) => {
+    { t0: tC, set: Ro, p0: [-1.2, 2.0, 1.9], l0: [-1.5, 2.85, -0.5], p1: [-1.0, 1.95, 1.5], l1: [-1.5, 2.85, -0.5], fov0: 40, act: (t) => {   // low angle: the new flag against the sky
       fT.visible = true; fB.visible = false; fT.wave(t); K.pose(itu, A.orate(t, 1)); roy.forEach((c, i) => K.pose(c, A.guard(t, i)));
-      return U.film(t) + U.tiles(t, tPla - 0.3, tD + 0.2, [['⛪', 'Religión', tRel - 0.1], ['🦅', 'Independencia', tInd - 0.1], ['🤝', 'Unión', tUni - 0.1]], { top: 600, w: 300 })
+      return U.film(t) + U.tiles(t, tPla - 0.3, tD + 0.2, [['⛪', 'Religión', tRel - 0.1], ['🦅', 'Independencia', tInd - 0.1], ['🤝', 'Unión', tUni - 0.1]], { top: 260, w: 300 })
         + U.badge(t, '24 de febrero de 1821', 'Plan de Iguala', 'Las tres garantías: bandera blanca, verde y roja', tPla - 0.3, tD + 0.1);
     } },
     { t0: tD, set: Ac, p0: [0, 1.5, 3.0], l0: [0, 1.15, 0], p1: [0, 1.45, 2.5], l1: [0, 1.15, 0], fov0: 42, act: (t) => {
