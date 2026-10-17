@@ -65,3 +65,11 @@ export function title(t, a, b, kicker, head, sub) {
   const k = K(t, a, b, 0.6, 0.5); if (k <= 0) return '';
   return `<div class="title" style="opacity:${k};transform:translateY(${(1 - k) * 20}px)"><div class="k">${kicker}</div><div class="h" style="font-size:112px">${head}</div><div class="s">${sub}</div></div>`;
 }
+
+// A quote card placed anywhere (the shared quote() is a full-width centre panel).
+export function quoteAt(t, parts, author, a, b, { left = 72, top = 560, w = 760, size = 40 } = {}) {
+  const k = ss(a, a + 0.4, t) * (1 - ss(b - 0.4, b, t)); if (k <= 0) return '';
+  const body = parts.map(([txt, tt]) => `<span style="opacity:${0.18 + 0.82 * ss(tt, tt + 0.3, t)}">${txt}</span>`).join(' ');
+  return `<div style="position:absolute;left:${left}px;top:${top}px;width:${w}px;padding:26px 34px;${PANEL};opacity:${k};transform:translateY(${(1 - k) * 16}px)">
+    <div style="font:800 ${size}px/1.3 'Inter Display',Inter;color:#fff">“${body}”</div><div style="font:600 24px Inter;color:#ffb627;margin-top:14px">— ${author}</div></div>`;
+}

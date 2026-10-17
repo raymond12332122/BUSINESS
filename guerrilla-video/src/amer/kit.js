@@ -8,6 +8,7 @@ import { mesh, box, cyl, at, rng } from '../lib/props.js';
 import { flattenAhoge, generic, epaulettes, crossbelts, sombrero, glasses, rebozo, sarape } from '../mx/kit.js';
 import * as N from '../napo/kit.js';
 import { blobShadow, freeze } from '../rusia/kit.js';
+import { finish } from './look.js';
 export { blobShadow, freeze };
 
 export { flattenAhoge, generic };
@@ -18,19 +19,22 @@ const U = {
   continental: { dark: '#121a30', mid: '#233660', light: '#e6d6ae', gold: '#c9a227' },
   militia: { dark: '#2a2018', mid: '#6a5238', light: '#e8dcc2', gold: '#b08d3a' },
   redcoat: { dark: '#4a1013', mid: '#b3262a', light: '#f3f0e8', gold: '#d4af37' },
-  frances: { dark: '#8e8c84', mid: '#ece8de', light: '#ffffff', gold: '#d4af37' },
+  frances: { dark: '#24387e', mid: '#ded3bb', light: '#f7f2e6', gold: '#d4af37' },   // Bourbon white coats, royal-blue facings
   colono: { dark: '#2a1e16', mid: '#7a5a3a', light: '#efe6d2', gold: '#b08d3a' },
   haiti: { dark: '#141c3a', mid: '#2a3f8f', light: '#f3f0e8', gold: '#d4af37' },
   cimarron: { dark: '#2c241c', mid: '#8a7458', light: '#eee6d4', gold: '#b08d3a' },
   insurgente: { dark: '#3a2c20', mid: '#a08a6a', light: '#efe7d6', gold: '#b08d3a' },
-  realista: { dark: '#1c2440', mid: '#d9d3c4', light: '#f6f3ea', gold: '#d4af37' },
+  realista: { dark: '#121a36', mid: '#2c3f7a', light: '#efe8d6', gold: '#d4af37' },   // royalist blue, white belts
   patriota: { dark: '#10162e', mid: '#25336b', light: '#f3f0e8', gold: '#d4af37' },
   granadero: { dark: '#0e1430', mid: '#1d2a5a', light: '#f3f0e8', gold: '#d4af37' },
   llanero: { dark: '#3a3024', mid: '#d8ccb0', light: '#f4efe2', gold: '#b08d3a' },
   brasil: { dark: '#123222', mid: '#1f5a36', light: '#f0d84a', gold: '#d4af37' },
   portugues: { dark: '#10162e', mid: '#2a3a6a', light: '#f3f0e8', gold: '#d4af37' },
   criollo: { dark: '#141416', mid: '#2e2e34', light: '#f4f1ea', gold: '#c9a227' },
-  dama: { dark: '#6a5a6e', mid: '#d8cce0', light: '#ffffff', gold: '#d4af37' },
+  dama: { dark: '#7a2a4a', mid: '#e3a0b8', light: '#fff2f5', gold: '#d4af37' },
+  damaB: { dark: '#24466e', mid: '#9cc0e4', light: '#f2f7ff', gold: '#d4af37' },
+  damaC: { dark: '#6e521a', mid: '#e2c47e', light: '#fffaea', gold: '#d4af37' },
+  damaD: { dark: '#2a5a3a', mid: '#9ccaa4', light: '#f2fbf2', gold: '#d4af37' },
   ...N.UNIFORMS,
 };
 export const uni = (r, name) => N.uniformize(r, U[name] || name);
@@ -119,7 +123,7 @@ export const OUTFITS = {
   trabajador: r => { generic(r, '#1d1612'); uni(r, 'cimarron'); hat(r, sombrero('palm'), { scale: 0.8, y: 0.9, tilt: -0.08, cap: true }); return r; },
   peninsular: r => { generic(r, '#3a2a20'); uni(r, 'realista'); hat(r, N.bicorne({ cockadeCols: ['#c0272d', '#c0272d', '#c0272d'] }), BIC); return r; },
   criollo: r => { generic(r, pickHair(r)); uni(r, 'criollo'); hat(r, N.tophat('#1d1b1c'), { scale: 0.9, y: 0.88, tilt: -0.04 }); return r; },
-  dama: r => { generic(r, pickHair(r)); uni(r, 'dama'); return r; },
+  dama: r => { generic(r, pickHair(r)); uni(r, ['dama', 'damaB', 'damaC', 'damaD'][Math.floor(r.seed * 7) % 4]); return r; },
   indigena: r => { generic(r, '#141012'); uni(r, 'insurgente'); r.wear('chest', sarape(), [0, 0.4, 0]); return r; },
   insurgente: r => { generic(r, pickHair(r)); uni(r, 'insurgente'); hat(r, sombrero('palm'), { scale: 0.85, y: 0.9, tilt: -0.08, cap: true }); hold(r, machete(), 'R', [0, -0.02, 0.03], [0, 0, 0]); return r; },
   insurgenteF: r => { generic(r, pickHair(r)); uni(r, 'insurgente'); hat(r, N.chambergo('#c9b07a'), { y: 0.9, tilt: -0.06, cap: true }); musket(r, '#3b3a36', '#7a5232', false); return r; },
@@ -148,7 +152,7 @@ export const OUTFITS = {
   // --- leaders: full-proportion models keep their race outfits; period hats and props go on top
   lider: r => r,
   lWashington: r => { hat(r, tricorne({ trim: '#e2bd45', cockadeCol: '#1d1b1c' }), { ...TRI, scale: 1.2 }); return r; },
-  lFranklin: r => { r.wear('head', glasses(false), [0, 0.69, 0.235]); return r; },
+  lFranklin: r => { if (r.big) eyeGlasses(r, glasses(false)); else r.wear('head', glasses(false), [0, 0.69, 0.235]); return r; },
   lKing: r => { hat(r, N.crown(), { y: 0.86, tilt: 0.04, scale: 1.1 }); r.cape = r.wear('chest', N.cape('#9a1b2a', '#f6f2ea', { w: 0.5, h: 0.5, ermine: true }), [0, 0.5, -0.1]); return r; },
   lToussaint: r => { hat(r, N.bicorne({ trim: '#e2bd45', plume: '#c0272d', cockadeCols: ['#2a3f8f', '#f4f1ea', '#c0272d'] }), { ...BIC, scale: 1.15 }); return r; },
   lPedro: r => { hat(r, N.bicorne({ trim: '#e2bd45', plume: '#2f7a3a', cockadeCols: ['#2f7a3a', '#f0d84a', '#2f7a3a'] }), { ...BIC, scale: 1.15 }); return r; },
@@ -202,7 +206,7 @@ let seedCounter = 0;
 export function person(parent, who, outfit = who, x = 0, z = 0, yaw = 0) {
   const role = ROLES[who], key = role ? role[0] : who;
   const r = C_.spawn(key); r.seed = (seedCounter++ * 1.37) % 10; OUTFITS[role && outfit === who ? role[1] : outfit](r);
-  r.root.position.set(x, 0, z); r.root.rotation.y = yaw; parent.add(r.root); r.who = who; return r;
+  r.root.position.set(x, 0, z); r.root.rotation.y = yaw; parent.add(r.root); r.who = who; finish(r); return r;
 }
 export const role = (parent, who, x = 0, z = 0, yaw = 0) => person(parent, who, who, x, z, yaw);
 // Crowd of extras laid out on a grid inside [x0, z0, x1, z1] (blob shadows instead of shadow maps).
@@ -219,3 +223,42 @@ export function crowd(parent, outfit, n, [x0, z0, x1, z1], { seed = 1, yaw = 0, 
   return out;
 }
 export { pose } from '../mx/kit.js';
+
+// Seat a posed rig so its pelvis rests on a seat whose top is at world height y.
+export function seatAt(r, y) {
+  r.root.updateMatrixWorld(true);
+  const hp = new THREE.Vector3(); r.j.hip.bone.getWorldPosition(hp);
+  r.root.position.y += y + (r.big ? 0.1 : 0.05) - hp.y; r.root.updateMatrixWorld(true); return r;
+}
+
+// Spectacles on a full-proportion head: lens centres on the eye bones, set just in front of the face,
+// with temple arms back to the ears (so nothing cuts through the face).
+export function eyeGlasses(r, g) {
+  const find = n => { let hit = null; r.model.traverse(o => { if (!hit && o.isBone && (o.name === n || o.name.startsWith(n + '_'))) hit = o; }); return hit; };
+  const head = r.j.head.bone, eL = find('Eye_L'), eR = find('Eye_R');
+  r.root.updateMatrixWorld(true);
+  const wl = new THREE.Vector3(), wr = new THREE.Vector3(); eL.getWorldPosition(wl); eR.getWorldPosition(wr);
+  const ipd = wl.distanceTo(wr), mid = wl.clone().add(wr).multiplyScalar(0.5);
+  const fwd = new THREE.Vector3(0, 0, 1).applyQuaternion(r.root.getWorldQuaternion(new THREE.Quaternion()));
+  const pos = mid.addScaledVector(fwd, ipd * 0.5).add(new THREE.Vector3(0, ipd * 0.04, 0));
+  // temple arms
+  const arm = new THREE.MeshStandardMaterial({ color: '#7a6a4a', metalness: 0.5, roughness: 0.4 });
+  for (const sd of [-1, 1]) { const a = new THREE.Mesh(new THREE.BoxGeometry(0.008, 0.008, 0.2), arm); a.position.set(sd * 0.158, 0.005, -0.1); g.add(a); }
+  const k = ipd / 0.2;   // the prop's lenses sit 0.2 apart
+  const inv = head.matrixWorld.clone().invert(); const lp = pos.clone().applyMatrix4(inv);
+  head.add(g); g.position.copy(lp);
+  const hq = head.getWorldQuaternion(new THREE.Quaternion()), rq = r.root.getWorldQuaternion(new THREE.Quaternion());
+  g.quaternion.copy(hq.invert().multiply(rq));
+  const hs = head.getWorldScale(new THREE.Vector3()); g.scale.set(k / hs.x, k / hs.y, k / hs.z);
+  r.glasses = g; return g;
+}
+
+// Put a posed rider in the saddle: the pelvis lands just above the horse's seat point, whatever the rider's size.
+// Call every frame after animateHorse() and the rider's pose.
+export function rideOn(r, H, clear = 0.05) {
+  H.updateMatrixWorld(true); const seat = new THREE.Vector3(), q = new THREE.Quaternion(); H.seat.getWorldPosition(seat); H.seat.getWorldQuaternion(q);
+  r.root.updateMatrixWorld(true); const hip = new THREE.Vector3(); r.j.hip.bone.getWorldPosition(hip); hip.applyMatrix4(r.root.matrixWorld.clone().invert());
+  const target = seat.add(new THREE.Vector3(0, clear * (r.big ? 1.6 : 1), 0).applyQuaternion(q)).sub(hip.multiply(r.root.scale).applyQuaternion(q));
+  const par = r.root.parent; par.updateMatrixWorld(true); target.applyMatrix4(par.matrixWorld.clone().invert());
+  r.root.position.copy(target); r.root.quaternion.copy(q);
+}

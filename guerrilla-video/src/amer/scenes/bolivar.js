@@ -9,6 +9,7 @@ import * as S from '../sets.js';
 import * as A from '../anim.js';
 import * as AM from '../amap.js';
 import * as P from '../props.js';
+import * as LK from '../look.js';
 import * as RP from '../../rusia/props.js';
 
 export { preload } from '../amap.js';
@@ -36,8 +37,7 @@ export function build(ctx) {
   const vf = P.banner('colombia', { h: 3.2, w: 1.4, fh: 0.9 }); vf.position.set(-1.5, 0, -0.6); Cc.add(vf);
   // ---- Jamaica, 1815: the letter
   const Jm = S.hall({ wall: '#6a5a48', cloth: '#3a2a20', floor: '#4a3426', night: true, w: 8, d: 7 });
-  const sea = new THREE.Mesh(new THREE.PlaneGeometry(1.6, 1.4), new THREE.MeshBasicMaterial({ color: '#2a4a70' })); sea.position.set(1.8, 2.3, -3.46); Jm.add(sea);
-  const moon = new THREE.Mesh(new THREE.CircleGeometry(0.16, 20), new THREE.MeshBasicMaterial({ color: '#f3ecd6' })); moon.position.set(2.2, 2.7, -3.44); Jm.add(moon);
+  const win = LK.nightWindow(1.5, 1.6); win.position.set(1.8, 2.3, -3.42); Jm.add(win);
   Jm.table.position.set(-0.4, 0, -1.6); const lamp = RP.keroseneLamp(true, 0.8); lamp.position.set(0.3, 0.82, -1.6); Jm.add(lamp);
   const bol2 = K.role(Jm, 'bolivar', -0.5, -0.85, 0.15); K.hold(bol2, K.quill(), 'R', [0, 0.02, 0.03], [20, 0, 0], 0.45);
   // ---- the crossing of the Andes (Páramo de Pisba)
@@ -49,7 +49,7 @@ export function build(ctx) {
   By.add(LP.strip([[-40, -3.4], [0, -3.6], [40, -3.2]], 2.2, '#5f8fa8', 0.02)); const br = P.stoneBridge(4.4, 2.0); br.position.set(1.2, -0.45, -3.5); By.add(br);
   const pats = K.crowd(By, ['patriota', 'llanero'], 9, [-4.4, -1.6, -0.6, 1.4], { seed: 93, yaw: 0.9 });
   const roy = K.crowd(By, 'realista', 8, [1.0, -7.2, 4.8, -5.0], { seed: 94, yaw: -0.6 });
-  const vR = RP.volleyFx(By, roy.map(c => c.root.position.clone().add(new THREE.Vector3(-0.3, 0.55, 0.3)))), vP = RP.volleyFx(By, pats.map(c => c.root.position.clone().add(new THREE.Vector3(0.3, 0.55, -0.3))));
+  const vR = P.volleySmoke(By, roy.map(c => c.root.position.clone().add(new THREE.Vector3(-0.3, 0.55, 0.3)))), vP = P.volleySmoke(By, pats.map(c => c.root.position.clone().add(new THREE.Vector3(0.3, 0.55, -0.3))));
 
   const sfx = [{ t: 0.2, type: 'whoosh', vol: 0.3 }, { t: tDec, type: 'bell', vol: 0.35 }, { t: tCay, type: 'hit', vol: 0.4 }, { t: tB, type: 'crowd', dur: tC - tB, vol: 0.2 }, { t: tEmp, type: 'laugh', vol: 0.25 },
     { t: tC, type: 'waves', dur: tD - tC, vol: 0.3 }, { t: tC + 0.4, type: 'quill', dur: 2.2, vol: 0.3 }, { t: tD, type: 'whoosh', vol: 0.3 }, { t: tBar, type: 'pop', vol: 0.35 },

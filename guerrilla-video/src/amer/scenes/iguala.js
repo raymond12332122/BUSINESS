@@ -68,7 +68,8 @@ export function build(ctx) {
     } },
     { t0: tD, set: Ac, p0: [0, 1.5, 3.0], l0: [0, 1.15, 0], p1: [0, 1.45, 2.5], l1: [0, 1.15, 0], fov0: 42, act: (t) => {
       const k = ss(tAbr - 0.6, tAbr, t); K.pose(itu2, A.embrace(t, 1, k)); K.pose(gue, A.embrace(t, 2, k)); itu2.setFace(C.blinkEye(t, 1), 'smile'); gue.setFace(k > 0.5 ? 'happy' : 'open', k > 0.5 ? 'smile' : 'wavy');
-      itu2.root.position.x = 0.55 - 0.18 * k; gue.root.position.x = -0.55 + 0.18 * k; both.forEach((c, i) => K.pose(c, k > 0.5 ? C.cheer(t, i) : A.guard(t, i)));
+      // they walk into each other's arms, turning to face one another
+      itu2.root.position.x = 0.62 - 0.36 * k; gue.root.position.x = -0.62 + 0.36 * k; itu2.root.rotation.y = -0.9 - 0.55 * k; gue.root.rotation.y = 0.9 + 0.55 * k; both.forEach((c, i) => K.pose(c, k > 0.5 ? C.cheer(t, i) : A.guard(t, i)));
       return U.film(t) + U.badge(t, 'Acatempan, 1821', 'El abrazo', 'Según la tradición; algunos historiadores dudan que ocurriera', tD + 0.2, tE + 0.1)
         + U.bubble(ctx, [-0.4, 1.72, 0], '¡Opera O-san! (snif)', fade(t, tAbr, tE), { size: 24 });
     } },

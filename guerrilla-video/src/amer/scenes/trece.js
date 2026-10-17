@@ -25,10 +25,10 @@ export function build(ctx) {
   const tB = tBos - 0.4, tC = L[1].t0 - 0.3, tD = tCua - 0.4, tE = L[2].t0 - 0.3, tF = tAyu - 0.3, tG = tYor + 0.5;
 
   // ---- London: George III and his tea
-  const Ld = S.interior({ wall: '#2a3a6a', floor: '#5a3a24', w: 12, d: 9, h: 5.2, lights: [[-2.5, 4.3, 0.5], [2.5, 4.3, 0.5]], windows: false });
-  Ld.add(LP.at(LP.box(4.6, 0.36, 2.4, '#8a1f2a'), 0, 0.18, -3.2)); const th = N.throne({ fabric: '#8a1f2a' }); th.position.set(0, 0.36, -3.6); Ld.add(th);
-  for (const x of [-3.6, 3.6]) { const f = P.banner('gbr', { h: 3.6, w: 1.5, fh: 1.0 }); f.position.set(x, 0, -3.8); Ld.add(f); }
-  const king = K.role(Ld, 'jorge3', 0, -2.3, 0); king.root.position.y = 0.36; const cup = K.hold(king, K.teacup(), 'R', [0.0, 0.0, 0.05]);
+  const Ld = S.palace();
+  const king = K.role(Ld, 'jorge3', 0, -4.42, 0); K.pose(king, A.sitTea(0, 1, 0)); K.seatAt(king, 0.36 + 0.61);
+  const cup = K.hold(king, P.cupOnly(), 'R', [0.0, -0.02, 0.04]), sau = K.hold(king, P.saucer(), 'L', [0.0, -0.035, 0.03]);
+  const guards = [['suzuka', -2.9], ['oguri', 2.9]].map(([w, x]) => K.person(Ld, w, 'casaca', x, -2.1, 0));
   // ---- Boston harbour, 16 Dec 1773
   const Bo = S.harbor({ light: 'night', ships: 1 });
   const thrower = [['spe', -3.0], ['tamamo', -1.6], ['golshiC', -0.2], ['oguri', 1.2], ['doto', 2.6]].map(([w, x], i) => { const c = w === 'golshiC' ? K.role(Bo, 'golshiC', x, -10.8, Math.PI) : K.person(Bo, w, 'colono', x, -10.8, Math.PI); c.root.position.y = 0.73; return c; });
@@ -39,7 +39,7 @@ export function build(ctx) {
   const Lx = S.village('sunrise');
   const mil = K.crowd(Lx, 'miliciano', 6, [-4.4, -3.6, -1.2, -1.6], { seed: 31, yaw: Math.PI / 2 - 0.15, yawJ: 0.1 });
   const red = K.crowd(Lx, 'casaca', 6, [1.4, -3.6, 4.6, -1.6], { seed: 32, yaw: -Math.PI / 2 + 0.15, yawJ: 0.1 });
-  const vRed = RP.volleyFx(Lx, red.map(c => c.root.position.clone().add(new THREE.Vector3(-0.45, 0.55, 0.05)))), vMil = RP.volleyFx(Lx, mil.map(c => c.root.position.clone().add(new THREE.Vector3(0.45, 0.55, 0.05))));
+  const vRed = P.volleySmoke(Lx, red.map(c => c.root.position.clone().add(new THREE.Vector3(-0.45, 0.55, 0.05)))), vMil = P.volleySmoke(Lx, mil.map(c => c.root.position.clone().add(new THREE.Vector3(0.45, 0.55, 0.05))));
   // ---- the Assembly Room, Philadelphia
   const Hl = S.hall({ wall: '#a9b49a', cloth: '#2f5a3a' });
   const jef = K.role(Hl, 'jefferson', -0.55, -1.2, 0.15), fra = K.role(Hl, 'franklin', 0.65, -1.3, -0.35);
@@ -65,13 +65,18 @@ export function build(ctx) {
     { t: tFra, type: 'pop', vol: 0.35 }, { t: tEsp, type: 'pop', vol: 0.35 }, { t: tG, type: 'fanfare', vol: 0.35 }, { t: tRec, type: 'sting2', vol: 0.35 }];
 
   const throwU = (t, i) => { const T = 1.7, ph = t - (tTir - 0.6) - i * 0.33; return ph < 0 ? -1 : (ph % T) / T; };
+  const londonAct = (t) => {
+    const u = (t * 0.35) % 1, sipK = ss(0.15, 0.35, u) * (1 - ss(0.6, 0.8, u));   // a slow sip every ~3 s
+    K.pose(king, A.sitTea(t, 1, sipK)); king.setFace(C.blinkEye(t, 1, sipK > 0.7 ? 'closed' : 'open'), sipK > 0.7 ? 'smile' : 'neutral');
+    guards.forEach((g, i) => { K.pose(g, A.guard ? A.guard(t, i) : C.idle(t, i, 0.1)); g.setFace(C.blinkEye(t, i + 4), 'neutral'); });
+    return U.film(t) + CARD(t, 'jorge3', 0.5, tB, { side: 'l' });
+  };
   const shots = [
-    { t0: 0, set: Ld, p0: [0.9, 1.8, 2.6], l0: [0, 1.5, -2.4], p1: [0.6, 1.75, 1.8], l1: [0, 1.5, -2.4], fov0: 40, act: (t) => {
-      const sipK = 0.5 + 0.5 * Math.sin(t * 1.4); K.pose(king, A.sip(t, 1, sipK)); king.setFace(C.blinkEye(t, 1, sipK > 0.8 ? 'closed' : 'open'), sipK > 0.8 ? 'smile' : 'neutral');
-      return U.film(t) + CARD(t, 'jorge3', 0.5, tB, { side: 'l' })
-        + U.quote(t, [['Ningún impuesto', tImp - 0.2], ['sin representación', tRep - 0.2]], 'Lema de los colonos', tImp - 0.3, tB + 0.2, 72);
-    } },
-    { t0: tB, set: Bo, p0: [7.2, 2.3, -7.4], l0: [-0.4, 1.0, -11.6], p1: [6.2, 2.1, -7.8], l1: [-0.6, 1.0, -11.6], fov0: 44, act: (t) => {
+    // the throne room, then the king at her tea while the colonies protest
+    { t0: 0, set: Ld, p0: [-5.2, 2.3, 6.4], l0: [1.2, 1.9, -3.4], p1: [-4.2, 2.1, 5.0], l1: [1.0, 1.8, -3.6], fov0: 44, act: (t) => londonAct(t) },
+    { t0: 3.6, set: Ld, p0: [-1.5, 1.62, -0.9], l0: [0.25, 1.38, -4.2], p1: [-1.25, 1.58, -1.4], l1: [0.25, 1.36, -4.2], fov0: 34, act: (t) => londonAct(t)
+      + U.quoteAt(t, [['Ningún impuesto', tImp - 0.2], ['sin representación', tRep - 0.2]], 'Lema de los colonos', tImp - 0.3, tB + 0.2, { left: 1080, top: 600, w: 760 }) },
+    { t0: tB, set: Bo, p0: [4.6, 1.75, -7.9], l0: [-0.8, 1.25, -12.0], p1: [3.7, 1.65, -8.4], l1: [-0.9, 1.2, -12.0], fov0: 44, act: (t) => {
       Bo.sea.wave(t);
       thrower.forEach((c, i) => { const u = throwU(t, i); K.pose(c, u < 0 ? C.idle(t, i) : A.heave(t, u, i)); c.setFace(C.blinkEye(t, i), u > 0.5 && u < 0.9 ? 'open' : 'smile');
         const ch = chests[i], sp = splash[i]; ch.visible = u >= 0 && u < 0.98;

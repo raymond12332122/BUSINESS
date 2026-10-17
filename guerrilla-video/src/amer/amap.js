@@ -115,7 +115,7 @@ export function americasMap({ light = 'day', period = 1775 } = {}) {
   const night = light === 'night';
   const s = stage({ groundA: null, skyTop: night ? '#0b1020' : '#4a6fa8', skyHor: night ? '#1d2840' : '#cfe0ea', fog: night ? ['#1d2840', 260, 900] : ['#cfe0ea', 260, 900],
     sunPos: [20, 60, 30], sun: night ? 1.1 : 2.2, hemi: night ? 0.75 : 1.3, shadow: 120 });
-  const g = new THREE.Group(); s.add(g); s.mapGroup = g; s.userData.near = 1;
+  const g = new THREE.Group(); s.add(g); s.mapGroup = g; s.userData.near = 1; s.userData.look = { vign: 0.06, sat: 1.05, con: 0.1, bloom: 0, warm: 0.02, cool: 0.02 };
   const sea = new THREE.Mesh(new THREE.PlaneGeometry(2400, 2400, 64, 64), new THREE.MeshStandardMaterial({ color: COL.sea, roughness: 0.6 })); sea.rotation.x = -Math.PI / 2; sea.position.y = -0.02; g.add(sea);   // subdivided: one huge clipped triangle loses depth precision and can draw over the land
   g.add(slab(RD.land, 0, 0.05, COL.land));
   s.groups = {};

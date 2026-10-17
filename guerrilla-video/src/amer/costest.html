@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import * as C from '../lib/chars.js';
 import * as K from './kit.js';
 import { stage } from '../lib/stage.js';
+import * as LK from './look.js';
 try {
   const W = 1600, H = 900, q = new URLSearchParams(location.search);
   const r = new THREE.WebGLRenderer({ antialias: true }); r.setSize(W, H); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(r.domElement);
@@ -17,8 +18,8 @@ try {
   const n = list.length, sp = +(q.get('sp') || 1.15), az = +(q.get('az') || 0), cy = +(q.get('cy') || 1.0), dist = +(q.get('d') || 7.6), look = +(q.get('look') || 0.62);
   cam.position.set(Math.sin(az) * dist, cy, Math.cos(az) * dist); cam.lookAt(0, look, 0); cam.updateMatrixWorld();
   list.forEach(([who, o], i) => { const x = (i - (n - 1) / 2) * sp; const c = K.person(scene, who, o, x, 0, 0);
-    K.pose(c, { ...C.idle(0.3, i), gun: c.gun ? 'low' : 'none' }); c.setFace('open', 'smile');
+    K.pose(c, { ...C.idle(0.3, i), gun: c.gun ? 'low' : 'none' }); c.setFace('open', 'smile'); if (q.has('fx')) LK.finish(c, { outline: q.get('fx') !== 'noink' });
     const v = new THREE.Vector3(x, 0, 0).project(cam); const d = document.createElement('div'); d.className = 'l'; d.textContent = who + ':' + o; d.style.left = ((v.x + 1) / 2 * W) + 'px'; d.style.top = ((1 - v.y) / 2 * H + 8) + 'px'; ui.appendChild(d); });
-  r.render(scene, cam); window.__ready = true;
+  if (q.has('post')) LK.makePost(r, W, H).render(scene, cam); else r.render(scene, cam); window.__ready = true;
 } catch (e) { window.__error = String(e.stack || e); }
 </script></body></html>

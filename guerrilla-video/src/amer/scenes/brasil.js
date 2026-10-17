@@ -44,7 +44,8 @@ export function build(ctx) {
   const ped = K.role(Rj, 'pedro', 1.0, -9.6, -0.2); ped.root.position.y = 0.73;
   // ---- Ipiranga, 7 Sep 1822
   const Ip = S.brook('golden');
-  const H = horse({ coat: '#5a3a26', mane: '#1d1612', cloth: '#2f7a3a', trim: '#d4af37', seed: 3 }); H.scale.setScalar(1.75); H.position.set(0.4, 0, -0.4); H.rotation.y = -1.25; H.userData.dynamic = true; Ip.add(H);
+  // the horse is slimmer across the barrel than it is long, so a full-size rider's legs clear its flanks
+  const H = horse({ coat: '#5a3a26', mane: '#1d1612', cloth: '#2f7a3a', trim: '#d4af37', seed: 3 }); H.scale.set(1.12, 1.48, 1.48); H.position.set(0.4, 0, -0.4); H.rotation.y = -1.25; H.userData.dynamic = true; Ip.add(H);
   const ped2 = K.role(Ip, 'pedro', 0, 0, 0); K.hold(ped2, N.sabre(), 'R', [0, -0.01, 0.02], [0, 0, 0], 1.0);
   const guard = K.crowd(Ip, 'brasileno', 9, [-4.8, -4.0, 4.8, -1.8], { seed: 121, yaw: 0.2 });
   // ---- the Empire of Brazil
@@ -73,9 +74,9 @@ export function build(ctx) {
         + U.bubble(ctx, [1.0, 2.45, -9.6], '¡Me quedo! ¡El destino no existe!', fade(t, tQue - 0.5, tE), { size: 24 })
         + U.source(t, tQue - 0.2, tE + 0.2, '«Dia do Fico»: 9 de enero de 1822');
     } },
-    { t0: tE, set: Ip, p0: [1.0, 1.9, 5.4], l0: [0.2, 1.7, -0.4], p1: [0.8, 1.85, 4.6], l1: [0.2, 1.75, -0.4], fov0: 44, act: (t) => {
+    { t0: tE, set: Ip, p0: [-0.7, 1.25, 4.1], l0: [0.15, 1.62, -0.45], p1: [-0.55, 1.2, 3.4], l1: [0.15, 1.68, -0.45], fov0: 46, act: (t) => {
       const up = ss(tGri - 0.4, tGri + 0.2, t); animateHorse(H, t, 'stand', { seed: 3, rear: 0.6 * up * (1 - ss(tMue + 0.6, tMue + 1.4, t)) });
-      const p = ridePose(t, 3); const s2 = A.swordUp(t, 3, up); p.armR = s2.armR; p.elbR = s2.elbR; p.head = [-6 * up, 0, 0]; K.pose(ped2, p); seatOn(ped2, H, 0.86); ped2.setFace(C.blinkEye(t, 3), up > 0.5 ? 'shout' : 'neutral');
+      const p = ridePose(t, 3); p.thL = [-46, -6, 34]; p.thR = [-46, 6, -34]; p.knL = [62, 0, 0]; p.knR = [62, 0, 0]; const s2 = A.swordUp(t, 3, up); p.armR = s2.armR; p.elbR = s2.elbR; p.armL = [-34, -14, -50]; p.elbL = [0, -64, 0]; p.head = [-6 * up, 0, 0]; K.pose(ped2, p); K.rideOn(ped2, H); ped2.setFace(C.blinkEye(t, 3), up > 0.5 ? 'shout' : 'neutral');
       guard.forEach((c, i) => K.pose(c, t > tGri ? (i % 2 ? A.swordUp(t, i, 1) : C.cheer(t, i)) : C.idle(t, i)));
       return U.film(t) + U.datePage(t, tE + 0.2, tGri - 0.2, 'Arroyo Ipiranga, São Paulo', 'SEPT.', '7', '1822', { x: 1640, y: 90, accent: '#2f7a3a', w: 250 })
         + U.shout(t, '¡Independencia o muerte!', tInd - 0.2, tF + 0.2, 110) + U.source(t, tGri, tF + 0.2, 'La frase viene de relatos escritos años después');

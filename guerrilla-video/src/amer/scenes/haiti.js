@@ -50,7 +50,7 @@ export function build(ctx) {
   const des = K.role(Vt, 'dessalines', -1.4, 1.2, 0.5);
   const hai = K.crowd(Vt, 'haitiano', 9, [-5.2, -1.2, -1.0, 1.0], { seed: 54, yaw: 0.6, yawJ: 0.15 });
   const frn = K.crowd(Vt, 'frances1802', 8, [1.6, -4.4, 5.4, -2.2], { seed: 55, yaw: -0.6, yawJ: 0.15 });
-  const vF = RP.volleyFx(Vt, frn.map(c => c.root.position.clone().add(new THREE.Vector3(-0.3, 0.55, 0.3)))), vH = RP.volleyFx(Vt, hai.map(c => c.root.position.clone().add(new THREE.Vector3(0.3, 0.55, -0.3))));
+  const vF = P.volleySmoke(Vt, frn.map(c => c.root.position.clone().add(new THREE.Vector3(-0.3, 0.55, 0.3)))), vH = P.volleySmoke(Vt, hai.map(c => c.root.position.clone().add(new THREE.Vector3(0.3, 0.55, -0.3))));
   // ---- Gonaïves, 1 Jan 1804
   const Go = S.tropics('day', { cane: false, mill: false, seed: 551 });
   const des2 = K.role(Go, 'dessalines', 0.3, -0.6, 0);

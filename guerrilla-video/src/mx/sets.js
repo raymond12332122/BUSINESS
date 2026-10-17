@@ -76,7 +76,7 @@ export function interior({ wall = '#7a2f2a', floor = '#5a3a24', w = 12, d = 10, 
     if (!bulbs) continue;
     const ch = new THREE.Mesh(new THREE.SphereGeometry(0.18, 10, 8), new THREE.MeshBasicMaterial({ color: '#fff0c8' })); ch.position.set(x, y + 0.25, z); s.add(ch); }
   s.background = new THREE.Color('#1a120c');
-  s.userData = { sun, hemi: s.children[0], interior: true };
+  s.userData = { sun, hemi: s.children[0], interior: true, room: { w, d, h, wall, floor, fl, wm, back, windows } };
   return s;
 }
 // Port (Veracruz): water, pier, warehouses.

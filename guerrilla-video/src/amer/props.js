@@ -150,3 +150,122 @@ export function bell(s = 1) {
 export function crownCushion() {
   const g = new THREE.Group(); const c = N.cushion('#8a1f2a'); g.add(c); const cr = N.crown(); cr.scale.setScalar(0.7); cr.position.y = 0.08; g.add(cr); return g;
 }
+
+// ------------------------------------------------------------ palace tea service and royal fittings
+export function teapot(col = '#f4efe6', trim = '#3a5a9a') {
+  const g = new THREE.Group(), por = std(col, { roughness: 0.25 }), tr = std(trim, { roughness: 0.3 });
+  const body = mesh(new THREE.SphereGeometry(0.09, 18, 14), por); body.scale.set(1, 0.82, 1); body.position.y = 0.075; g.add(body);
+  g.add(at(mesh(new THREE.TorusGeometry(0.09, 0.006, 6, 24), tr), 0, 0.075, 0, Math.PI / 2, 0, 0));
+  const lid = mesh(new THREE.SphereGeometry(0.05, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), por); lid.position.y = 0.135; g.add(lid);
+  g.add(at(mesh(new THREE.SphereGeometry(0.014, 8, 6), tr), 0, 0.19, 0));
+  const sp = mesh(new THREE.CylinderGeometry(0.012, 0.022, 0.12, 8), por); sp.position.set(0.1, 0.1, 0); sp.rotation.z = -0.9; g.add(sp);
+  g.add(at(mesh(new THREE.TorusGeometry(0.045, 0.01, 6, 14, Math.PI * 1.3), por), -0.095, 0.085, 0, 0, 0, Math.PI * 0.4));
+  return g;
+}
+export function cupOnly() {   // teacup without its saucer (the saucer goes in the other hand)
+  const g = new THREE.Group(), w = std('#f6f2ea', { roughness: 0.3 });
+  g.add(at(mesh(new THREE.CylinderGeometry(0.045, 0.032, 0.055, 16, 1, true), std('#f6f2ea', { roughness: 0.3, side: THREE.DoubleSide })), 0, 0.028, 0));
+  g.add(at(mesh(new THREE.CircleGeometry(0.042, 16), std('#7a4a22', { roughness: 0.2 })), 0, 0.046, 0, -Math.PI / 2, 0, 0));
+  g.add(at(mesh(new THREE.CircleGeometry(0.032, 14), w), 0, 0.001, 0, Math.PI / 2, 0, 0));
+  g.add(at(mesh(new THREE.TorusGeometry(0.016, 0.0045, 5, 10), w), 0.05, 0.03, 0));
+  g.add(at(mesh(new THREE.TorusGeometry(0.045, 0.003, 4, 20), std('#d4af37', { metalness: 0.6, roughness: 0.3 })), 0, 0.055, 0, Math.PI / 2, 0, 0));
+  return g;
+}
+export function saucer() { const g = new THREE.Group(); g.add(at(mesh(new THREE.CylinderGeometry(0.075, 0.06, 0.012, 20), std('#f6f2ea', { roughness: 0.3 })), 0, 0, 0));
+  g.add(at(mesh(new THREE.TorusGeometry(0.072, 0.003, 4, 24), std('#d4af37', { metalness: 0.6, roughness: 0.3 })), 0, 0.006, 0, Math.PI / 2, 0, 0)); return g; }
+export function cakeStand() {
+  const g = new THREE.Group(), gold = std('#d4af37', { metalness: 0.6, roughness: 0.3 }), por = std('#f6f2ea', { roughness: 0.3 });
+  g.add(at(cyl(0.01, 0.01, 0.42, '#d4af37', 8), 0, 0.21, 0));
+  const cols = ['#f2b8c6', '#f6e3a8', '#c8e0b0', '#e8c49a', '#f4f1ea'];
+  [[0.16, 0.04], [0.12, 0.18], [0.085, 0.31]].forEach(([r, y], i) => { g.add(at(mesh(new THREE.CylinderGeometry(r, r * 0.9, 0.01, 22), por), 0, y, 0));
+    const n = 5 + (2 - i) * 2; for (let k = 0; k < n; k++) { const a = k / n * Math.PI * 2, cake = mesh(new THREE.CylinderGeometry(0.024, 0.026, 0.026, 10), std(cols[(k + i) % cols.length], { roughness: 0.6 }));
+      cake.position.set(Math.cos(a) * r * 0.62, y + 0.018, Math.sin(a) * r * 0.62); g.add(cake); g.add(at(mesh(new THREE.SphereGeometry(0.009, 6, 4), std('#c0303a')), cake.position.x, y + 0.036, cake.position.z)); } });
+  g.add(at(mesh(new THREE.TorusGeometry(0.03, 0.006, 6, 12), gold), 0, 0.44, 0));
+  return g;
+}
+export function teaTable(cloth = '#f4f1ea') {
+  const g = new THREE.Group(), wood = std('#5a3420', { roughness: 0.4 });
+  g.add(at(mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.04, 28), wood), 0, 0.72, 0));
+  g.add(at(mesh(new THREE.CylinderGeometry(0.47, 0.5, 0.12, 28, 1, true), std(cloth, { side: THREE.DoubleSide, roughness: 0.9 })), 0, 0.68, 0));
+  g.add(at(cyl(0.05, 0.07, 0.68, '#5a3420', 10), 0, 0.36, 0));
+  for (let i = 0; i < 3; i++) { const a = i / 3 * Math.PI * 2, l = mesh(new THREE.BoxGeometry(0.06, 0.05, 0.36), wood); l.position.set(Math.cos(a) * 0.16, 0.03, Math.sin(a) * 0.16); l.rotation.y = -a + Math.PI / 2; g.add(l); }
+  const tp = teapot(); tp.position.set(-0.18, 0.74, 0.05); g.add(tp);
+  const cs = cakeStand(); cs.position.set(0.16, 0.74, -0.1); g.add(cs);
+  for (const [x, z] of [[-0.05, 0.28], [0.25, 0.22]]) { const sc = saucer(); sc.position.set(x, 0.745, z); g.add(sc); const c = cupOnly(); c.position.set(x, 0.752, z); g.add(c); }
+  return g;
+}
+// The royal arms on a cloth of estate: shield quartered (England, Scotland, Ireland, Hanover) under a crown.
+export function clothOfEstate(w = 2.2, h = 3.4, fabric = '#7a1424') {
+  const tex = canvasTex(256, Math.round(256 * h / w), (g, W, H) => {
+    g.fillStyle = fabric; g.fillRect(0, 0, W, H);
+    g.fillStyle = 'rgba(212,175,55,0.18)'; for (let j = 0; j < 9; j++) for (let i = 0; i < 6; i++) { g.beginPath(); g.arc(i * W / 5 + (j % 2) * W / 10, j * H / 8, 5, 0, 7); g.fill(); }
+    const cx = W / 2, cy = H * 0.42, sw = W * 0.34, sh = W * 0.42;
+    g.fillStyle = '#d4af37'; g.beginPath(); g.moveTo(cx - sw * 0.6, cy - sh * 0.62); for (let k = 0; k <= 4; k++) g.lineTo(cx - sw * 0.6 + k * sw * 0.3, cy - sh * 0.62 - (k % 2 ? 26 : 12)); g.lineTo(cx + sw * 0.6, cy - sh * 0.52); g.lineTo(cx - sw * 0.6, cy - sh * 0.52); g.fill();
+    g.save(); g.beginPath(); g.moveTo(cx - sw / 2, cy - sh / 2); g.lineTo(cx + sw / 2, cy - sh / 2); g.lineTo(cx + sw / 2, cy + sh * 0.1); g.quadraticCurveTo(cx + sw / 2, cy + sh / 2, cx, cy + sh * 0.62); g.quadraticCurveTo(cx - sw / 2, cy + sh / 2, cx - sw / 2, cy + sh * 0.1); g.closePath(); g.clip();
+    [['#c0272d', 0, 0], ['#d4af37', 1, 0], ['#2a4fa0', 0, 1], ['#c0272d', 1, 1]].forEach(([c, i, j]) => { g.fillStyle = c; g.fillRect(cx - sw / 2 + i * sw / 2, cy - sh / 2 + j * sh * 0.56, sw / 2, sh * 0.56); });
+    g.fillStyle = '#d4af37'; for (const [i, j] of [[0, 0], [1, 1]]) for (let k = 0; k < 3; k++) g.fillRect(cx - sw / 2 + i * sw / 2 + sw * 0.12, cy - sh / 2 + j * sh * 0.56 + 12 + k * 16, sw * 0.26, 6);
+    g.restore(); g.strokeStyle = '#d4af37'; g.lineWidth = 4; g.strokeRect(10, 10, W - 20, H - 20);
+  });
+  const m = mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.85 })); return m;
+}
+export function canopy(w = 2.6, d = 1.4, fabric = '#7a1424') {
+  const g = new THREE.Group(), gold = std('#d4af37', { metalness: 0.6, roughness: 0.35 });
+  g.add(at(box(w, 0.16, d, fabric), 0, 0, 0)); g.add(at(box(w + 0.06, 0.05, d + 0.06, '#d4af37'), 0, 0.09, 0));
+  for (let i = 0; i < 26; i++) { const x = -w / 2 + (i + 0.5) * w / 26; const f = mesh(new THREE.ConeGeometry(0.035, 0.16, 6), gold); f.rotation.x = Math.PI; f.position.set(x, -0.15, d / 2 + 0.01); g.add(f); }
+  const crown = mesh(new THREE.SphereGeometry(0.16, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), gold); crown.position.set(0, 0.08, d / 2 - 0.1); g.add(crown);
+  g.add(at(mesh(new THREE.SphereGeometry(0.04, 8, 6), gold), 0, 0.26, d / 2 - 0.1));
+  return g;
+}
+export function footstool(col = '#7a1424') { const g = new THREE.Group(); g.add(at(box(0.6, 0.14, 0.36, col), 0, 0.12, 0)); for (const [x, z] of [[-0.25, -0.13], [0.25, -0.13], [-0.25, 0.13], [0.25, 0.13]]) g.add(at(cyl(0.02, 0.025, 0.08, '#d4af37', 6), x, 0.04, z)); return g; }
+
+// Musket volley smoke for this video: grey and translucent, blown forward from the muzzles so the shooters stay visible.
+let PUFF = null;
+function puffTex() { return PUFF || (PUFF = canvasTex(128, 128, (g, W, H) => { const gr = g.createRadialGradient(W / 2, H / 2, 0, W / 2, H / 2, W / 2);
+  gr.addColorStop(0, 'rgba(255,255,255,0.9)'); gr.addColorStop(0.45, 'rgba(255,255,255,0.45)'); gr.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = gr; g.fillRect(0, 0, W, H); })); }
+export function volleySmoke(parent, origins, { color = '#b9b4aa', size = 0.34, opacity = 0.5 } = {}) {
+  const puffs = [], flashes = [];
+  origins.forEach((o, i) => {
+    for (let k = 0; k < 3; k++) { const m = new THREE.Sprite(new THREE.SpriteMaterial({ map: puffTex(), color, transparent: true, depthWrite: false })); m.visible = false; parent.add(m); puffs.push([m, o, k, i]); }
+    const f = new THREE.Sprite(new THREE.SpriteMaterial({ map: puffTex(), color: '#ffcf70', transparent: true, depthWrite: false, blending: THREE.AdditiveBlending })); f.visible = false; parent.add(f); flashes.push([f, o]);
+  });
+  return (t, tv, dir = new THREE.Vector3(0, 0, 1)) => {
+    const u = t - tv;
+    for (const [m, o, k, i] of puffs) { const v = u - k * 0.06 - (i % 3) * 0.03; m.visible = v > 0 && v < 2.6; if (!m.visible) continue; const e = 1 - Math.exp(-v * 2.4);
+      m.position.copy(o).addScaledVector(dir, 0.45 + 0.9 * e + k * 0.22).add(new THREE.Vector3(0, 0.18 * v + k * 0.04, 0)); m.scale.setScalar(size * (0.35 + 1.4 * e + k * 0.15)); m.material.opacity = opacity * (1 - v / 2.6); }
+    for (const [f, o] of flashes) { f.visible = u > 0 && u < 0.08; if (f.visible) { f.position.copy(o).addScaledVector(dir, 0.18); f.scale.setScalar(0.32); f.material.opacity = 1; } }
+  };
+}
+
+// ------------------------------------------------------------ plaza furniture
+export function fountain(r = 1.6) {
+  const g = new THREE.Group(), stone = std('#d8ccb4', { roughness: 0.85 }), dark = std('#b8ac94', { roughness: 0.9 });
+  g.add(at(mesh(new THREE.CylinderGeometry(r, r * 1.04, 0.5, 8), stone), 0, 0.25, 0));
+  const water = mesh(new THREE.CircleGeometry(r * 0.92, 24), new THREE.MeshStandardMaterial({ color: '#4f8aa8', roughness: 0.15, metalness: 0.2 })); water.rotation.x = -Math.PI / 2; water.position.y = 0.42; g.add(water);
+  g.add(at(mesh(new THREE.CylinderGeometry(0.16, 0.24, 1.3, 10), dark), 0, 0.95, 0));
+  g.add(at(mesh(new THREE.CylinderGeometry(0.6, 0.18, 0.22, 12), stone), 0, 1.55, 0));
+  g.add(at(mesh(new THREE.CylinderGeometry(0.1, 0.14, 0.5, 8), dark), 0, 1.85, 0));
+  g.add(at(mesh(new THREE.SphereGeometry(0.16, 10, 8), stone), 0, 2.15, 0));
+  const jet = mesh(new THREE.ConeGeometry(0.55, 0.9, 16, 1, true), new THREE.MeshBasicMaterial({ color: '#cfe8f4', transparent: true, opacity: 0.32, side: THREE.DoubleSide, depthWrite: false }));
+  jet.position.y = 1.2; jet.rotation.x = Math.PI; g.add(jet);
+  return g;
+}
+export function stall(awning = '#c0392b', seed = 1) {
+  const g = new THREE.Group(), wood = std('#6a4a2c'), r = rng(seed);
+  for (const [x, z] of [[-0.9, -0.5], [0.9, -0.5], [-0.9, 0.5], [0.9, 0.5]]) g.add(at(cyl(0.04, 0.04, 2.0, '#6a4a2c', 6), x, 1.0, z));
+  g.add(at(box(2.0, 0.08, 1.1, '#7a5636'), 0, 0.8, 0));
+  const tex = canvasTex(128, 64, (c, W, H) => { for (let i = 0; i < 8; i++) { c.fillStyle = i % 2 ? '#f4efe2' : awning; c.fillRect(i * W / 8, 0, W / 8, H); } });
+  const aw = mesh(new THREE.PlaneGeometry(2.3, 1.4), new THREE.MeshStandardMaterial({ map: tex, side: THREE.DoubleSide, roughness: 0.9 })); aw.position.set(0, 2.05, 0.15); aw.rotation.x = -Math.PI / 2 + 0.35; g.add(aw);
+  const fruit = ['#e8a030', '#c0302a', '#7aa83a', '#f2d04a', '#9a3a6a'];
+  for (let i = 0; i < 4; i++) { const cr = box(0.42, 0.18, 0.34, '#8a6a42'); cr.position.set(-0.7 + i * 0.47, 0.93, 0.05); g.add(cr);
+    for (let k = 0; k < 6; k++) g.add(at(mesh(new THREE.SphereGeometry(0.05, 8, 6), std(fruit[(i + k) % fruit.length], { roughness: 0.5 })), -0.82 + i * 0.47 + (k % 3) * 0.1, 1.05, -0.03 + Math.floor(k / 3) * 0.12)); }
+  return g;
+}
+export function lampPost(h = 3.0) {
+  const g = new THREE.Group(), iron = std('#2a2a2c', { roughness: 0.5, metalness: 0.4 });
+  g.add(at(cyl(0.05, 0.08, h, '#2a2a2c', 8), 0, h / 2, 0));
+  g.add(at(mesh(new THREE.CylinderGeometry(0.16, 0.1, 0.32, 6, 1, true), new THREE.MeshStandardMaterial({ color: '#fff2c8', emissive: '#ffcf80', emissiveIntensity: 0.25, transparent: true, opacity: 0.85, side: THREE.DoubleSide })), 0, h + 0.12, 0));
+  g.add(at(mesh(new THREE.ConeGeometry(0.2, 0.18, 6), iron), 0, h + 0.36, 0));
+  return g;
+}
+export function bench() { const g = new THREE.Group(); g.add(at(box(1.6, 0.08, 0.42, '#7a5636'), 0, 0.45, 0)); g.add(at(box(1.6, 0.36, 0.06, '#7a5636'), 0, 0.68, -0.2));
+  for (const x of [-0.7, 0.7]) g.add(at(box(0.08, 0.45, 0.4, '#2a2a2c'), x, 0.22, 0)); return g; }

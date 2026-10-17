@@ -3,6 +3,7 @@
 import * as C from '../lib/chars.js';
 import { ss, clamp } from '../lib/util.js';
 export * from '../ww1/anim.js';
+import { sit } from '../mx/anim.js';
 const { sin, cos, max, abs } = Math;
 
 // Pulling a bell rope with both hands (Dolores).
@@ -36,3 +37,11 @@ export function fangirl(t, seed = 0) { const b = abs(sin(t * 7 + seed)), p = C.i
 export function diva(t, seed = 0) { const p = C.idle(t, seed, 0.3), w = sin(t * 2 + seed) * 6; p.armR = [-10, 0, -20 + w]; p.elbR = [0, 0, -10]; p.armL = [-70, -10, -70]; p.elbL = [0, -60, 0]; p.chest = [-8, 0, 0]; p.head = [-14, 10, 0]; return p; }
 // Facepalm (Teio hearing Rudolf's pun): right hand to the forehead.
 export function facepalm(t, seed = 0) { const p = C.idle(t, seed, 0.3); p.armR = [-70, 30, 30]; p.elbR = [0, 120, 0]; p.head = [16, 0, 0]; return p; }
+
+// Seated with a teacup (right hand, lifted to the lips at k = 1) and its saucer held at the lap (left hand).
+export function sitTea(t, seed = 0, k = 0) {
+  const p = sit(t, seed, 2);
+  p.armR = [-30 - 48 * k, 18 + 8 * k, 70 - 36 * k]; p.elbR = [0, 40 + 76 * k, 0];
+  p.armL = [-28, -16, -62]; p.elbL = [0, -66, 0];
+  p.head = [8 * k + 4, 0, 0]; return p;
+}

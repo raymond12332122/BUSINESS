@@ -60,7 +60,7 @@ export function build(ctx) {
       K.pose(jos, A.proud(t, 4)); jos.setFace(C.blinkEye(t, 4), 'neutral'); jos.hat.visible = k > 0.5;
       return U.film(t) + U.badge(t, 'Bayona, mayo de 1808', 'Las abdicaciones', 'Fernando VII y Carlos IV ceden la corona', tB + 0.2, tC + 0.1)
         + U.pin(ctx, [-1.25, 1.35, -0.8], 'Fernando VII', '', fade(t, tBay - 0.2, tC + 0.2), '#c0392b') + U.pin(ctx, [1.25, 1.35, -0.8], 'José Bonaparte', 'rey de España', fade(t, tJos - 0.2, tC + 0.2), '#2a4fa0')
-        + CARD(t, 'fernando', tBay - 0.3, tC + 0.2, { side: 'r', top: 300, w: 560 }) + U.bubble(ctx, [-1.25, 1.55, -0.8], '¿Otra vez pierdo un imperio?', fade(t, tJos, tC - 0.1), { size: 24 });
+        + CARD(t, 'fernando', tBay - 0.3, tC + 0.2, { side: 'l', top: 96, w: 600 }) + U.bubble(ctx, [-1.25, 1.55, -0.8], '¿Otra vez pierdo un imperio?', fade(t, tJos, tC - 0.1), { size: 24 });
     } },
     { t0: tC, set: Ca, p0: [0, 1.6, 4.2], l0: [0, 1.5, -2.2], p1: [0, 1.5, 3.4], l1: [0, 1.4, -2.2], fov0: 46, act: (t) => {
       vec.forEach((c, i) => { K.pose(c, i % 3 === 1 ? A.talk(t, i) : i % 3 === 2 ? A.fist(t, i) : C.idle(t, i)); c.setFace(C.blinkEye(t, i), i % 2 ? 'open' : 'neutral'); });

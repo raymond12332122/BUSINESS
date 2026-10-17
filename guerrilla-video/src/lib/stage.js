@@ -12,8 +12,8 @@ export function stage({ skyTop = '#5b8fd8', skyHor = '#d6e7f3', groundA = '#7fae
   dl.shadow.mapSize.set(2048, 2048); dl.shadow.bias = -0.0004; dl.shadow.normalBias = 0.02;
   Object.assign(dl.shadow.camera, { left: -shadow, right: shadow, top: shadow, bottom: -shadow, near: 0.5, far: 80 });
   scene.add(dl); scene.add(dl.target);
-  if (groundA) scene.add(P.ground(groundSize, groundA, groundB, seed, bumps));
-  scene.userData = { sun: dl, hemi: hl, sky: skyMesh };
+  const gm = groundA ? P.ground(groundSize, groundA, groundB, seed, bumps) : null; if (gm) scene.add(gm);
+  scene.userData = { sun: dl, hemi: hl, sky: skyMesh, ground: gm, groundSize };
   return scene;
 }
 // Keep the shadow frustum centred on the action.
