@@ -41,6 +41,14 @@ export function build(ctx) {
   const guards = [['suzuka', -2.9], ['oguri', 2.9]].map(([w, x]) => K.person(Ld, w, 'casaca', x, -2.1, 0));
   // ---- Boston harbour, 16 Dec 1773
   const Bo = S.harbor({ light: 'night', ships: 1 });
+  // Griffin's Wharf at night: Boston houses with lit windows behind the wharf, and a cool moonlight fill from the water
+  { const rnd = LP.rng(77), lit = new THREE.MeshBasicMaterial({ color: new THREE.Color(1.45, 1.0, 0.5) });
+    for (let i = 0; i < 6; i++) {
+      const w = 3.2 + (i % 2) * 0.6, h = 4.4 + ((i * 7) % 3) * 0.5;
+      const th = N.townhouseFR(w, h, ['#8a4a3a', '#6a5a4a', '#9a5a44', '#5a4a40', '#7a3a30', '#8a6a52'][i], i + 60); th.position.set(-10.5 + i * 4.1, 0, -2.2); th.rotation.y = Math.PI; Bo.add(th);
+      for (let f = 0; f < 3; f++) for (let k = 0; k < Math.floor(w / 0.9); k++) if (rnd() < 0.45) { const q = new THREE.Mesh(new THREE.PlaneGeometry(0.36, 0.76), lit); q.position.set(-w / 2 + 0.5 + k * 0.9, 0.9 + f * 1.2, 1.34); th.add(q); }
+    }
+    const fill = new THREE.PointLight('#9fb4ff', 5, 12, 1.3); fill.position.set(1.0, 2.6, -14.2); Bo.add(fill); }
   const thrower = [['spe', -3.0], ['tamamo', -1.6], ['golshiC', -0.2], ['oguri', 1.2], ['doto', 2.6]].map(([w, x], i) => { const c = w === 'golshiC' ? K.role(Bo, 'golshiC', x, -10.8, Math.PI) : K.person(Bo, w, 'colono', x, -10.8, Math.PI); c.root.position.y = 0.73; return c; });
   const chests = thrower.map((c, i) => { const ch = P.teaChest(i); ch.userData.dynamic = true; Bo.add(ch); return ch; });
   const splash = thrower.map(() => { const r = F.ring('#e8f2ff', 0.4); r.rotation.x = -Math.PI / 2; r.userData.dynamic = true; Bo.add(r); return r; });
@@ -86,7 +94,7 @@ export function build(ctx) {
     { t0: 0, set: Ld, p0: [-5.2, 2.3, 6.4], l0: [1.2, 1.9, -3.4], p1: [-4.2, 2.1, 5.0], l1: [1.0, 1.8, -3.6], fov0: 44, act: (t) => londonAct(t) },
     { t0: 3.6, set: Ld, p0: [-1.5, 1.62, -0.9], l0: [0.25, 1.38, -4.2], p1: [-1.25, 1.58, -1.4], l1: [0.25, 1.36, -4.2], fov0: 34, act: (t) => londonAct(t)
       + U.quoteAt(t, [['Ningún impuesto', tImp - 0.2], ['sin representación', tRep - 0.2]], 'Lema de los colonos', tImp - 0.3, tB + 0.2, { left: 1080, top: 600, w: 760 }) },
-    { t0: tB, set: Bo, p0: [4.6, 1.75, -7.9], l0: [-0.8, 1.25, -12.0], p1: [3.7, 1.65, -8.4], l1: [-0.9, 1.2, -12.0], fov0: 44, act: (t) => {
+    { t0: tB, set: Bo, p0: [2.6, 1.05, -15.4], l0: [-0.3, 1.45, -10.6], p1: [2.0, 1.1, -14.8], l1: [-0.3, 1.45, -10.6], fov0: 46, act: (t) => {   // from the water: the raiders face us as the chests come over
       Bo.sea.wave(t);
       thrower.forEach((c, i) => { const u = throwU(t, i); K.pose(c, u < 0 ? C.idle(t, i) : A.heave(t, u, i)); c.setFace(C.blinkEye(t, i), u > 0.5 && u < 0.9 ? 'open' : 'smile');
         const ch = chests[i], sp = splash[i]; ch.visible = u >= 0 && u < 0.98;
