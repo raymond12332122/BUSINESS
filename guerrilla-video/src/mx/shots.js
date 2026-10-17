@@ -17,7 +17,8 @@ export function runShots(inst, ctx, shots, t) {
   if (s.shake) { const k = s.shake(t); cam.position.x += Math.sin(t * 61) * k; cam.position.y += Math.sin(t * 47 + 1) * k; }
   cam.lookAt(...s.l0.map((v, k) => v + (l1[k] - v) * e));
   const fov = (s.fov0 || 38) + ((s.fov1 || s.fov0 || 38) - (s.fov0 || 38)) * e;
-  if (cam.fov !== fov) { cam.fov = fov; cam.updateProjectionMatrix(); }
+  const near = s.set?.userData?.near || 0.1;   // far-away sets (continental maps) ask for a deeper near plane to keep depth precision
+  if (cam.fov !== fov || cam.near !== near) { cam.fov = fov; cam.near = near; cam.updateProjectionMatrix(); }
   inst.current = s.set;
   if (s.sun) s.sun(t);
   return (s.act ? s.act(t, u, t - s.t0) : '') || '';

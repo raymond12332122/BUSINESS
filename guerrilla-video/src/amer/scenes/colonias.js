@@ -20,8 +20,8 @@ export function build(ctx) {
   const tB = tPor - 0.35, tC = tFra - 0.3, tD = L[2].t0 - 0.35;
 
   const Mp = AM.americasMap({ period: 'virr' });
-  const pCal = AM.pulse(Mp, -120, 37, '#c0392b', 3.5), pPat = AM.pulse(Mp, -69, -48, '#c0392b', 3.5), pSD = AM.pulse(Mp, -72.4, 19.1, '#2a4fa0', 1.0);
-  const VIRR = [['NUEVA ESPAÑA', -104, 25, tNE], ['PERÚ', -75, -10, tPer], ['RÍO DE LA PLATA', -63, -30, tRio], ['NUEVA GRANADA', -74, 3, tVir + 0.2], ['GUATEMALA', -88.5, 14.6, tVir + 0.35], ['CHILE', -71.5, -36, tVir + 0.5]];
+  const pCal = AM.pulse(Mp, -120, 37, '#c0392b', 3.5), pPat = AM.pulse(Mp, -68.5, -42, '#c0392b', 3.5), pSD = AM.pulse(Mp, -72.4, 19.1, '#2a4fa0', 1.0);
+  const VIRR = [['NUEVA ESPAÑA', -104, 25, tNE], ['PERÚ', -75, -10, tPer], ['RÍO DE LA PLATA', -62, -25.5, tRio], ['NUEVA GRANADA', -74, 3, tVir + 0.2], ['GUATEMALA', -88.5, 14.6, tVir + 0.35], ['CHILE', -71.5, -31.5, tVir + 0.5]];
   const [hx, , hz] = AM.apos(-72.5, 19.0);
   // ---- colonial plaza: who was who
   const Pz = S.plaza('day', { arcade: true });
@@ -36,11 +36,11 @@ export function build(ctx) {
     { t: tD, type: 'crowd', dur: ctx.dur - tD, vol: 0.25 }, ...[tMan, tCri, tInd, tEsc].map(x => ({ t: x, type: 'tick', vol: 0.32 }))];
 
   const shots = [
-    { t0: 0, set: Mp, p0: [0, 300, 92], l0: [0, 0, -2], p1: [4, 270, 92], l1: [4, 0, 6], fov0: 40, act: (t) => {
+    { t0: 0, set: Mp, p0: [0, 330, 106], l0: [0, 0, 12], p1: [4, 270, 92], l1: [4, 0, 6], fov0: 40, act: (t) => {
       Mp.paint('virr'); Mp.zoom(3.2); Mp.tintState('virr', 'ESP', '#ffffff', 0, 0);
       for (const st of ['V_NES', 'V_GUA', 'V_NGR', 'V_VEN', 'V_PER', 'V_RPL', 'V_CHL', 'V_CUB']) Mp.tintState('virr', st, '#f2b636', ss(tEsp - 0.2, tEsp + 0.4, t) * (1 - ss(tVir - 0.2, tVir + 0.5, t)), 0.5);
       pCal.update(t, tCal - 0.1, tB); pPat.update(t, tPat - 0.1, tB);
-      return U.film(t) + AM.chip(ctx, -120, 37, fade(t, tCal - 0.1, tVir), 'California', '', '#c0392b', 2) + AM.chip(ctx, -69, -48, fade(t, tPat - 0.1, tVir + 0.6), 'Patagonia', '', '#c0392b', 2)
+      return U.film(t) + AM.chip(ctx, -120, 37, fade(t, tCal - 0.1, tVir), 'California', '', '#c0392b', 2) + AM.chip(ctx, -68.5, -42, fade(t, tPat - 0.1, tVir + 0.6), 'Patagonia', '', '#c0392b', 2)
         + VIRR.map(([n, lo, la, ta]) => AM.areaLabel(ctx, lo, la, n, fade(t, ta - 0.15, tB + 0.3), 'st', 24)).join('')
         + U.badge(t, 'Hacia 1775', 'El Imperio español', 'Virreinatos y capitanías generales', 0.4, tVir);
     } },

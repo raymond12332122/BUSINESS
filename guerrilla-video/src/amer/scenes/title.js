@@ -39,7 +39,7 @@ export function build(ctx) {
   // ---- map: 1775 -> 1825
   const Mp = AM.americasMap({ period: 1775 });
   const NEW = [['USA', 'ESTADOS UNIDOS', -96, 40], ['HTI', 'HAITÍ', -72.5, 19.2], ['MEX', 'MÉXICO', -102, 24], ['CAM', 'CENTROAMÉRICA', -87, 14.2], ['GCO', 'GRAN COLOMBIA', -72, 5],
-    ['PER', 'PERÚ', -75, -9.5], ['BOL', 'BOLIVIA', -64.5, -17], ['CHL', 'CHILE', -71, -30], ['ARG', 'PROVINCIAS UNIDAS', -64, -34], ['PRY', 'PARAGUAY', -58, -23.2], ['BRA', 'BRASIL', -50, -10]];
+    ['PER', 'PERÚ', -75, -9.5], ['BOL', 'BOLIVIA', -64.5, -17], ['CHL', 'CHILE', -72.5, -27], ['ARG', 'PROVINCIAS UNIDAS', -63.5, -31], ['PRY', 'PARAGUAY', -58, -23.2], ['BRA', 'BRASIL', -50, -10]];
   const EMP = [['ESP', 'IMPERIO ESPAÑOL', -66, -22], ['GBR', 'IMPERIO BRITÁNICO', -95, 56], ['POR', 'PORTUGAL', -50, -8], ['FRA', 'FRANCIA', -72.5, 19.4]];
   // ---- theatre line-up
   const Th = S.theater(); Th.backdrop.material.map = AM.paperMap(1024, 512, { title: 'Las Américas · 1775–1825' }); Th.backdrop.material.needsUpdate = true;
