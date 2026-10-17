@@ -389,8 +389,11 @@ export function motes(parent, box, n = 120, seed = 3) {
   for (let i = 0; i < n; i++) pos.push(box[0] + r() * (box[3] - box[0]), box[1] + r() * (box[4] - box[1]), box[2] + r() * (box[5] - box[2]));
   const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
   const m = new THREE.PointsMaterial({ color: '#fff0d0', size: 0.02, transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending });
-  m.onBeforeCompile = sh => { sh.uniforms.gTime = GTIME; sh.vertexShader = 'uniform float gTime;\n' + sh.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
-    transformed.y += mod(gTime * 0.05 + position.x * 3.1, 0.6) - 0.3; transformed.x += 0.08 * sin(gTime * 0.4 + position.z * 5.0);`); };
+  // a mote drifting right past the lens must not blow up into a big square: cap its size and fade it out near the camera
+  m.onBeforeCompile = sh => { sh.uniforms.gTime = GTIME; sh.vertexShader = 'uniform float gTime;\nvarying float vFade;\n' + sh.vertexShader.replace('#include <begin_vertex>', `#include <begin_vertex>
+    transformed.y += mod(gTime * 0.05 + position.x * 3.1, 0.6) - 0.3; transformed.x += 0.08 * sin(gTime * 0.4 + position.z * 5.0);`)
+    .replace('#include <fog_vertex>', '#include <fog_vertex>\n  gl_PointSize = min(gl_PointSize, 3.5); vFade = smoothstep(0.6, 1.6, -mvPosition.z);');
+    sh.fragmentShader = 'varying float vFade;\n' + sh.fragmentShader.replace('#include <color_fragment>', '#include <color_fragment>\n  diffuseColor.a *= vFade;'); };
   const p = new THREE.Points(g, m); parent.add(p); return p;
 }
 export function curtain(w = 1.0, h = 3.2, color = '#8a1f2a') {
