@@ -30,7 +30,8 @@ export function build(ctx) {
   // ---- Junín, 6 Aug 1824: lances and sabres only
   const Jn = S.sierra('day', { ground: ['#9aa06a', '#8a9060'], height: 1.6, pines: false, seed: 1211 });
   Jn.add(LP.strip([[-60, -14], [0, -16], [60, -15]], 6, '#6a9ab8', 0.02));
-  const riders = [...Array(6)].map((_, i) => { const H = horse({ coat: ['#5a3a26', '#8a6a4a', '#3a2a20'][i % 3], mane: '#1d1612', cloth: '#2a3f8f', seed: i }); H.position.set(-6 + (i % 3) * 1.6, 0, -3.2 - Math.floor(i / 3) * 1.4); H.rotation.y = Math.PI / 2; H.userData.dynamic = true; Jn.add(H);
+  // horses at 0.8 scale so the chibi riders' legs straddle the barrel
+  const riders = [...Array(6)].map((_, i) => { const H = horse({ coat: ['#5a3a26', '#8a6a4a', '#3a2a20'][i % 3], mane: '#1d1612', cloth: '#2a3f8f', seed: i }); H.scale.setScalar(0.8); H.position.set(-6 + (i % 3) * 1.6, 0, -3.2 - Math.floor(i / 3) * 1.4); H.rotation.y = Math.PI / 2; H.userData.dynamic = true; Jn.add(H);
     const r = K.person(Jn, ['oguri', 'tamamo', 'helios', 'spe', 'doto', 'hishi'][i], 'llanero', 0, 0, 0); K.blobShadow(r); return [H, r]; });
   const bol = K.role(Jn, 'bolivar', 0.9, 1.2, -0.4), suc = K.role(Jn, 'sucre', -0.5, 1.4, 0.3);
   // ---- Ayacucho, 9 Dec 1824
@@ -51,7 +52,7 @@ export function build(ctx) {
     } },
     { t0: tB, set: Jn, p0: [3.6, 1.5, 5.4], l0: [-1.0, 1.0, -2.6], p1: [3.0, 1.45, 4.8], l1: [-0.4, 1.0, -2.6], fov0: 44, act: (t) => {
       const u = t - tB;
-      riders.forEach(([H, r], i) => { H.position.x = -11 + ((u * 2.4 + i * 3.4) % 20); animateHorse(H, t, 'gallop', { seed: i }); const p = ridePose(t, i, 1); p.armR = [-30, 0, -20]; p.elbR = [0, 0, -20]; K.pose(r, p); seat(r, H); });
+      riders.forEach(([H, r], i) => { H.position.x = -11 + ((u * 2.4 + i * 3.4) % 20); animateHorse(H, t, 'gallop', { seed: i }); const p = ridePose(t, i, 1); p.armR = [-30, 0, -20]; p.elbR = [0, 0, -20]; p.thL = [-34, -8, 72]; p.thR = [-34, 8, -72]; p.knL = [58, 0, 0]; p.knR = [58, 0, 0]; K.pose(r, p); K.rideOn(r, H); });   // short legs splayed over the barrel
       K.pose(bol, t > tDis - 0.2 ? A.proud(t, 1) : C.idle(t, 1)); bol.setFace(C.blinkEye(t, 1), t > tDis ? 'grin' : 'neutral');
       K.pose(suc, t > tDis + 0.6 ? A.facepalm(t, 2) : C.idle(t, 2)); suc.setFace(t > tDis + 0.6 ? 'flat' : C.blinkEye(t, 2), t > tDis + 0.6 ? 'wavy' : 'smile');
       return U.film(t) + U.badge(t, '6 de agosto de 1824', 'Junín', '45 minutos, solo lanzas y sables', tJun - 0.3, tC + 0.1)
