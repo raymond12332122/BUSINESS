@@ -38,10 +38,10 @@ export function year(t, a, b, y, { x = 1700, top = 70, label = '' } = {}) {
 export function credits(t, a, b, rows, { title = 'ELENCO', x = 1290, w = 560, speed = 1 } = {}) {
   const k = K(t, a, b, 0.6, 0.6); if (k <= 0) return '';
   const rowH = 86, H = rows.length * rowH + 160, prog = clamp((t - a) / Math.max(0.1, b - a));
-  const y = 1080 - prog * (H + 1080 - 900) * speed;
+  const y = 1080 - prog * (H + 1080 - 760) * speed;   // the roll stops with its last row above the captions
   const items = rows.map(([u, f, q]) => `<div style="height:${rowH}px"><div style="font:900 32px 'Inter Display',Inter;color:#fff">${u}</div>
     <div style="font:700 22px Inter;color:#e0b84a;margin-top:2px">${f}</div>${q ? `<div style="font:600 18px/1.3 Inter;color:#c9c4b8;margin-top:4px;font-style:italic">${q}</div>` : ''}</div>`).join('');
-  return `<div style="position:absolute;left:${x}px;top:0;bottom:0;width:${w}px;overflow:hidden;opacity:${k};-webkit-mask-image:linear-gradient(transparent 0,#000 120px,#000 960px,transparent 1080px)">
+  return `<div style="position:absolute;left:${x}px;top:0;bottom:0;width:${w}px;overflow:hidden;opacity:${k};-webkit-mask-image:linear-gradient(transparent 0,#000 120px,#000 820px,transparent 920px)">
     <div style="position:absolute;left:0;right:0;top:${y}px;padding:30px 36px;${PANEL}"><div style="font:900 30px Inter;letter-spacing:.3em;color:#e0b84a;margin-bottom:26px">${title}</div>${items}</div></div>`;
 }
 // Comic speech bubble pinned above a 3D point.

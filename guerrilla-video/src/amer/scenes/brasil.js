@@ -11,6 +11,7 @@ import * as AM from '../amap.js';
 import * as P from '../props.js';
 import * as N from '../../napo/kit.js';
 import { horse, animateHorse, ridePose } from '../../napo/horse.js';
+import { canvasTex } from '../../mx/props.js';
 
 export { preload } from '../amap.js';
 const fade = AM.fade;
@@ -36,6 +37,8 @@ export function build(ctx) {
   const pRio = AM.pulse(Mp, -43.17, -22.91, '#2f7a3a', 2.0);
   // ---- Rio de Janeiro harbour
   const Rj = S.harbor({ light: 'day', sugarloaf: true, ships: 2, flag: 'gb' });
+  const ptTex = canvasTex(256, 160, P.FLAGS.portugal);   // the court sailed under Portuguese colours (the British escort stayed offshore)
+  Rj.ships.forEach(sh => sh.traverse(o => { const im = o.isMesh && o.material.map?.image; if (im && im.width === 256 && im.height === 160) o.material.map = ptTex; }));   // the stern ensign
   const joao = K.role(Rj, 'joao', -0.6, -10.6, 0); joao.root.position.y = 0.73;
   const court = [['mcqueen', 'dama', -1.6], ['helios', 'criollo', 0.5], ['spe', 'dama', 1.4], ['hishi', 'portugues', -2.6], ['oguri', 'portugues', 2.4]].map(([w, o, x]) => { const c = K.person(Rj, w, o, x, -10.4, 0); c.root.position.y = 0.73; return c; });
   const ped = K.role(Rj, 'pedro', 1.0, -9.6, -0.2); ped.root.position.y = 0.73;
