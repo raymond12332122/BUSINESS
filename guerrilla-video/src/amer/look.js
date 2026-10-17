@@ -448,6 +448,7 @@ const LIGHTS = {
   overcast: { clouds: 0.95, sunCol: '#f0eee8', sun: 0.3, look: { sat: 1.05 } },
   night: { clouds: 0.15, sunCol: '#b8c8ff', sun: 0.4, stars: 1, cloudCol: '#56607a', look: { cool: 0.08, warm: 0.05, rimColor: '#9fb4ff', rim: 0.22, bloom: 0.5, bloomT: 0.85, sat: 1.06 } },
   snow: { clouds: 0.75, sunCol: '#f4f6ff', sun: 0.5, cloudCol: '#f0f2f6', look: { cool: 0.06, sat: 1.08, rim: 0.25 } },
+  alpine: { clouds: 0.3, sunCol: '#fff4e0', sun: 1.0, cloudCol: '#ffffff', look: { cool: 0.05, sat: 1.12, rim: 0.32 } },   // clear high-altitude summer air
   blizzard: { clouds: 0.95, sunCol: '#e8ecf4', sun: 0.2, cloudCol: '#dfe3ea', look: { cool: 0.07, sat: 1.05, rim: 0.2 } },
   fire: { clouds: 0.3, sunCol: '#ff9a50', look: { warm: 0.08, bloom: 0.5, bloomT: 0.85 } },
 };

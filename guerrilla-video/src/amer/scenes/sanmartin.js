@@ -35,7 +35,8 @@ export function build(ctx) {
   const gran = K.crowd(Me, 'granadero', 10, [-4.6, -3.8, 4.6, -1.4], { seed: 101, yaw: 0 });
   const fA = P.banner('andes', { h: 3, w: 1.3, fh: 0.85 }); fA.position.set(-1.6, 0, -0.4); Me.add(fA);
   // ---- crossing the Andes
-  const An = S.andes('snow', { seed: 1021 });
+  const An = S.andes('alpine', { seed: 1021, snowing: false });   // Jan-Feb 1817: summer in the passes, clear and bitterly cold
+  { const dl = An.userData.sun; dl.position.set(10, 9, -10); dl.userData.off = dl.position.clone(); }   // sun from the right of the view: the peaks get a lit and a shaded face
   const sm2 = K.role(An, 'sanmartin', 0.7, 0.4, Math.PI / 2 - 0.15);
   const marchers = [...Array(8)].map((_, i) => K.blobShadow(K.person(An, ['oguri', 'tamamo', 'cafe', 'doto', 'helios', 'spe', 'hishi', 'suzuka'][i], i % 3 ? 'granadero' : 'patriota', -0.6 - i * 1.15, 0.2 + (i % 2) * 0.5, Math.PI / 2)));
   const mules = [...Array(5)].map((_, i) => { const m = P.mule(i); m.position.set(-1.4 - i * 2.2, 0, -0.9 - (i % 2) * 0.3); m.rotation.y = Math.PI / 2; m.userData.dynamic = true; An.add(m); return m; });

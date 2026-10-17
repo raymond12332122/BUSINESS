@@ -12,6 +12,7 @@ const std = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness
 export const L2 = {
   ...LIGHT,
   snow: { skyTop: '#7a8aa3', skyHor: '#d8dde4', sunColor: '#eef2ff', sun: 1.5, hemi: 1.35, hemiSky: '#dfe8f5', hemiGround: '#9aa3ae', fog: ['#cdd3db', 18, 90] },
+  alpine: { skyTop: '#3f6fb4', skyHor: '#cfe0f2', sunColor: '#fff2dc', sun: 2.1, hemi: 1.25, hemiSky: '#dfe8f5', hemiGround: '#9aa3ae', fog: ['#c9d8e8', 45, 280] },
   blizzard: { skyTop: '#8a95a6', skyHor: '#c9ced6', sunColor: '#e6ecf5', sun: 1.0, hemi: 1.45, hemiSky: '#dfe6ef', hemiGround: '#a0a8b2', fog: ['#c3c9d1', 8, 48] },
   fire: { skyTop: '#140a10', skyHor: '#7a2a14', sunColor: '#ff9a50', sun: 1.2, hemi: 0.6, hemiSky: '#ff9a6a', hemiGround: '#2a1a14', fog: ['#4a1e14', 25, 110] },
   sunrise: { skyTop: '#5d76a8', skyHor: '#f4c99a', sunColor: '#ffd8a8', sun: 2.2, hemi: 1.15, hemiSky: '#ffe0c8', hemiGround: '#7a7a5a', fog: ['#e6d6c2', 14, 80] },
