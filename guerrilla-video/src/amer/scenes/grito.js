@@ -88,9 +88,10 @@ export function build(ctx) {
     } },
     { t0: tE, set: Mp, p0: [mx, 32, mz + 14], l0: [mx, 0, mz], p1: [mx - 0.5, 30, mz + 12], l1: [mx - 0.5, 0, mz], fov0: 42, act: (t) => {
       Mp.paint(1810); Mp.zoom(0.35); route.set(ss(tTom - 0.3, tMon + 0.6, t)); back.set(ss(tPer, tCal + 0.3, t)); north.set(ss(tCapt - 0.3, tFus + 0.4, t));
-      const ck = (lo, la, a, ttl, sub, col = '#c0392b') => AM.chip(ctx, lo, la, fade(t, a, ctx.dur + 1), ttl, sub, col, 0.15);
-      return U.film(t) + ck(-101.26, 21.02, tGua - 0.1, 'Guanajuato', 'Alhóndiga de Granaditas, 28 sept.')
-        + ck(-99.33, 19.33, tMon - 0.1, 'Monte de las Cruces', '30 oct. 1810') + AM.chip(ctx, -99.13, 19.43, fade(t, tCap - 0.2, tDer), 'Ciudad de México', 'no la tomó', '#5a4a3a', 0.15)
+      const ck = (lo, la, a, ttl, sub, col = '#c0392b', b = ctx.dur + 1) => AM.chip(ctx, lo, la, fade(t, a, b), ttl, sub, col, 0.15);
+      // neighbouring chips hand over: Guanajuato gives way to Calderón, Monte de las Cruces to the capital
+      return U.film(t) + ck(-101.26, 21.02, tGua - 0.1, 'Guanajuato', 'Alhóndiga de Granaditas, 28 sept.', '#c0392b', tCal - 0.3)
+        + ck(-99.33, 19.33, tMon - 0.1, 'Monte de las Cruces', '30 oct. 1810', '#c0392b', tCap - 0.3) + AM.chip(ctx, -99.13, 19.43, fade(t, tCap - 0.2, tDer), 'Ciudad de México', 'no la tomó', '#5a4a3a', 0.15)
         + ck(-102.93, 20.73, tCal - 0.2, 'Puente de Calderón', '17 ene. 1811', '#8a5a3a') + ck(-106.09, 28.63, tFus - 0.3, 'Chihuahua', 'fusilado el 30 jul. 1811', '#3a3a3a');
     } },
   ];
