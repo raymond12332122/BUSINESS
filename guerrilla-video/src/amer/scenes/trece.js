@@ -37,8 +37,8 @@ export function build(ctx) {
   for (let i = 0; i < 6; i++) { const ch = P.teaChest(i + 3); ch.position.set(-4 + i * 1.6, 0.73, -9.6 + (i % 2) * 0.4); Bo.add(ch); }
   // ---- Lexington green, April 1775
   const Lx = S.village('sunrise');
-  const mil = K.crowd(Lx, 'miliciano', 6, [-4.4, -3.6, -1.2, -1.6], { seed: 31, yaw: Math.PI / 2 - 0.15, yawJ: 0.1 });
-  const red = K.crowd(Lx, 'casaca', 6, [1.4, -3.6, 4.6, -1.6], { seed: 32, yaw: -Math.PI / 2 + 0.15, yawJ: 0.1 });
+  const mil = K.crowd(Lx, 'miliciano', 6, [-4.4, -3.6, -1.2, -1.6], { seed: 31, yaw: Math.PI / 2 - 0.65, yawJ: 0.1 });
+  const red = K.crowd(Lx, 'casaca', 6, [1.4, -3.6, 4.6, -1.6], { seed: 32, yaw: -Math.PI / 2 + 0.65, yawJ: 0.1 });
   const vRed = P.volleySmoke(Lx, red.map(c => c.root.position.clone().add(new THREE.Vector3(-0.45, 0.55, 0.05)))), vMil = P.volleySmoke(Lx, mil.map(c => c.root.position.clone().add(new THREE.Vector3(0.45, 0.55, 0.05))));
   // ---- the Assembly Room, Philadelphia
   const Hl = S.hall({ wall: '#a9b49a', cloth: '#2f5a3a' });
