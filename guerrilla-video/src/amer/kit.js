@@ -153,7 +153,7 @@ export const OUTFITS = {
   lider: r => r,
   lWashington: r => { hat(r, tricorne({ trim: '#e2bd45', cockadeCol: '#1d1b1c' }), { ...TRI, scale: 1.2 }); return r; },
   lFranklin: r => { if (r.big) eyeGlasses(r, glasses(false)); else r.wear('head', glasses(false), [0, 0.69, 0.235]); return r; },
-  lKing: r => { hat(r, N.crown(), { y: 0.86, tilt: 0.04, scale: 1.1 }); r.cape = r.wear('chest', N.cape('#9a1b2a', '#f6f2ea', { w: 0.5, h: 0.5, ermine: true }), [0, 0.5, -0.1]); return r; },
+  lKing: r => { hat(r, N.crown(), { y: 0.86, tilt: 0.04, scale: 1.1 }); r.cape = r.wear('chest', N.cape('#9a1b2a', '#f6f2ea', { w: 0.5, h: 0.5, ermine: true, ermR: 0.17 }), [0, 0.5, -0.1]); return r; },
   lToussaint: r => { hat(r, N.bicorne({ trim: '#e2bd45', plume: '#c0272d', cockadeCols: ['#2a3f8f', '#f4f1ea', '#c0272d'] }), { ...BIC, scale: 1.15 }); return r; },
   lPedro: r => { hat(r, N.bicorne({ trim: '#e2bd45', plume: '#2f7a3a', cockadeCols: ['#2f7a3a', '#f0d84a', '#2f7a3a'] }), { ...BIC, scale: 1.15 }); return r; },
   lBic: r => { hat(r, N.bicorne({ trim: '#e2bd45', plume: '#f4f1ea', cockadeCols: ['#f0d84a', '#2a3f8f', '#c0272d'] }), BIC); return r; },
@@ -206,7 +206,8 @@ let seedCounter = 0;
 export function person(parent, who, outfit = who, x = 0, z = 0, yaw = 0) {
   const role = ROLES[who], key = role ? role[0] : who;
   const r = C_.spawn(key); r.seed = (seedCounter++ * 1.37) % 10; OUTFITS[role && outfit === who ? role[1] : outfit](r);
-  r.root.position.set(x, 0, z); r.root.rotation.y = yaw; parent.add(r.root); r.who = who; finish(r); return r;
+  // dynamic: keeps bake() from merging the rig's hats, belts and held props into the static set geometry (they must follow the bones)
+  r.root.position.set(x, 0, z); r.root.rotation.y = yaw; r.root.userData.dynamic = true; parent.add(r.root); r.who = who; finish(r); return r;
 }
 export const role = (parent, who, x = 0, z = 0, yaw = 0) => person(parent, who, who, x, z, yaw);
 // Crowd of extras laid out on a grid inside [x0, z0, x1, z1] (blob shadows instead of shadow maps).

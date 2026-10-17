@@ -27,7 +27,17 @@ export function build(ctx) {
   // ---- London: George III and his tea
   const Ld = S.palace();
   const king = K.role(Ld, 'jorge3', 0, -4.42, 0); K.pose(king, A.sitTea(0, 1, 0)); K.seatAt(king, 0.36 + 0.61);
-  const cup = K.hold(king, P.cupOnly(), 'R', [0.0, -0.02, 0.04]), sau = K.hold(king, P.saucer(), 'L', [0.0, -0.035, 0.03]);
+  // cup and saucer live in the king's model space and are set at her wrists every frame: they stay level, and the cup
+  // tips toward her lips on each sip (the hands reach them by IK: targets in rest model space, mouth at y≈1.16)
+  const cup = P.cupOnly(), sau = P.saucer(); king.root.add(cup, sau);
+  const _iv = new THREE.Matrix4(), _w = new THREE.Vector3(), CUP_OFF = new THREE.Vector3(0.05, 0, 0.04), SAU_OFF = new THREE.Vector3(-0.04, 0.02, 0.05);
+  const teaPose = (t, k) => {
+    const p = A.sitTea(t, 1, k); p.ikR = [-0.03 - 0.005 * k, 0.95 + 0.145 * k, 0.17 - 0.04 * k]; p.ikL = [0.07, 0.91, 0.17]; K.pose(king, p);
+    king.root.updateMatrixWorld(true); _iv.copy(king.root.matrixWorld).invert();
+    cup.position.copy(king.j.wriR.bone.getWorldPosition(_w).applyMatrix4(_iv)).add(CUP_OFF); cup.rotation.set(-0.45 * k, 0, 0);
+    sau.position.copy(king.j.wriL.bone.getWorldPosition(_w).applyMatrix4(_iv)).add(SAU_OFF);
+  };
+  teaPose(0, 0);
   const guards = [['suzuka', -2.9], ['oguri', 2.9]].map(([w, x]) => K.person(Ld, w, 'casaca', x, -2.1, 0));
   // ---- Boston harbour, 16 Dec 1773
   const Bo = S.harbor({ light: 'night', ships: 1 });
@@ -67,7 +77,7 @@ export function build(ctx) {
   const throwU = (t, i) => { const T = 1.7, ph = t - (tTir - 0.6) - i * 0.33; return ph < 0 ? -1 : (ph % T) / T; };
   const londonAct = (t) => {
     const u = (t * 0.35) % 1, sipK = ss(0.15, 0.35, u) * (1 - ss(0.6, 0.8, u));   // a slow sip every ~3 s
-    K.pose(king, A.sitTea(t, 1, sipK)); king.setFace(C.blinkEye(t, 1, sipK > 0.7 ? 'closed' : 'open'), sipK > 0.7 ? 'smile' : 'neutral');
+    teaPose(t, sipK); king.setFace(C.blinkEye(t, 1, sipK > 0.7 ? 'closed' : 'open'), sipK > 0.7 ? 'smile' : 'neutral');
     guards.forEach((g, i) => { K.pose(g, A.guard ? A.guard(t, i) : C.idle(t, i, 0.1)); g.setFace(C.blinkEye(t, i + 4), 'neutral'); });
     return U.film(t) + CARD(t, 'jorge3', 0.5, tB, { side: 'l' });
   };
@@ -113,10 +123,10 @@ export function build(ctx) {
         + AM.chip(ctx, -87.2, 30.4, fade(t, tEsp - 0.1, ctx.dur + 1), 'España', 'Bernardo de Gálvez toma Pensacola (1781)', '#c9a227', 0.6)
         + CARD(t, 'galvez', tEsp - 0.3, tG + 0.2, { side: 'r', top: 560, w: 600 });
     } },
-    { t0: tG, set: Yt, p0: [2.6, 1.6, 4.2], l0: [0.4, 0.8, -1.2], p1: [2.2, 1.55, 3.6], l1: [0.4, 0.8, -1.2], fov0: 42, act: (t) => {
+    { t0: tG, set: Yt, p0: [2.6, 1.3, 4.2], l0: [0.4, 0.75, -1.2], p1: [2.2, 1.26, 3.6], l1: [0.4, 0.75, -1.2], fov0: 42, act: (t) => {
       Yt.tick && Yt.tick(t); usf.wave(t); frf.wave(t + 1);
       K.pose(was, A.proud(t, 1)); was.setFace(C.blinkEye(t, 1), 'smile'); K.pose(laf, A.fangirl(t, 2)); laf.setFace('happy', 'smile');
-      cont.forEach((c, i) => K.pose(c, i % 2 ? A.jubilant(t, i) : A.guard(t, i))); brit.forEach((c, i) => { K.pose(c, A.kneel(t, i + 9)); c.setFace(C.blinkEye(t, i + 9, 'flat'), 'frown'); });
+      cont.forEach((c, i) => K.pose(c, i % 2 ? A.jubilant(t, i) : A.guard(t, i))); brit.forEach((c, i) => { const p = A.kneel(t, i + 9); p.head = [4, 6 * Math.sin(i * 1.7), 0]; K.pose(c, p); c.setFace(C.blinkEye(t, i + 9, 'flat'), 'frown'); });   // heads only slightly bowed so their glum faces read
       return U.film(t) + U.badge(t, '19 de octubre de 1781', 'Yorktown', 'Se rinden unos 8.000 británicos', tG + 0.2, tDos - 0.1)
         + CARD(t, 'lafayette', tG + 0.3, tDos + 0.2, { side: 'l' })
         + U.indep(t, tDos - 0.2, ctx.dur + 1, 'Estados Unidos', 'Declarada el 4 de julio de 1776', 'Gran Bretaña la reconoce en 1783 (Tratado de París)', ['#b22234', '#f4f1ea', '#2a2d62'], { x: 1500, y: 140 });

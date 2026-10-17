@@ -265,7 +265,7 @@ export function telescope() {
 }
 
 // Cape hanging from the shoulders. cape.wave(t, wind, side) animates it: wind 0 hangs still, 1 streams straight back.
-export function cape(color = '#a3202a', lining = '#efe6d2', { w = 0.44, h = 0.46, ermine = false } = {}) {
+export function cape(color = '#a3202a', lining = '#efe6d2', { w = 0.44, h = 0.46, ermine = false, ermR = 0.205 } = {}) {
   const geo = new THREE.PlaneGeometry(w, h, 10, 12); geo.translate(0, -h / 2, 0);
   const base = geo.attributes.position.array.slice();
   const g = new THREE.Group();
@@ -274,8 +274,10 @@ export function cape(color = '#a3202a', lining = '#efe6d2', { w = 0.44, h = 0.46
   const inner = mesh(geo, liningMat); outer.castShadow = inner.castShadow = true; g.add(outer, inner);
   if (ermine) { // ermine shoulder capelet over the red mantle
     const em = new THREE.MeshStandardMaterial({ map: ermineTex(), roughness: 0.95, side: THREE.DoubleSide });
-    const cp = mesh(new THREE.CylinderGeometry(0.1, 0.205, 0.11, 28, 1, true), em); cp.scale.set(1, 1, 0.82); cp.position.set(0, -0.04, 0.1); g.add(cp);
-    const rim = mesh(new THREE.TorusGeometry(0.205, 0.016, 6, 32), em); rim.rotation.x = Math.PI / 2; rim.scale.set(1, 0.82, 1); rim.position.set(0, -0.095, 0.1); g.add(rim);
+    // rounded over the shoulders (a lathe that starts flat at the collar and drapes down at the edge), not a straight cone
+    const prof = []; for (let i = 0; i <= 10; i++) { const u = i / 10; prof.push(new THREE.Vector2(0.085 + (ermR - 0.085) * Math.sin(u * Math.PI / 2), -0.11 * Math.pow(u, 1.7))); }
+    const cp = mesh(new THREE.LatheGeometry(prof, 32), em); cp.scale.set(1, 1, 0.82); cp.position.set(0, 0.015, 0.1); g.add(cp);
+    const rim = mesh(new THREE.TorusGeometry(ermR, 0.016, 6, 32), em); rim.rotation.x = Math.PI / 2; rim.scale.set(1, 0.82, 1); rim.position.set(0, -0.095, 0.1); g.add(rim);
   }
   g.wave = (t, wind = 0, side = 0) => {
     const p = geo.attributes.position;
