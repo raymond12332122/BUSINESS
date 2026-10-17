@@ -37,9 +37,11 @@ export function build(ctx) {
   const josefa = K.role(Jo, 'josefa', 0.3, -1.6, -0.3);
   // ---- Dolores, 16 Sep 1810, before dawn
   const Do = S.doloresSet();
+  Do.church.bell.position.z = 1.15;   // hang the bell in the belfry arch so it reads from the plaza
+  for (const [x, z, r, i] of [[8.6, -4.6, -0.25, 0], [12.4, -3.4, -0.1, 1], [16.2, -5.0, -0.3, 2]]) { const h = MX.adobe(3, 2.4, 2.2, ['#d9b48a', '#c9967a', '#d6c08f'][i], i + 4); h.position.set(x, 0, z); h.rotation.y = r; Do.add(h); }
   const hid = K.role(Do, 'hidalgo', 4.05, -4.2, -0.8);
   const warm = new THREE.PointLight('#ffb060', 9, 7, 1.3); warm.position.set(3.4, 2.0, -2.6); Do.add(warm);
-  const town = K.crowd(Do, ['insurgente', 'insurgenteF', 'indigena', 'dama'], 14, [-1.6, -2.6, 2.8, 1.8], { seed: 71, yaw: Math.PI * 0.85 });
+  const town = K.crowd(Do, ['insurgente', 'insurgenteF', 'indigena', 'dama'], 14, [-2.8, -3.2, 1.4, 1.4], { seed: 71, yaw: Math.PI * 0.85 });
   town.forEach(c => { const dx = 4.2 - c.root.position.x, dz = -4.2 - c.root.position.z; c.root.rotation.y = Math.atan2(dx, dz); });
   const torches = town.filter((_, i) => i % 4 === 1).map(c => K.hold(c, K.torch(), 'L', [0, 0, 0.02]));
   // ---- the march with the Guadalupe banner
@@ -58,6 +60,13 @@ export function build(ctx) {
     { t: tC, type: 'bell', vol: 0.5 }, { t: tC + 1.2, type: 'bell', vol: 0.5 }, { t: tC + 2.4, type: 'bell', vol: 0.5 }, { t: tLla, type: 'crowd', dur: tE - tLla, vol: 0.35 }, { t: tLev, type: 'shout', vol: 0.35 },
     { t: tD, type: 'march', dur: tE - tD, vol: 0.3 }, { t: tE, type: 'whoosh', vol: 0.3 }, ...[tGua, tMon].map(x => ({ t: x, type: 'boom', vol: 0.3 })), { t: tCal, type: 'boom', vol: 0.35 }, { t: tFus, type: 'drum', dur: 1.2, vol: 0.3 }];
 
+  const doAct = (t) => {
+    Do.church.bell.rotation.z = 0.5 * Math.sin(t * 3.2); torches.forEach((tc, i) => tc.flame.scale.set(1, 1.8 + 0.3 * Math.sin(t * 17 + i), 1));
+    K.pose(hid, A.ringBell(t, 1)); hid.setFace(C.blinkEye(t, 1), t > tLla ? 'shout' : 'grin');
+    town.forEach((c, i) => { K.pose(c, t > tLev ? (i % 2 ? C.cheer(t, i) : A.fist(t, i)) : C.idle(t, i, 0.4)); c.setFace(C.blinkEye(t, i), t > tLev ? 'open' : 'neutral'); });
+    return U.film(t) + U.datePage(t, tC + 0.2, tLla - 0.3, 'Dolores, 5 de la mañana', 'SEPT.', '16', '1810', { x: 1620, y: 90, accent: '#2f7a3a', w: 250 })
+      + CARD(t, 'hidalgo', tHid - 0.4, tD + 0.2, { side: 'l' }) + U.bubble(ctx, [4.2, 1.75, -4.2], '¡Turbo a toda máquina!', fade(t, tLla, tD), { size: 26 });
+  };
   const shots = [
     { t0: 0, set: Qr, p0: [0.3, 1.4, 2.6], l0: [0, 0.9, -1.6], p1: [0.2, 1.35, 2.1], l1: [0, 0.9, -1.6], fov0: 42, act: (t) => {
       K.pose(allende, A.talk(t, 1)); allende.setFace(C.blinkEye(t, 1), 'open'); cons.forEach((c, i) => { K.pose(c, i === 1 ? A.fist(t, i) : C.idle(t, i, 0.4)); c.setFace(C.blinkEye(t, i), 'neutral'); });
@@ -68,13 +77,9 @@ export function build(ctx) {
       const p = A.talk(t, 2); p.thR = [-24 * stomp, 0, -2]; p.knR = [30 * stomp, 0, 0]; K.pose(josefa, p); josefa.setFace(C.blinkEye(t, 2), stomp > 0.2 ? 'open' : 'smile');
       return U.film(t) + CARD(t, 'josefa', tCor - 0.5, tC + 0.2, { side: 'l' }) + U.bubble(ctx, [0.3, 1.75, -1.6], '¡Corran, los descubrieron!', fade(t, tAvi - 0.4, tC), { size: 26 });
     } },
-    { t0: tC, set: Do, p0: [2.4, 1.5, -0.6], l0: [3.7, 1.25, -4.2], p1: [2.8, 1.45, -1.3], l1: [3.9, 1.25, -4.2], fov0: 46, act: (t) => {
-      Do.church.bell.rotation.x = 0.55 * Math.sin(t * 3.2); torches.forEach((tc, i) => tc.flame.scale.set(1, 1.8 + 0.3 * Math.sin(t * 17 + i), 1));
-      K.pose(hid, A.ringBell(t, 1)); hid.setFace(C.blinkEye(t, 1), t > tLla ? 'shout' : 'grin');
-      town.forEach((c, i) => { K.pose(c, t > tLev ? (i % 2 ? C.cheer(t, i) : A.fist(t, i)) : C.idle(t, i, 0.4)); c.setFace(C.blinkEye(t, i), t > tLev ? 'open' : 'neutral'); });
-      return U.film(t) + U.datePage(t, tC + 0.2, tD + 0.2, 'Dolores, 5 de la mañana', 'SEPT.', '16', '1810', { x: 1620, y: 90, accent: '#2f7a3a', w: 250 })
-        + CARD(t, 'hidalgo', tHid - 0.4, tD + 0.2, { side: 'l' }) + U.bubble(ctx, [4.2, 1.75, -4.2], '¡Turbo a toda máquina!', fade(t, tLla, tD), { size: 26 });
-    } },
+    // wide from the plaza: the bell swinging in the tower over the gathering town, then Hidalgo at the rope
+    { t0: tC, set: Do, p0: [2.6, 1.3, 1.8], l0: [4.3, 10.6, -5.5], p1: [2.5, 1.4, 1.4], l1: [4.0, 1.5, -4.2], fov0: 50, act: doAct },
+    { t0: tHid - 0.6, set: Do, p0: [6.0, 1.55, 0.3], l0: [2.4, 1.1, -3.4], p1: [5.7, 1.5, -0.2], l1: [2.5, 1.1, -3.5], fov0: 46, act: doAct },
     { t0: tD, set: Ma, p0: [1.2, 1.5, 5.0], l0: [0, 1.2, -1.0], p1: [0.8, 1.45, 4.0], l1: [0, 1.2, -1.0], fov0: 46, act: (t) => {
       banner.wave && banner.wave(t); const p = C.walk(t, 0.45, 1); p.armR = [-60, 0, 30]; p.elbR = [0, 0, -60]; K.pose(hid2, p); hid2.setFace(C.blinkEye(t, 1), 'grin');
       army.forEach((c, i) => K.pose(c, i % 4 === 0 ? C.cheer(t, i) : C.walk(t, 0.45, i)));
