@@ -32,9 +32,9 @@ export const FLAGS = {
   haiti: (x, W, H) => bands(x, W, H, ['#1f3f8f', '#c8102e'], true),
   guadalupe: null,
   // Army of the Three Guarantees: white, green, red diagonals, a star in each
-  trigarante: (x, W, H) => { const cols = ['#f4f1ea', '#2f7a3a', '#c8102e']; x.save(); x.beginPath(); x.rect(0, 0, W, H); x.clip();
-    for (let i = 0; i < 3; i++) { x.fillStyle = cols[i]; x.beginPath(); const o = (i - 1) * W * 0.42; x.moveTo(o - W * 0.5, H); x.lineTo(o + W * 0.5 - W * 0.21, H); x.lineTo(o + W * 1.0 + W * 0.21, 0); x.lineTo(o, 0); x.closePath(); x.fill(); }
-    x.restore(); for (let i = 0; i < 3; i++) starAt(x, W * (0.26 + i * 0.24), H * (0.72 - i * 0.22), H * 0.08, '#d4af37'); },
+  trigarante: (x, W, H) => { const band = c => { x.beginPath(); if (c <= 1) { x.moveTo(0, 0); x.lineTo(c * W, 0); x.lineTo(0, c * H); } else { x.moveTo(0, 0); x.lineTo(W, 0); x.lineTo(W, (c - 1) * H); x.lineTo((c - 1) * W, H); x.lineTo(0, H); } x.closePath(); x.fill(); };
+    x.fillStyle = '#c8102e'; x.fillRect(0, 0, W, H); x.fillStyle = '#2f7a3a'; band(4 / 3); x.fillStyle = '#f4f1ea'; band(2 / 3);
+    [[1 / 3, '#d4af37'], [1, '#f4f1ea'], [5 / 3, '#f4f1ea']].forEach(([u, c]) => starAt(x, u / 2 * W, u / 2 * H, H * 0.09, c)); },
   // Mexican Empire, 1821: vertical tricolour with a crowned eagle
   mexEmp: (x, W, H) => { bands(x, W, H, ['#2f7a3a', '#f4f1ea', '#c8102e'], true); x.fillStyle = '#6a4a22'; x.beginPath(); x.ellipse(W / 2, H * 0.56, W * 0.07, H * 0.16, 0, 0, 7); x.fill();
     x.fillStyle = '#d4af37'; x.fillRect(W / 2 - W * 0.05, H * 0.24, W * 0.1, H * 0.08); },

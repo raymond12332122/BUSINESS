@@ -140,3 +140,18 @@ export function brook(light = 'golden', { seed = 901 } = {}) {
   LP.scatter(s, (r, i) => (i % 4 ? LP.roundTree(1.4 + r() * 0.6, '#4f7f3a', i) : RP.palm(1.2 + r() * 0.4, i)), 50, [-60, -60, 60, -16], seed + 2);
   return s;
 }
+// ---------------------------------------------------------------- cathedral nave (coronations), with flag drapes of `kind`
+export function cathedral(kind = 'mexEmp') {
+  const s = new THREE.Scene();
+  s.add(new THREE.HemisphereLight('#fff1d8', '#5a4632', 0.95));
+  const sun = new THREE.DirectionalLight('#ffe6c0', 1.6); sun.position.set(8, 14, 6); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+  Object.assign(sun.shadow.camera, { left: -10, right: 10, top: 10, bottom: -10, near: 0.5, far: 50 }); s.add(sun, sun.target);
+  const nave = N.gothicNave({ len: 26, w: 12, h: 13 }); s.add(nave); nave.traverse(o => { if (o.isMesh) o.castShadow = false; });
+  const tex = MX.canvasTex(160, 400, (g, W, H) => { P.FLAGS[kind](g, W, H); g.fillStyle = 'rgba(0,0,0,0.12)'; for (let i = 0; i < 5; i++) g.fillRect(i * W / 5, 0, 3, H); });
+  for (const sd of [-1, 1]) for (let i = 0; i < 4; i++) { const d = new THREE.Mesh(new THREE.PlaneGeometry(1.0, 3.2), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.9, side: THREE.DoubleSide })); d.position.set(sd * 4.7, 5.6, -8 + i * 4); d.rotation.y = -sd * Math.PI / 2; s.add(d); }
+  for (const [x, z] of [[-3, -6], [3, -6], [-3, 2], [3, 2]]) { const l = new THREE.PointLight('#ffd9a0', 8, 16, 1.4); l.position.set(x, 5, z); s.add(l); }
+  s.add(LP.at(LP.box(5, 0.36, 3, '#8a1f2a'), 0, 0.18, -6)); const th = N.throne({ fabric: '#8a1f2a' }); th.position.set(0, 0.36, -6.6); s.add(th);
+  s.background = new THREE.Color('#2a2018');
+  s.userData = { sun, hemi: s.children[0], interior: true };
+  return s;
+}
