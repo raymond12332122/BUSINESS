@@ -18,7 +18,14 @@ os.makedirs(os.path.join(OUT, 'voice'), exist_ok=True)
 SAY = {'Cu Chi': 'Ku Chi', 'Nelson': 'Nélson', 'Jena': 'Yena', 'Harfuch': 'Jarfuch', 'Sheinbaum': 'Shein-báum', 'Capos': 'Cápos', 'capos': 'cápos', 'Barrett': 'Bárret', 'gas LP': 'gas ele pe', 'Pskov': 'Pskof', 'Brest-Litovsk': 'Brest Litóvsk', 'Románov': 'Románoff', 'Kronstadt': 'Kronstat', 'piolet': 'piolé',
        'Sarajevo': 'Sarayevo', 'Princip': 'Príntsip', 'Ypres': 'Ípres', 'Marne': 'Marn', 'Zimmermann': 'Tsímerman',
        'Saint-Domingue': 'San Domíng', 'Toussaint Louverture': 'Tusán Luvertúr', 'Toussaint': 'Tusán', 'Jean-Jacques Dessalines': 'Yan Yak Desalín',
-       'Yorktown': 'Yórktaun', 'Ipiranga': 'Ipiránga'}
+       'Yorktown': 'Yórktaun', 'Ipiranga': 'Ipiránga',
+       # ¿Qué pasaría si...? (umamusume names read by a Spanish voice)
+       'Symboli Rudolf': 'Símboli Rúdolf', 'Sirius Symboli': 'Sírius Símboli', 'Rudolf': 'Rúdolf', 'Sirius': 'Sírius',
+       'Super Creek': 'Súper Crik', 'Grass Wonder': 'Gras Uánder', 'Air Groove': 'Eir Grúuv', 'Mejiro McQueen': 'Meyíro Mak Kuín',
+       'T.M. Opera O': 'Ti Em Ópera Óu', 'Opera O': 'Ópera Óu', 'Meisho Doto': 'Méisho Dóto', 'Gold Ship': 'Góld Ship',
+       'Agnes Digital': 'Ágnes Díyital', 'Agnes': 'Ágnes', 'Tokai Teio': 'Tókai Téio', 'Kaichō': 'Kaichóo', 'Satono Diamond': 'Satóno Dáiamond',
+       'Tamamo Cross': 'Tamámo Crós', 'Silence Suzuka': 'Sáilens Suzúka', 'Twin Turbo': 'Tuín Túrbo', 'tawake': 'tahuáke',
+       'Winning Live': 'Uíning Láiv', 'umamusume': 'umamusúme', 'savate': 'saváte'}
 script = json.load(open(os.path.join(ROOT, 'src', f'script_{LANG}.json') if VIDEO == 'guerrilla' else os.path.join(ROOT, 'src', VIDEO, f'script_{LANG}.json')))
 
 

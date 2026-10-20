@@ -259,9 +259,10 @@ export class Rig {
     if (rig.lids.length) this.faceRig = rig;
   }
   setFaceBones(eye, mouth) {
-    const c = { blink: 1, closed: 1, happy: 0.8, flat: 0.45, squint: 0.55, dizzy: 0.7 }[eye] || 0;
-    const mo = { open: 0.8, shout: 1, scream: 1.1, big: 0.9, teeth: 0.45, grin: 0.35, tri: 0.7, wavy: 0.25, tongue: 0.5 }[mouth] || 0;
-    const sm = { smile: 1, grin: 1, cat: 0.8, teeth: 0.8, happy: 0.8 }[mouth] || 0;
+    // numbers give continuous values: eye = lid closure 0..1, mouth = jaw opening 0..1 (or [opening, smile])
+    const c = typeof eye === 'number' ? eye : { blink: 1, closed: 1, happy: 0.8, flat: 0.45, squint: 0.55, dizzy: 0.7 }[eye] || 0;
+    const mo = typeof mouth === 'number' ? mouth : Array.isArray(mouth) ? mouth[0] : { open: 0.8, shout: 1, scream: 1.1, big: 0.9, teeth: 0.45, grin: 0.35, tri: 0.7, wavy: 0.25, tongue: 0.5 }[mouth] || 0;
+    const sm = Array.isArray(mouth) ? mouth[1] : { smile: 1, grin: 1, cat: 0.8, teeth: 0.8, happy: 0.8 }[mouth] || 0;
     for (const L of this.faceRig.lids) L.b.position.copy(L.rest).addScaledVector(L.d, c);
     for (const L of this.faceRig.lips) L.b.position.copy(L.rest).addScaledVector(L.d, mo);
     for (const L of this.faceRig.corners) L.b.position.copy(L.rest).addScaledVector(L.d, sm);

@@ -1,0 +1,148 @@
+{
+ "scenes": [
+  {
+   "id": "titulo",
+   "lead": 1.4,
+   "tail": 1.2,
+   "gaps": {
+    "1": 0.6
+   },
+   "lines": [
+    "¿Qué pasaría si mañana Symboli Rudolf, la única umamusume con siete coronas, a quien todos llaman «el Emperador», gobernara México?",
+    "¿Y si al mismo tiempo su amiga de la infancia y eterna rival, Sirius Symboli, llegara a la Casa Blanca?",
+    "Vamos a imaginarlo, con un elenco muy especial."
+   ]
+  },
+  {
+   "id": "mexico",
+   "lead": 0.8,
+   "tail": 1.0,
+   "gaps": {
+    "2": 1.1
+   },
+   "lines": [
+    "Rudolf llegaría a Palacio Nacional como llegaba al consejo estudiantil: puntual, impecable y con un plan para cada uno de los casi ciento treinta y un millones de mexicanos.",
+    "Su sueño de siempre, un mundo donde todas puedan vivir felices, sería su lema de gobierno.",
+    "Juntas a las seis de la mañana, documentos sellados con precisión perfecta y un chiste malo en cada discurso. Cuando se le ocurre uno, se le mueven las orejas.",
+    "Los diputados no se reirían. Pero tampoco se atreverían a llegar tarde."
+   ]
+  },
+  {
+   "id": "eeuu",
+   "lead": 0.8,
+   "tail": 1.0,
+   "lines": [
+    "Mientras tanto, Sirius Symboli aterrizaría en Washington pilotando su propio avión. Sí: tiene licencia de piloto.",
+    "Su estilo sería el opuesto: directa, sin rodeos y sin aduladores. Odia las mentiras, las pláticas inútiles... y los chistes malos.",
+    "Su promesa: gobernar para quienes se quedan fuera, los que nadie mira, aunque haya que romper una que otra regla.",
+    "En el Despacho Oval pondría una mesa de billar y entrenaría ella misma a los perros del Servicio Secreto."
+   ]
+  },
+  {
+   "id": "vecinos",
+   "lead": 0.8,
+   "tail": 1.0,
+   "lines": [
+    "Y aquí empezaría el problema: México y Estados Unidos no pueden ignorarse.",
+    "Comparten una frontera de más de tres mil kilómetros, que cruzan cerca de un millón de personas cada día.",
+    "En dos mil veinticinco comerciaron casi ochocientos setenta y tres mil millones de dólares: México fue el primer socio comercial de Estados Unidos.",
+    "Y los mexicanos que viven allá enviaron más de sesenta y un mil millones de dólares en remesas a sus familias."
+   ]
+  },
+  {
+   "id": "llamada",
+   "lead": 0.8,
+   "tail": 1.0,
+   "gaps": {
+    "1": 0.7,
+    "2": 1.0
+   },
+   "lines": [
+    "La primera llamada entre las dos presidentas duraría once segundos.",
+    "Rudolf la abriría con un chiste: «Entre nosotras no hay barreras... ¡solo barras y estrellas!»",
+    "Sirius le colgaría.",
+    "Desde ese día, cada reunión sería un duelo. Rudolf quiere reglas claras para ayudar a todos; Sirius quiere libertad para ayudar a cada quien, aunque sea saltándose las reglas.",
+    "En el fondo querían lo mismo. Pero ninguna lo iba a admitir."
+   ]
+  },
+  {
+   "id": "mundo",
+   "lead": 0.8,
+   "tail": 1.0,
+   "lines": [
+    "El resto del mundo también tendría líderes... peculiares.",
+    "En Canadá, Super Creek, que se llama a sí misma «mamá», les mandaría cobijas y jarabe de maple a las dos para que hicieran las paces.",
+    "En Japón, Grass Wonder, que nació en Estados Unidos pero es más japonesa que nadie, sonreiría con dulzura. Nadie quiere verla enojada.",
+    "En Alemania, Air Groove exigiría puntualidad absoluta, y le gritaría «¡tawake!» a quien llegue tarde.",
+    "En Francia, Mejiro McQueen gobernaría rodeada de pastelerías, mientras intenta seguir a dieta.",
+    "En Italia, T.M. Opera O se proclamaría la líder más bella del mundo; y en San Marino, rodeada por su Italia, Meisho Doto quedaría... otra vez en segundo lugar.",
+    "Gold Ship gobernaría Australia, y le declararía la guerra a los emúes.",
+    "Y en Corea del Sur, Agnes Digital se desmayaría de la emoción al ver a tantas umamusume en el poder."
+   ]
+  },
+  {
+   "id": "mundo2",
+   "lead": 0.6,
+   "tail": 1.0,
+   "lines": [
+    "En Colombia, Tokai Teio haría todo igual que su admirada «Kaichō» Rudolf... pero bailando.",
+    "En Brasil, Satono Diamond gobernaría con su lema, «¡el destino no existe!», y en Argentina, Tamamo Cross, pequeñita pero peleonera, no dejaría que nadie la mirara por encima del hombro.",
+    "Silence Suzuka mantendría a Suiza neutral y en silencio, y en Mónaco, Twin Turbo saldría a toda velocidad... hasta quedarse sin gasolina."
+   ]
+  },
+  {
+   "id": "cumbre",
+   "lead": 0.8,
+   "tail": 1.0,
+   "lines": [
+    "Para calmar las cosas, el mundo organizaría una cumbre en Ginebra.",
+    "Fue un caos: Gold Ship llegó en paracaídas, Opera O cantó un aria y Agnes se desmayó dos veces.",
+    "Hasta que Super Creek propuso algo que todas entendieron: si no se ponen de acuerdo, que lo decidan como umamusume. Con una carrera."
+   ]
+  },
+  {
+   "id": "entrena",
+   "lead": 0.8,
+   "tail": 1.0,
+   "lines": [
+    "La Gran Carrera de Norteamérica se correría en el Hipódromo de las Américas, en la Ciudad de México, abierto desde mil novecientos cuarenta y tres.",
+    "Rudolf entrenaría al amanecer, con disciplina de emperador. Sirius, a su manera: patadas de savate, saltos y paseando a sus perros.",
+    "Y como nadie quería quedarse fuera, se inscribirían también Tokai Teio, Twin Turbo, Gold Ship y Tamamo Cross."
+   ]
+  },
+  {
+   "id": "carrera",
+   "lead": 1.2,
+   "tail": 1.2,
+   "gaps": {
+    "2": 0.7
+   },
+   "lines": [
+    "¡Arrancan! Twin Turbo sale disparada a toda velocidad... y a mitad de la recta ya no puede más.",
+    "Gold Ship sale última, como siempre, y en la curva empieza a remontar.",
+    "En la recta final quedan dos: Rudolf por dentro, Sirius por fuera, cabeza con cabeza.",
+    "Y cruzan la meta... al mismo tiempo. ¡Empate fotográfico!"
+   ]
+  },
+  {
+   "id": "live",
+   "lead": 1.0,
+   "tail": 3.0,
+   "lines": [
+    "En el mundo de las umamusume, las ganadoras celebran con un concierto: el Winning Live.",
+    "Y por primera vez en años, Rudolf y Sirius cantarían juntas, como cuando eran niñas y corrían una al lado de la otra.",
+    "Todas las líderes del mundo subirían al escenario a bailar con ellas."
+   ]
+  },
+  {
+   "id": "final",
+   "lead": 0.8,
+   "tail": 9.0,
+   "lines": [
+    "¿Qué pasaría de verdad? Probablemente lo de siempre: dos vecinos que discuten, se reconcilian y se necesitan.",
+    "Con más de tres mil kilómetros de frontera, millones de familias repartidas en los dos lados y un comercio enorme, a México y a Estados Unidos les conviene correr juntos.",
+    "Y si algún día gobiernan las umamusume... ojalá todo termine con un buen concierto."
+   ]
+  }
+ ]
+}

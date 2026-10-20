@@ -15,6 +15,11 @@ RENAME = {
     314: 'Shoulder_R', 316: 'Arm_R', 318: 'Elbow_R', 320: 'Wrist_R',                  # 右肩, 右腕, 右ひじ, 右手首
     31: 'Thigh_L', 32: 'Knee_L', 33: 'Ankle_L', 14: 'Thigh_R', 15: 'Knee_R', 16: 'Ankle_R',   # 足, ひざ, 足首 (the skinned ones, not the D bones)
 }
+# fingers (親指, 人差指, 中指, 薬指, 小指 x 3 segments), told apart by their rest positions under each wrist
+for side, w in (('L', 288), ('R', 320)):
+    for name, first in (('Index', 2), ('Middle', 5), ('Pinky', 8), ('Ring', 11), ('Thumb', 14)):
+        for seg in range(3):
+            RENAME[w + first + seg] = f'{name}_0{seg + 1}_{side}'
 DUPLICATE_BODY = 527          # node holding the untextured copy of the body (mesh 6)
 
 src, dst = sys.argv[1], sys.argv[2]
