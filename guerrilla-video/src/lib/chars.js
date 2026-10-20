@@ -73,9 +73,10 @@ function tposeArms(scene) {
   }
 }
 
+// Rips name joints 'Wrist_R' or 'Wrist_R_0341'; helpers such as 'Wrist_R_Pole_0434' or 'Ankle_L_IK_Handle' must not match.
 function findBone(root, prefix) {
   let hit = null;
-  root.traverse(o => { if (!hit && o.isBone && (o.name === prefix || o.name.startsWith(prefix + '_'))) hit = o; });
+  root.traverse(o => { if (!hit && o.isBone && (o.name === prefix || (o.name.startsWith(prefix + '_') && /^\d+$/.test(o.name.slice(prefix.length + 1))))) hit = o; });
   return hit;
 }
 
@@ -182,7 +183,8 @@ export class Rig {
     }
     const ikL = pose.ikL || grips?.L, ikR = pose.ikR || grips?.R;
     if (ikL || ikR) {
-      this.model.updateMatrixWorld(true);
+      // root and bones together: a moved root with stale bone matrices would aim the second arm at an offset target
+      this.root.updateWorldMatrix(true, true);
       if (ikL) this.solveArm('L', ikL, pose.poleL);
       if (ikR) this.solveArm('R', ikR, pose.poleR);
     }
