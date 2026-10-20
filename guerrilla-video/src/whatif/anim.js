@@ -120,3 +120,19 @@ export function kick(t, seed = 0, u = 0, o = {}) {
   return withArms(p, { fR: [-0.02 * k, 0.17 * k, 0.15 * k], heelL: 8 * k, hip: [0, -18 * k, 10 * k], waist: [-14 * k, -10 * k, -12 * k], chest: [-6 * k, -8 * k, -6 * k], hipX: 0.012 * k, hipY: -0.006 - 0.008 * k,
     head: [6 * k, 14 * k, 6 * k], armL: [-60 * k, -20, -50 - 20 * k], armR: [30 * k, 20, 58 + 18 * k], elbL: [0, -90 * k, 0], elbR: [0, 50 * k, 0], hL: HAND.fist, hR: HAND.fist, fyL: 6 + 40 * k });
 }
+// Military salute: right hand flat at the brow.
+export function salute(t, seed = 0, k = 1, o = {}) {
+  const p = M.stand(t, seed, { amt: 0.3, ...o });
+  return withArms(p, { aR: ['head', -0.55, 0.45, 0.9], aWR: k, plR: [-1, 0.1, 0.2], hR: HAND.flat, head: [p.head[0] - 2, p.head[1] * 0.3, p.head[2] * 0.3] });
+}
+// Yawn: arms stretch up and out, head back (sleepy cabinet at 6 a.m.).
+export function yawn(t, seed = 0, k = 1, o = {}) {
+  const p = M.stand(t, seed, { amt: 0.4, ...o });
+  return withArms(p, { armL: [-10, 0, -76 + 100 * k], armR: [-10, 0, 76 - 100 * k], elbL: [0, -20 - 30 * k, 0], elbR: [0, 20 + 30 * k, 0], head: [p.head[0] - 14 * k, p.head[1], p.head[2]], chest: [p.chest[0] - 6 * k, 0, 0], hL: HAND.open, hR: HAND.open });
+}
+// Seated talk at a table: forearms on the table top, beat gestures with the right hand.
+export function sitTalk(t, seed = 0, e = 0.6, o = {}) {
+  const p = sit(t, seed, o), beat = Math.max(0, Math.sin(t * 5 + seed)) ** 2, b1 = 0.5 + 0.5 * Math.sin(t * 3.1 + seed);
+  return withArms(p, { armL: [-58, -18, -76], elbL: [0, -64, 0], armR: [-62 - 18 * e * b1, 14, 70], elbR: [0, 54 + 30 * e * b1, 0], hR: M.mix({ h: HAND.relax }, { h: HAND.open }, e * beat).h,
+    head: [8 + 4 * beat * e, 10 * Math.sin(t * 0.8 + seed) * e, 0] });
+}

@@ -18,7 +18,7 @@ async function boot() {
   const ui = document.getElementById('ui'), fade = document.getElementById('fade');
   // Finishing pass (post-processing, animated grass/clouds) for videos that ship one.
   let post = null, look = null;
-  if (VIDEO === 'amer' && QP.get('post') !== '0') { look = await import('./amer/look.js'); post = look.makePost(renderer, W, H); }
+  if ((VIDEO === 'amer' || VIDEO === 'whatif') && QP.get('post') !== '0') { look = await import('./amer/look.js'); post = look.makePost(renderer, W, H); }
 
   const TL = await (await fetch(LANG === 'en' ? `${BASE}/timeline.json` : `${BASE}/${LANG}/timeline.json`)).json();
   await C.loadCast();
@@ -67,7 +67,10 @@ async function boot() {
     const sc = inst.current || inst.scene;
     if (sc.userData.sky) sc.userData.sky.position.copy(inst.ctx.camera.position);
     if (look) look.tick(T);
-    if (post) post.render(sc, inst.ctx.camera); else renderer.render(sc, inst.ctx.camera);
+    const views = inst.views ? inst.views(t) : null;   // split-screen panels
+    if (post) post.render(sc, inst.ctx.camera, views);
+    else if (views) { renderer.setScissorTest(true); for (const v of views) { renderer.setViewport(v.x * W, 0, v.w * W, H); renderer.setScissor(v.x * W, 0, v.w * W, H); renderer.render(v.scene, v.camera); } renderer.setScissorTest(false); renderer.setViewport(0, 0, W, H); }
+    else renderer.render(sc, inst.ctx.camera);
     const cap = captionAt(s.lines, t);
     ui.innerHTML = trHTML(html) + (cap && !inst.noCaptions && !(inst.hideCaptions && inst.hideCaptions(t)) ? `<div class="cap">${cap}</div>` : '');
     const fi = i === 0 ? 0.6 : 0.3, fo = 0.3;

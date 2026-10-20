@@ -6,6 +6,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+import { Pass } from 'three/addons/postprocessing/Pass.js';
 
 // ------------------------------------------------------------ cast shading
 // Shared uniforms, so each set can retune the rim and outline for its light (night scenes want less rim).
@@ -100,6 +101,22 @@ export function finishProp(obj) {
 }
 
 // ------------------------------------------------------------ post-processing
+// Renders several (scene, camera) panels side by side into the composer's buffer (split-screen shots).
+class SplitPass extends Pass {
+  constructor() { super(); this.views = null; this.needsSwap = false; }
+  render(renderer, writeBuffer, readBuffer) {
+    const W = readBuffer.width, H = readBuffer.height;
+    for (const v of this.views) {
+      const x = Math.round(v.x * W), w = Math.round(v.w * W);
+      readBuffer.viewport.set(x, 0, w, H); readBuffer.scissor.set(x, 0, w, H); readBuffer.scissorTest = true;
+      renderer.setRenderTarget(readBuffer);
+      if (v.scene.userData.sky) v.scene.userData.sky.position.copy(v.camera.position);
+      renderer.render(v.scene, v.camera);
+    }
+    readBuffer.viewport.set(0, 0, W, H); readBuffer.scissor.set(0, 0, W, H); readBuffer.scissorTest = false;
+    renderer.setRenderTarget(readBuffer);
+  }
+}
 const GRADE = {
   uniforms: { tDiffuse: { value: null }, sat: { value: 1.12 }, con: { value: 0.18 }, vign: { value: 0.22 }, warm: { value: 0.035 }, cool: { value: 0.045 },
     lift: { value: 0.012 }, aspect: { value: 16 / 9 } },
@@ -125,11 +142,14 @@ export function makePost(renderer, W, H) {
   const bloom = new UnrealBloomPass(new THREE.Vector2(w, h), 0.28, 0.55, 1.05);
   const grade = new ShaderPass(GRADE);
   composer.addPass(rp); composer.addPass(bloom); composer.addPass(new OutputPass()); composer.addPass(grade);
+  const split = new SplitPass();
   return {
     composer, bloom, grade,
-    render(scene, camera) {
+    // views: optional [{ scene, camera, x, w }] side-by-side panels (x, w as fractions of the frame width)
+    render(scene, camera, views = null) {
+      if (views) scene = views[0].scene;
       const L = scene.userData.look || {};
-      rp.scene = scene; rp.camera = camera;
+      rp.scene = scene; rp.camera = camera; split.views = views; composer.passes[0] = views ? split : rp;
       bloom.enabled = L.bloom !== 0; bloom.strength = L.bloom ?? 0.3; bloom.threshold = Math.max(1.5, L.bloomT ?? 1.5);
       const g = grade.uniforms; g.sat.value = L.sat ?? 1.12; g.con.value = L.con ?? 0.18; g.vign.value = L.vign ?? 0.22;
       g.warm.value = L.warm ?? 0.035; g.cool.value = L.cool ?? 0.045;

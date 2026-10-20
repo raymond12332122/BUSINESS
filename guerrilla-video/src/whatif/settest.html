@@ -1,0 +1,31 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style></head><body>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+// Set QA: ?set=name&args=JSON-array&p=x,y,z&l=x,y,z&fov=38&t=1&c=key:outfit:x:z:yaw:pose,...&sash=1&shades=1&post=1
+import * as THREE from 'three';
+import * as C from '../lib/chars.js';
+import * as K from './kit.js';
+import * as S from './sets.js';
+import * as A from './anim.js';
+import * as LK from '../amer/look.js';
+try {
+  const W = 1280, H = 720, q = new URLSearchParams(location.search);
+  const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); r.setSize(W, H); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(r.domElement);
+  const cs = (q.get('c') || '').split(',').filter(Boolean).map(x => x.split(':'));
+  C.castOnly([...new Set(cs.map(([w]) => w))]); await C.loadCast();
+  const s = S[q.get('set')](...JSON.parse(q.get('args') || '[]'));
+  const t = +(q.get('t') || 1);
+  cs.forEach(([who, o, x, z, yaw, ps], i) => {
+    const c = K.person(s, who, o || 'self', +x || 0, +z || 0, +yaw || 0);
+    if (q.has('sash') && who === 'rudolf') K.fitSash(c, ['#0f6b3f', '#f6f3ea', '#c3262f'], { emblem: K.eagleKnot() });
+    if (q.has('shades') && who === 'sirius') K.aviators(c);
+    K.act(c, (A[ps || 'stand'] || A.stand)(t, i * 1.3), t, { smile: 0.4 });
+  });
+  if (s.tick) s.tick(t);
+  const cam = new THREE.PerspectiveCamera(+(q.get('fov') || 38), W / H, 0.05, 900);
+  cam.position.set(...(q.get('p') || '0,1.6,8').split(',').map(Number)); cam.lookAt(...(q.get('l') || '0,1,0').split(',').map(Number));
+  if (s.userData.sky) s.userData.sky.position.copy(cam.position);
+  if (q.has('post')) LK.makePost(r, W, H).render(s, cam); else r.render(s, cam);
+  window.__ready = true;
+} catch (e) { window.__error = String(e.stack || e); }
+</script></body></html>
