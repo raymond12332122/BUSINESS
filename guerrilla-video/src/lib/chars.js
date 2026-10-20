@@ -14,13 +14,15 @@ export const CAST = {
   // full-proportion game models (see BIG)
   rudolf: 'symboli_rudolf', teio: 'tokai_teio', groove: 'air_groove', golshi: 'gold_ship', suzukaB: 'silence_suzuka_big', mcqueenB: 'mejiro_mcqueen_big',
   grass: 'grass_wonder', opera: 'tm_opera_o', digital: 'agnes_digital', tamamoB: 'tamamo_cross_big', dia: 'satono_diamond', turbo: 'twin_turbo',
-  creek: 'super_creek', dotoB: 'meisho_doto_halloween',
+  creek: 'super_creek', dotoB: 'meisho_doto_halloween', sirius: 'sirius_symboli',
 };
 // Full-proportion models are normalised to these heights (scene units; the chibis stand ~1.15-1.2 tall).
 export const BIG = {
   rudolf: 1.45, teio: 1.33, groove: 1.45, golshi: 1.5, suzukaB: 1.42, mcqueenB: 1.40, grass: 1.42, opera: 1.38, digital: 1.27,
-  tamamoB: 1.25, dia: 1.42, turbo: 1.30, creek: 1.48, dotoB: 1.43,
+  tamamoB: 1.25, dia: 1.42, turbo: 1.30, creek: 1.48, dotoB: 1.43, sirius: 1.47,
 };
+// Rips that rest in an A-pose (the procedural poses assume a T-pose): their arms are lifted level once at load.
+const APOSE = { sirius: true };
 let only = null;
 // Limit which models a page loads (each video needs a subset; loading all of them costs seconds per render chunk).
 export function castOnly(keys) { only = keys; }
@@ -56,8 +58,19 @@ export async function loadCast() {
     const ms = []; g.scene.traverse(o => { if (o.isMesh) ms.push(o); });
     const vc = new Map(ms.map(o => [o.material.name, o]));
     for (const o of ms) { const n = o.material.name || '', base = vc.get(n.slice(0, -2)); if (n.endsWith('_0') && base && base.geometry.attributes.position.count === o.geometry.attributes.position.count) base.parent.remove(base); }
+    if (APOSE[k]) tposeArms(g.scene);
     cache[k] = g.scene;
   }));
+}
+function tposeArms(scene) {
+  scene.updateMatrixWorld(true);
+  for (const s of ['L', 'R']) for (const [a, b] of [['Arm', 'Elbow'], ['Elbow', 'Wrist']]) {
+    const A = findBone(scene, `${a}_${s}`), B = findBone(scene, `${b}_${s}`);
+    const d = B.getWorldPosition(new THREE.Vector3()).sub(A.getWorldPosition(new THREE.Vector3())).normalize();
+    const q = new THREE.Quaternion().setFromUnitVectors(d, new THREE.Vector3(s === 'L' ? 1 : -1, 0, 0));
+    const wq = A.getWorldQuaternion(new THREE.Quaternion()), pq = A.parent.getWorldQuaternion(new THREE.Quaternion());
+    A.quaternion.copy(pq.invert().multiply(q).multiply(wq)); A.updateMatrixWorld(true);
+  }
 }
 
 function findBone(root, prefix) {
