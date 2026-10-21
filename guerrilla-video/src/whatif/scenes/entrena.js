@@ -27,6 +27,8 @@ export function build(ctx) {
   const Day = S.racecourse('day');
   // ================================================================ B: dawn training
   const Dawn = S.racecourse('dawn');
+  const board = (set, bg, ink, a, b) => set.screen.draw((x, w, h) => { x.fillStyle = bg; x.fillRect(0, 0, w, h); x.fillStyle = ink; x.font = '900 70px Inter'; x.textAlign = 'center'; x.fillText(a, w / 2, h / 2 - 20); x.fillText(b, w / 2, h / 2 + 60); });
+  board(Day, '#0d1a12', '#7dff9a', 'GRAN CARRERA', 'DE NORTEAMÉRICA'); board(Dawn, '#0b1426', '#9fc4ff', 'HIPÓDROMO', 'DE LAS AMÉRICAS');   // the infield screen is never a black hole
   const rud = K.leader(Dawn, 'rudolf', 0, 0, 0); K.fitSash(rud, SASH, { emblem: K.eagleKnot() });
   const sir = K.leader(Dawn, 'sirius', 0, 0, 0);
   const D0 = 20, RUNV = 0.95;   // her jog along the home straight (chibi units/s → about 3.2 m/s for her)
@@ -68,7 +70,14 @@ export function build(ctx) {
   const named = { rudolf: tC + 0.4, sirius: tC + 0.8, teio: tTe, turbo: tTu, golshi: tGo, tamamoB: tTa };
   const POSE = { rudolf: (t, k) => A.handOnHeart(t, 1, k), sirius: t => A.crossArms(t, 2), teio: (t, k) => M.mix(A.stand(t, 3), A.teioStep(t, 3), k), turbo: (t, k) => M.mix(A.stand(t, 4), A.cheer(t, 4), k),
     golshi: (t, k) => M.mix(A.stand(t, 5), A.point(t, 5, 0, 70, 'R'), k), tamamoB: (t, k) => M.mix(A.stand(t, 6), A.handsOnHips(t, 6), k) };
+  // the camera trucks along the line and presents each runner as she is named, then pulls back on the whole field
+  const KEYS = [[tC, -3.6], [tIns + 0.15, -3.6], [tTe + 0.05, -1.2], [tTu + 0.05, 0.7], [tGo + 0.05, 2.5], [tTa + 0.05, 4.0], [tTa + 0.7, 4.2]];
+  const lin = t => { if (t <= KEYS[0][0]) return KEYS[0][1]; for (let i = 1; i < KEYS.length; i++) if (t <= KEYS[i][0]) { const [a, x0] = KEYS[i - 1], [b, x1] = KEYS[i]; return x0 + (x1 - x0) * (t - a) / (b - a); } return KEYS[KEYS.length - 1][1]; };
+  const camC = (c, t) => { let fx = 0; for (let k = -4; k <= 4; k++) fx += lin(t + k * 0.1) / 9;   // box-filtered: smooth starts and stops
+    const back = ss(tTa + 0.5, ctx.dur - 0.2, t), x = fx * (1 - back), d = 4.4 + 2.6 * back;   // stops short of the inner rail
+    c.position.set(x * 0.92, 1.25 + 0.15 * back, 44.5 - d); c.lookAt(x, 1.12, 44.5); c.fov = 42 + 6 * back; c.updateProjectionMatrix(); };
   const actC = t => {
+    camC(ctx.camera, t);
     field.forEach(({ r, k, x }) => { r.root.position.set(x, 0, 44.5); r.root.rotation.y = Math.PI; const kk = ss(named[k] - 0.2, named[k] + 0.3, t);
       K.act(r, POSE[k](t, kk), t, { smile: 0.4 + 0.4 * kk, mouth: kk > 0.5 && (k === 'turbo' || k === 'golshi') ? [0.6, 0.9] : undefined }); });
     return U.film(t) + U.roster(t, tC + 0.2, ctx.dur + 1, ROW.map(([k]) => [k, named[k]]), { x: 1560, y: 110, w: 520 });
