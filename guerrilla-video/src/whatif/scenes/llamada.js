@@ -38,7 +38,7 @@ export function build(ctx) {
   const rec = D.phone.receiver; D.add(rec); rec.userData.dynamic = true;
   const cell = P.smartphone('#1d2a3a'); cell.userData.dynamic = true; OV.add(cell);
   const camL = new THREE.PerspectiveCamera(36, 0.5 * ctx.W / ctx.H, 0.1, 200), camR = new THREE.PerspectiveCamera(36, 0.5 * ctx.W / ctx.H, 0.1, 200);
-  camL.position.set(1.05, 1.3, 0.25); camL.lookAt(0.95, 1.12, -2.2); camR.position.set(0.15, 1.3, 3.95); camR.lookAt(0, 1.12, 1.5);
+  camL.position.set(1.05, 1.3, 0.25); camL.lookAt(0.95, 1.42, -2.2); camR.position.set(0.15, 1.3, 3.95); camR.lookAt(0, 1.42, 1.5);   // heads low enough for the bubbles above them
   const hung = t => t > tEnd;
   // overlays over each half of the split: project with that panel's camera into its half of the frame
   const projWith = (cam, x0, w) => ({ project(v) { cam.updateMatrixWorld(); const p = new THREE.Vector3(...v).project(cam); return [x0 + (p.x + 1) / 2 * w, (1 - p.y) / 2 * ctx.H, p.z < 1]; } });
