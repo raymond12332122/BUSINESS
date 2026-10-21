@@ -1027,6 +1027,86 @@ def narco_bed(moods=NARCO_MOODS, bpm=80, key=0):
     return L, R
 
 
+# ------------------------------------------------------------------ "¿Qué pasaría si...?": idol pop, marimba, driving rock, calm and tense beds
+WHATIF_MOODS = {'titulo': 'pop', 'mexico': 'marimba', 'eeuu': 'drive', 'vecinos': 'calm', 'llamada': 'tense', 'mundo': 'marimba', 'mundo2': 'marimba',
+                'cumbre': 'pop', 'entrena': 'drive', 'carrera': 'race', 'live': 'pop', 'final': 'calm'}
+def whatif_pop(moods=WHATIF_MOODS, bpm=124, key=0):
+    beat = 60 / bpm; bar = 4 * beat
+    CH = {'C': [48, 52, 55], 'G': [43, 47, 50], 'Am': [45, 48, 52], 'F': [41, 45, 48], 'Dm': [50, 53, 57], 'E': [40, 44, 47], 'Em': [40, 43, 47]}
+    CH = {k: [n + key for n in v] for k, v in CH.items()}
+    prog = {'pop': ['C', 'G', 'Am', 'F'], 'marimba': ['C', 'F', 'G', 'C', 'Am', 'F', 'G', 'C'], 'drive': ['Am', 'F', 'C', 'G'], 'race': ['Am', 'F', 'C', 'G'], 'calm': ['F', 'C', 'G', 'Am'], 'tense': ['Am', 'Am', 'Dm', 'E']}
+    hook = [[(76, .5), (76, .5), (79, 1), (76, .5), (74, .5), (72, 1)], [(74, .5), (74, .5), (76, .5), (74, .5), (71, 2)], [(72, .5), (72, .5), (76, 1), (79, .5), (81, .5), (79, 1)], [(77, 1), (76, .5), (74, .5), (72, 2)]]
+    hook = [[(n + key, d) for n, d in b_] for b_ in hook]
+    L, R = np.zeros(N), np.zeros(N)
+    cache_ = {}
+    def memo(k, fn):
+        if k not in cache_: cache_[k] = fn()
+        return cache_[k]
+    def add(x, t0, gl=0.5, gr=0.5):
+        i = int(t0 * SR)
+        if i >= N or i < 0: return
+        x = x[: N - i]; L[i:i + len(x)] += x * gl; R[i:i + len(x)] += x * gr
+    def kick(): return memo('k', lambda: sweep(110, 45, 0.3) * env_exp(0.3, 11))
+    def clap(): return memo('c', lambda: fft_filter(noise(0.18), lo=900, hi=5000) * (env_exp(0.18, 30) + 0.5 * np.roll(env_exp(0.18, 40), int(0.012 * SR))))
+    def hat(o=False): return memo(('h', o), lambda: fft_filter(noise(0.25 if o else 0.05), lo=7000) * env_exp(0.25 if o else 0.05, 14 if o else 70))
+    def snare(): return memo('s', lambda: fft_filter(noise(0.2), lo=1200, hi=7000) * env_exp(0.2, 22) + np.sin(2 * np.pi * 200 * t_(0.2)) * env_exp(0.2, 35) * 0.5)
+    def bass(m, d): return memo(('b', m, round(d, 3)), lambda: fft_filter(2 * ((NOTE(m) * t_(d)) % 1) - 1, hi=420) * np.minimum(1, t_(d) / 0.01) * np.exp(-t_(d) * 1.5))
+    def marimba(m, d=0.6): return memo(('m', m), lambda: (np.sin(2 * np.pi * NOTE(m) * t_(d)) + 0.25 * np.sin(2 * np.pi * NOTE(m) * 4 * t_(d)) * env_exp(d, 18)) * env_exp(d, 6) * np.minimum(1, t_(d) / 0.003))
+    def lead(m, d):
+        def mk():
+            tt = t_(d); f = NOTE(m) * (1 + 0.004 * np.sin(2 * np.pi * 5.5 * tt) * np.minimum(1, tt * 2)); ph = np.cumsum(f) / SR
+            x = sum(np.sin(2 * np.pi * k * ph) / k for k in (1, 3, 5, 7)) * 0.8 + 0.3 * np.sin(4 * np.pi * ph)
+            return fft_filter(x, hi=4200) * np.minimum(1, tt / 0.015) * np.minimum(1, (d - tt) / 0.06) * (0.75 + 0.25 * np.exp(-tt * 3))
+        return memo(('l', m, round(d, 3)), mk)
+    def stab(chord, d):
+        def mk(): tt = t_(d); return fft_filter(sum(2 * ((NOTE(n + 12) * tt * (1 + det)) % 1) - 1 for n in chord for det in (-0.004, 0.004)), hi=2600) * np.minimum(1, tt / 0.01) * np.exp(-tt * 5)
+        return memo(('st', tuple(chord), round(d, 3)), mk)
+    def pad(chord, d):
+        def mk(): tt = t_(d); return fft_filter(sum(2 * ((NOTE(n + 12) * tt * (1 + det)) % 1) - 1 for n in chord for det in (-0.006, 0.006)), hi=1400) * np.minimum(1, tt / 0.6) * np.minimum(1, (d - tt) / 0.6)
+        return memo(('p', tuple(chord), round(d, 3)), mk)
+    def mood_at(t):
+        for sc in TL['scenes']:
+            if sc['start'] <= t < sc['start'] + sc['dur']: return moods.get(sc['id'], 'pop')
+        return 'pop'
+    nb = int(TOTAL / bar) + 1
+    for b in range(nb):
+        t0 = b * bar; m = mood_at(t0 + bar / 2); pr = prog[m]; ch = CH[pr[b % len(pr)]]
+        if m in ('pop', 'drive', 'race'):
+            fast = m == 'race'
+            for k in range(4): add(kick() * 0.6, t0 + k * beat)
+            for k in (1, 3): add((clap() if m == 'pop' else snare()) * 0.32, t0 + k * beat, 0.45, 0.55)
+            for q in range(8 if not fast else 16): add(hat(q % 4 == 2 and not fast) * 0.12, t0 + q * beat / (2 if not fast else 4), 0.35, 0.65)
+            for q in range(8): add(bass(ch[0] - 12 + (12 if q % 2 else 0), beat * 0.45) * 0.42, t0 + q * beat / 2)
+            if m == 'pop':
+                for q in (0, 1.5, 3): add(stab(ch, beat * 0.5) * 0.11, t0 + q * beat, 0.55, 0.45)
+                tt = t0
+                for (n, du) in hook[b % 4]:
+                    add(lead(n, du * beat * 0.92) * 0.10, tt, 0.42, 0.58); tt += du * beat
+            else:
+                add(pad(ch, bar) * 0.06, t0); add(stab(ch, beat * 0.4) * 0.13, t0); add(stab(ch, beat * 0.4) * 0.1, t0 + 2.5 * beat)
+        elif m == 'marimba':
+            arp = [ch[0], ch[1], ch[2], ch[1], ch[0] + 12, ch[2], ch[1], ch[2]]
+            for q, n in enumerate(arp): add(marimba(n + 12) * 0.24, t0 + q * beat / 2, 0.38 + 0.03 * q, 0.62 - 0.03 * q)
+            for q in (0, 2): add(bass(ch[0] - 12, beat * 0.9) * 0.35, t0 + q * beat)
+            add(kick() * 0.35, t0); add(kick() * 0.25, t0 + 2.5 * beat)
+            for q in range(4): add(hat() * 0.08, t0 + q * beat + beat / 2, 0.4, 0.6)
+            if b % 2 == 1: add(marimba(ch[2] + 24, 0.4) * 0.12, t0 + 3.5 * beat)
+        elif m == 'tense':
+            for q in range(8): add(stab([ch[0]], beat * 0.4) * (0.16 if q % 2 == 0 else 0.1), t0 + q * beat / 2)
+            add(pad(ch, bar) * 0.06, t0); add(kick() * 0.3, t0)
+        else:  # calm
+            add(pad(ch, bar) * 0.09, t0)
+            arp = [ch[0], ch[1], ch[2], ch[0] + 12, ch[2], ch[1], ch[2], ch[0] + 12]
+            for q, n in enumerate(arp): add(memo(('ks', n), lambda n=n: ks(NOTE(n + 12), 1.2, 0.3)) * 0.16, t0 + q * beat / 2, 0.4 + 0.03 * q, 0.62 - 0.03 * q)
+            add(bass(ch[0] - 12, bar * 0.9) * 0.22, t0)
+    for X_ in (L, R):
+        y = X_.copy()
+        for dms, g in ((31, 0.22), (53, 0.16), (79, 0.11), (113, 0.08), (173, 0.05)):
+            d_ = int(dms * SR / 1000); y[d_:] += X_[:-d_] * g
+        X_[:] = fft_filter(y, lo=40, hi=7000)
+    return L, R
+
+
 # ------------------------------------------------------------------ music bed (D minor, slow pads + soft pulse)
 if VIDEO == 'mx':
     musL, musR = corrido(); t_all = np.arange(N) / SR
@@ -1050,7 +1130,10 @@ BPM = 84; beat = 60 / BPM
 if VIDEO == 'ww1':
     musL, musR = narco_bed(WW1_MOODS, bpm=70, key=-3); t_all = np.arange(N) / SR
     sc_ = 0.15 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
-if VIDEO not in ('mx', 'napo', 'amer', 'narco', 'puebla', 'rusia', 'ww1'):
+if VIDEO == 'whatif':
+    musL, musR = whatif_pop(); t_all = np.arange(N) / SR
+    sc_ = 0.15 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
+if VIDEO not in ('mx', 'napo', 'amer', 'narco', 'puebla', 'rusia', 'ww1', 'whatif'):
     prog = [[146.8, 174.6, 220.0], [116.5, 146.8, 174.6], [174.6, 220.0, 261.6], [130.8, 164.8, 196.0]]  # Dm Bb F C
     bar = 4 * beat
     musL, musR = np.zeros(N), np.zeros(N)

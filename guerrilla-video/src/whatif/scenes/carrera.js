@@ -84,7 +84,7 @@ export function build(ctx) {
     { t0: tMit - 0.3, set: Rc, p0: [0, 1, 0], l0: [0, 1, -40], fov0: 40, act: t => act(t, camFront) },
     { t0: tGold - 0.3, set: Rc, p0: [0, 1, 0], l0: [0, 1, -40], fov0: 42, act: t => act(t, camGold) },
     { t0: tRec - 0.3, set: Rc, p0: [0, 1, 0], l0: [0, 1, 40], fov0: 40, act: t => act(t, camDuel) },
-    { t0: tMeta - 1.2, set: Rc, p0: [FX - 2, 1.3, 30.5], l0: [FX + 0.5, 1.0, 41], fov0: 46, act: t => act(t) + U.photoFinish(t, tMeta + 0.05, tEmp - 0.45, 'EMPATE', tEmp - 0.9) },
+    { t0: tMeta - 0.75, set: Rc, p0: [FX - 2.5, 1.3, 29.0], l0: [FX + 0.5, 1.0, 41], fov0: 50, act: t => act(t) + U.photoFinish(t, tMeta + 0.05, tEmp - 0.45, 'EMPATE', tEmp - 0.9) },
     { t0: tEmp - 0.5, set: Rc, p0: [0, 1, 0], l0: [0, 1, 0], fov0: 38, act: t => act(t, camEnd) + U.bigTitle(t, tEmp - 0.4, ctx.dur + 1, 'FOTO FINISH', '¡Empate!', 'Rudolf y Sirius, cabeza con cabeza', { top: 60 }) },
   ];
   const inst = { scene: Rc, scenes: [Rc], sfx };

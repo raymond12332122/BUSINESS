@@ -48,11 +48,11 @@ export function build(ctx) {
     const pR = walkIn(rud, t, tB, [RUN0, 0.75], Math.PI / 2, RUNLEN, { run: 0.7, speed: 0.95, seed: 1, acc: 0.6 }); rud.root.position.y = DY;
     const pS = walkIn(sir, t, tB, [RUN0, -0.75], Math.PI / 2, RUNLEN, { run: 0.7, speed: 0.95, seed: 2, acc: 0.6 }); sir.root.position.y = DY;
     const glance = ss(tJun - 0.4, tJun + 0.1, t);
-    const rp = rud.root.position, sp = sir.root.position;
+    const rp = rud.root.position, sp = sir.root.position, m0 = rp.clone().add(sp).multiplyScalar(0.5);
     pR.look = [sp.x, DY + 1.2, sp.z]; pR.lookW = 0.7 * glance; pS.look = [rp.x, DY + 1.2, rp.z]; pS.lookW = 0.7 * glance;
     K.act(rud, pR, t, { smile: 0.5 + 0.4 * glance }); K.act(sir, pS, t, { smile: 0.3 + 0.5 * glance });
     fams.forEach(f => { f.r.root.visible = true; const p = walkIn(f.r, t, tB - 2, [f.x0, f.z], f.dir > 0 ? Math.PI / 2 : -Math.PI / 2, 30, { speed: 0.55, seed: f.i }); f.r.root.position.y = DY; K.act(f.r, p, t, { smile: 0.8 }); });
-    trucks.forEach((tr, i) => { const x = ((i * 23 + 7 * (t - tB)) % 70) - 35; tr.visible = true; tr.position.set(i === 1 ? -x : x, DY, i === 1 ? 2.9 : -2.9); tr.rotation.y = i === 1 ? Math.PI : 0; });
+    trucks.forEach((tr, i) => { tr.visible = true; tr.position.set(m0.x - 11 - 15 * i, DY, i % 2 ? 3.1 : -3.1); tr.rotation.y = 0; });   // they follow behind the runners, never past the camera
     const c = ctx.camera, m = rp.clone().add(sp).multiplyScalar(0.5); c.position.set(m.x + 6.2, DY + 1.35, 0.4); c.lookAt(m.x, DY + 1.05, 0);
     Br.tick?.(t);
     return U.film(t) + U.popCard(t, tKm - 0.2, tFam - 0.1, 'FRONTERA', '3,142 km', 'compartidos', { x: 1500, y: 130, w: 420, accent: '#ffd34a', icon: '🌉' })
@@ -62,7 +62,7 @@ export function build(ctx) {
 
   // ================================================================ C + credits: the finale on the Winning Live stage
   const St = S.liveStage(), Y = St.stage.top;
-  drawScreen(St.stage, ['¡GRACIAS!', '¿QUÉ PASARÍA SI…?']);
+  drawScreen(St.stage, ['WINNING LIVE', 'GRAN CARRERA DE NORTEAMÉRICA']);
   const cast = SPOTS.map(([k, x, z]) => { const r = K.leader(St, k, x, z, 0); if (k === 'rudolf') K.fitSash(r, SASH, { emblem: K.eagleKnot() }); return { r, k, x, z, i: SPOTS.findIndex(s => s[0] === k) }; });
   St.confT0 = tCon - 0.2;
   const ROWS = Object.values(K.LEADERS).map(([uma, country, , quip]) => [uma, country === 'México' || country === 'Estados Unidos' ? `Presidenta de ${country}` : `Líder de ${country}`, quip]);
@@ -74,7 +74,7 @@ export function build(ctx) {
       K.act(c.r, p, t, { smile: 0.9, eye: 0.15, mouth: [0.3, 0.9] }); });
     St.tick?.(t);
     return U.film(t) + U.credits(t, tCred, ctx.dur - 3.3, ROWS, { title: 'ELENCO', x: 1290, w: 560, speed: 1 })
-      + U.bigTitle(t, ctx.dur - 3.4, ctx.dur + 1, 'GRACIAS POR VER', '¿Qué pasaría si…?', '', { top: 380 });
+      + U.bigTitle(t, ctx.dur - 3.4, ctx.dur + 1, 'GRACIAS POR VER', '¿Qué pasaría si…?', '', { top: 610 });
   };
 
   const sfx = [
