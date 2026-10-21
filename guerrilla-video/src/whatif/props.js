@@ -474,9 +474,23 @@ export function chalet() { const g = new THREE.Group(); g.add(at(mesh(new THREE.
 export function yacht(len = 8, col = '#f4f4f2') { const g = new THREE.Group(); const hull = mesh(new THREE.CapsuleGeometry(1.1, len, 6, 14), std(col, { roughness: 0.3 })); hull.rotation.x = Math.PI / 2; hull.scale.set(1, 1, 0.55); hull.position.y = 0.4; g.add(hull);
   g.add(at(mesh(new THREE.BoxGeometry(1.8, 1.0, len * 0.5), std('#ffffff', { roughness: 0.3 })), 0, 1.2, -0.5)); g.add(at(mesh(new THREE.BoxGeometry(1.6, 0.25, len * 0.45), std('#2a3a4a', { roughness: 0.2 })), 0, 1.5, -0.5));
   g.add(at(mesh(new THREE.BoxGeometry(1.2, 0.7, len * 0.25), std('#ffffff')), 0, 1.9, -0.9)); return g; }
-export function casino() { const g = new THREE.Group(), st = std('#efe2c4', { roughness: 0.8 }); g.add(at(mesh(new THREE.BoxGeometry(14, 6, 6), st), 0, 3, 0));
-  for (const x of [-5.5, 5.5]) { g.add(at(mesh(new THREE.BoxGeometry(2.2, 9, 2.2), st), x, 4.5, 2)); const d = mesh(new THREE.SphereGeometry(1.2, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), std('#5a7a6a')); d.position.set(x, 9, 2); g.add(d); }
-  for (let i = 0; i < 6; i++) g.add(at(mesh(new THREE.PlaneGeometry(0.9, 2.2), std('#2a3a4a')), -3.5 + i * 1.4, 2.2, 3.01)); g.add(at(box(14.4, 0.4, 6.4, '#d8c8a8'), 0, 6.2, 0)); return shadowy(g); }
+export function casino() {
+  const g = new THREE.Group(), st = std('#efe2c4', { roughness: 0.8 }), trim = std('#fbf6ea', { roughness: 0.7 }), glass = std('#34465a', { roughness: 0.25, metalness: 0.3 }), cu = std('#5f9a82', { roughness: 0.5, metalness: 0.2 });
+  g.add(at(mesh(new THREE.BoxGeometry(14, 6, 6), st), 0, 3, 0));
+  for (const x of [-5.5, 5.5]) { g.add(at(mesh(new THREE.BoxGeometry(2.2, 9, 2.2), st), x, 4.5, 2)); const d = mesh(new THREE.SphereGeometry(1.2, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), cu); d.position.set(x, 9, 2); g.add(d);
+    g.add(at(mesh(new THREE.ConeGeometry(0.12, 1.0, 8), cu), x, 10.6, 2)); for (const y of [3.2, 6.4]) g.add(at(mesh(new THREE.PlaneGeometry(0.7, 1.6), glass), x, y, 3.11)); }
+  // tall arched windows in pale surrounds either side of the entrance
+  for (const x of [-3.0, -1.6, 1.6, 3.0]) { g.add(at(mesh(new THREE.PlaneGeometry(1.1, 3.0), trim), x, 2.35, 3.005)); g.add(at(mesh(new THREE.PlaneGeometry(0.8, 2.2), glass), x, 2.15, 3.01));
+    const arch = mesh(new THREE.CircleGeometry(0.4, 16, 0, Math.PI), glass); arch.position.set(x, 3.25, 3.01); g.add(arch); }
+  g.add(at(mesh(new THREE.PlaneGeometry(1.5, 2.8), trim), 0, 1.4, 3.005)); g.add(at(mesh(new THREE.PlaneGeometry(1.2, 2.5), glass), 0, 1.25, 3.01));
+  // cornice, attic with the clock, and the gilded marquee over the door
+  g.add(at(box(14.4, 0.4, 6.4, '#d8c8a8'), 0, 6.2, 0)); g.add(at(box(4.4, 1.7, 0.5, '#f4ead4'), 0, 7.2, 2.75));
+  const face = mesh(new THREE.CircleGeometry(0.55, 24), std('#fbfaf4')); face.position.set(0, 7.2, 3.02); g.add(face);
+  const rim = mesh(new THREE.RingGeometry(0.55, 0.64, 24), std('#c9a227', { metalness: 0.6, roughness: 0.35 })); rim.position.set(0, 7.2, 3.021); g.add(rim);
+  g.add(at(box(0.05, 0.42, 0.02, '#1d1d1f'), 0, 7.36, 3.03)); g.add(at(box(0.3, 0.05, 0.02, '#1d1d1f'), 0.13, 7.2, 3.03));
+  g.add(at(box(2.6, 0.12, 1.6, '#c9a227'), 0, 3.0, 3.8)); for (const x of [-1.15, 1.15]) g.add(at(cyl(0.05, 0.05, 3.0, '#2a2a2e', 8), x, 1.5, 4.5));
+  return shadowy(g);
+}
 // Geneva summit: round table with a gap, chairs, flags on poles behind.
 export function summitTable(R = 4.2) { const g = new THREE.Group(), w = std('#6a4428', { roughness: 0.4 });
   const top = mesh(new THREE.RingGeometry(R - 0.9, R, 64, 1, 0.35, Math.PI * 2 - 0.7), w); top.rotation.x = -Math.PI / 2; top.position.y = 0.76; g.add(top);

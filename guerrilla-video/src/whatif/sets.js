@@ -249,7 +249,16 @@ export function country(code) {
     s.add(LP.at(LP.box(26, 0.02, 80, '#4e5054'), 0, 0.011, -30)); for (let i = 0; i < 12; i++) add(NP.building(8, 14 + R() * 10, 8, ['#d8d0c0', '#c8c0b0', '#e2dccc'][i % 3], { seed: i }), (i % 2 ? 1 : -1) * 22, 0, -10 - (i >> 1) * 10, i % 2 ? -Math.PI / 2 : Math.PI / 2); }
   if (code === 'ch') { add(P.matterhorn(44), -8, 0, -90); add(P.matterhorn(30), 30, 0, -110, 1); add(P.chalet(), 7, 0, -12, -0.3); for (let i = 0; i < 12; i++) add(LP.pine(1.4 + R(), '#2f5a3a', i), (i % 2 ? 1 : -1) * (6 + R() * 18), 0, -8 - R() * 25); }
   if (code === 'mc') { add(P.casino(), -6, 0, -18, 0.2); const sea = new THREE.Mesh(new THREE.PlaneGeometry(300, 120), std('#2a7ab0', { roughness: 0.25 })); sea.rotation.x = -Math.PI / 2; sea.position.set(0, 0.05, -80); s.add(sea);
-    for (let i = 0; i < 7; i++) add(P.yacht(7 + R() * 5, ['#f4f4f2', '#ffffff', '#1d2a3a'][i % 3]), -20 + i * 7, 0, -26 - R() * 8, Math.PI / 2 + (R() - 0.5) * 0.3); s.add(LP.at(LP.box(70, 0.4, 2, '#d8d0c0'), 0, 0.2, -21)); }
+    for (let i = 0; i < 7; i++) add(P.yacht(7 + R() * 5, ['#f4f4f2', '#ffffff', '#1d2a3a'][i % 3]), -20 + i * 7, 0, -26 - R() * 8, Math.PI / 2 + (R() - 0.5) * 0.3); s.add(LP.at(LP.box(70, 0.4, 2, '#d8d0c0'), 0, 0.2, -21));
+    // the Grand Prix street: asphalt under the runner, a red-and-white kerb and a striped barrier behind her
+    s.add(LP.at(LP.box(70, 0.02, 2.2, '#3a3c40'), 0, 0.011, 0.5));
+    for (let i = 0; i < 88; i++) s.add(LP.at(LP.box(0.8, 0.03, 0.3, i % 2 ? '#f4f4f2' : '#d42a2a'), -34.8 + i * 0.8, 0.016, -0.75));
+    const ad = canvasTexLocal(1024, 64, (x, W, H) => { [['#d42a2a', '#ffffff', 'MONACO'], ['#f4f4f2', '#d42a2a', 'GRAND PRIX'], ['#1d4fb8', '#ffffff', 'TURBO ★'], ['#1d1d1f', '#f2c14e', 'MONTE-CARLO']].forEach(([bg, ink, txt], i) => {
+      x.fillStyle = bg; x.fillRect(i * W / 4, 0, W / 4, H); x.fillStyle = ink; x.font = '900 34px Inter'; x.textAlign = 'center'; x.fillText(txt, i * W / 4 + W / 8, 45); }); });
+    ad.wrapS = THREE.RepeatWrapping; ad.repeat.set(7, 1); const grey = std('#9a9ca0');
+    s.add(LP.at(new THREE.Mesh(new THREE.BoxGeometry(70, 0.9, 0.22), [grey, grey, grey, grey, new THREE.MeshStandardMaterial({ map: ad, roughness: 0.6 }), grey]), 0, 0.45, -1.9));
+    for (const x of [-14, -3, 8, 19]) add(LP.palm(1.3, x + 40), x, 0, -9);
+    s.flag.position.set(2.6, 0, -12); }   // the flag stands back where the low camera sees it whole
   finishOut(s, C.light, { kind: C.kind, noGrass: C.kind !== 'grass', grass: { area: [-20, -20, 20, 6], n: 3500, clear: [[0, 0, 2.5]] }, look: code === 'kr' ? { bloom: 0.6, bloomT: 0.8 } : {} });
   ticker(s).push(t => f.wave(t, code === 'kr' ? 0.3 : 0.6));
   return s;
