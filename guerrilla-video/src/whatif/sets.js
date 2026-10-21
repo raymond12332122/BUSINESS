@@ -244,7 +244,7 @@ export function country(code) {
     const sea = new THREE.Mesh(new THREE.PlaneGeometry(400, 160), std('#3a8ab8', { roughness: 0.3 })); sea.rotation.x = -Math.PI / 2; sea.position.set(0, 0.03, -100); s.add(sea);
     const wt = canvasTexLocal(256, 64, (x, W, H) => { x.fillStyle = '#f4f0e6'; x.fillRect(0, 0, W, H); x.fillStyle = '#1d1d1f'; x.beginPath(); x.moveTo(0, H); for (let i = 0; i <= W; i += 4) x.lineTo(i, H / 2 + Math.sin(i / W * Math.PI * 4) * 14); x.lineTo(W, H); x.fill(); });
     wt.wrapS = THREE.RepeatWrapping; wt.repeat.set(12, 1); const walk = new THREE.Mesh(new THREE.PlaneGeometry(60, 2.2), new THREE.MeshStandardMaterial({ map: wt, roughness: 0.9 })); walk.rotation.x = -Math.PI / 2; walk.position.set(0, 0.012, -3.2); s.add(walk);
-    for (let i = 0; i < 6; i++) add(LP.palm(1.2, i), -14 + i * 5.5, 0, -6); }
+    for (let i = 0; i < 6; i++) add(LP.palm(1.2, i), -11 + i * 5.5, 0, -6); }   // no crown right behind the leader's head from the low camera
   if (code === 'ar') { add(P.obelisco(28), 0, 0, -26); for (let i = 0; i < 10; i++) add(P.jacaranda(1 + R() * 0.4, i), (i % 2 ? 1 : -1) * (7 + R() * 8), 0, -6 - R() * 18);
     s.add(LP.at(LP.box(26, 0.02, 80, '#4e5054'), 0, 0.011, -30)); for (let i = 0; i < 12; i++) add(NP.building(8, 14 + R() * 10, 8, ['#d8d0c0', '#c8c0b0', '#e2dccc'][i % 3], { seed: i }), (i % 2 ? 1 : -1) * 22, 0, -10 - (i >> 1) * 10, i % 2 ? -Math.PI / 2 : Math.PI / 2); }
   if (code === 'ch') { add(P.matterhorn(44), -8, 0, -90); add(P.matterhorn(30), 30, 0, -110, 1); add(P.chalet(), 7, 0, -12, -0.3); for (let i = 0; i < 12; i++) add(LP.pine(1.4 + R(), '#2f5a3a', i), (i % 2 ? 1 : -1) * (6 + R() * 18), 0, -8 - R() * 25); }
