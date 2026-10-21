@@ -68,7 +68,8 @@ export function build(ctx) {
   // follow cameras (they override the shot's static framing)
   // follow cameras ride on the field's smooth pace, never on one runner's position (no jumps when the lead changes)
   const camTurbo = (c, t) => { const p = pos('turbo'); c.position.set(p.x + 3.0, 1.45, -38.6); c.lookAt(p.x - 2.5, 1.0, -40.9); };
-  const camFront = (c, t) => { const a = raceAt(D0 + base(t) + 24, 2), b = raceAt(D0 + base(t) + 6, 2); c.position.set(a.x, 1.7, a.z); c.lookAt(b.x, 0.9, b.z); };
+  // trackside, just inside the rail and a few metres ahead of Twin Turbo: she runs out of gas while the field swallows her
+  const camTired = (c, t) => { const dT = dOf(runners[1], t), a = raceAt(dT + 4.6, -1.0), b = raceAt(dT - 0.8, 1.2); c.position.set(a.x, 1.5, a.z); c.lookAt(b.x, 0.95, b.z); };
   const camGold = (c, t) => { const dg = dOf(runners[5], t), a = raceAt(dg - 5, 8.4), b = raceAt(dg + 1.5, 4); c.position.set(a.x, 2.4, a.z); c.lookAt(b.x, 1.0, b.z); };
   const camDuel = (c, t) => { const m = mid('rudolf', 'sirius'), k = ss(tCab - 0.3, tCab + 0.6, t); c.position.set(m.x + 7.5 - 2.5 * k, 1.35, m.z + 0.2); c.lookAt(m.x, 1.2, m.z); c.fov = 40 - 10 * k; c.updateProjectionMatrix(); };
   const FX = Rc.finishX;
@@ -81,10 +82,11 @@ export function build(ctx) {
   const shots = [
     { t0: 0, set: Rc, p0: [g0.x - 9, 1.0, g0.z + 1.5], l0: [g0.x, 1.3, g0.z], p1: [g0.x - 8, 1.0, g0.z + 1.2], l1: [g0.x, 1.3, g0.z], fov0: 44, act: t => act(t) },
     { t0: tGo + 0.9, set: Rc, p0: [0, 1, 0], l0: [0, 1, -40], fov0: 38, act: t => act(t, camTurbo) },
-    { t0: tMit - 0.3, set: Rc, p0: [0, 1, 0], l0: [0, 1, -40], fov0: 40, act: t => act(t, camFront) },
+    { t0: tMit - 0.3, set: Rc, p0: [0, 1, 0], l0: [0, 1, -40], fov0: 42, act: t => act(t, camTired) },
     { t0: tGold - 0.3, set: Rc, p0: [0, 1, 0], l0: [0, 1, -40], fov0: 42, act: t => act(t, camGold) },
     { t0: tRec - 0.3, set: Rc, p0: [0, 1, 0], l0: [0, 1, 40], fov0: 40, act: t => act(t, camDuel) },
-    { t0: tMeta - 0.75, set: Rc, p0: [FX - 2.5, 1.3, 29.0], l0: [FX + 0.5, 1.0, 41], fov0: 50, act: t => act(t) + U.photoFinish(t, tMeta + 0.05, tEmp - 0.45, 'EMPATE', tEmp - 0.9) },
+    // the photo-finish camera sits on the line; the image freezes as their heads cross it
+    { t0: tMeta - 0.45, set: Rc, p0: [FX, 2.2, 35.5], l0: [FX, 0.95, 41.5], fov0: 34, act: t => act(Math.min(t, tMeta + 0.02)) + U.photoFinish(t, tMeta + 0.05, tEmp - 0.45, 'EMPATE', tEmp - 0.9) },
     { t0: tEmp - 0.5, set: Rc, p0: [0, 1, 0], l0: [0, 1, 0], fov0: 38, act: t => act(t, camEnd) + U.bigTitle(t, tEmp - 0.4, ctx.dur + 1, 'FOTO FINISH', '¡Empate!', 'Rudolf y Sirius, cabeza con cabeza', { top: 60 }) },
   ];
   const inst = { scene: Rc, scenes: [Rc], sfx };
