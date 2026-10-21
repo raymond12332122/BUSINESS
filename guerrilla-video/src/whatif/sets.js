@@ -230,7 +230,8 @@ export function country(code) {
   if (code === 'jp') { add(P.torii(4.6), 0, 0, -7); add(P.fuji(30), 10, 0, -120); for (let i = 0; i < 10; i++) add(P.sakura(1 + R() * 0.5, i), (i % 2 ? 1 : -1) * (4 + R() * 9), 0, -3 - R() * 16);
     for (const x of [-2.2, 2.2]) add(P.stoneLantern(), x, 0, -4.5); s.add(LP.at(LP.box(3, 0.02, 30, '#c8bca0'), 0, 0.012, -15)); }
   if (code === 'de') { add(P.clockTower(), 0, 0, -16); for (let i = 0; i < 4; i++) add(P.halfTimber(5, i), (i < 2 ? -1 : 1) * (9 + (i % 2) * 5.4), 0, -12 + (i % 2) * 0.6, 0); s.clock = s.children.find(o => o.clock)?.clock; }
-  if (code === 'fr') { add(P.eiffel(34), 6, 0, -40); add(P.patisserie(), -3.2, 0, -4.2, 0.25); for (let i = 0; i < 6; i++) add(LP.roundTree(1.4, '#5f8a3a', i), 9 + i * 3, 0, -14 - i); }
+  if (code === 'fr') { add(P.eiffel(22), -12.6, 0, -104); add(P.patisserie(), -3.2, 0, -4.2, 0.25); add(P.patisserie({ name: 'Boulangerie', awning: '#2a5ab8', wall: '#efe2cc', trim: '#5a2a3a', seed: 2 }), -10.6, 0, -3.2, 1.0);
+    for (let i = 0; i < 4; i++) add(LP.roundTree(1.3, '#5f8a3a', i), 5.5 + i * 2.6, 0, -16 - i * 2.5); }   // the shop fronts face the camera, the tower stands clear on the right
   if (code === 'it') { add(P.colosseum(), 0, 0, -22); for (let i = 0; i < 10; i++) add(P.cypress(1 + R() * 0.4, i), (i % 2 ? 1 : -1) * (7 + R() * 10), 0, -8 - R() * 20); }
   if (code === 'sm') { add(P.sanMarino(), 0, 0, -24); for (let i = 0; i < 8; i++) add(LP.roundTree(1.2 + R() * 0.5, '#4f7f32', i), -14 + R() * 28, 0, -8 - R() * 8); }
   if (code === 'au') { add(P.uluru(), 6, 0, -70); for (let i = 0; i < 9; i++) add(P.eucalyptus(1 + R() * 0.4, i), (i % 2 ? 1 : -1) * (5 + R() * 14), 0, -6 - R() * 20);

@@ -372,19 +372,28 @@ export function eiffel(h = 30) {
   const arch = mesh(new THREE.TorusGeometry(3.2, 0.3, 6, 24, Math.PI), m); arch.position.set(0, 2.6, 4.6); g.add(arch); const arch2 = arch.clone(); arch2.position.set(0, 2.6, -4.6); g.add(arch2);
   g.add(at(mesh(new THREE.ConeGeometry(0.22, 2.6, 6), m), 0, h + 1.2, 0)); return shadowy(g);
 }
-export function patisserie() {
+export function patisserie({ name = 'Pâtisserie', awning = '#c0392b', wall = '#f2ecdf', trim = '#2a3a5a', seed = 0 } = {}) {
   const g = new THREE.Group();
-  g.add(at(mesh(new THREE.BoxGeometry(7, 5.5, 3), std('#f2ecdf')), 0, 2.75, -1.5));
-  const sign = canvasTex(512, 96, (x, W, H) => { x.fillStyle = '#2a3a5a'; x.fillRect(0, 0, W, H); x.fillStyle = '#e8c860'; x.font = 'italic 700 52px Georgia'; x.textAlign = 'center'; x.fillText('Pâtisserie', W / 2, 64); });
+  g.add(at(mesh(new THREE.BoxGeometry(7, 5.5, 3), std(wall)), 0, 2.75, -1.5));
+  const sign = canvasTex(512, 96, (x, W, H) => { x.fillStyle = trim; x.fillRect(0, 0, W, H); x.fillStyle = '#e8c860'; x.font = 'italic 700 52px Georgia'; x.textAlign = 'center'; x.fillText(name, W / 2, 64); });
   g.add(at(mesh(new THREE.PlaneGeometry(4.2, 0.8), new THREE.MeshStandardMaterial({ map: sign })), 0, 3.9, 0.02));
-  const aw = canvasTex(256, 64, (x, W, H) => { for (let i = 0; i < 16; i++) { x.fillStyle = i % 2 ? '#ffffff' : '#c0392b'; x.fillRect(i * W / 16, 0, W / 16 + 1, H); } });
+  const aw = canvasTex(256, 64, (x, W, H) => { for (let i = 0; i < 16; i++) { x.fillStyle = i % 2 ? '#ffffff' : awning; x.fillRect(i * W / 16, 0, W / 16 + 1, H); } });
   const awn = mesh(new THREE.PlaneGeometry(6.2, 1.2), new THREE.MeshStandardMaterial({ map: aw, side: THREE.DoubleSide })); awn.position.set(0, 3.15, 0.5); awn.rotation.x = -1.0; g.add(awn);
-  g.add(at(mesh(new THREE.PlaneGeometry(5.4, 1.9), std('#d8e8f0', { roughness: 0.1, metalness: 0.2, transparent: true, opacity: 0.35 })), 0, 1.55, 0.05));
-  g.add(at(box(5.6, 0.12, 0.7, '#e8dcc0'), 0, 0.85, -0.3));
+  // the shop window juts out of the wall: a display case, cakes on two shelves behind the glass, gilt lettering on it
+  const VX = -0.6, VW = 5.0, VD = 0.62;
+  g.add(at(box(VW + 0.2, 0.8, VD + 0.04, trim), VX, 0.4, VD / 2)); g.add(at(box(VW + 0.2, 0.14, VD + 0.04, trim), VX, 2.43, VD / 2));
+  for (const sx of [-1, 1]) g.add(at(box(0.1, 1.5, VD, trim), VX + sx * (VW / 2 + 0.05), 1.61, VD / 2));
+  g.add(at(box(VW, 0.04, VD - 0.08, '#f4ead8'), VX, 0.82, VD / 2 - 0.02)); g.add(at(box(VW, 0.04, 0.3, '#f4ead8'), VX, 1.36, 0.17));
   const cols = ['#f6c6d6', '#7a4a2a', '#f2e6b8', '#c0392b', '#8fd0a0', '#f4a460'];
-  for (let i = 0; i < 9; i++) { const c = cake(cols[i % 6], 0.55); c.position.set(-2.4 + i * 0.6, 0.91, -0.3); g.add(c); }
-  g.add(at(box(1.0, 2.2, 0.05, '#2a3a5a'), 2.9, 1.1, 0.02));
-  return shadowy(g);
+  g.add(at(mesh(new THREE.PlaneGeometry(VW, 1.5), std('#6a4a3a')), VX, 1.61, 0.01));   // the warm shop interior behind the cakes
+  for (let i = 0; i < 6; i++) { const c = cake(cols[(i + seed) % 6], 1.15); c.position.set(VX - VW / 2 + 0.5 + i * (VW - 1.0) / 5, 0.84, VD / 2 + 0.02); g.add(c); }
+  for (let i = 0; i < 5; i++) { const c = cake(cols[(i + 3 + seed) % 6], 0.8); c.position.set(VX - VW / 2 + 0.7 + i * (VW - 1.4) / 4, 1.38, 0.17); g.add(c); }
+  const glass = at(mesh(new THREE.PlaneGeometry(VW, 1.5), std('#dceaf2', { roughness: 0.05, metalness: 0.2, transparent: true, opacity: 0.2, depthWrite: false })), VX, 1.61, VD + 0.01);
+  const gilt = canvasTex(512, 96, (x, W, H) => { x.fillStyle = '#e8c860'; x.font = 'italic 700 60px Georgia'; x.textAlign = 'center'; x.fillText(name, W / 2, 66); });
+  const word = at(mesh(new THREE.PlaneGeometry(2.3, 0.43), new THREE.MeshStandardMaterial({ map: gilt, transparent: true, alphaTest: 0.3, roughness: 0.5 })), VX + 1.25, 2.1, VD + 0.015);
+  g.add(at(box(1.0, 2.2, 0.05, trim), 2.9, 1.1, 0.02));
+  shadowy(g); g.add(glass, word);   // glass and lettering cast no shadow on the cakes
+  return g;
 }
 export function cake(col = '#f6c6d6', s = 1) {
   const g = new THREE.Group(); g.add(at(mesh(new THREE.CylinderGeometry(0.16 * s, 0.17 * s, 0.14 * s, 18), std(col, { roughness: 0.6 })), 0, 0.07 * s, 0));
