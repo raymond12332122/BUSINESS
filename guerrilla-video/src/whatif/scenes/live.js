@@ -11,6 +11,14 @@ const { ss, clamp, HAND } = M;
 const fade = U.fade;
 const V = () => new THREE.Vector3();
 const wrist = (r, s) => { r.root.updateMatrixWorld(true); return r.j['wri' + s].bone.getWorldPosition(V()); };
+const mouth = r => { r.root.updateMatrixWorld(true); const h = r.j.head.bone.getWorldPosition(V()), yaw = r.root.rotation.y; return h.add(V().set(Math.sin(yaw) * 0.08, 0.05, Math.cos(yaw) * 0.08)); };
+const UP = new THREE.Vector3(0, 1, 0);
+// The mic's head sits just off her lips while the hand is up at her face; lower, it rests upright in her fist.
+function holdMic(mic, r, s) {
+  const g = wrist(r, s), m = mouth(r), d = m.clone().sub(g), k = clamp((0.36 - d.length()) / 0.12), dir = d.normalize();
+  mic.quaternion.identity().slerp(new THREE.Quaternion().setFromUnitVectors(UP, dir), k);
+  mic.position.copy(g).add(V().set(0, 0.06, 0)).lerp(m.clone().addScaledVector(dir, -0.19), k);
+}
 
 // Idol performance: the Teio Step underneath, singing into the mic above (mic in the right hand, or mirrored to the left).
 export function idol(t, seed, sing = 1, side = 'R') {
@@ -46,16 +54,16 @@ export function build(ctx) {
       const r = c.r, duo = c === rud || c === sir, t0 = duo ? null : rise(c);
       let y = Y; if (t0 !== null) { const k = ss(t0, t0 + 0.7, t); y = Y - 1.6 * (1 - k); r.root.visible = t > t0 - 0.05; }
       // Rudolf and Sirius start a little apart, come together on "juntas", side by side as when they were girls
-      let x = c.x; if (duo) { const sx = c === rud ? -1 : 1, k = ss(tJun - 0.6, tJun + 0.4, t); x = sx * (1.7 - 0.8 * k); if (t < tB) x = sx * 1.7; }
+      let x = c.x; if (duo) { const sx = c === rud ? -1 : 1, k = ss(tJun - 0.6, tJun + 0.4, t); x = sx * (1.7 - 1.15 * k); if (t < tB) x = sx * 1.7; }
       r.root.position.set(x, y, c.z); r.root.rotation.set(0, 0, 0);
       let p;
       if (duo) { const hands = ss(tLado - 0.4, tLado + 0.2, t) * (1 - ss(tC - 0.1, tC + 0.3, t)), free = c === rud ? 'L' : 'R';
-        p = t < tWin - 0.3 ? A.stand(t, 1) : idol(t, c === rud ? 1 : 2, 1, c === rud ? 'R' : 'L');
-        if (hands > 0) { p['a' + free] = ['world', 0, Y + 1.6, c.z + 0.08]; p['aW' + free] = hands; p['h' + free] = HAND.soft; p['pl' + free] = [c === rud ? 1 : -1, -0.3, -0.5]; } }
+        p = M.mix(A.stand(t, c === rud ? 1 : 2), idol(t, c === rud ? 1 : 2, 1, c === rud ? 'R' : 'L'), ss(tWin - 0.7, tWin - 0.1, t));
+        if (hands > 0) { p['a' + free] = ['world', 0, Y + 1.38, c.z + 0.08]; p['aW' + free] = hands; p['h' + free] = HAND.soft; p['pl' + free] = [c === rud ? 1 : -1, -0.3, -0.5]; } }
       else p = idol(t, SPOTS.findIndex(s => s[0] === c.k) * 0.7, 0);
       K.act(r, p, t, { mouth: duo && t > tWin ? [0.35 + 0.35 * Math.abs(Math.sin(t * 7 + (c === rud ? 0 : 1))), 0.8] : [0.3, 0.9], eye: 0.15, smile: 0.9 });
     });
-    [rud, sir].forEach((c, i) => { mics[i].position.copy(wrist(c.r, c === rud ? 'R' : 'L')).add(V().set(0, 0.04, 0.02)); mics[i].rotation.set(0.4, 0, 0); });
+    [rud, sir].forEach((c, i) => holdMic(mics[i], c.r, c === rud ? 'R' : 'L'));
     St.tick?.(t);
     return U.film(t) + U.bigTitle(t, tWin - 0.3, tB + 0.2, 'EL CONCIERTO DE LAS GANADORAS', 'Winning Live', '', { top: 60 });
   };
