@@ -260,10 +260,19 @@ export function summit() {
   const s = MS.interior({ wall: '#e8e4dc', floor: '#8a7a68', w: 22, d: 18, h: 9, lights: [[0, 7, 0]], windows: false, bulbs: false });
   LK.room(s, { floorKind: 'planks', floorCol: '#b89a78', paper: 'plaster', paperCol: '#ece8e0', paperAccent: '#c9c2b2', panelCol: '#8a8278', chandeliers: 0, paintings: 0, shafts: false, pilasters: false, warm: false });
   s.userData.sun.intensity = 1.4; s.userData.hemi.intensity = 1.5;
-  const dome = new THREE.Mesh(new THREE.SphereGeometry(10, 40, 16, 0, Math.PI * 2, 0, Math.PI / 2), new THREE.MeshStandardMaterial({ color: '#d8d0c4', side: THREE.BackSide, roughness: 0.9 })); dome.scale.set(1, 0.32, 0.85); dome.position.y = 8.6; s.add(dome);
+  // the flat ceiling gets an elliptical opening under the dome, and the dome an oculus with daylight at the top of its shaft
+  const ceil = s.children.find(o => o.isMesh && o.geometry.type === 'PlaneGeometry' && Math.abs(o.position.y - 9) < 0.01 && Math.abs(o.rotation.x - Math.PI / 2) < 0.01);
+  if (ceil) { const sh = new THREE.Shape(); sh.moveTo(-11, -9); sh.lineTo(11, -9); sh.lineTo(11, 9); sh.lineTo(-11, 9); sh.lineTo(-11, -9);
+    const hole = new THREE.Path(); hole.absellipse(0, 0, 9.9, 8.4, 0, Math.PI * 2, true); sh.holes.push(hole); ceil.geometry.dispose(); ceil.geometry = new THREE.ShapeGeometry(sh, 48); }
+  const domeM = new THREE.MeshStandardMaterial({ color: '#d8d0c4', side: THREE.BackSide, roughness: 0.9 }), OC = 0.24, ocR = 10 * Math.sin(OC);
+  const dome = new THREE.Mesh(new THREE.SphereGeometry(10, 40, 16, 0, Math.PI * 2, OC, Math.PI / 2 - OC), domeM); dome.scale.set(1, 0.32, 0.85); dome.position.y = 8.6; s.add(dome);
+  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(ocR, ocR, 6, 40, 1, true), domeM); shaft.scale.z = 0.85; shaft.position.y = 8.6 + 3.2 * Math.cos(OC) + 2.95; s.add(shaft);
+  const sky = new THREE.Mesh(new THREE.CircleGeometry(ocR, 40), new THREE.MeshBasicMaterial({ color: '#eaf3ff' })); sky.rotation.x = Math.PI / 2; sky.scale.y = 0.85; sky.position.y = shaft.position.y + 2.95; s.add(sky);
+  closeRoom(s, 22, 18, 9, '#ece8e0', '#8a8278');   // the close-ups look toward +z
   const r = LP.rng(91), n = 900, im = new THREE.InstancedMesh(new THREE.ConeGeometry(0.18, 1, 6), new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.4 }), n), m4 = new THREE.Matrix4(), q = new THREE.Quaternion(), c = new THREE.Color();
   const pal = ['#e84a5f', '#2ab7ca', '#fed766', '#7bc950', '#9b5de5', '#f15bb5', '#00bbf9', '#fee440', '#f77f00'];
-  for (let i = 0; i < n; i++) { const a = r() * Math.PI * 2, rr = Math.sqrt(r()) * 9.5, x = Math.cos(a) * rr, z = Math.sin(a) * rr * 0.85, y = 8.6 + Math.sqrt(Math.max(0, 1 - (rr / 10) ** 2)) * 3.2 - 0.2, L = 0.4 + r() * 1.6;
+  for (let i = 0; i < n; i++) { let a, rr; do { a = r() * Math.PI * 2; rr = Math.sqrt(r()) * 9.5; } while (rr < ocR + 0.6);   // the oculus stays clear for the parachute
+    const x = Math.cos(a) * rr, z = Math.sin(a) * rr * 0.85, y = 8.6 + Math.sqrt(Math.max(0, 1 - (rr / 10) ** 2)) * 3.2 - 0.2, L = 0.4 + r() * 1.6;
     q.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI); m4.compose(new THREE.Vector3(x, y - L / 2, z), q, new THREE.Vector3(0.6 + r() * 0.8, L, 0.6 + r() * 0.8)); im.setMatrixAt(i, m4); im.setColorAt(i, c.set(pal[(r() * pal.length) | 0])); }
   s.add(im);
   const tb = P.summitTable(4.4); tb.scale.y = 0.6 / tb.top; tb.top = 0.6; s.add(tb); s.table = tb;   // at the leaders' seated height
