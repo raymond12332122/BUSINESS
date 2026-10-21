@@ -56,7 +56,7 @@ export function palacioNacional({ w = 44 } = {}) {
   for (let k = 0; k < 25; k++) balc.add(at(mesh(new THREE.BoxGeometry(0.04, 1.0, 0.04), iron), -3.1 + k * 0.258, 0.65, 1.9));
   for (const sx of [-1, 1]) for (let k = 0; k < 9; k++) balc.add(at(mesh(new THREE.BoxGeometry(0.04, 1.0, 0.04), iron), sx * 3.15, 0.65, -0.6 + k * 0.31));
   balc.add(at(mesh(new THREE.BoxGeometry(6.4, 0.06, 0.08), std('#c9a227', { metalness: 0.6, roughness: 0.35 })), 0, 1.15, 1.9));
-  balc.add(at(mesh(new THREE.BoxGeometry(2.6, 3.0, 0.1), std('#2b2622')), 0, 1.65, -0.62));   // the balcony doorway
+  balc.add(at(mesh(new THREE.BoxGeometry(2.6, 3.0, 0.1), std('#2b2622')), 0, 1.65, 0.03));   // the balcony doorway, on the face of the central body
   // bell niche, clock and coat of arms on the central body
   const niche = new THREE.Shape(); niche.moveTo(-0.9, 0); niche.lineTo(0.9, 0); niche.lineTo(0.9, 1.4); niche.absarc(0, 1.4, 0.9, 0, Math.PI, false);
   g.add(at(mesh(new THREE.ShapeGeometry(niche, 16), std('#1f1a16')), 0, 13.4, 0.62));
@@ -72,6 +72,45 @@ export function palacioNacional({ w = 44 } = {}) {
   // roof flagpole
   const fp = new THREE.Group(); fp.position.set(0, H + 3.5, -2); g.add(fp); g.roofFlag = fp;
   return shadowy(g);
+}
+// Colonial block for the sides of a plaza: tezontle or cantera façade with portales on the ground floor and
+// balconied windows above (one painted bay repeated along the front), stone cornice on top. Front face at z = d / 2.
+export function colonialBlock(w = 26, h = 13, { col = '#a8643f', stone = '#d9ccb0', d = 8, seed = 0, portal = true } = {}) {
+  const g = new THREE.Group(), r = rng(seed + 5), bays = Math.max(2, Math.round(w / 3.4));
+  const face = canvasTex(128, 512, (x, W, H) => {
+    x.fillStyle = col; x.fillRect(0, 0, W, H);
+    for (let i = 0; i < 500; i++) { x.fillStyle = r() > 0.5 ? 'rgba(0,0,0,.09)' : 'rgba(255,255,255,.07)'; x.fillRect(r() * W, r() * H, 2, 2); }
+    x.fillStyle = stone; x.fillRect(0, 0, W, 16); x.fillRect(0, H * 0.33, W, 7); x.fillRect(0, H * 0.66, W, 7);
+    if (portal) { x.fillStyle = stone; x.fillRect(0, H * 0.7, 14, H * 0.3); x.fillRect(W - 14, H * 0.7, 14, H * 0.3);
+      x.fillStyle = '#2a201a'; x.beginPath(); x.moveTo(20, H); x.lineTo(20, H * 0.8); x.arc(W / 2, H * 0.8, W / 2 - 20, Math.PI, 0); x.lineTo(W - 20, H); x.fill(); }
+    else { x.fillStyle = '#2a2622'; x.fillRect(38, H * 0.76, 52, H * 0.24); }
+    for (const fy of [0.4, 0.08]) { const y0 = H * fy + 20;
+      x.fillStyle = stone; x.fillRect(30, y0 - 8, 68, H * 0.2 + 16);
+      x.fillStyle = '#34404c'; x.fillRect(38, y0, 52, H * 0.2);
+      x.fillStyle = 'rgba(255,255,255,.12)'; x.fillRect(40, y0 + 2, 10, H * 0.2 - 4);
+      x.fillStyle = '#1d1d1f'; x.fillRect(30, y0 + H * 0.2 - 22, 68, 4); for (let k = 0; k < 7; k++) x.fillRect(32 + k * 10.5, y0 + H * 0.2 - 22, 2.5, 22); } });
+  face.wrapS = THREE.RepeatWrapping; face.repeat.set(bays, 1);
+  const side = std(col, { roughness: 0.9 }), front = new THREE.MeshStandardMaterial({ map: face, roughness: 0.9 });
+  g.add(at(mesh(new THREE.BoxGeometry(w, h, d), [side, side, side, side, front, side]), 0, h / 2, 0));
+  g.add(at(mesh(new THREE.BoxGeometry(w + 0.4, 0.5, d + 0.4), std(stone)), 0, h + 0.25, 0));
+  return shadowy(g);
+}
+// Hundreds of far-off chibi fans as instanced bodies, heads and ears; .update(t) makes them bounce.
+export function massCrowd(n, [x0, z0, x1, z1], { seed = 1, face = null, jump = 1 } = {}) {
+  const r = rng(seed), g = new THREE.Group(), lam = () => new THREE.MeshLambertMaterial({ color: '#ffffff' });
+  const body = new THREE.InstancedMesh(new THREE.CapsuleGeometry(0.15, 0.3, 4, 8), lam(), n), head = new THREE.InstancedMesh(new THREE.SphereGeometry(0.17, 10, 8), lam(), n);
+  const ear = new THREE.InstancedMesh(new THREE.ConeGeometry(0.045, 0.13, 4), lam(), n * 2);
+  const clothes = ['#c0392b', '#2a5ab8', '#f2f0ea', '#e8c020', '#2f8a3a', '#1d1d1f', '#e86a9a', '#8a5a3a', '#4fb0d8', '#0f6b3f'], hair = ['#3a2a20', '#1d1612', '#6a4a30', '#2e2420', '#8a5a3a', '#c8a060'];
+  const P = [], c = new THREE.Color();
+  for (let i = 0; i < n; i++) { const x = x0 + r() * (x1 - x0), z = z0 + r() * (z1 - z0), hc = hair[(r() * hair.length) | 0];
+    P.push({ x, z, yaw: face ? Math.atan2(face[0] - x, face[1] - z) : r() * 6.28, ph: r() * 6.28, f: 1.6 + r() * 1.4, a: (0.03 + r() * 0.06) * jump });
+    body.setColorAt(i, c.set(clothes[(r() * clothes.length) | 0])); head.setColorAt(i, c.set(hc)); ear.setColorAt(2 * i, c.set(hc)); ear.setColorAt(2 * i + 1, c.set(hc)); }
+  const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler(), one = new THREE.Vector3(1, 1, 1), v = new THREE.Vector3();
+  g.update = t => { P.forEach((p, i) => { const b = p.a * Math.max(0, Math.sin(t * p.f * Math.PI + p.ph));
+    q.setFromEuler(e.set(0, p.yaw, 0)); body.setMatrixAt(i, m.compose(v.set(p.x, 0.36 + b, p.z), q, one)); head.setMatrixAt(i, m.compose(v.set(p.x, 0.8 + b, p.z), q, one));
+    for (const s of [-1, 1]) { q.setFromEuler(e.set(0, p.yaw, -s * 0.3)); const ox = s * 0.09; ear.setMatrixAt(2 * i + (s > 0 ? 1 : 0), m.compose(v.set(p.x + Math.cos(p.yaw) * ox, 0.97 + b, p.z - Math.sin(p.yaw) * ox), q, one)); } });
+    body.instanceMatrix.needsUpdate = head.instanceMatrix.needsUpdate = ear.instanceMatrix.needsUpdate = true; };
+  g.add(body, head, ear); g.update(0); [body, head, ear].forEach(o => { o.frustumCulled = false; }); return dyn(g);
 }
 // Metropolitan Cathedral (background): twin bell towers with domed caps, nave front and the central dome.
 export function catedral() {
@@ -104,7 +143,7 @@ export function deskExec({ w = 1.9, d = 0.9, plate = '' } = {}) {
   g.add(at(mesh(new THREE.BoxGeometry(w - 1.1, 0.5, 0.04), dark), 0, 0.45, d / 2 - 0.04));
   g.add(at(mesh(new THREE.BoxGeometry(0.9, 0.006, 0.55), std('#1f3a2a', { roughness: 0.7 })), 0, 0.763, 0.02));
   if (plate) { const t = canvasTex(256, 64, (x, W, H) => { x.fillStyle = '#c9a227'; x.fillRect(0, 0, W, H); x.fillStyle = '#2a1e10'; x.font = '700 30px Georgia'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(plate, W / 2, H / 2); });
-    const p = mesh(new THREE.BoxGeometry(0.34, 0.07, 0.04), [std('#c9a227'), std('#c9a227'), std('#c9a227'), std('#c9a227'), new THREE.MeshStandardMaterial({ map: t, metalness: 0.5, roughness: 0.35 }), std('#c9a227')]);
+    const wd = std('#2c1a10', { roughness: 0.5 }), p = mesh(new THREE.BoxGeometry(0.34, 0.07, 0.04), [wd, wd, wd, wd, new THREE.MeshStandardMaterial({ map: t, metalness: 0.15, roughness: 0.45 }), wd]);
     p.position.set(0, 0.8, d / 2 - 0.12); p.rotation.x = -0.4; g.add(p); }
   g.top = 0.763; return shadowy(g);
 }
@@ -121,7 +160,7 @@ export function documentSheet(seed = 0) {
   const r = rng(seed + 9);
   const t = canvasTex(160, 220, (x, W, H) => { x.fillStyle = '#fbf9f2'; x.fillRect(0, 0, W, H); x.fillStyle = '#2a2a30'; x.font = '700 11px Georgia'; x.fillText('GOBIERNO DE MÉXICO', 14, 22);
     x.fillStyle = '#6a6a70'; for (let i = 0; i < 14; i++) x.fillRect(14, 40 + i * 10, (W - 28) * (0.55 + r() * 0.45), 3); x.fillRect(W - 70, H - 40, 56, 2); });
-  const g = new THREE.Group(), p = plane(0.21, 0.29, new THREE.MeshStandardMaterial({ map: t, roughness: 0.9 })); p.rotation.x = -Math.PI / 2; g.add(p);
+  const g = new THREE.Group(), p = plane(0.21, 0.29, new THREE.MeshStandardMaterial({ map: t, roughness: 0.9, side: THREE.DoubleSide })); p.rotation.x = -Math.PI / 2; g.add(p);
   const sealT = canvasTex(128, 128, (x) => { x.strokeStyle = '#b3121a'; x.lineWidth = 7; x.beginPath(); x.arc(64, 64, 54, 0, 7); x.stroke(); x.lineWidth = 3; x.beginPath(); x.arc(64, 64, 42, 0, 7); x.stroke();
     x.fillStyle = '#b3121a'; x.font = '900 18px Georgia'; x.textAlign = 'center'; x.fillText('APROBADO', 64, 70); });
   const seal = plane(0.07, 0.07, new THREE.MeshBasicMaterial({ map: sealT, transparent: true, opacity: 0, depthWrite: false })); seal.rotation.x = -Math.PI / 2; seal.position.set(0.05, 0.001, 0.09); g.add(seal);
@@ -479,6 +518,17 @@ export function bigScreen(w = 12, h = 6.5) {
   const c = document.createElement('canvas'); c.width = 768; c.height = Math.round(768 * h / w); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
   const face = mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t })); face.position.set(0, 6 + h / 2, 0.21); g.add(face);
   g.draw = fn => { fn(c.getContext('2d'), c.width, c.height); t.needsUpdate = true; }; dyn(face); return g;
+}
+
+// Semi-trailer truck for the border bridge (cab at +x, length ~9.5), scaled to the cast.
+export function truck(col = '#c0392b', trailer = '#e8e6e0') {
+  const g = new THREE.Group();
+  g.add(at(mesh(new THREE.BoxGeometry(1.9, 1.9, 2.1), std(col, { roughness: 0.4 })), 3.6, 1.55, 0));
+  g.add(at(mesh(new THREE.BoxGeometry(0.06, 0.8, 1.8), std('#2a3440', { roughness: 0.15, metalness: 0.3 })), 4.57, 1.95, 0));
+  g.add(at(mesh(new THREE.BoxGeometry(6.6, 2.3, 2.15), std(trailer, { roughness: 0.6 })), -0.8, 1.95, 0));
+  g.add(at(mesh(new THREE.BoxGeometry(8.8, 0.25, 1.6), std('#2a2a2e')), 0.2, 0.62, 0));
+  for (const x of [3.8, 2.4, -2.6, -3.5]) for (const z of [-0.85, 0.85]) g.add(at(mesh(new THREE.CylinderGeometry(0.42, 0.42, 0.3, 14), std('#151515')), x, 0.42, z, Math.PI / 2, 0, 0));
+  return dyn(shadowy(g));
 }
 
 // ============================================================ the Winning Live stage

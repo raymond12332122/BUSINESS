@@ -136,3 +136,26 @@ export function sitTalk(t, seed = 0, e = 0.6, o = {}) {
   return withArms(p, { armL: [-58, -18, -76], elbL: [0, -64, 0], armR: [-62 - 18 * e * b1, 14, 70], elbR: [0, 54 + 30 * e * b1, 0], hR: M.mix({ h: HAND.relax }, { h: HAND.open }, e * beat).h,
     head: [8 + 4 * beat * e, 10 * Math.sin(t * 0.8 + seed) * e, 0] });
 }
+// Seated version of a standing gesture: legs and pelvis from sit(), arms, chest and head from the gesture.
+const UPPER = ['armL', 'armR', 'elbL', 'elbR', 'hL', 'hR', 'aL', 'aR', 'aWL', 'aWR', 'plL', 'plR', 'shL', 'shR', 'head', 'neck', 'chest'];
+export function seated(g, t, seed = 0, ...args) { const p = sit(t, seed), q = g(t, seed, ...args); for (const k of UPPER) if (q[k] !== undefined) p[k] = q[k]; return p; }
+// A bouncy idol step (the "Teio Step"): step-touch side to side on the beat, arms swinging across, a little hop every other bar.
+export function teioStep(t, seed = 0, bpm = 124, o = {}) {
+  const b = t * bpm / 60, ph = b * PI, s = sin(ph), bounce = abs(sin(ph)), hop = max(0, sin(b * PI / 4)) ** 8;
+  const p = M.stand(t, seed, { amt: 0.15, ...o }), L = max(0, -s), R = max(0, s);
+  return withArms(p, { hipX: 0.013 * s, hipY: -0.014 - 0.012 * bounce, fL: [0.006 + 0.01 * L, 0.03 * L * L, 0.012 * L], fR: [-0.006 - 0.01 * R, 0.03 * R * R, 0.012 * R],
+    heelL: 14 * L, heelR: 14 * R, hip: [0, 10 * s, -4 * s], waist: [2, -8 * s, 3 * s], chest: [-2, -6 * s, 4 * s], head: [-4, 12 * s, 8 * s],
+    armL: [-35 - 35 * R, 30 * R, -55 + 25 * R], armR: [-35 - 35 * L, -30 * L, 55 - 25 * L], elbL: [0, -60 - 30 * R, 0], elbR: [0, 60 + 30 * L, 0], hL: HAND.open, hR: HAND.open,
+    lift: 0.04 * hop, sec: { bob: bounce - 0.5, sway: 0.4 * s, wind: 0 } });
+}
+// Out of breath: hands on the knees, back bent, shoulders heaving.
+export function winded(t, seed = 0, k = 1, o = {}) {
+  const p = M.stand(t, seed, { amt: 0.2, ...o }), br = sin(t * 7 + seed);
+  return withArms(p, { waist: [30 * k, 0, 0], chest: [14 * k + 3 * br * k, 0, 0], head: [-18 * k, 0, 4], hipY: -0.02 * k, hipZ: -0.015 * k, fL: [0.008, 0, 0.01], fR: [-0.008, 0, -0.01],
+    aL: [0.75, -0.55, 1.5], aR: [-0.75, -0.55, 1.5], aWL: k, aWR: k, plL: [1, 0, -0.3], plR: [-1, 0, -0.3], hL: HAND.flat, hR: HAND.flat });
+}
+// "Shh": index finger to the lips.
+export function shush(t, seed = 0, k = 1, o = {}) {
+  const p = M.stand(t, seed, { amt: 0.4, ...o });
+  return withArms(p, { aR: ['head', 0.0, -0.55, 1.25], aWR: k, plR: [-0.7, -1, 0], hR: HAND.point, head: [p.head[0] + 4, p.head[1] * 0.5, -6 * k] });
+}

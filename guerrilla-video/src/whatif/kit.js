@@ -12,6 +12,7 @@ import { cap, helmet, tie } from '../narco/kit.js';
 import { hat } from '../amer/kit.js';
 import { finish, finishProp } from '../amer/look.js';
 import { blobShadow } from '../rusia/kit.js';
+import { sit } from './anim.js';
 export { blobShadow, finishProp };
 const std = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.8, ...o });
 export function canvasTex(w, h, draw) {
@@ -230,4 +231,10 @@ export function onPath(r, pts, d) {
   const [ax, az] = pts[i], [bx, bz] = pts[i + 1], L = Math.hypot(bx - ax, bz - az) || 1, u = Math.min(1, Math.max(0, (d - acc) / L));
   r.root.position.x = ax + (bx - ax) * u; r.root.position.z = az + (bz - az) * u; r.root.rotation.y = Math.atan2(bx - ax, bz - az);
   return r;
+}
+// Seat a rig so its pelvis rests on a seat top at world height y (feet dangle when the seat is taller than her knees).
+export function seatOn(r, y) {
+  r.root.position.y = 0; r.apply(sit(0, r.seed)); r.root.updateMatrixWorld(true);
+  const hp = new THREE.Vector3(); r.j.hip.bone.getWorldPosition(hp);
+  r.root.position.y = y + (r.big ? 0.1 : 0.05) - hp.y; return r;
 }

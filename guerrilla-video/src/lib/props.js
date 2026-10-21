@@ -15,7 +15,7 @@ export function mat(color, opts = {}) {
 }
 
 function mesh(geo, m, shadow = true) {
-  const o = new THREE.Mesh(geo, typeof m === 'object' && m.isMaterial ? m : mat(m));
+  const o = new THREE.Mesh(geo, Array.isArray(m) || (typeof m === 'object' && m.isMaterial) ? m : mat(m));   // per-face material lists pass through
   o.castShadow = shadow; o.receiveShadow = true; return o;
 }
 const box = (w, h, d, c) => mesh(new THREE.BoxGeometry(w, h, d), c);

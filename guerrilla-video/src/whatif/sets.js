@@ -45,7 +45,10 @@ export function zocalo(light = 'golden') {
   const pal = P.palacioNacional(); pal.position.set(0, 0, -24); s.add(pal); s.palacio = pal;
   const rf = flagPole('mx', { h: 5, w: 3.2 }); rf.position.copy(pal.roofFlag.position); pal.add(rf); s.roofFlag = rf;
   const cat = P.catedral(); cat.position.set(-36, 0, -4); cat.rotation.y = Math.PI / 2; s.add(cat);
-  for (let i = 0; i < 3; i++) { const b = NP.building(14, 12, 10, ['#a85a48', '#b06650', '#9a503e'][i], { seed: i + 3 }); b.position.set(34, 0, -14 + i * 15); b.rotation.y = -Math.PI / 2; s.add(b); }
+  // the other three sides of the plaza: colonial blocks with portales (east, south, west beyond the cathedral)
+  const blocks = [[34, -12, -Math.PI / 2, 24, '#a85a48'], [34, 14, -Math.PI / 2, 24, '#b9876a'], [34, 40, -Math.PI / 2, 22, '#9a503e'],
+    [-26, 54, Math.PI, 26, '#c9b590'], [2, 54, Math.PI, 26, '#b07a5a'], [30, 54, Math.PI, 24, '#a8643f'], [-34, 24, Math.PI / 2, 22, '#b9876a'], [-34, 46, Math.PI / 2, 18, '#a85a48']];
+  blocks.forEach(([x, z, ry, w, col], i) => { const b = P.colonialBlock(w, 12 + (i % 3) * 1.5, { col, seed: i, portal: i !== 4 }); b.position.set(x, 0, z); b.rotation.y = ry; s.add(b); });
   const f = flagPole('mx', { h: 18, w: 10.5 }); f.position.set(0, 0, 6); s.add(f); s.flag = f;
   s.add(LP.at(new THREE.Mesh(new THREE.CylinderGeometry(1.4, 1.6, 0.6, 24), std('#9a948a')), 0, 0.3, 6));
   for (const x of [-18, -10, 10, 18]) { const l = lamp(4.2); l.position.set(x, 0, -17); s.add(l); }
@@ -54,16 +57,23 @@ export function zocalo(light = 'golden') {
   return s;
 }
 
+// Interiors are open at +z for the usual camera; reverse shots need that fourth wall (with a wainscot to match).
+function closeRoom(s, w, d, h, paper, panel) {
+  const wall = new THREE.Mesh(new THREE.PlaneGeometry(w, h), std(paper)); wall.position.set(0, h / 2, d / 2 - 0.02); wall.rotation.y = Math.PI; s.add(wall);
+  s.add(LP.at(LP.box(w, 1.1, 0.05, panel), 0, 0.55, d / 2 - 0.05)); s.add(LP.at(LP.box(w, 0.08, 0.08, panel), 0, 1.12, d / 2 - 0.06));
+}
 // ------------------------------------------------------------ council room at dawn (6:00 a.m.)
 export function council(light = 'dawn') {
   const s = MS.interior({ wall: '#d8c8a8', floor: '#5a3a26', w: 12, d: 10, h: 4.4, lights: [[0, 3.8, 0]], windows: true, bulbs: false });
   LK.room(s, { floorKind: 'planks', floorCol: '#8a5a3a', paper: 'stripes', paperCol: '#e6d8bc', paperAccent: '#c9a227', panelCol: '#5a3a22', chandeliers: 1, paintings: 2, shafts: true, windowCol: '#ffd2a0' });
   s.userData.sun.color.set('#ffcf9a'); s.userData.sun.intensity = 2.0; s.userData.hemi.intensity = 1.25;
   const fillC = new THREE.PointLight('#ffe2c0', 5, 12, 1.3); fillC.position.set(0, 3.4, 2.5); s.add(fillC);
-  const tb = P.conferenceTable(5.6, 1.5); tb.position.set(0, 0, -0.6); s.add(tb); s.table = tb;
+  closeRoom(s, 12, 10, 4.4, '#e6d8bc', '#5a3a22');
+  // furniture at the cast's scale: the leaders stand ~1.42 tall, the chibi ministers sit on taller chairs
+  const tb = P.conferenceTable(5.6, 1.5); tb.position.set(0, 0, -0.6); tb.scale.y = 0.6 / tb.top; tb.top = 0.6; s.add(tb); s.table = tb;
   s.chairs = [];
-  for (let i = 0; i < 4; i++) for (const sz of [-1, 1]) { const c = P.officeChair(); c.position.set(-1.8 + i * 1.2, 0, -0.6 + sz * 1.05); c.rotation.y = sz > 0 ? Math.PI : 0; s.add(c); s.chairs.push(c); }
-  const head = P.officeChair('#5a1a1a'); head.position.set(3.35, 0, -0.6); head.rotation.y = -Math.PI / 2; s.add(head); s.headChair = head;
+  for (let i = 0; i < 4; i++) for (const sz of [-1, 1]) { const c = P.officeChair(); c.scale.setScalar(0.8); c.seatY *= 0.8; c.position.set(-1.8 + i * 1.2, 0, -0.6 + sz * 0.98); c.rotation.y = sz > 0 ? Math.PI : 0; s.add(c); s.chairs.push(c); }
+  const head = P.officeChair('#5a1a1a'); head.scale.setScalar(0.72); head.seatY *= 0.72; head.position.set(3.08, 0, -0.6); head.rotation.y = -Math.PI / 2; s.add(head); s.headChair = head;
   const clk = P.wallClock(0.36); clk.position.set(-3.2, 3.1, -4.93); s.add(clk); s.clock = clk;
   const f = flagPole('mx', { h: 2.8, w: 1.3, gold: true }); f.position.set(4.6, 0, -4.2); s.add(f); s.flag = f;
   for (let i = 0; i < 8; i++) { const d = P.documentSheet(i); d.position.set(-2 + i * 0.55, tb.top + 0.002, -0.6 + (i % 2 ? 0.45 : -0.45)); d.rotation.y = (i % 3 - 1) * 0.1; s.add(d); }
@@ -76,12 +86,15 @@ export function despacho(light = 'day') {
   const s = MS.interior({ wall: '#e2d4b8', floor: '#4a2e1e', w: 9, d: 8, h: 4.0, lights: [[0, 3.5, 0.5]], windows: true, bulbs: false });
   LK.room(s, { floorKind: 'planks', floorCol: '#8a5a3a', paper: 'damask', paperCol: '#e8dcc0', paperAccent: '#b89a5a', panelCol: '#4a2c1a', chandeliers: 0, paintings: 1, shafts: true, windowCol: '#fff0d0' });
   s.userData.sun.intensity = 2.0; s.userData.hemi.intensity = 1.2;
-  const d = P.deskExec({ plate: 'PRESIDENTA' }); d.position.set(0, 0, -1.2); s.add(d); s.desk = d;
-  const ch = P.officeChair('#3a1a12'); ch.position.set(0, 0, -2.0); s.add(ch); s.chair = ch;
-  const ph = P.deskPhone(); ph.position.set(0.62, d.top, -1.3); ph.rotation.y = -0.3; s.add(ph); s.phone = ph;
-  const pad = P.inkPad(); pad.position.set(-0.55, d.top, -1.05); s.add(pad); s.pad = pad;
-  s.docs = []; for (let i = 0; i < 6; i++) { const doc = P.documentSheet(i + 20); doc.position.set(-0.85 + (i % 2) * 0.0, d.top + 0.002 + i * 0.002, -1.35); doc.rotation.y = 0.04 * (i - 3); s.add(doc); s.docs.push(doc); }
-  const done = P.documentSheet(40); done.position.set(0.05, d.top + 0.003, -0.98); s.add(done); s.sheet = done;
+  const d = P.deskExec({ plate: 'PRESIDENTA' }); d.position.set(0, 0, -1.2); d.scale.setScalar(0.8); d.top *= 0.8; s.add(d); s.desk = d;   // sized for a 1.42 m leader
+  const ch = P.officeChair('#3a1a12'); ch.scale.setScalar(0.72); ch.seatY *= 0.72; ch.position.set(0, 0, -1.45); s.add(ch); s.chair = ch;
+  // she sits at z = -1.45 facing +z (shoulders ~ -1.65, arms ~0.35 long): the in-tray on her left (+x), the out-pile and
+  // the ink pad on her right, the sheet to seal in front of her; papers face her
+  const ph = P.deskPhone(); ph.position.set(0.58, d.top, -1.05); ph.rotation.y = Math.PI - 0.3; s.add(ph); s.phone = ph;
+  const pad = P.inkPad(); pad.position.set(-0.3, d.top, -1.48); s.add(pad); s.pad = pad;
+  s.docs = []; for (let i = 0; i < 6; i++) { const doc = P.documentSheet(i + 20); doc.position.set(0.28, d.top + 0.002 + i * 0.002, -1.33); doc.rotation.y = Math.PI + 0.04 * (i - 3); s.add(doc); s.docs.push(doc); }
+  s.inTop = [0.28, d.top + 0.014, -1.33]; s.outPile = [-0.2, d.top + 0.002, -1.28];
+  const done = P.documentSheet(40); done.position.set(0.04, d.top + 0.003, -1.32); done.rotation.y = Math.PI; s.add(done); s.sheet = done;
   const f = flagPole('mx', { h: 2.7, w: 1.25 }); f.position.set(-2.7, 0, -3.3); s.add(f); s.flag = f;
   s.userData.look = { warm: 0.05, bloom: 0.3 };
   ticker(s).push(t => f.wave(t, 0.2));
@@ -95,6 +108,7 @@ export function mananera() {
   const mic = P.micStand(0.3); mic.position.set(0, 0.25 + 1.05 * 0.82, -2.15); s.add(mic);
   s.screen.material = new THREE.MeshBasicMaterial({ map: canvasTexLocal(1024, 512, (x, W, H) => { const g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#0f3d2a'); g.addColorStop(1, '#5a1a24'); x.fillStyle = g; x.fillRect(0, 0, W, H);
     x.fillStyle = '#f4efe2'; x.font = '900 64px Inter'; x.textAlign = 'center'; x.fillText('UN MUNDO DONDE TODAS', W / 2, H / 2 - 20); x.fillText('PUEDAN VIVIR FELICES', W / 2, H / 2 + 60); }) });
+  s.flags.forEach(f => { f.position.x = Math.sign(f.position.x) * 3.6; });
   s.userData.look = { warm: 0.04, bloom: 0.3 };
   return s;
 }
@@ -109,12 +123,23 @@ export function camara() {
   s.seats = [];
   for (let row = 0; row < 4; row++) { const R = 4.2 + row * 1.25, n = 9 + row * 2;
     for (let i = 0; i < n; i++) { const a = -0.9 + 1.8 * (i + 0.5) / n, x = Math.sin(a) * R, z = Math.cos(a) * R - 3.5;
-      const d = new THREE.Group(); d.add(LP.at(LP.box(0.9, 0.06, 0.45, '#9a6a40'), 0, 0.72 + row * 0.18, 0)); d.add(LP.at(LP.box(0.9, 0.7 + row * 0.18, 0.06, '#7a4a28'), 0, (0.7 + row * 0.18) / 2, 0.2));
-      d.position.set(x, 0, z); d.rotation.y = a + Math.PI; s.add(d); s.seats.push({ x: Math.sin(a) * (R + 0.55), z: Math.cos(a) * (R + 0.55) - 3.5, yaw: a + Math.PI, y: row * 0.18 }); }
+      // chibi deputies: desk tops 0.42 above their tier, chibi-sized chairs (seat top 0.24)
+      const ty = row * 0.18, d = new THREE.Group(); d.add(LP.at(LP.box(0.9, 0.05, 0.42, '#9a6a40'), 0, ty + 0.4, 0)); d.add(LP.at(LP.box(0.9, ty + 0.4, 0.05, '#7a4a28'), 0, (ty + 0.4) / 2, 0.19));
+      d.position.set(x, 0, z); d.rotation.y = a + Math.PI; s.add(d);
+      const st = { x: Math.sin(a) * (R + 0.5), z: Math.cos(a) * (R + 0.5) - 3.5, yaw: a + Math.PI, y: ty, seat: ty + 0.24, row, a };
+      const c = MX.chair(false); c.position.set(st.x, ty, st.z); c.rotation.y = st.yaw; s.add(c); st.chair = c; s.seats.push(st); }
     const tier = new THREE.Mesh(new THREE.RingGeometry(R + 0.2, R + 1.4, 48, 1, Math.PI / 2 - 0.95, 1.9), std('#5a2a22')); tier.rotation.x = -Math.PI / 2; tier.position.set(0, row * 0.18 + 0.005, -3.5); s.add(tier); }
-  const rostrum = new THREE.Group(); rostrum.add(LP.at(LP.box(3.2, 1.0, 1.2, '#4a2a18'), 0, 0.5, 0)); rostrum.add(LP.at(LP.box(5, 1.6, 0.8, '#3a2014'), 0, 0.8, -1.2)); rostrum.position.set(0, 0, -6.2); s.add(rostrum);
-  const f = flagPole('mx', { h: 4.2, w: 2.2 }); f.position.set(-3.2, 0, -7.2); s.add(f); s.flag = f;
-  const clk = P.wallClock(0.55); clk.position.set(0, 5.2, -7.93); s.add(clk); s.clock = clk;
+  // the rostrum: a dais with the lectern; the speaker stands at s.speaker on top of it
+  const rostrum = new THREE.Group(); rostrum.add(LP.at(LP.box(6, 0.5, 2.6, '#4a2a18'), 0, 0.25, 0)); rostrum.add(LP.at(LP.box(1.0, 0.95, 0.5, '#3a2014'), 0, 0.975, 0.75));
+  rostrum.add(LP.at(LP.box(1.06, 0.05, 0.6, '#5a3420'), 0, 1.47, 0.75)); rostrum.add(LP.at(LP.box(6.4, 2.4, 0.3, '#3a2014'), 0, 1.2, -1.25)); rostrum.position.set(0, 0, -6.4); s.add(rostrum);
+  s.speaker = [0, 0.5, -6.25]; s.lecternTop = [0, 1.495, -5.65];
+  const door = new THREE.Group(); door.add(LP.at(LP.box(0.12, 2.5, 1.5, '#2a1a10'), 0, 1.25, 0)); door.add(LP.at(LP.box(0.16, 2.7, 0.12, '#c9a227'), 0, 1.35, 0.8)); door.add(LP.at(LP.box(0.16, 2.7, 0.12, '#c9a227'), 0, 1.35, -0.8));
+  door.position.set(9.94, 0, -3.2); s.add(door); s.door = [9.4, -3.2];
+  const f = flagPole('mx', { h: 4.2, w: 2.2 }); f.position.set(-4.6, 0, -7.2); s.add(f); s.flag = f;
+  const clk = P.wallClock(0.55); clk.position.set(3.6, 4.4, -7.93); s.add(clk); s.clock = clk;
+  for (const x of [-5, 5]) { const l = new THREE.PointLight('#ffe2c0', 5, 13, 1.3); l.position.set(x, 5, 6); s.add(l); }
+  const back = new THREE.Mesh(new THREE.PlaneGeometry(20, 7), std('#8a6a4a')); back.position.set(0, 3.5, 7.98); back.rotation.y = Math.PI; s.add(back);   // the room is open at +z: close it for reverse shots
+  s.add(LP.at(LP.box(20, 1.2, 0.06, '#4a2c1a'), 0, 0.6, 7.95));
   s.userData.look = { warm: 0.05, bloom: 0.28 };
   ticker(s).push(t => f.wave(t, 0.2));
   return s;
@@ -169,11 +194,12 @@ export function ovalOffice() {
   for (const a of [-0.32, 0, 0.32]) { const ang = Math.PI + a, x = Math.sin(ang) * A * 0.985, z = Math.cos(ang) * B * 0.985;
     const w = new THREE.Mesh(new THREE.PlaneGeometry(1.1, 2.8), new THREE.MeshBasicMaterial({ color: '#fff4dc' })); w.position.set(x, 2.1, z); w.lookAt(0, 2.1, 0); s.add(w);
     for (const k of [-1, 1]) { const dr = LK.curtain(0.55, 3.6, '#c9a24a'); dr.position.set(x + Math.cos(ang) * k * 0.75 * -1, 2.3, z + Math.sin(ang) * k * 0.75); dr.lookAt(0, 2.3, 0); s.add(dr); } }
-  const desk = P.resoluteDesk(); desk.position.set(0, 0, -B + 1.3); s.add(desk); s.desk = desk;
-  const chair = P.officeChair('#2a1a12'); chair.position.set(0, 0, -B + 0.55); s.add(chair);
+  // furniture at the cast's scale (the leaders stand ~1.42 tall)
+  const desk = P.resoluteDesk(); desk.position.set(0, 0, -B + 1.3); desk.scale.setScalar(0.82); desk.top *= 0.82; s.add(desk); s.desk = desk;
+  const chair = P.officeChair('#2a1a12'); chair.scale.setScalar(0.72); chair.seatY *= 0.72; chair.position.set(0, 0, -B + 0.62); s.add(chair);
   for (const [code, x] of [['us', -1.6], ['un', 1.6]]) { const f = flagPole(code === 'un' ? 'us' : code, { h: 2.8, w: 1.2 }); f.position.set(x, 0, -B + 0.6); s.add(f); (s.flags = s.flags || []).push(f); }
   for (const sx of [-1, 1]) { const so = P.sofa('#ece2c8', 1.8); so.position.set(sx * 3.3, 0, -0.4); so.rotation.y = -sx * Math.PI / 2; s.add(so); }
-  const pt = P.poolTable(); pt.position.set(0, 0, 0.6); s.add(pt); s.pool = pt;
+  const pt = P.poolTable(); pt.position.set(0, 0, 0.6); pt.scale.setScalar(0.85); s.add(pt); s.pool = pt;
   for (const ang of [Math.PI * 0.62, Math.PI * 0.72, Math.PI * 1.28, Math.PI * 1.38]) { const x = Math.sin(ang) * A * 0.97, z = Math.cos(ang) * B * 0.97; const p = LK.painting(0.8, 1.0, { seed: Math.round(ang * 10), kind: 'portrait' }); p.position.set(x, 2.4, z); p.lookAt(0, 2.4, 0); s.add(p); }
   const light = new THREE.PointLight('#fff2d8', 6, 12, 1.4); light.position.set(0, 3.8, 1); s.add(light);
   s.userData = { sun, hemi, interior: true, look: { warm: 0.05, bloom: 0.3 } };
@@ -239,10 +265,10 @@ export function summit() {
   for (let i = 0; i < n; i++) { const a = r() * Math.PI * 2, rr = Math.sqrt(r()) * 9.5, x = Math.cos(a) * rr, z = Math.sin(a) * rr * 0.85, y = 8.6 + Math.sqrt(Math.max(0, 1 - (rr / 10) ** 2)) * 3.2 - 0.2, L = 0.4 + r() * 1.6;
     q.setFromAxisAngle(new THREE.Vector3(1, 0, 0), Math.PI); m4.compose(new THREE.Vector3(x, y - L / 2, z), q, new THREE.Vector3(0.6 + r() * 0.8, L, 0.6 + r() * 0.8)); im.setMatrixAt(i, m4); im.setColorAt(i, c.set(pal[(r() * pal.length) | 0])); }
   s.add(im);
-  const tb = P.summitTable(4.4); s.add(tb); s.table = tb;
+  const tb = P.summitTable(4.4); tb.scale.y = 0.6 / tb.top; tb.top = 0.6; s.add(tb); s.table = tb;   // at the leaders' seated height
   s.seats = []; const codes = ['mx', 'us', 'ca', 'jp', 'de', 'fr', 'it', 'sm', 'au', 'kr', 'co', 'br', 'ar', 'ch', 'mc'];
-  codes.forEach((code, i) => { const a = 0.55 + i * (Math.PI * 2 - 1.1) / (codes.length - 1), x = Math.sin(a) * 5.4, z = Math.cos(a) * 5.4;
-    const ch = P.officeChair('#2a3a5a'); ch.position.set(x, 0, z); ch.rotation.y = a + Math.PI; s.add(ch); s.seats.push({ x, z, yaw: a + Math.PI, code, chair: ch });
+  codes.forEach((code, i) => { const a = 0.55 + i * (Math.PI * 2 - 1.1) / (codes.length - 1), x = Math.sin(a) * 4.75, z = Math.cos(a) * 4.75;
+    const ch = P.officeChair('#2a3a5a'); ch.scale.setScalar(0.72); ch.seatY *= 0.72; ch.position.set(x, 0, z); ch.rotation.y = a + Math.PI; s.add(ch); s.seats.push({ x, z, yaw: a + Math.PI, code, chair: ch, a });
     const f = flagPole(code, { h: 2.6, w: 1.0 }); f.position.set(Math.sin(a) * 8.4, 0, Math.cos(a) * 8.4); f.rotation.y = a + Math.PI / 2; s.add(f); (s.flags = s.flags || []).push(f); });
   for (const [x, z] of [[-6, 4], [6, 4], [0, -6]]) { const l = new THREE.PointLight('#ffffff', 7, 16, 1.2); l.position.set(x, 6, z); s.add(l); }
   s.userData.look = { warm: 0.02, cool: 0.04, bloom: 0.28 };
@@ -262,6 +288,7 @@ export function trackPos(d, lane = 0) {
 }
 export function racecourse(light = 'day') {
   const s = wStage(light, ['#6e9a4a', '#628e40'], { groundSize: 420 });
+  if (s.fog) { s.fog.near = 170; s.fog.far = 700; }   // a big venue: keep the far turn and the city crisp from the air
   const { L, R, W } = TRACK;
   const dirt = new THREE.MeshStandardMaterial({ map: LK.detailTex('dirt').clone(), color: '#b08058', roughness: 1 }); dirt.map.needsUpdate = true; dirt.map.wrapS = dirt.map.wrapT = THREE.RepeatWrapping; dirt.map.repeat.set(0.25, 0.25);
   const shape = new THREE.Shape(); shape.moveTo(-L / 2, R + W); shape.lineTo(L / 2, R + W); shape.absarc(L / 2, 0, R + W, Math.PI / 2, -Math.PI / 2, true); shape.lineTo(-L / 2, -R - W); shape.absarc(-L / 2, 0, R + W, -Math.PI / 2, Math.PI / 2, true);
@@ -304,7 +331,7 @@ export function liveStage() {
   s.userData.look = { bloom: 0.7, bloomT: 0.75, warm: 0.04, cool: 0.08, rimColor: '#ffb8e8', rim: 0.45, sat: 1.15 };
   ticker(s).push(t => {
     s.stickBase.forEach(([x, y, z, ph], i) => { const a = Math.sin(t * 4.2 + ph) * 0.5; m4.makeRotationZ(a).setPosition(x + Math.sin(t * 4.2 + ph) * 0.12, y, z); sticks.setMatrixAt(i, m4); }); sticks.instanceMatrix.needsUpdate = true;
-    st.beams.forEach((h, i) => { h.rotation.z = 0.45 * Math.sin(t * 0.9 + i * 0.8); h.rotation.x = 0.25 * Math.sin(t * 0.7 + i); h.beam.material.opacity = 0.08 + 0.05 * Math.sin(t * 3 + i); });
+    st.beams.forEach((h, i) => { h.rotation.z = 0.45 * Math.sin(t * 0.9 + i * 0.8); h.rotation.x = 0.25 * Math.sin(t * 0.7 + i); h.beam.material.opacity = (0.08 + 0.05 * Math.sin(t * 3 + i)) * (s.beamK ?? 1); });   // scenes dim the beams for close shots
     st.floorLights.forEach((l, i) => l.material.color.setHSL(((t * 0.2 + i * 0.1) % 1), 0.8, 0.6));
     if (conf.visible) { s.confBase.forEach(([x, y, z, ph, sp], i) => { const tt = t - (s.confT0 || 0); m4.makeRotationFromEuler(new THREE.Euler(tt * 3 * sp + ph, tt * 2 + ph, 0)).setPosition(x + Math.sin(tt + ph) * 0.6, y - ((tt * sp * 1.4) % 18), z); conf.setMatrixAt(i, m4); }); conf.instanceMatrix.needsUpdate = true; }
   });

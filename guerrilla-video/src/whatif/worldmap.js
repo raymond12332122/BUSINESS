@@ -48,6 +48,8 @@ export function worldMap({ light = 'day' } = {}) {
     const m = new THREE.Mesh(geo, mat); m.receiveShadow = true; m.castShadow = true; g.add(m);
     s.countries[c.name] = { mesh: m, mat, base: LAND };
   }
+  // countries a scene recolours must stay out of the static bake: s.keep([...names]) before bakeAll
+  s.keep = names => names.forEach(n => { const c = s.countries[n]; if (c) c.mesh.userData.dynamic = true; });
   s.paint = (name, color, k = 1) => { const c = s.countries[name]; if (!c) return; c.mat.color.set(c.base).lerp(new THREE.Color(color), k); c.mesh.position.y = 0.12 * k; };
   return s;
 }

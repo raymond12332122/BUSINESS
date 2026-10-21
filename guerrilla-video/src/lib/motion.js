@@ -172,18 +172,21 @@ export function bodyPoint(rig, a, out = new THREE.Vector3()) {
 }
 // Normalized hand targets (pose.aL / aR, see bodyPoint) become arm-IK targets; pose.aWL / aWR (0..1) blend them with
 // where the FK arms would put the wrists, so FK and contact poses cross-fade without pops.
+// A target ['world', x, y, z] is a fixed point in the scene (a document on a desk, a railing): it is converted into the
+// chest-riding rest space the arm IK expects, using the chest as the FK pose leaves it this frame.
 function handTargets(rig, pose, base) {
-  const R = rig.root, fkW = {}, need = ['L', 'R'].some(s => pose['a' + s] && (pose['aW' + s] ?? 1) < 1);
-  const inv = new THREE.Matrix4(), chestRest = new THREE.Matrix4().copy(rig.chestRestInv).invert();
+  const R = rig.root, fkW = {}, isW = a => a && a[0] === 'world';
+  const need = ['L', 'R'].some(s => pose['a' + s] && ((pose['aW' + s] ?? 1) < 1 || isW(pose['a' + s])));
+  const inv = new THREE.Matrix4(), chestRest = new THREE.Matrix4().copy(rig.chestRestInv).invert(), toRest = new THREE.Matrix4();
   if (need) {
     const p2 = { ...pose }; delete p2.aL; delete p2.aR; delete p2.ikL; delete p2.ikR; base(p2); R.updateWorldMatrix(true, true);
     inv.copy(R.matrixWorld).invert();
-    const toRest = new THREE.Matrix4().multiplyMatrices(inv, rig.j.chest.bone.matrixWorld).invert().premultiply(chestRest);
+    toRest.multiplyMatrices(inv, rig.j.chest.bone.matrixWorld).invert().premultiply(chestRest);
     for (const s of ['L', 'R']) fkW[s] = { w: wpos(rig.j['wri' + s].bone, V()).applyMatrix4(inv).applyMatrix4(toRest), e: wpos(rig.j['elb' + s].bone, V()).applyMatrix4(inv), sh: wpos(rig.j['arm' + s].bone, V()).applyMatrix4(inv), wc: wpos(rig.j['wri' + s].bone, V()).applyMatrix4(inv) };
   }
   for (const s of ['L', 'R']) {
     const a = pose['a' + s]; if (!a) continue;
-    const w = pose['aW' + s] ?? 1, T = bodyPoint(rig, a);
+    const w = pose['aW' + s] ?? 1, T = isW(a) ? V().set(a[1], a[2], a[3]).applyMatrix4(inv).applyMatrix4(toRest) : bodyPoint(rig, a);
     if (w < 1) T.lerpVectors(fkW[s].w, T, w);
     pose['ik' + s] = T.toArray();
     const def = new THREE.Vector3(...(pose['pl' + s] || [s === 'L' ? 0.7 : -0.7, -1, -0.25]));

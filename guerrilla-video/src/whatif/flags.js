@@ -60,8 +60,9 @@ export function flagURL(code) {
 // A waving flag on a pole: returns a group with .wave(t). Cloth is a subdivided plane bent with travelling sines.
 export function flagPole(code, { h = 3.2, w = 1.5, pole = '#d8d8d8', gold = true } = {}) {
   const g = new THREE.Group();
-  const p = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.035, h, 10), new THREE.MeshStandardMaterial({ color: pole, metalness: 0.5, roughness: 0.4 })); p.position.y = h / 2; p.castShadow = true; g.add(p);
-  if (gold) { const b = new THREE.Mesh(new THREE.SphereGeometry(0.06, 12, 10), new THREE.MeshStandardMaterial({ color: '#d4af37', metalness: 0.7, roughness: 0.3 })); b.position.y = h + 0.04; g.add(b); }
+  const pr = Math.max(0.025, h * 0.0075);   // tall masts get proportionally thicker
+  const p = new THREE.Mesh(new THREE.CylinderGeometry(pr, pr * 1.4, h, 10), new THREE.MeshStandardMaterial({ color: pole, metalness: 0.5, roughness: 0.4 })); p.position.y = h / 2; p.castShadow = true; g.add(p);
+  if (gold) { const b = new THREE.Mesh(new THREE.SphereGeometry(pr * 2.4, 12, 10), new THREE.MeshStandardMaterial({ color: '#d4af37', metalness: 0.7, roughness: 0.3 })); b.position.y = h + pr * 1.6; g.add(b); }
   const fh = w * 2 / 3, geo = new THREE.PlaneGeometry(w, fh, 24, 8); geo.translate(w / 2, 0, 0);
   const cloth = new THREE.Mesh(geo, new THREE.MeshStandardMaterial({ map: flagTex(code), side: THREE.DoubleSide, roughness: 0.85 }));
   cloth.position.set(0.03, h - fh / 2 - 0.05, 0); cloth.castShadow = true; g.add(cloth);

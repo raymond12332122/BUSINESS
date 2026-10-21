@@ -38,7 +38,7 @@ export function build(ctx) {
   K.fitSash(cast[7], SASH, { emblem: K.eagleKnot() });
 
   const lineAct = t => { cast.forEach((r, i) => K.act(r, POSE[order[i]](t, i * 1.3), t, { smile: 0.5, mouth: order[i] === 'golshi' || order[i] === 'turbo' ? [0.5, 0.8] : undefined })); return U.film(t); };
-  const sfx = [{ t: 0, type: 'city', dur: tB, vol: 0.25 }, { t: tB, type: 'birds', dur: tC - tB, vol: 0.25 }, { t: tC, type: 'applause', dur: 4, vol: 0.35 }, { t: tC - 0.1, type: 'whoosh', vol: 0.3 }];
+  const sfx = [{ t: 0, type: 'traffic', dur: tB, vol: 0.18 }, { t: tB, type: 'birds', dur: tC - tB, vol: 0.25 }, { t: tC, type: 'applause', dur: 4, vol: 0.35 }, { t: tC - 0.1, type: 'whoosh', vol: 0.3 }];
 
   const shots = [
     { t0: 0, set: Z, p0: [2.4, 0.95, -1.6], l0: [0, 1.75, -12], p1: [1.35, 1.2, -4.1], l1: [0, 1.25, -7.2], fov0: 46, fov1: 38, act: t => {
