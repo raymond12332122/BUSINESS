@@ -1,0 +1,59 @@
+{
+  "scenes": [
+    {"id": "titulo", "lead": 1.4, "tail": 1.3, "gaps": {"1": 0.5}, "lines": [
+      "Entre mil novecientos treinta y nueve y mil novecientos cuarenta y cinco, el mundo vivió la guerra más grande y mortífera de la historia.",
+      "Se peleó en Europa, en África, en Asia y en todos los océanos, y murieron entre setenta y ochenta y cinco millones de personas.",
+      "Esta es la historia de la Segunda Guerra Mundial."]},
+    {"id": "causas", "lead": 0.8, "tail": 1.1, "lines": [
+      "Todo empezó con las heridas de la guerra anterior: el Tratado de Versalles dejó a Alemania humillada, sin colonias y endeudada.",
+      "Después llegó la Gran Depresión de mil novecientos veintinueve, con millones de personas sin trabajo.",
+      "En ese caos crecieron los dictadores: Mussolini en Italia, Hitler en Alemania desde mil novecientos treinta y tres, y un gobierno militarista en Japón que invadió China.",
+      "Hitler rearmó a su país y se anexó Austria y Checoslovaquia, mientras las demás potencias, con tal de evitar otra guerra, lo dejaban hacer."]},
+    {"id": "polonia", "lead": 0.8, "tail": 1.2, "lines": [
+      "En agosto de mil novecientos treinta y nueve, Hitler y Stalin, que se odiaban, firmaron un pacto secreto para repartirse Europa del Este.",
+      "El primero de septiembre, Alemania invadió Polonia, y dos días después Reino Unido y Francia le declararon la guerra.",
+      "Los alemanes usaron la guerra relámpago: tanques y aviones coordinados por radio que rompían el frente sin detenerse. Con los soviéticos entrando por el este, Polonia cayó en cinco semanas."]},
+    {"id": "francia", "lead": 0.8, "tail": 1.2, "lines": [
+      "En mil novecientos cuarenta le tocó a Francia. Los tanques alemanes cruzaron el bosque de las Ardenas y rodearon a los ejércitos aliados contra el mar.",
+      "En Dunkerque, cientos de barcos, muchos de pescadores, rescataron a unos trescientos treinta y ocho mil soldados. En junio, los alemanes entraron en París.",
+      "Gran Bretaña quedó sola. Winston Churchill prometió no rendirse jamás, y sus pilotos, guiados por el radar, ganaron la Batalla de Inglaterra mientras las bombas caían sobre Londres."]},
+    {"id": "este", "lead": 0.8, "tail": 1.2, "lines": [
+      "En junio de mil novecientos cuarenta y uno, Hitler rompió su pacto e invadió la Unión Soviética con unos tres millones de soldados.",
+      "Leningrado fue sitiada casi novecientos días y cientos de miles murieron de hambre, pero el invierno y la resistencia soviética frenaron a los alemanes frente a Moscú.",
+      "En Stalingrado, casa por casa, se libró una de las batallas más sangrientas de la historia. En febrero de mil novecientos cuarenta y tres, el ejército alemán se rindió, y desde entonces sólo retrocedió."]},
+    {"id": "pacifico", "lead": 0.8, "tail": 1.2, "lines": [
+      "Del otro lado del mundo, Japón buscaba un imperio en Asia. El siete de diciembre de mil novecientos cuarenta y uno atacó por sorpresa Pearl Harbor, en Hawái.",
+      "Estados Unidos, con el presidente Franklin Roosevelt, entró a la guerra. Japón conquistó medio Pacífico, pero en junio de mil novecientos cuarenta y dos perdió cuatro portaaviones en Midway.",
+      "Desde ahí, los estadounidenses avanzaron de isla en isla, mientras China llevaba años resistiendo la invasión japonesa."]},
+    {"id": "africa", "lead": 0.8, "tail": 1.2, "lines": [
+      "También se combatió en los desiertos del norte de África: en El Alamein, en Egipto, los británicos frenaron al general alemán Rommel, el «Zorro del Desierto».",
+      "Después, los aliados desembarcaron en Italia. Mussolini cayó en mil novecientos cuarenta y tres, y en las montañas italianas también pelearon veinticinco mil soldados brasileños."]},
+    {"id": "holocausto", "lead": 1.0, "tail": 1.6, "gaps": {"1": 0.5, "2": 0.5}, "lines": [
+      "Mientras tanto, en la Europa ocupada, los nazis cometían uno de los peores crímenes de la humanidad: el Holocausto.",
+      "Persiguieron, encerraron en guetos y asesinaron de forma sistemática a seis millones de judíos, dos de cada tres judíos de Europa, y también al pueblo gitano, a personas con discapacidad, a prisioneros y a opositores.",
+      "Sólo en Auschwitz fueron asesinadas cerca de un millón cien mil personas. Una de las víctimas fue Ana Frank, la niña que escribió su diario escondida en Ámsterdam."]},
+    {"id": "frente", "lead": 0.8, "tail": 1.2, "lines": [
+      "La guerra también se ganó en las fábricas: Estados Unidos construyó unos trescientos mil aviones, y millones de mujeres entraron a trabajar en la industria.",
+      "Más de ochocientas mil mujeres soviéticas fueron al frente, como las «Brujas de la Noche», que bombardeaban en la oscuridad desde frágiles biplanos.",
+      "En Bletchley Park, Alan Turing y miles de mujeres descifraron los mensajes secretos de la máquina Enigma. La guerra aceleró el radar, la penicilina, los cohetes y las primeras computadoras."]},
+    {"id": "mexico", "lead": 0.8, "tail": 1.2, "lines": [
+      "¿Y México? En mayo de mil novecientos cuarenta y dos, submarinos alemanes hundieron dos petroleros mexicanos: el Potrero del Llano y el Faja de Oro.",
+      "El presidente Manuel Ávila Camacho pidió al Congreso declarar la guerra al Eje. México envió petróleo y metales, y cientos de miles de braceros fueron a trabajar a los campos de Estados Unidos.",
+      "En mil novecientos cuarenta y cinco, el Escuadrón doscientos uno, de la Fuerza Aérea Expedicionaria Mexicana, voló en combate sobre Filipinas. Cinco de sus pilotos no regresaron."]},
+    {"id": "diad", "lead": 0.8, "tail": 1.2, "lines": [
+      "El seis de junio de mil novecientos cuarenta y cuatro llegó el Día D: casi ciento sesenta mil soldados aliados desembarcaron en las playas de Normandía, la mayor invasión por mar de la historia.",
+      "En agosto, París fue liberada, y por el este el Ejército Rojo avanzaba sin parar.",
+      "En abril de mil novecientos cuarenta y cinco, los soviéticos tomaron Berlín. Hitler se suicidó en su búnker, y el ocho de mayo Alemania se rindió sin condiciones."]},
+    {"id": "bomba", "lead": 1.0, "tail": 1.4, "gaps": {"1": 0.5}, "lines": [
+      "Pero Japón seguía peleando. En secreto, Estados Unidos había construido un arma nueva: la bomba atómica.",
+      "El seis de agosto de mil novecientos cuarenta y cinco, una sola bomba destruyó Hiroshima, y tres días después otra cayó sobre Nagasaki. A finales de ese año habían muerto más de doscientas mil personas.",
+      "El quince de agosto, el emperador anunció por radio la rendición, que se firmó el dos de septiembre. La Segunda Guerra Mundial había terminado."]},
+    {"id": "legado", "lead": 0.8, "tail": 1.2, "lines": [
+      "El precio fue terrible. La mayoría de los muertos fueron civiles: la Unión Soviética perdió unos veintisiete millones de personas, China entre quince y veinte millones, y Polonia, casi una de cada seis.",
+      "Para que no se repitiera, en mil novecientos cuarenta y cinco nació la Organización de las Naciones Unidas, con México entre sus fundadores. Los jefes nazis fueron juzgados en Núremberg, y después se proclamó la Declaración Universal de los Derechos Humanos.",
+      "Pero el mundo quedó partido en dos, entre Estados Unidos y la Unión Soviética: empezaba la Guerra Fría."]},
+    {"id": "final", "lead": 0.8, "tail": 3.2, "gaps": {"1": 0.6}, "lines": [
+      "La Segunda Guerra Mundial mostró hasta dónde puede llegar el odio, y también todo lo que la gente común es capaz de hacer por la libertad.",
+      "Recordarla es la mejor forma de que nunca vuelva a pasar."]}
+  ]
+}

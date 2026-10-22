@@ -25,7 +25,11 @@ SAY = {'Cu Chi': 'Ku Chi', 'Nelson': 'Nélson', 'Jena': 'Yena', 'Harfuch': 'Jarf
        'T.M. Opera O': 'Ti Em Ópera Óu', 'Opera O': 'Ópera Óu', 'Meisho Doto': 'Méisho Dóto', 'Gold Ship': 'Góld Ship',
        'Agnes Digital': 'Ágnes Díyital', 'Agnes': 'Ágnes', 'Tokai Teio': 'Tókai Téio', 'Kaichō': 'Kaichóo', 'Satono Diamond': 'Satóno Dáiamond',
        'Tamamo Cross': 'Tamámo Crós', 'Silence Suzuka': 'Sáilens Suzúka', 'Twin Turbo': 'Tuín Túrbo', 'tawake': 'tahuáke',
-       'Winning Live': 'Uíning Láiv', 'umamusume': 'umamusúme', 'savate': 'saváte'}
+       'Winning Live': 'Uíning Láiv', 'umamusume': 'umamusúme', 'savate': 'saváte',
+       # Segunda Guerra Mundial
+       'Winston Churchill': 'Uínston Chérchil', 'Churchill': 'Chérchil', 'Franklin Roosevelt': 'Fránklin Rúsvelt', 'Roosevelt': 'Rúsvelt',
+       'Pearl Harbor': 'Perl Járbor', 'Midway': 'Miduéi', 'Rommel': 'Rómel', 'El Alamein': 'El Alaméin', 'Bletchley Park': 'Bléchli Park',
+       'Alan Turing': 'Álan Tiúring', 'Auschwitz': 'Áushvits', 'Día D': 'Día De'}
 script = json.load(open(os.path.join(ROOT, 'src', f'script_{LANG}.json') if VIDEO == 'guerrilla' else os.path.join(ROOT, 'src', VIDEO, f'script_{LANG}.json')))
 
 
