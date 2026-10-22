@@ -37,6 +37,7 @@ Object.assign(EU.CITY, {
   'Normandía': [-0.6, 49.35], 'Múnich': [11.58, 48.14], 'Auschwitz': [19.2, 50.03], 'Núremberg': [11.08, 49.45], 'Yalta': [34.16, 44.5],
   'Sicilia': [14.1, 37.5], 'Ardenas': [5.6, 50.05], 'Viena': [16.37, 48.21], 'Praga': [14.42, 50.08], 'Varsovia': [21.01, 52.23], 'Oslo': [10.75, 59.91],
   'Copenhague': [12.57, 55.68], 'Bruselas': [4.35, 50.85], 'Atenas': [23.73, 37.98], 'Belgrado': [20.46, 44.82], 'Kiev': [30.52, 50.45], 'Tobruk': [23.96, 32.08],
+  'Treblinka': [22.05, 52.63], 'Sobibor': [23.6, 51.45], 'Belzec': [23.46, 50.37], 'Majdanek': [22.6, 51.22], 'Chelmno': [18.73, 52.15], 'Bergen-Belsen': [9.9, 52.76],
 });
 export const NAME = { X_GER: 'ALEMANIA', X_ITA: 'ITALIA', A_GBR: 'REINO UNIDO', A_FRA: 'FRANCIA', A_POL: 'POLONIA', SOV: 'UNIÓN SOVIÉTICA', TCH: 'CHECOSLOVAQUIA' };
 export async function preload() { await EU.preload(); await preloadWorld(); }

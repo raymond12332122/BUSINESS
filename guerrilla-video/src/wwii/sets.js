@@ -411,3 +411,73 @@ export function apennines(light = 'snow') {
   LK.outdoor(s, light, { kind: 'snow', noGrass: true });
   return s;
 }
+
+// ------------------------------------------------------------ the Holocaust, told soberly: places and remembrance, no perpetrators, no violence
+import { canvasTex } from '../whatif/kit.js';
+// Warsaw, 1940: a grey street of tenements (chibi scale), closed at the far end by the ghetto wall: brick, barbed wire, a shut gate.
+export function ghetto(light = 'overcast') {
+  const s = WS.wStage(light, ['#7a766e', '#706c64'], { groundSize: 200 });
+  if (s.fog) { s.fog.color.set('#a6a49e'); s.fog.near = 16; s.fog.far = 80; }
+  s.add(LP.at(LP.box(6.2, 0.02, 80, '#5e5a54'), 0, 0.011, -24));
+  for (const x of [-3.9, 3.9]) s.add(LP.at(LP.box(1.6, 0.1, 80, '#8a857c'), x, 0.05, -24));
+  const cols = ['#8a8074', '#7a7268', '#958a7a', '#6e6860'];
+  for (let i = 0; i < 7; i++) for (const sx of [-1, 1]) { const j = sx > 0 ? 1 : 0, b = P.terrace(7, 6 + ((i * 3 + j) % 3) * 0.8, 5, cols[(i + j) % 4], 60 + i * 2 + j); b.position.set(sx * 7.2, 0, 4 - i * 7.2); b.rotation.y = -sx * Math.PI / 2; s.add(b); }
+  const bt = canvasTex(256, 128, (x, W, H) => { x.fillStyle = '#4a3a32'; x.fillRect(0, 0, W, H); for (let j = 0; j < 16; j++) for (let i = -1; i < 17; i++) { const v = 0.82 + ((i * 7 + j * 11) % 9) / 36; x.fillStyle = `rgb(${138 * v | 0},${82 * v | 0},${62 * v | 0})`; x.fillRect(i * 16 + (j % 2) * 8 + 1, j * 8 + 1, 14, 6); } });
+  bt.wrapS = bt.wrapT = THREE.RepeatWrapping; bt.repeat.set(5, 1.2);
+  const wall = new THREE.Mesh(new THREE.BoxGeometry(9.4, 2.3, 0.35), new THREE.MeshStandardMaterial({ map: bt, roughness: 0.95 })); wall.position.set(0, 1.15, -15); wall.castShadow = wall.receiveShadow = true; s.add(wall);
+  s.add(LP.at(LP.box(1.9, 1.75, 0.1, '#3e3226'), 0, 0.875, -14.8));
+  for (const x of [-0.6, -0.3, 0, 0.3, 0.6]) s.add(LP.at(LP.box(0.03, 1.7, 0.04, '#2a2018'), x, 0.875, -14.74));
+  const bw = MX.barbedWire(9.4); bw.position.set(0, 2.3, -15); bw.scale.set(1, 0.8, 1); s.add(bw);
+  const lamp = NP.streetLight(false, 3.2); lamp.position.set(-3.3, 0, -6); s.add(lamp);
+  LK.outdoor(s, light, { kind: 'cobble', noGrass: true });
+  return s;
+}
+// Auschwitz-Birkenau in winter fog: the railway runs straight through the arch of the gatehouse; fences, bare trees, a lone wagon.
+export function birkenau() {
+  const s = RS.rStage('snow', RS.SNOW, { seed: 3101, bumps: 0.25 });
+  if (s.fog) { s.fog.color.set('#b4b8be'); s.fog.near = 8; s.fog.far = 95; }
+  const tr = RP.track(150, { snow: true }); tr.position.set(0, 0, -55); s.add(tr);
+  const gh = P.gatehouse(); gh.position.set(0, 0, -44); s.add(gh); s.gate = gh;
+  const side = RP.track(60, { snow: true }); side.position.set(-6.5, 0, -12); s.add(side);
+  const car = P.boxcar(); car.position.set(-6.5, 0.1, -3); s.add(car); s.wagon = car;
+  for (const sx of [-1, 1]) for (let i = 0; i < 14; i++) { const z = 8 - i * 3.6, x = sx * 12; s.add(LP.at(LP.box(0.16, 2.4, 0.16, '#a8a49c'), x, 1.2, z));
+    if (i) for (const y of [0.6, 1.2, 1.8, 2.3]) s.add(LP.at(LP.box(0.012, 0.012, 3.6, '#55524c'), x, y, z + 1.8)); }
+  const sn = RP.snowfall(s, { area: [-14, 0, -20, 14, 10, 10], n: 700, speed: 0.6 }); ticker(s).push(t => sn.update(t));
+  LK.outdoor(s, 'overcast', { kind: 'snow', noGrass: true });
+  return s;
+}
+// A dark memorial hall: black stone floor, a long wall of blank plaques, candles along its foot. s.row (candles), s.three (tall candles).
+export function memorialDark() {
+  const s = new THREE.Scene(); s.background = new THREE.Color('#060709'); s.fog = new THREE.Fog('#060709', 7, 24);
+  s.add(new THREE.HemisphereLight('#4a4a58', '#0a0a0c', 0.35));
+  const key = new THREE.SpotLight('#ffd9a8', 14, 30, 0.5, 0.7, 1.4); key.position.set(0, 7, 5); key.target.position.set(0, 0, -2); s.add(key, key.target);
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(60, 40), new THREE.MeshStandardMaterial({ color: '#141518', roughness: 0.62, metalness: 0.05 })); fl.rotation.x = -Math.PI / 2; fl.receiveShadow = true; s.add(fl);
+  const pt = canvasTex(512, 128, (x, W, H) => { x.fillStyle = '#1c1d22'; x.fillRect(0, 0, W, H); for (let i = 0; i < 8; i++) { x.fillStyle = '#26282e'; x.fillRect(i * 64 + 4, 8, 56, H - 16); x.fillStyle = 'rgba(200,190,170,0.18)'; for (let j = 0; j < 9; j++) x.fillRect(i * 64 + 12, 20 + j * 11, 30 + ((i * 13 + j * 7) % 12), 3); } });
+  pt.wrapS = THREE.RepeatWrapping; pt.repeat.set(3, 1);
+  const wall = new THREE.Mesh(new THREE.BoxGeometry(18, 2.6, 0.5), new THREE.MeshStandardMaterial({ map: pt, roughness: 0.6 })); wall.position.set(0, 1.3, -3.2); wall.receiveShadow = true; s.add(wall);
+  s.row = Array.from({ length: 34 }, (_, i) => { const c = P.memCandle(0.16 + ((i * 7) % 5) * 0.03, { seed: i }); c.position.set(-8 + i * 0.48 + ((i * 5) % 3) * 0.06, 0, -2.75 + ((i * 3) % 4) * 0.12); s.add(c); return c; });
+  for (const [x, z] of [[-4, -2.5], [0, -2.5], [4, -2.5]]) { const l = new THREE.PointLight('#ffb766', 1.6, 5, 1.6); l.position.set(x, 0.45, z); s.add(l); }
+  s.three = [-0.55, 0, 0.55].map((x, i) => { const c = P.memCandle(0.42, { seed: 40 + i, light: true, power: 1.6 }); c.position.set(x, 0, 1.2); s.add(c); return c; });
+  ticker(s); s.userData = { interior: true };
+  return s;
+}
+// Amsterdam, 1942–44: Anne's room in the Secret Annex — faded wallpaper with her pictures pasted on it, a window on the chestnut tree,
+// a small desk facing the room (she sits behind it, the window at her back). s.desk.top, s.chair, s.P (the page she writes on).
+export function annex() {
+  const s = RS.room({ w: 5.4, d: 4.6, h: 2.5, wall: '#b4a684', lower: '#6a5a44', lowerH: 0.62, floor: '#5e4632', ceil: '#e2dac6', hemi: 0.7, sunI: 0.5,
+    lights: [[0.5, 1.7, -1.4, 2.6, '#ffe6bc', 6], [-1.6, 2.2, 1.0, 1.4, '#ffe2b8', 7]], bg: '#1a140e' });
+  const win = new THREE.Group(); win.position.set(0.3, 1.32, -2.29); s.add(win);
+  win.add(new THREE.Mesh(new THREE.PlaneGeometry(1.0, 1.1), new THREE.MeshBasicMaterial({ map: P.annexView(), toneMapped: false })));
+  for (const [w, h, x, y] of [[1.12, 0.07, 0, 0.58], [1.12, 0.1, 0, -0.58], [0.07, 1.2, -0.53, 0], [0.07, 1.2, 0.53, 0], [0.04, 1.1, 0, 0], [1.0, 0.04, 0, 0.18]]) win.add(LP.at(LP.box(w, h, 0.06, '#e8e2d4'), x, y, 0.03));
+  const sun = new THREE.SpotLight('#fff0d0', 10, 9, 0.6, 0.6, 1.2); sun.position.set(0.3, 1.5, -2.6); sun.target.position.set(0, 0.3, 0.4); s.add(sun, sun.target);
+  const pics = canvasTex(256, 256, (x, W, H) => { x.clearRect(0, 0, W, H); const cs = ['#d8c8a8', '#c8b8a0', '#e0d4bc', '#b8a890', '#d0c0a4']; for (let i = 0; i < 14; i++) { const px = (i * 61) % 200 + 10, py = ((i * 97) % 190) + 10, w = 34 + (i * 13) % 20, h = 44 + (i * 7) % 18;
+    x.save(); x.translate(px + w / 2, py + h / 2); x.rotate(((i * 37) % 11 - 5) / 60); x.fillStyle = cs[i % 5]; x.fillRect(-w / 2, -h / 2, w, h); x.fillStyle = 'rgba(60,50,40,0.55)'; x.beginPath(); x.ellipse(0, -h * 0.08, w * 0.22, h * 0.24, 0, 0, 7); x.fill(); x.fillRect(-w * 0.3, h * 0.18, w * 0.6, h * 0.22); x.restore(); } });
+  const pm = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 1.2), new THREE.MeshStandardMaterial({ map: pics, transparent: true, roughness: 0.9 })); pm.position.set(-1.35, 1.35, -2.28); s.add(pm);
+  const desk = RP.desk(1.3, 0.62, '#5a3e28'); desk.position.set(0.3, 0, -1.05); s.add(desk); s.desk = desk;
+  const chair = RP.chairR('#5a3e28', '#6a4a30'); chair.position.set(0.3, 0, -1.62); s.add(chair); s.chair = chair;
+  const bed = new THREE.Group(); bed.add(LP.at(LP.box(0.72, 0.22, 1.5, '#5a3e28'), 0, 0.11, 0)); bed.add(LP.at(LP.box(0.68, 0.08, 1.46, '#d8d0bc'), 0, 0.26, 0)); bed.add(LP.at(LP.box(0.5, 0.07, 0.28, '#efe8d8'), 0, 0.33, -0.55)); bed.add(LP.at(LP.box(0.7, 0.05, 0.8, '#7a5a5a'), 0, 0.31, 0.3)); bed.position.set(-2.1, 0, -0.9); s.add(bed);
+  const shelf = RP.bookshelf(1.0, 1.6, 7, 0.5); shelf.position.set(2.45, 0, -0.6); shelf.rotation.y = -Math.PI / 2; s.add(shelf);
+  const lamp = RP.deskLamp(true, '#7a5a2a', 0.38); lamp.position.set(-0.12, desk.top, -1.0); s.add(lamp);
+  s.P = [0.3, desk.top, -0.95];
+  return s;
+}

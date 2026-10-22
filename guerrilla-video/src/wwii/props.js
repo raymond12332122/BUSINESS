@@ -558,3 +558,85 @@ export function fieldGun(col = '#8a7c58') {
   g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
   return dyn(g);
 }
+
+// ------------------------------------------------------------ remembrance (the Holocaust is told without people being hurt)
+// A memorial candle: .update(t, k, since): k = how lit (1 burning .. 0 out); since = seconds since it went out (a thin wisp rises).
+export function memCandle(h = 0.32, { seed = 0, light = false, power = 1.2, col = '#efe8d8' } = {}) {
+  const g = new THREE.Group();
+  g.add(at(cyl(0.06, 0.065, h, col, 16), 0, h / 2, 0)); g.add(at(cyl(0.004, 0.004, 0.03, '#1a1a1a', 4), 0, h + 0.015, 0));
+  const halo = glow('#ff9a40', 1, 0.3), flame = glow('#ffcf7a', 1, 1), core = glow('#fff6e0', 1, 1);
+  halo.position.y = h + 0.06; flame.position.y = h + 0.075; core.position.y = h + 0.06; g.add(halo, flame, core);
+  const pl = light ? new THREE.PointLight('#ffb766', 0, 5, 1.6) : null; if (pl) { pl.position.y = h + 0.18; g.add(pl); }
+  const wisp = [0, 1, 2].map(i => { const m = new THREE.Sprite(new THREE.SpriteMaterial({ map: puffTex(), color: '#c8c2b8', transparent: true, depthWrite: false, opacity: 0 })); m.material.rotation = i * 2.1; m.userData.dynamic = true; g.add(m); return m; });
+  g.update = (t, k = 1, since = -1) => {
+    const f = (0.88 + 0.12 * Math.sin(t * 13 + seed * 3) * Math.sin(t * 7.3 + seed)) * k;
+    flame.scale.set(0.085 * f, 0.19 * f, 1); core.scale.set(0.035 * f, 0.08 * f, 1); halo.scale.setScalar(0.85 * f);
+    flame.material.opacity = Math.min(1, k * 1.4); core.material.opacity = k; halo.material.opacity = 0.3 * k; flame.visible = core.visible = halo.visible = k > 0.01;
+    if (pl) pl.intensity = power * f;
+    wisp.forEach((m, i) => { const u = since >= 0 ? (since - i * 0.25) / 2.2 : -1, on = u > 0 && u < 1;
+      m.visible = on; if (!on) return; m.position.set(0.05 * Math.sin(u * 6 + i * 2), h + 0.05 + u * 0.75, 0.03 * Math.cos(u * 5 + i)); m.scale.set(0.03 + 0.1 * u, 0.06 + 0.2 * u, 1); m.material.opacity = 0.32 * (1 - u) * Math.min(1, u * 8); });
+  };
+  g.update(0); g.userData.dynamic = true; return g;
+}
+// A closed wooden freight wagon (the deportation trains), standing on a track; facing +z along its length.
+export function boxcar(col = '#5e3a2c') {
+  const g = new THREE.Group(), L = 5.2, W = 1.7, H = 1.9, y0 = 0.62;
+  const tex = canvasTex(256, 128, (x, w, h) => { x.fillStyle = col; x.fillRect(0, 0, w, h); for (let i = 0; i < 26; i++) { x.fillStyle = `rgba(0,0,0,${0.12 + (i * 37 % 10) / 60})`; x.fillRect(i * w / 26, 0, 2, h); }
+    x.fillStyle = 'rgba(255,255,255,0.05)'; for (let i = 0; i < 40; i++) x.fillRect((i * 53) % w, (i * 29) % h, 6, 1); });
+  const body = mesh(new THREE.BoxGeometry(W, H, L), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.9 })); body.position.y = y0 + H / 2; g.add(body);
+  const roof = new THREE.Mesh(new THREE.CylinderGeometry(1.6, 1.6, L + 0.1, 24, 1, true, -0.55, 1.1), new THREE.MeshStandardMaterial({ color: '#3a3430', roughness: 0.8, side: THREE.DoubleSide }));
+  roof.rotation.x = -Math.PI / 2; roof.position.y = y0 + H - 1.6 * Math.cos(0.55) + 0.02; g.add(roof);   // axis along z, the arc on top
+  const gab = new THREE.Shape(); for (let i = 0; i <= 12; i++) { const u = -0.55 + 1.1 * i / 12; gab[i ? 'lineTo' : 'moveTo'](1.6 * Math.sin(u), 1.6 * Math.cos(u) - 1.6 * Math.cos(0.55)); }
+  for (const z of [L / 2, -L / 2]) { const e = new THREE.Mesh(new THREE.ShapeGeometry(gab, 12), new THREE.MeshStandardMaterial({ color: col, roughness: 0.9, side: THREE.DoubleSide })); e.position.set(0, y0 + H + 0.02, z); g.add(e); }   // the curved tops of the end walls
+  for (const sx of [-1, 1]) {
+    g.add(at(box(0.04, H * 0.86, 1.5, '#4e3024'), sx * (W / 2 + 0.02), y0 + H * 0.46, 0.2));   // the sliding door
+    g.add(at(box(0.05, 0.05, 2.0, '#2a2622'), sx * (W / 2 + 0.05), y0 + H * 0.9, 0.2));         // its rail
+    const win = at(box(0.03, 0.2, 0.36, '#0e0c0a'), sx * (W / 2 + 0.03), y0 + H * 0.8, -L / 2 + 0.5); g.add(win);  // the small barred vent
+    for (let i = 0; i < 3; i++) g.add(at(box(0.04, 0.22, 0.02, '#4a4a4a'), sx * (W / 2 + 0.05), y0 + H * 0.8, -L / 2 + 0.38 + i * 0.12));
+  }
+  g.add(at(box(W + 0.1, 0.16, L + 0.3, '#1e1c1a'), 0, y0 - 0.06, 0));
+  for (const z of [-L / 2 + 0.9, L / 2 - 0.9]) for (const sx of [-1, 1]) { const w = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.1, 18), std('#2a2826')); w.rotation.z = Math.PI / 2; w.position.set(sx * 0.53, 0.36, z); g.add(w); }
+  for (const z of [-L / 2 - 0.2, L / 2 + 0.2]) for (const sx of [-1, 1]) g.add(at(cyl(0.09, 0.09, 0.18, '#2a2826', 10), sx * 0.6, y0 + 0.05, z, Math.PI / 2, 0, 0));   // buffers
+  g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  return g;
+}
+// The Birkenau gatehouse: long low brick wings, the central tower with its hipped roof, the arch the railway runs through.
+export function gatehouse() {
+  const g = new THREE.Group(), bt = canvasTex(256, 128, (x, W, H) => { x.fillStyle = '#4a2c22'; x.fillRect(0, 0, W, H); for (let j = 0; j < 16; j++) for (let i = -1; i < 17; i++) { const v = 0.85 + ((i * 7 + j * 13) % 9) / 40; x.fillStyle = `rgb(${120 * v | 0},${70 * v | 0},${54 * v | 0})`; x.fillRect(i * 16 + (j % 2) * 8 + 1, j * 8 + 1, 14, 6); } });
+  bt.wrapS = bt.wrapT = THREE.RepeatWrapping;
+  const brick = (w, h, d, rx, ry) => { const t = bt.clone(); t.needsUpdate = true; t.repeat.set(rx, ry); return mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ map: t, roughness: 0.95 })); };
+  const roofM = std('#2e2a28', { roughness: 0.85 }), dark = new THREE.MeshBasicMaterial({ color: '#0a0908' });
+  for (const sx of [-1, 1]) {
+    const w = brick(34, 4.2, 6, 14, 2); w.position.set(sx * (2.7 + 17), 2.1, 0); g.add(w);
+    const ridge = new THREE.Mesh(new THREE.BoxGeometry(34, 1.4, 4.4), roofM); ridge.position.set(sx * (2.7 + 17), 4.2 + 0.55, 0); g.add(ridge);
+    for (let i = 0; i < 11; i++) { const win = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.9), dark); win.position.set(sx * (5 + i * 3), 2.6, 3.01); g.add(win); }
+  }
+  const tw = brick(5.6, 10, 6.8, 3, 5); tw.position.set(0, 5, 0); g.add(tw);
+  const cap = new THREE.Mesh(new THREE.CylinderGeometry(0.15, 4.4, 2.6, 4, 1), roofM); cap.rotation.y = Math.PI / 4; cap.scale.set(1, 1, 1.15); cap.position.y = 11.3; g.add(cap);
+  const hut = new THREE.Mesh(new THREE.BoxGeometry(3.6, 1.0, 3.6), std('#d8d2c4', { roughness: 0.8 })); hut.position.y = 10.2; g.add(hut);   // the watch room: a band of windows under the roof
+  for (const [x, z, ry] of [[0, 1.81, 0], [0, -1.81, Math.PI], [1.81, 0, Math.PI / 2], [-1.81, 0, -Math.PI / 2]]) for (let i = -1; i <= 1; i++) { const p = new THREE.Mesh(new THREE.PlaneGeometry(0.8, 0.6), dark); p.position.set(x + (ry === 0 || ry === Math.PI ? i * 1.05 : 0), 10.2, z + (ry === 0 || ry === Math.PI ? 0 : i * 1.05)); p.rotation.y = ry; g.add(p); }
+  const sh = new THREE.Shape(); sh.moveTo(-1.5, 0); sh.lineTo(1.5, 0); sh.lineTo(1.5, 2.6); sh.absarc(0, 2.6, 1.5, 0, Math.PI, false); sh.lineTo(-1.5, 0);
+  for (const z of [3.42, -3.42]) { const arch = new THREE.Mesh(new THREE.ShapeGeometry(sh, 16), dark); arch.position.set(0, 0, z); if (z < 0) arch.rotation.y = Math.PI; g.add(arch); }
+  g.traverse(o => { if (o.isMesh && !o.material.isMeshBasicMaterial) { o.castShadow = true; o.receiveShadow = true; } });
+  return g;
+}
+// Anne Frank's diary (the red-and-white checked autograph book): open = pages spread for writing, closed = the book alone.
+export function diary(open = false) {
+  const g = new THREE.Group();
+  const ck = canvasTex(64, 64, (x, W, H) => { x.fillStyle = '#f0e8d8'; x.fillRect(0, 0, W, H); x.fillStyle = 'rgba(184,52,47,0.85)'; for (let i = 0; i < 8; i += 2) { x.fillRect(i * 8, 0, 8, H); x.fillRect(0, i * 8, W, 8); } x.fillStyle = 'rgba(60,20,16,0.35)'; for (let i = 0; i < 8; i++) x.fillRect(i * 8 + 3, 0, 1, H); });
+  const coverM = new THREE.MeshStandardMaterial({ map: ck, roughness: 0.8 });
+  if (!open) { const b = mesh(new THREE.BoxGeometry(0.11, 0.024, 0.14), [std('#e8e0cc'), std('#e8e0cc'), coverM, std('#7a2a24'), std('#e8e0cc'), std('#e8e0cc')]); b.position.y = 0.012; g.add(b); return g; }
+  const pg = canvasTex(64, 80, (x, W, H) => { x.fillStyle = '#f6f0e2'; x.fillRect(0, 0, W, H); x.strokeStyle = 'rgba(40,40,80,0.55)'; x.lineWidth = 1; for (let j = 8; j < H - 6; j += 5) { x.beginPath(); x.moveTo(6, j); for (let i = 6; i < W - 6; i += 3) x.lineTo(i, j + Math.sin(i * 1.7 + j) * 0.8); x.stroke(); } });
+  g.add(at(mesh(new THREE.BoxGeometry(0.23, 0.004, 0.145), coverM), 0, 0.002, 0));
+  for (const sx of [-1, 1]) { const p = mesh(new THREE.BoxGeometry(0.105, 0.012, 0.135), [std('#efe8d8'), std('#efe8d8'), new THREE.MeshStandardMaterial({ map: pg, roughness: 0.9 }), std('#efe8d8'), std('#efe8d8'), std('#efe8d8')]); p.position.set(sx * 0.056, 0.01, 0); p.rotation.z = -sx * 0.04; g.add(p); }
+  return g;
+}
+// What Anne saw from the attic: the chestnut tree, the gables of the canal houses, a pale sky (a canvas for a window).
+export function annexView() {
+  return canvasTex(256, 256, (x, W, H) => {
+    const sky = x.createLinearGradient(0, 0, 0, H); sky.addColorStop(0, '#9fb8cc'); sky.addColorStop(1, '#dfe6e8'); x.fillStyle = sky; x.fillRect(0, 0, W, H);
+    x.fillStyle = '#5a4a44'; for (let i = 0; i < 6; i++) { const bx = i * 46 - 10, bh = 70 + (i * 37 % 40); x.beginPath(); x.moveTo(bx, H); x.lineTo(bx, H - bh); x.lineTo(bx + 20, H - bh - 26); x.lineTo(bx + 40, H - bh); x.lineTo(bx + 40, H); x.fill(); }
+    x.fillStyle = '#3a2e26'; x.fillRect(58, 120, 16, 136);
+    for (const [cx, cy, r] of [[66, 96, 58], [30, 120, 40], [104, 112, 44], [70, 52, 42]]) { const gr = x.createRadialGradient(cx - 10, cy - 12, 4, cx, cy, r); gr.addColorStop(0, '#7a9a5a'); gr.addColorStop(1, '#3e5a32'); x.fillStyle = gr; x.beginPath(); x.arc(cx, cy, r, 0, 7); x.fill(); }
+  });
+}

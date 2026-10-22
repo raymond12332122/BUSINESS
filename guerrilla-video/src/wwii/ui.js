@@ -62,3 +62,10 @@ export function slam(t, a, b, text, { x = 960, y = 540, rot = -6, col = '#b8342f
   return `<div style="position:absolute;left:${x}px;top:${y}px;transform:translate(-50%,-50%) rotate(${rot}deg) scale(${sc});opacity:${Math.min(1, k * 1.6) * out};white-space:nowrap;
     font:900 ${size}px 'Inter Display',Inter;letter-spacing:.06em;color:${col};border:7px solid ${col};border-radius:12px;padding:4px 24px;background:rgba(250,244,230,.86);box-shadow:0 12px 34px rgba(0,0,0,.4)">${text}</div>`;
 }
+// A quiet list (the other victims): each item fades in at its cue time, a small candle-light dot before it.
+export function memList(t, a, b, title, items, { x = 1300, y = 170, w = 560 } = {}) {
+  const k = K(t, a, b, 0.5, 0.5); if (k <= 0) return '';
+  return `<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;padding:22px 28px;${PANEL};opacity:${k};border-left:6px solid #c9a227">
+    <div style="font:800 21px Inter;letter-spacing:.16em;color:#e0b84a;margin-bottom:12px">${title}</div>${items.map(([txt, tt]) => { const o = ss(tt, tt + 0.4, t);
+      return `<div style="display:flex;align-items:center;gap:16px;margin:11px 0;opacity:${o};transform:translateX(${(1 - o) * 24}px)"><div style="width:12px;height:12px;border-radius:6px;background:#ffcf7a;box-shadow:0 0 14px #ffb04a;flex:none"></div><div style="font:700 31px Inter;color:#f4efe6">${txt}</div></div>`; }).join('')}</div>`;
+}
