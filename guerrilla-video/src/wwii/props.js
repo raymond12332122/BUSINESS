@@ -232,3 +232,136 @@ export function tank(kind = 'pz4', { col = null, number = '214' } = {}) {
   g.rock = (t, v = 1) => { body.position.y = 0.012 * v * Math.sin(t * 9.1) ; body.rotation.x = 0.006 * v * Math.sin(t * 6.3 + 1); };
   return dyn(g);
 }
+
+// ------------------------------------------------------------ aircraft
+// Planes of 1939-45 from a few parameters (metres, nose toward +z, scaled by s): a lathed fuselage, tapered or
+// elliptical wings (with an inverted gull for the Stuka), tail, engines with spinning propellers, canopy and markings.
+// .spin(t) turns the propellers.
+const glass = () => new THREE.MeshStandardMaterial({ color: '#9fc4d8', roughness: 0.08, metalness: 0.3, transparent: true, opacity: 0.55 });
+function planform(span, root, tip, { sweep = 0, ellipse = false, n = 14 } = {}) {   // one half wing in (x = span, y = chord forward) from x = 0
+  const pts = [];
+  if (ellipse) { for (let i = 0; i <= n; i++) { const a = i / n * Math.PI / 2, x = Math.sin(a) * span, c = Math.cos(a) * root; pts.push([x, c * 0.42]); }
+    for (let i = n; i >= 0; i--) { const a = i / n * Math.PI / 2, x = Math.sin(a) * span, c = Math.cos(a) * root; pts.push([x, -c * 0.58]); } }
+  else pts.push([0, root * 0.4], [span, tip * 0.4 - sweep], [span + tip * 0.08, -sweep], [span, -tip * 0.6 - sweep], [0, -root * 0.6]);
+  return pts;
+}
+function flatPart(pts, thick, material, mirror = false) {
+  const sh = new THREE.Shape(pts.map(([x, y]) => new THREE.Vector2(mirror ? -x : x, y)));
+  const geo = new THREE.ExtrudeGeometry(sh, { depth: thick, bevelEnabled: true, bevelThickness: thick * 0.35, bevelSize: thick * 0.4, bevelSegments: 2 }); geo.rotateX(Math.PI / 2); geo.translate(0, thick / 2, 0);
+  const m = new THREE.Mesh(geo, material); m.castShadow = true; return m;
+}
+function prop(r, blades = 3, col = '#1e1e1e', spinner = '#2a2a2a') {
+  const g = new THREE.Group(), hub = new THREE.Group(); g.add(hub);
+  hub.add(at(new THREE.Mesh(new THREE.ConeGeometry(r * 0.16, r * 0.42, 16), metal(spinner)), 0, 0, r * 0.12, Math.PI / 2, 0, 0));
+  for (let i = 0; i < blades; i++) { const b = new THREE.Mesh(new THREE.BoxGeometry(r * 0.14, r, r * 0.03), metal(col)); b.position.y = r / 2; const arm = new THREE.Group(); arm.rotation.z = i / blades * Math.PI * 2; b.rotation.y = 0.35; arm.add(b); hub.add(arm); }
+  const disc = new THREE.Mesh(new THREE.CircleGeometry(r, 32), new THREE.MeshBasicMaterial({ color: '#2a2a2a', transparent: true, opacity: 0, depthWrite: false })); hub.add(disc);
+  g.spin = (t, rpm = 22) => { hub.rotation.z = t * rpm; disc.material.opacity = rpm > 10 ? 0.16 : 0; }; return g;
+}
+const PLANES = {
+  stuka: { s: 0.5, col: '#4a5640', under: '#9fb2c2', mark: 'de', len: 11.1, fus: [[-5.6, 0.12], [-4, 0.42], [-1, 0.62], [1.6, 0.66], [3.6, 0.62], [4.9, 0.55], [5.5, 0.3]], fh: 1.18,
+    wing: { z: 1.3, y: -0.45, span: 6.9, root: 2.6, tip: 1.4, sweep: 0.15, gull: [2.0, -0.22, 0.2] }, tail: { z: -4.9, y: 0.25, span: 2.4, root: 1.4, tip: 0.8 }, fin: { z: -4.9, h: 1.5, root: 1.6, tip: 0.9 },
+    nose: { r: 1.7, z: 5.6, blades: 3 }, canopy: { z: 0.9, len: 3.0, r: 0.42, y: 0.62 }, gear: 'spats', bomb: true },
+  bf109: { s: 0.5, col: '#5a6458', under: '#a6b8c6', mark: 'de', len: 8.9, fus: [[-4.5, 0.1], [-3, 0.34], [0, 0.55], [2.2, 0.56], [3.8, 0.45], [4.4, 0.24]], fh: 1.12,
+    wing: { z: 1.0, y: -0.35, span: 4.95, root: 2.2, tip: 1.0, sweep: 0.1, dihedral: 0.1 }, tail: { z: -3.9, y: 0.35, span: 1.6, root: 1.0, tip: 0.6 }, fin: { z: -3.9, h: 1.1, root: 1.1, tip: 0.6 },
+    nose: { r: 1.5, z: 4.5, blades: 3 }, canopy: { z: 0.3, len: 1.8, r: 0.36, y: 0.5 } },
+  spitfire: { s: 0.5, col: '#5e5a3c', under: '#c8d2b8', mark: 'uk', len: 9.1, fus: [[-4.6, 0.1], [-3, 0.32], [0, 0.55], [2.4, 0.55], [3.9, 0.42], [4.5, 0.2]], fh: 1.12,
+    wing: { z: 1.0, y: -0.35, span: 5.6, root: 2.6, ellipse: true, dihedral: 0.1 }, tail: { z: -4.0, y: 0.3, span: 1.7, root: 1.1, ellipse: true }, fin: { z: -4.0, h: 1.2, root: 1.2, tip: 0.5 },
+    nose: { r: 1.6, z: 4.6, blades: 3 }, canopy: { z: 0.1, len: 1.7, r: 0.36, y: 0.52 } },
+  he111: { s: 0.5, col: '#4c5644', under: '#9fb2c2', mark: 'de', len: 16.4, fus: [[-8.2, 0.12], [-6, 0.6], [-1, 0.95], [4, 0.95], [6.8, 0.8], [8.0, 0.4]], fh: 1.15,
+    wing: { z: 1.5, y: -0.3, span: 11.3, root: 4.6, tip: 1.8, sweep: 0.7, dihedral: 0.06 }, tail: { z: -7.3, y: 0.3, span: 3.6, root: 2.0, tip: 1.2 }, fin: { z: -7.3, h: 2.2, root: 2.2, tip: 1.2 },
+    engines: [[-3.0, -0.15, 2.8], [3.0, -0.15, 2.8]], er: 1.7, glassNose: true },
+  zero: { s: 0.5, col: '#b8b8a4', under: '#b8b8a4', mark: 'jp', len: 9.1, fus: [[-4.5, 0.1], [-3, 0.34], [0, 0.58], [2.4, 0.6], [3.9, 0.56], [4.5, 0.3]], fh: 1.08,
+    wing: { z: 0.8, y: -0.4, span: 6.0, root: 2.6, tip: 1.2, sweep: 0.2, dihedral: 0.11 }, tail: { z: -3.9, y: 0.3, span: 1.8, root: 1.1, tip: 0.6 }, fin: { z: -4.0, h: 1.2, root: 1.2, tip: 0.6 },
+    nose: { r: 1.45, z: 4.6, blades: 3, cowl: '#1c1c1c' }, canopy: { z: 0.1, len: 2.2, r: 0.36, y: 0.55 } },
+  p47: { s: 0.5, col: '#59603f', under: '#9aa092', mark: 'us', len: 11.0, fus: [[-5.5, 0.12], [-3.6, 0.45], [0, 0.78], [2.8, 0.8], [4.6, 0.72], [5.4, 0.6]], fh: 1.18,
+    wing: { z: 1.3, y: -0.45, span: 6.2, root: 2.9, ellipse: true, dihedral: 0.1 }, tail: { z: -4.7, y: 0.35, span: 2.2, root: 1.3, tip: 0.8 }, fin: { z: -4.8, h: 1.5, root: 1.6, tip: 0.8 },
+    nose: { r: 1.85, z: 5.45, blades: 4, cowl: '#59603f' }, canopy: { z: 0.4, len: 2.0, r: 0.4, y: 0.75 } },
+  b29: { s: 0.5, col: '#c8ccd0', under: '#c8ccd0', mark: 'us', metal: true, len: 30.2, fus: [[-15, 0.2], [-12, 1.2], [-6, 1.45], [8, 1.45], [12.5, 1.35], [14.6, 0.9], [15.1, 0.2]], fh: 1.0,
+    wing: { z: 1.5, y: -0.2, span: 21.5, root: 5.8, tip: 1.6, sweep: 0.6, dihedral: 0.06 }, tail: { z: -13.4, y: 0.3, span: 6.0, root: 3.0, tip: 1.4 }, fin: { z: -13.6, h: 5.0, root: 4.6, tip: 1.8 },
+    engines: [[-4.6, -0.1, 4.0], [-9.4, -0.1, 3.0], [4.6, -0.1, 4.0], [9.4, -0.1, 3.0]], er: 2.4, glassNose: true },
+};
+const PLANE_MARKS = {
+  de: s => MARKS.de(), uk: s => decal(1, 1, (x, W) => [['#1f3f8f', 0.5], ['#f2f2f2', 0.33], ['#c8302a', 0.17]].forEach(([c, r]) => { x.fillStyle = c; x.beginPath(); x.arc(W / 2, W / 2, W * r - 2, 0, 7); x.fill(); })),
+  jp: s => decal(1, 1, (x, W) => { x.fillStyle = '#f2f2f2'; x.beginPath(); x.arc(W / 2, W / 2, W * 0.5 - 2, 0, 7); x.fill(); x.fillStyle = '#c0242a'; x.beginPath(); x.arc(W / 2, W / 2, W * 0.42, 0, 7); x.fill(); }),
+  us: s => decal(1.6, 0.8, (x, W, H) => { const c = W / 2, r = H * 0.47; x.fillStyle = '#f2f2f2'; x.fillRect(c - W * 0.46, H * 0.32, W * 0.92, H * 0.36); x.fillStyle = '#1f3a6a'; x.beginPath(); x.arc(c, H / 2, r, 0, 7); x.fill();
+    x.fillStyle = '#f2f2f2'; x.beginPath(); for (let i = 0; i < 10; i++) { const rr = i % 2 ? r * 0.38 : r * 0.92, a = -Math.PI / 2 + i * Math.PI / 5; x.lineTo(c + rr * Math.cos(a), H / 2 + rr * Math.sin(a)); } x.closePath(); x.fill(); }, 256),
+};
+export function aircraft(kind = 'stuka', { col = null } = {}) {
+  const sp = PLANES[kind], g = new THREE.Group(), body = new THREE.Group(); g.add(body);
+  const C = metal(col || sp.col, sp.metal ? { metalness: 0.75, roughness: 0.35 } : { roughness: 0.65 }), Und = metal(sp.under, sp.metal ? { metalness: 0.75, roughness: 0.35 } : { roughness: 0.65 }), dark = metal('#1c1c1c');
+  // fuselage: lathe around the length axis, a little taller than wide
+  const prof = [[sp.fus[0][0], 0], ...sp.fus, [sp.fus[sp.fus.length - 1][0], 0]];
+  const rAt = z => { for (let i = 0; i + 1 < sp.fus.length; i++) { const [z0, r0] = sp.fus[i], [z1, r1] = sp.fus[i + 1]; if (z >= z0 && z <= z1) return r0 + (r1 - r0) * (z - z0) / (z1 - z0); } return sp.fus[0][1]; };
+  const lat = new THREE.LatheGeometry(prof.map(([z, r]) => new THREE.Vector2(r, z)), 24); lat.rotateX(Math.PI / 2); lat.scale(1, sp.fh, 1);
+  const fus = new THREE.Mesh(lat, C); fus.castShadow = true; body.add(fus);
+  // wings (two halves; the Stuka's bend down then up at the gull)
+  const W = sp.wing, half = sx => {
+    const grp = new THREE.Group(); grp.position.set(0, W.y, W.z);
+    if (W.gull) { const [gx, a1, a2] = W.gull, inner = planform(gx, W.root, W.root * 0.94), outer = planform(W.span - gx, W.root * 0.94, W.tip, { sweep: W.sweep });
+      const a = flatPart(inner, 0.22, C, sx < 0); a.rotation.z = sx * a1; grp.add(a);
+      const j = new THREE.Group(); j.position.set(sx * gx * Math.cos(a1), sx * gx * Math.sin(a1) * 1, 0); j.position.y = gx * Math.sin(a1); j.rotation.z = sx * a2; grp.add(j); j.add(flatPart(outer, 0.18, C, sx < 0)); }
+    else { const p = flatPart(planform(W.span, W.root, W.tip, { sweep: W.sweep, ellipse: W.ellipse }), 0.2, C, sx < 0); p.rotation.z = sx * (W.dihedral || 0); grp.add(p); }
+    body.add(grp); return grp; };
+  const wl = half(1), wr = half(-1);
+  const T = sp.tail; for (const sx of [1, -1]) { const p = flatPart(planform(T.span, T.root, T.tip || T.root * 0.5, { ellipse: T.ellipse }), 0.1, C, sx < 0); p.position.set(0, T.y, T.z); body.add(p); }
+  const F = sp.fin, fin = new THREE.Shape([new THREE.Vector2(-F.root * 0.6, 0), new THREE.Vector2(F.root * 0.4, 0), new THREE.Vector2(F.tip * 0.2 - F.root * 0.15, F.h), new THREE.Vector2(-F.tip * 0.8 - F.root * 0.15, F.h)]);
+  const fg = new THREE.ExtrudeGeometry(fin, { depth: 0.12, bevelEnabled: false }); fg.rotateY(-Math.PI / 2); fg.translate(0.06, 0, 0);
+  const finM = new THREE.Mesh(fg, C); finM.position.set(0, 0.25, F.z); finM.castShadow = true; body.add(finM);
+  // engines and propellers
+  const props = [];
+  if (sp.nose) { const N = sp.nose, cowl = new THREE.Mesh(new THREE.CylinderGeometry(sp.fus[sp.fus.length - 2][1] * 1.02, sp.fus[sp.fus.length - 3][1], 0.9, 24), metal(N.cowl || sp.col));
+    cowl.rotation.x = Math.PI / 2; cowl.position.z = N.z - 0.7; cowl.scale.z = sp.fh; body.add(cowl); const p = prop(N.r, N.blades); p.position.z = N.z; body.add(p); props.push(p); }
+  for (const [x, y, z] of sp.engines || []) { const n = new THREE.Mesh(new THREE.CapsuleGeometry(0.62, 2.6, 6, 16), C); n.rotation.x = Math.PI / 2; n.position.set(x, W.y + y, z); body.add(n);
+    const p = prop(sp.er, 3); p.position.set(x, W.y + y, z + 2.0); body.add(p); props.push(p); }
+  // canopy / glazed nose
+  if (sp.canopy) { const K_ = sp.canopy, c = new THREE.Mesh(new THREE.CapsuleGeometry(K_.r, K_.len, 6, 14), glass()); c.rotation.x = Math.PI / 2; c.scale.set(1, 1, 0.85); c.position.set(0, K_.y, K_.z); body.add(c); }
+  if (sp.glassNose) { const z = sp.fus[sp.fus.length - 1][0], r = sp.fus[sp.fus.length - 2][1]; const n = new THREE.Mesh(new THREE.SphereGeometry(r * 0.95, 18, 12, 0, Math.PI * 2, 0, Math.PI / 2), glass()); n.rotation.x = Math.PI / 2; n.position.z = z - r * 0.7; body.add(n); }
+  if (sp.gear === 'spats') for (const sx of [1, -1]) { const leg = new THREE.Mesh(new THREE.CapsuleGeometry(0.2, 1.2, 4, 10), C); leg.scale.set(0.7, 1, 2.0); leg.position.set(sx * 2.0, -1.3, 1.7); leg.rotation.x = 0.15; body.add(leg);
+    body.add(at(new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 0.2, 14), dark), sx * 2.0, -1.95, 1.75, 0, 0, Math.PI / 2)); }
+  if (sp.bomb) { const b = new THREE.Group(); b.add(new THREE.Mesh(new THREE.CapsuleGeometry(0.22, 1.2, 4, 12), metal('#3a3a34'))); b.children[0].rotation.x = Math.PI / 2; b.position.set(0, -0.85, 1.0); body.add(b); g.bomb = b; }
+  // markings on wings and fuselage sides
+  const mk = PLANE_MARKS[sp.mark];
+  if (mk) {
+    const w = W.span, xs = 0.7 * w, ang = W.gull ? W.gull[2] : (W.dihedral || 0);
+    const yTop = (W.gull ? W.gull[0] * Math.sin(W.gull[1]) + (xs - W.gull[0]) * Math.sin(W.gull[2]) : xs * Math.sin(ang)) + 0.2, chord = W.ellipse ? W.root * Math.cos(Math.asin(0.7)) : W.root + (W.tip - W.root) * 0.7;
+    for (const sx of [1, -1]) { const m = mk(); m.scale.setScalar(Math.min(chord * 0.75, 1.6) * (sp.mark === 'us' ? 1.25 : 1)); m.rotation.set(-Math.PI / 2, 0, 0); const h = new THREE.Group(); h.rotation.z = sx * ang; h.add(m);
+      h.position.set(sx * xs * Math.cos(ang), W.y + yTop, W.z - chord * 0.1 - (W.sweep || 0) * 0.7); body.add(h); }
+    const zs = -sp.len * 0.22, rr = rAt(zs);
+    for (const sx of [1, -1]) { const m = mk(); m.scale.setScalar(Math.min(rr * 1.5, 1.4) * (sp.mark === 'us' ? 1.2 : 1)); m.rotation.y = sx * Math.PI / 2; m.position.set(sx * (rr + 0.015), 0.0, zs); body.add(m); }
+  }
+  body.traverse(o => { if (o.isMesh) o.castShadow = true; });
+  g.scale.setScalar(sp.s); g.body = body; g.props = props; g.kind = kind;
+  g.spin = (t, rpm = 24) => props.forEach((p, i) => p.spin(t + i * 0.37, rpm));
+  return dyn(g);
+}
+
+// ------------------------------------------------------------ home front
+// Cathedral-style wireless set (chibi scale): arched walnut cabinet, fretwork over the speaker cloth, a glowing dial.
+// .glow(k) lights the dial.
+export function radioSet() {
+  const g = new THREE.Group(), wood = std('#5a3620', { roughness: 0.45 }), W = 0.3, H = 0.26, D = 0.16;
+  g.add(at(new THREE.Mesh(new THREE.BoxGeometry(W, H, D), wood), 0, H / 2, 0));
+  const arch = new THREE.Mesh(new THREE.CylinderGeometry(W / 2, W / 2, D, 24, 1, false, -Math.PI / 2, Math.PI), wood); arch.rotation.x = Math.PI / 2; arch.rotation.y = Math.PI / 2; arch.position.y = H; g.add(arch);
+  const cloth = canvasTex(128, 160, (x, Wd, Hd) => { x.fillStyle = '#c8a878'; x.fillRect(0, 0, Wd, Hd); x.strokeStyle = '#3a2414'; x.lineWidth = 9;
+    for (let i = 0; i < 5; i++) { x.beginPath(); x.moveTo(14 + i * 25, Hd); x.quadraticCurveTo(Wd / 2, Hd * 0.1 + i * 6, Wd - 14 - i * 25, Hd); x.stroke(); } });
+  const front = new THREE.Mesh(new THREE.PlaneGeometry(W * 0.7, H * 0.95), new THREE.MeshStandardMaterial({ map: cloth, roughness: 0.9 })); front.position.set(0, H * 0.62, D / 2 + 0.002); g.add(front);
+  const dialM = new THREE.MeshStandardMaterial({ color: '#f2d08a', emissive: '#ffb040', emissiveIntensity: 0.0, roughness: 0.4 });
+  const dial = new THREE.Mesh(new THREE.CircleGeometry(0.035, 24), dialM); dial.position.set(0, 0.06, D / 2 + 0.003); g.add(dial);
+  for (const x of [-0.09, 0.09]) g.add(at(new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.02, 12), std('#2a1a10')), x, 0.05, D / 2 + 0.01, Math.PI / 2, 0, 0));
+  const lamp = new THREE.PointLight('#ffb050', 0, 0.9, 1.6); lamp.position.set(0, 0.08, D / 2 + 0.08); g.add(lamp);
+  g.glow = k => { dialM.emissiveIntensity = 1.6 * k; lamp.intensity = 0.6 * k; };
+  g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  return g;
+}
+// Striped border barrier on its post; .open(k) swings the boom up (0 closed .. 1 open).
+export function barrier(len = 3.8, h = 0.52) {
+  const g = new THREE.Group();
+  g.add(at(box(0.14, h + 0.12, 0.14, '#d8d2c4'), 0, (h + 0.12) / 2, 0)); g.add(at(box(0.12, h - 0.04, 0.12, '#d8d2c4'), len, (h - 0.04) / 2, 0));
+  const tex = canvasTex(256, 16, (x, W, H) => { for (let i = 0; i < 8; i++) { x.fillStyle = i % 2 ? '#f2f0ea' : '#c8202a'; x.fillRect(i * W / 8, 0, W / 8, H); } });
+  const boom = new THREE.Group(); boom.position.set(0, h, 0); g.add(boom); g.h = h;
+  const bar = new THREE.Mesh(new THREE.BoxGeometry(len + 0.25, 0.08, 0.08), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.6 })); bar.position.x = (len + 0.25) / 2 - 0.25; boom.add(bar);
+  boom.add(at(box(0.3, 0.14, 0.12, '#3a3a3a'), -0.3, 0, 0));   // counterweight
+  g.open = k => { boom.rotation.z = 1.3 * k; }; g.boom = boom;
+  g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  return dyn(g);
+}

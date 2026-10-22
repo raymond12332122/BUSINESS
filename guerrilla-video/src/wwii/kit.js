@@ -38,6 +38,7 @@ export const PAL = {
   coatA: { dark: '#1e1a18', mid: '#4a3e36', light: '#d8d0c4', gold: '#8a7a55' }, coatB: { dark: '#1a1e24', mid: '#3e4652', light: '#d8d8d4', gold: '#8a7a55' },
   coatC: { dark: '#2a2016', mid: '#6a5640', light: '#e6dcc6', gold: '#8a7a55' }, kid: { dark: '#2a2a3a', mid: '#5a5a7a', light: '#f2f0ea', gold: '#c0272d' },
   fisher: { dark: '#2a2a1e', mid: '#5a5a3a', light: '#e6dfc8', gold: '#c9a227' }, diplo: { dark: '#101216', mid: '#24282f', light: '#f1efea', gold: '#8c7a55' },
+  panzer: { dark: '#0e0e10', mid: '#1e1e22', light: '#3c3c44', gold: '#c8c8c8' },
   sci: { dark: '#8a8a86', mid: '#eeeeea', light: '#ffffff', gold: '#6a8aa8' }, mourn: { dark: '#0e0e10', mid: '#24242a', light: '#d8d6d0', gold: '#6a6a6a' },
 };
 const uni = (r, p) => uniformize(r, PAL[p] || p);
@@ -128,12 +129,20 @@ export function suitcase(color = '#6a4a2e') {
   for (const x of [-0.06, 0.06]) g.add(at(box(0.012, 0.155, 0.075, '#c9a227'), x, -0.1, 0)); return g;
 }
 // Name tag on a string (evacuated children).
+// Radio headphones (tank crews): two ear cups and a band over the crown; head space like the hats, worn at the cheeks.
+export function headphones(color = '#1a1a1c') {
+  const g = new THREE.Group(), m = new THREE.MeshStandardMaterial({ color, roughness: 0.5, metalness: 0.2 });
+  for (const sx of [-1, 1]) { const c = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.05, 18), m); c.rotation.z = Math.PI / 2; c.position.set(sx * 0.27, -0.16, 0.02); g.add(c); }
+  const band = new THREE.Mesh(new THREE.TorusGeometry(0.29, 0.014, 6, 24, Math.PI), m); band.position.set(0, -0.16, 0.0); g.add(band);
+  return g;
+}
 export function nameTag() { const g = new THREE.Group(); g.add(at(box(0.06, 0.04, 0.004, '#f4efe0'), 0, 0, 0)); return g; }
 
 // ------------------------------------------------------------ outfits
 Object.assign(WK.OUTFITS, {
   // soldiers
   aleman: r => { anon(r); uni(r, 'feld'); hat(r, stahlhelm('#55594f'), HELM); backpack(r, '#5a5e52', '#4a4e44'); slungRifle(r); return r; },
+  tanquista: r => { anon(r); uni(r, 'panzer'); hat(r, sideCap('#1a1a1e'), CAP); r.wear('head', headphones(), [0, 0.88, -0.02]); return r; },
   alemanGorro: r => { anon(r); uni(r, 'feld'); hat(r, sideCap('#62665b'), CAP); return r; },
   afrika: r => { anon(r); uni(r, 'afrika'); hat(r, sideCap('#a49c70'), CAP); slungRifle(r); return r; },
   britanico: r => { anon(r); uni(r, 'khaki'); hat(r, brodie('#5a5838'), { scale: 0.9, y: 0.88, tilt: -0.02, cap: true }); backpack(r, '#7a6e4a', '#6a6448'); slungRifle(r, '#2e3138', '#7a5232'); return r; },

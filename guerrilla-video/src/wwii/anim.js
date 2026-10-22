@@ -86,3 +86,24 @@ export function ladle(t, seed, A, B, u) {
   const w = ss(0.3, 0.55, u) * (1 - ss(0.75, 1, u)), q = [A[0] + (B[0] - A[0]) * w, A[1] + (B[1] - A[1]) * w + arc + 0.04 * (1 - s), A[2] + (B[2] - A[2]) * w];
   return withArms(p, { aR: ['world', ...q], aWR: 1, plR: [-1, -0.6, 0], hR: HAND.grip, aL: [0.25, 0.3, 1.4], aWL: 0.7, plL: [1, -1, 0], hL: HAND.soft, look: q, lookW: 0.5 });
 }
+// Handshake: the right hand reaches a world point P (between the two people) and pumps; k = 0..1 reach.
+export function handshake(t, seed, P, k = 1, pump = 1) {
+  const p = M.stand(t, seed, { amt: 0.5 }), y = 0.014 * pump * sin(t * 9 + seed);
+  p.aR = ['world', P[0], P[1] + y, P[2]]; p.aWR = k; p.plR = [-1, -0.7, -0.2]; p.hR = HAND.grip; p.chest = add(p.chest, [4 * k, 0, 0]); return p;
+}
+// Both hands on world points (lifting a bar, holding a rail): A for the left hand, B for the right.
+export function hands(t, seed, A, B, k = 1, o = {}) {
+  const p = M.stand(t, seed, { amt: 0.4, ...o });
+  p.aL = ['world', ...A]; p.aR = ['world', ...B]; p.aWL = k; p.aWR = k; p.plL = [1, -0.5, -0.3]; p.plR = [-1, -0.5, -0.3]; p.hL = HAND.grip; p.hR = HAND.grip; return p;
+}
+// Seated and leaning toward something (the wireless): chest forward, hands on the knees, head tilted to listen; k = 0..1.
+export function listen(t, seed = 0, k = 1) {
+  const p = sit(t, seed);
+  return withArms(p, { waist: add(p.waist, [10 * k, 0, 0]), chest: add(p.chest, [10 * k, 0, 0]), head: add(p.head, [6 * k, 4 * sin(t * 0.5 + seed), 10 * k]),
+    armL: [-40, -14, -70], armR: [-40, 14, 70], elbL: [0, -60, 0], elbR: [0, 60, 0], hL: HAND.soft, hR: HAND.soft });
+}
+// One hand to the ear (headphones), the other hanging: a tank commander talking on the radio.
+export function headset(t, seed = 0, k = 1) {
+  const p = M.stand(t, seed, { amt: 0.4 });
+  return withArms(p, { aL: ['head', 1.05, -0.2, 0.15], aWL: k, plL: [1, -0.6, 0.2], hL: HAND.soft, head: add(p.head, [-4, -8 * k, 0]) });
+}
