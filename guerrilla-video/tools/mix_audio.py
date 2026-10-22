@@ -952,6 +952,8 @@ RUSIA_MOODS = {'title': 'dark', 'zar': 'somber', 'domingo': 'tense', 'guerra': '
                'poder': 'dark', 'romanov': 'somber', 'civil': 'tense', 'urss': 'dark', 'mexico': 'suspense', 'outro': 'hope'}
 WW1_MOODS = {'title': 'dark', 'europa': 'suspense', 'sarajevo': 'tense', 'julio': 'tense', 'marne': 'dark', 'trincheras': 'somber', 'armas': 'tense',
              'verdun': 'dark', 'mundo': 'suspense', 'telegrama': 'suspense', 'fin': 'tense', 'versalles': 'calm', 'outro': 'somber'}
+WWII_MOODS = {'titulo': 'dark', 'causas': 'suspense', 'polonia': 'tense', 'francia': 'tense', 'este': 'dark', 'pacifico': 'tense', 'africa': 'suspense',
+              'holocausto': 'somber', 'frente': 'calm', 'mexico': 'suspense', 'diad': 'tense', 'bomba': 'dark', 'legado': 'somber', 'final': 'hope'}
 def narco_bed(moods=NARCO_MOODS, bpm=80, key=0):
     beat = 60 / bpm; bar = 4 * beat
     CH = {'Dm': [50, 53, 57], 'Bb': [46, 50, 53], 'Gm': [43, 46, 50], 'A': [45, 49, 52], 'F': [41, 45, 48], 'C': [48, 52, 55],
@@ -1130,10 +1132,13 @@ BPM = 84; beat = 60 / BPM
 if VIDEO == 'ww1':
     musL, musR = narco_bed(WW1_MOODS, bpm=70, key=-3); t_all = np.arange(N) / SR
     sc_ = 0.15 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
+if VIDEO == 'wwii':
+    musL, musR = narco_bed(WWII_MOODS, bpm=72, key=-2); t_all = np.arange(N) / SR
+    sc_ = 0.15 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
 if VIDEO == 'whatif':
     musL, musR = whatif_pop(); t_all = np.arange(N) / SR
     sc_ = 0.15 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
-if VIDEO not in ('mx', 'napo', 'amer', 'narco', 'puebla', 'rusia', 'ww1', 'whatif'):
+if VIDEO not in ('mx', 'napo', 'amer', 'narco', 'puebla', 'rusia', 'ww1', 'whatif', 'wwii'):
     prog = [[146.8, 174.6, 220.0], [116.5, 146.8, 174.6], [174.6, 220.0, 261.6], [130.8, 164.8, 196.0]]  # Dm Bb F C
     bar = 4 * beat
     musL, musR = np.zeros(N), np.zeros(N)
@@ -1166,9 +1171,9 @@ envn = movavg(envn, int(0.3 * SR))
 duck = 1 - 0.5 * np.clip(envn / (envn.max() * 0.5), 0, 1)
 fin = np.clip(np.minimum(t_all / 2.0, (TOTAL - 0.5 - t_all) / 3.0), 0, 1)
 for sc in TL['scenes']:  # silence the music bed under quiet scenes (the memorial)
-    if sc['id'] == 'cost':
+    if sc['id'] == 'cost' or (VIDEO == 'wwii' and sc['id'] == 'holocausto'):
         a, b = sc['start'], sc['start'] + sc['dur']
-        fin *= 1 - np.clip(np.minimum((t_all - (a - 1.5)) / 1.5, ((b + 1.5) - t_all) / 1.5), 0, 1)
+        fin *= 1 - (0.6 if VIDEO == 'wwii' else 1.0) * np.clip(np.minimum((t_all - (a - 1.5)) / 1.5, ((b + 1.5) - t_all) / 1.5), 0, 1)   # the Holocaust: the bed drops to a whisper
 musL, musR = musL * duck * fin, musR * duck * fin
 
 if os.environ.get('MUSIC_ONLY'):
