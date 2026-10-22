@@ -818,3 +818,53 @@ export function oreCar(ore = '#6a5a4a') {
   for (const z of [-len / 2 + 1.1, len / 2 - 1.1]) for (const dz of [-0.55, 0.55]) for (const sx of [-1, 1]) g.add(at(cyl(0.42, 0.42, 0.12, '#1a1a1a', 14), sx * 0.52, 0.42, z + dz, 0, 0, Math.PI / 2));
   g.len = len; return dyn(g);
 }
+
+// ------------------------------------------------------------ 1944–1945: D-Day, Berlin
+// A Higgins boat (LCVP) at chibi scale, bow toward +z: open hull, the steel ramp hinged at the bow (g.ramp.rotation.x:
+// 0 = up, ~1.45 = down on the sand), the coxswain's station aft. Deck at y = g.deck; holds a 3 x 4 squad.
+export function higgins(col = '#6a6e5a') {
+  const g = new THREE.Group(), L = 6.4, W = 2.5, H = 1.15, wood = std(col, { roughness: 0.85 }), steel = metal('#5a5e58');
+  g.add(at(mesh(new THREE.BoxGeometry(W, 0.3, L), wood), 0, 0.05, 0)); g.deck = 0.21;
+  g.add(at(box(W - 0.2, 0.02, L - 0.3, '#4a4e44'), 0, 0.21, 0));
+  for (const sx of [-1, 1]) g.add(at(mesh(new THREE.BoxGeometry(0.12, H, L), wood), sx * (W / 2 - 0.06), H / 2, 0));
+  g.add(at(mesh(new THREE.BoxGeometry(W, H, 0.12), wood), 0, H / 2, -L / 2 + 0.06));
+  for (const sx of [-1, 1]) g.add(at(box(0.14, 0.08, L, '#3a3c36'), sx * (W / 2 - 0.06), H + 0.04, 0));
+  const ramp = new THREE.Group(); ramp.position.set(0, 0.12, L / 2); g.add(ramp); g.ramp = ramp;
+  ramp.add(at(mesh(new THREE.BoxGeometry(W - 0.1, H + 0.15, 0.1), steel), 0, (H + 0.15) / 2, 0.04));
+  for (let i = 0; i < 4; i++) ramp.add(at(box(W - 0.2, 0.04, 0.03, '#4a4e48'), 0, 0.2 + i * 0.28, -0.02));
+  const cox = new THREE.Group(); cox.add(at(box(0.9, 0.5, 0.6, '#5a5e52'), 0, H + 0.25, 0)); cox.position.set(0.55, 0, -L / 2 + 0.5); g.add(cox);
+  g.L = L; g.W = W;
+  g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  return dyn(g);
+}
+// A Czech hedgehog: three steel angle beams crossed at right angles (beach obstacle).
+export function hedgehog(s = 1.1) {
+  const g = new THREE.Group(), m = metal('#3a3a36', { roughness: 0.6 });
+  [[0.62, 0, 0.62], [-0.62, 0, 0.62], [0, 0.62, 0]].forEach(([rx, ry, rz], i) => { const b = mesh(new THREE.BoxGeometry(0.09, 1.5, 0.09), m); b.rotation.set(i === 2 ? Math.PI / 2 : rx, ry, i === 2 ? 0.62 : rz); g.add(b); });
+  g.position.y = 0.42 * s; g.scale.setScalar(s); return g;
+}
+// The Reichstag in 1945: stone block with corner towers, the portico, the bare steel ribs of the burnt dome. Front at +z.
+export function reichstag() {
+  const g = new THREE.Group(), stone = std('#a49c8a', { roughness: 0.95 }), dark = '#2a2622';
+  const wt = canvasTex(256, 128, (x, W, H) => { x.fillStyle = '#a49c8a'; x.fillRect(0, 0, W, H); for (let j = 0; j < 3; j++) for (let i = 0; i < 12; i++) { x.fillStyle = (i * 7 + j * 3) % 5 ? '#141210' : '#3a2a20'; x.fillRect(6 + i * 21, 14 + j * 40, 11, 24); }
+    for (let i = 0; i < 9; i++) { const gr = x.createRadialGradient((i * 53) % W, (i * 31) % H, 2, (i * 53) % W, (i * 31) % H, 30); gr.addColorStop(0, 'rgba(20,16,12,0.55)'); gr.addColorStop(1, 'rgba(20,16,12,0)'); x.fillStyle = gr; x.fillRect(0, 0, W, H); } });
+  const facade = (w, h) => new THREE.MeshStandardMaterial({ map: (() => { const t = wt.clone(); t.needsUpdate = true; t.wrapS = THREE.RepeatWrapping; t.repeat.set(w / 10, 1); return t; })(), roughness: 0.95 });
+  g.add(at(mesh(new THREE.BoxGeometry(26, 8, 16), [facade(16, 8), facade(16, 8), stone, stone, facade(26, 8), facade(26, 8)]), 0, 4, 0));
+  for (const [x, z] of [[-11.5, -6.5], [11.5, -6.5], [-11.5, 6.5], [11.5, 6.5]]) { g.add(at(mesh(new THREE.BoxGeometry(5, 11, 5), [facade(5, 11), facade(5, 11), stone, stone, facade(5, 11), facade(5, 11)]), x, 5.5, z)); g.add(at(box(5.4, 0.5, 5.4, '#8a8272'), x, 11.2, z)); }
+  g.add(at(box(11, 1.2, 3.2, '#9a9282'), 0, 0.6, 9.2)); for (let i = 0; i < 6; i++) g.add(at(cyl(0.38, 0.42, 6.4, '#b0a896', 12), -4.5 + i * 1.8, 4.4, 9.6));
+  const ped = new THREE.Shape(); ped.moveTo(-5.8, 0); ped.lineTo(5.8, 0); ped.lineTo(0, 2.2); ped.closePath(); const pm = new THREE.Mesh(new THREE.ExtrudeGeometry(ped, { depth: 2.6, bevelEnabled: false }), stone); pm.position.set(0, 7.6, 8.1); g.add(pm);
+  g.add(at(box(12, 0.6, 3.0, '#8a8272'), 0, 7.6, 9.4));
+  const ribM = metal('#2a2826', { metalness: 0.6, roughness: 0.5 }), dome = new THREE.Group(); dome.position.y = 8; g.add(dome);
+  dome.add(at(box(9, 2.2, 9, '#8a8272'), 0, 1.1, 0));
+  for (let i = 0; i < 16; i++) { const a = i / 16 * Math.PI * 2, pts = []; for (let k = 0; k <= 10; k++) { const p = k / 10 * Math.PI / 2; pts.push(new THREE.Vector3(Math.cos(a) * 4.2 * Math.cos(p), 2.2 + 4.6 * Math.sin(p), Math.sin(a) * 4.2 * Math.cos(p))); }
+    dome.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 12, 0.07, 4, false), ribM)); }
+  for (const h of [0.3, 0.6, 0.85]) { const r = 4.2 * Math.cos(h * Math.PI / 2), ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.06, 4, 32), ribM); ring.rotation.x = Math.PI / 2; ring.position.y = 2.2 + 4.6 * Math.sin(h * Math.PI / 2); dome.add(ring); }
+  g.roofY = 8; g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  return g;
+}
+// A small hand flag on a stick (crowds): code from whatif/flags. Origin at the bottom of the stick.
+export function handFlag(code = 'gb', s = 1) {
+  const g = new THREE.Group(); g.add(at(cyl(0.006, 0.006, 0.34, '#d8d0c0', 5), 0, 0.17, 0));
+  const f = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.13), new THREE.MeshStandardMaterial({ map: flagTex(code, 150, 100), side: THREE.DoubleSide, roughness: 0.8 })); f.position.set(0.105, 0.27, 0); g.add(f); g.flag = f;
+  g.scale.setScalar(s); return dyn(g);
+}

@@ -603,3 +603,54 @@ export function luzonField(light = 'morning') {
   return s;
 }
 import { flagPole } from '../whatif/flags.js';
+
+// ------------------------------------------------------------ 6 June 1944: the Channel and the beaches of Normandy
+// Dawn over the Channel: Higgins boats heading for the coast (+z), destroyers and transports behind, barrage balloons.
+export function channelFleet() {
+  const s = NS2.napoStage('sunrise', [null, null], { seed: 3401, groundA: null, fog: ['#b8b4a8', 30, 200] });
+  NS2.sea(s, { color: '#4a6266', y: 0, size: 600 });
+  s.boats = [[-5, 2], [0.5, 4.5], [6, 1.5], [-9, -4], [3, -6], [10, -8], [-2, -12], [-12, -14]].map(([x, z], i) => { const b = P.higgins(); b.position.set(x, -0.12, z); b.rotation.y = (i % 3 - 1) * 0.05; s.add(b); b.ph = i * 1.3; return b; });
+  [[-30, -40], [18, -55], [-8, -80], [40, -70]].forEach(([x, z], i) => { const d = P.destroyer(); d.position.set(x, 0, z); d.rotation.y = 0.2 + i * 0.3; s.add(d); });
+  [[-24, -50, 26], [14, -64, 30], [36, -82, 28], [-40, -76, 24]].forEach(([x, z, h]) => { const b = P.balloon(h); b.position.set(x, 0, z); s.add(b); });
+  const coast = MX.sierra({ x0: -260, x1: 260, z: 130, depth: 40, height: 12, seed: 3402, base: '#6a6a58', top: '#8a8a70' }); coast.rotation.y = Math.PI; s.add(coast);
+  ticker(s).push(t => { s.sea.wave(t); s.boats.forEach(b => { b.position.y = -0.12 + 0.08 * Math.sin(t * 1.6 + b.ph); b.rotation.x = 0.03 * Math.sin(t * 1.3 + b.ph); b.rotation.z = 0.025 * Math.sin(t * 1.1 + b.ph * 2); }); });
+  return s;
+}
+// Omaha Beach: the sea at -z, wet sand rising to a shingle bank and the bluffs at +z, Czech hedgehogs, smoke, a casemate.
+export function normandy(light = 'overcast') {
+  const s = NS2.napoStage(light, [null, null], { seed: 3411, groundA: null, fog: ['#b4b2aa', 30, 160] });
+  NS2.sea(s, { color: '#55696a', y: 0, size: 500 });
+  const sand = new THREE.Mesh(new THREE.BoxGeometry(220, 1.0, 70), std('#b8aa88', { roughness: 1 })); sand.position.set(0, -0.164, 33); sand.rotation.x = -0.012; s.add(sand);   // waterline at z = -2
+  s.add(LP.at(LP.box(220, 0.6, 3, '#8a8478'), 0, 0.5, 30));
+  const bl = new THREE.PlaneGeometry(240, 30, 120, 12); bl.rotateX(-Math.PI / 2); const bp = bl.attributes.position;
+  for (let i = 0; i < bp.count; i++) { const x = bp.getX(i), z = bp.getZ(i) + 15; bp.setY(i, Math.max(0, Math.min(1, z / 8)) * (11 + 2.5 * Math.sin(x * 0.11) + 1.5 * Math.sin(x * 0.37))); }
+  bl.computeVertexNormals(); const bluff = new THREE.Mesh(bl, std('#6a7a4a', { roughness: 1, flatShading: true })); bluff.position.z = 38; s.add(bluff);
+  const r = LP.rng(3412); s.hogs = [];
+  for (let i = 0; i < 46; i++) { const x = -40 + r() * 80, z = 2 + r() * 20; const h = P.hedgehog(0.9 + r() * 0.4); h.position.set(x, h.position.y + Math.max(-0.2, (z - 2) * 0.012 - 0.15), z); h.rotation.y = r() * 3; s.add(h); s.hogs.push(h); }
+  const cm = P.casemate(); cm.position.set(-14, 11, 44); cm.rotation.y = 0.3; s.add(cm);
+  for (const [x, z, k] of [[-20, 30, 1.2], [8, 34, 1.6], [26, 26, 1.0], [-4, 46, 1.4]]) W1.smokeFrom(s, new THREE.Vector3(x, 2, z), { n: 12, color: '#5a5650', size: 2.6 * k, rise: 16, drift: [6, 0, 2], life: 6, opacity: 0.65 });
+  ticker(s).push(t => s.sea.wave(t));
+  return s;
+}
+// Berlin, May 1945: streets of ruins in smoke and the Reichstag at the end of a square (front toward +z).
+export function berlin(light = 'overcast') {
+  const s = WS.wStage(light, ['#6e6458', '#655c50'], { groundSize: 260 });
+  if (s.fog) { s.fog.color.set('#a8a090'); s.fog.near = 20; s.fog.far = 140; }
+  const rg = P.reichstag(); rg.position.set(0, 0, -34); s.add(rg); s.reich = rg;
+  const r = LP.rng(3421), cols = ['#b9a48a', '#a8a090', '#c2b49a', '#9a8c7a'];
+  for (let i = 0; i < 14; i++) { const sx = i % 2 ? 1 : -1, b = P.ruinBlock(6 + r() * 3, 5 + r() * 6, 5 + r() * 2, cols[i % 4], 70 + i); b.position.set(sx * (14 + r() * 8), 0, 10 - Math.floor(i / 2) * 9); b.rotation.y = (r() - 0.5) * 0.3; s.add(b); }
+  for (let i = 0; i < 12; i++) { const rb = P.rubble(1.4 + r() * 1.6, 80 + i, '#857664'); rb.position.set(-18 + r() * 36, 0, 6 - r() * 30); s.add(rb); }
+  for (const [x, z, k] of [[-20, -20, 1.4], [16, -40, 1.8], [-34, -50, 1.2]]) { W1.smokeFrom(s, new THREE.Vector3(x, 4, z), { n: 14, color: '#3a3430', size: 3 * k, rise: 30, drift: [5, 0, -3], life: 8, opacity: 0.7 }); W1.fireAt(s, new THREE.Vector3(x, 1.5, z), { n: 10, size: 1.8 * k, rise: 2, spread: 2 }); }
+  LK.outdoor(s, light, { kind: 'dirt', noGrass: true });
+  return s;
+}
+// A concrete bunker corridor lit by one caged bulb (the silhouette stands at the far end, z = -3.6). s.bulb (PointLight), s.lamp.
+export function bunker() {
+  const s = RS.room({ w: 3.2, d: 8, h: 2.4, wall: '#7a7a74', lower: '#5a5a54', lowerH: 0.9, floor: '#4a4a46', ceil: '#6a6a64', hemi: 0.18, sunI: 0.05, lights: [], bg: '#050505' });
+  const bulb = new THREE.PointLight('#ffd9a0', 6, 9, 1.6); bulb.position.set(0, 2.1, -1.6); s.add(bulb); s.bulb = bulb;
+  const lamp = P.glow('#ffd9a0', 0.5, 0.9); lamp.position.set(0, 2.18, -1.6); s.add(lamp); s.lamp = lamp;
+  s.add(LP.at(LP.cyl(0.01, 0.01, 0.2, '#2a2a2a', 4), 0, 2.32, -1.6));
+  for (const z of [-3.9, 0.4]) s.add(LP.at(LP.box(3.2, 0.25, 0.4, '#6a6a64'), 0, 2.28, z));
+  s.add(LP.at(LP.box(1.1, 1.9, 0.08, '#3a3a36'), 0.95, 0.95, -3.95));
+  return s;
+}
