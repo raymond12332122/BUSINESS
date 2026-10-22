@@ -121,11 +121,11 @@ export function build(ctx) {
     { t: tA2, type: 'waves', dur: tA3 - tA2, vol: 0.45 }, { t: tA2, type: 'engine', dur: tDrop - tA2, vol: 0.3 }, { t: tDrop, type: 'clank', vol: 0.5 }, { t: tDrop + 0.4, type: 'splash', vol: 0.45 },
     { t: tDrop + 0.5, type: 'shout', vol: 0.35 }, { t: tDrop + 0.6, type: 'gunfire', dur: tA3 - tDrop - 0.6, vol: 0.18 }, { t: tDrop + 1.0, type: 'boom', vol: 0.3 },
     { t: tA3, type: 'paper', vol: 0.3 }, { t: tA3 + 0.2, type: 'whoosh', vol: 0.3 },
-    { t: tB1, type: 'cheer', dur: tB2 - tB1, vol: 0.45 }, { t: tB1, type: 'crowd', dur: tB2 - tB1, vol: 0.3 }, { t: tB1, type: 'march', dur: tB2 - tB1, vol: 0.2 },
+    { t: tB1, type: 'cheer', dur: tB2 - tB1, vol: 0.45 }, { t: tB1, type: 'crowd', dur: tB2 - tB1, vol: 0.3 }, { t: tB1, type: 'march', dur: tB2 - tB1, vol: 0.2 }, { t: tB1, type: 'bells', dur: tB2 - tB1, vol: 0.3 },
     { t: tB2, type: 'whoosh', vol: 0.3 }, { t: tB2, type: 'drums', dur: tC1 - tB2, vol: 0.25 },
     { t: tC1, type: 'wind', dur: tC2 - tC1, vol: 0.3 }, { t: tC1, type: 'fire', dur: tC2 - tC1, vol: 0.25 }, { t: tC1 + 0.6, type: 'boom', vol: 0.25 }, { t: tBer, type: 'cheer', vol: 0.3 },
     { t: tC2, type: 'drone', dur: tC3 - tC2, vol: 0.3 }, { t: tSui + 0.3, type: 'click', vol: 0.4 },
-    { t: tC3, type: 'cheer', dur: ctx.dur - tC3, vol: 0.5 }, { t: tC3, type: 'crowd', dur: ctx.dur - tC3, vol: 0.35 }, ...[0.5, 1.4, 2.2, 3.0, 3.7].map(d => ({ t: tC3 + d, type: 'pop', vol: 0.3 })), { t: tRin - 0.1, type: 'stamp', vol: 0.45 },
+    { t: tC3, type: 'cheer', dur: ctx.dur - tC3, vol: 0.5 }, { t: tC3, type: 'crowd', dur: ctx.dur - tC3, vol: 0.35 }, { t: tC3, type: 'bells', dur: ctx.dur - tC3, vol: 0.25 }, ...[0.5, 1.4, 2.2, 3.0, 3.7].map(d => ({ t: tC3 + d, type: 'pop', vol: 0.3 })), { t: tRin - 0.1, type: 'stamp', vol: 0.45 },
   ];
   const shots = [
     { t0: 0, set: Ch, p0: [8.5, 3.6, 9.5], l0: [-3, 0.6, -14], p1: [7.6, 3.3, 8.2], l1: [-3, 0.6, -14], fov0: 46, act: actA1 },

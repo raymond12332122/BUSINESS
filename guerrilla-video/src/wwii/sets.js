@@ -654,3 +654,68 @@ export function bunker() {
   s.add(LP.at(LP.box(1.1, 1.9, 0.08, '#3a3a36'), 0.95, 0.95, -3.95));
   return s;
 }
+
+// ------------------------------------------------------------ 1945: the bomb and the end of the war
+// Alamogordo, New Mexico, 16 July 1945, before dawn: desert flats, mesas, the test tower far off (z = -60), an observation post.
+export function trinity() {
+  const s = WS.wStage('dawn', ['#a8946e', '#9c8862'], { groundSize: 500 });
+  s.add(MX.sierra({ x0: -260, x1: 260, z: -170, depth: 60, height: 22, seed: 3501, base: '#6a5a6a', top: '#8a7a88' }));
+  const tw = P.trinityTower(20); tw.position.set(-6, 0, -70); s.add(tw); s.tower = tw;
+  const post = new THREE.Group(); post.add(LP.at(LP.box(5, 0.55, 0.9, '#8a7a5a'), 0, 0.275, 0)); for (let i = 0; i < 9; i++) post.add(LP.at(LP.box(0.5, 0.16, 0.36, '#a8946a'), -2.2 + i * 0.55, 0.62, 0.1)); post.position.set(0, 0, -2.0); s.add(post);   // a low sandbag parapet
+  const r = LP.rng(3502); for (let i = 0; i < 40; i++) { const p = MX.agave(0.8 + r() * 0.5, i); p.position.set(-60 + r() * 120, 0, 6 - r() * 90); if (Math.abs(p.position.x) < 4 && p.position.z > -8) continue; s.add(p); }
+  LK.outdoor(s, 'golden', { kind: 'dirt', noGrass: true });
+  return s;
+}
+// Hiroshima from the hills across the bay, 6 August 1945: the city low and far (z = -150), the cloud rises behind it.
+export function hiroshimaFar() {
+  const s = NS2.napoStage('day', [null, null], { seed: 3511, groundA: null, fog: ['#dfe6ea', 120, 520] });
+  NS2.sea(s, { color: '#4a7a8e', y: 0, size: 900 });
+  const hill = new THREE.Mesh(new THREE.SphereGeometry(30, 28, 10, 0, Math.PI * 2, 0, Math.PI / 2), std('#5a7a4a', { roughness: 1, flatShading: true })); hill.scale.set(1.4, 0.2, 0.6); hill.position.set(0, -2, 14); s.add(hill);
+  LP.scatter(s, (r, i) => LP.pine(1.6 + r() * 0.6, '#3e5a34', i), 30, [-30, 6, 30, 22], 3512, [[0, 10, 6]]);
+  const city = new THREE.Group(); const r = LP.rng(3513); for (let i = 0; i < 160; i++) city.add(LP.at(LP.box(1.5 + r() * 3, 0.8 + r() * 2.4, 1.5 + r() * 3, ['#8a8478', '#9a9286', '#7a746a'][i % 3]), -70 + r() * 140, 0.6, -150 - r() * 40)); s.add(city);
+  s.add(MX.sierra({ x0: -400, x1: 400, z: -260, depth: 80, height: 40, seed: 3514, base: '#5a6a5a', top: '#7a8a7a' }));
+  const mc = P.mushroom(70); mc.position.set(-6, 0, -175); s.add(mc); s.cloud = mc;
+  ticker(s).push(t => s.sea.wave(t));
+  return s;
+}
+// Hiroshima today, at dusk on 6 August: the Genbaku Dome across the river, floating lanterns, strings of paper cranes.
+export function genbakuDusk() {
+  const s = NS2.napoStage('dusk', ['#5a6a4a', '#52603e'], { seed: 3521, fog: ['#c8a890', 40, 200] });
+  const river = new THREE.Mesh(new THREE.PlaneGeometry(200, 16), new THREE.MeshStandardMaterial({ color: '#3a4e5a', roughness: 0.2, metalness: 0.2 })); river.rotation.x = -Math.PI / 2; river.position.set(0, -0.35, -6); s.add(river);
+  for (const z of [2.1, -14.1]) s.add(LP.at(LP.box(200, 0.8, 0.4, '#8a8478'), 0, -0.2, z));
+  const gb = P.genbaku(); gb.position.set(-3, -0.2, -24); gb.rotation.y = 0.35; s.add(gb);
+  for (let i = 0; i < 10; i++) { const t = LP.roundTree(1.3 + (i % 3) * 0.2, '#4a6a3a', i); t.position.set(-30 + i * 6.5 + (i % 2) * 1.5, -0.2, -19 - (i % 3) * 2); if (Math.abs(t.position.x + 3) < 9) continue; s.add(t); }
+  s.lanterns = Array.from({ length: 34 }, (_, i) => { const l = P.floatLantern(i, ['#ffd890', '#ffb878', '#ffe4a8'][i % 3]); l.x0 = -14 + (i * 7.3) % 28; l.z0 = -12 + (i * 3.7) % 9; l.sp = 0.25 + (i % 5) * 0.04; s.add(l); return l; });
+  s.cranes = [];
+  for (const [x, z] of [[2.8, 3.2], [3.6, 3.0], [4.4, 3.3]]) { s.add(LP.at(LP.cyl(0.006, 0.006, 2.2, '#c8c0b0', 4), x, 1.1, z)); for (let k = 0; k < 12; k++) { const c = P.paperCrane(['#e84a5a', '#f2b632', '#4a9ad8', '#5ab85a', '#f27ab8', '#ffffff'][(k + x * 10) % 6 | 0]); c.position.set(x, 2.1 - k * 0.16, z); c.rotation.y = k * 0.7; s.add(c); s.cranes.push(c); } }
+  s.add(LP.at(LP.box(1.8, 0.05, 0.05, '#c8c0b0'), 3.6, 2.2, 3.15));
+  ticker(s).push(t => s.lanterns.forEach(l => { l.position.x = l.x0 + ((t * l.sp) % 28) - 4; l.position.z = l.z0; l.bob(t); }));
+  ticker(s).push(t => s.cranes.forEach((c, i) => { c.rotation.y = i * 0.7 + 0.3 * Math.sin(t * 0.8 + i); }));
+  return s;
+}
+// A Japanese home, 15 August 1945: tatami, shoji, the radio on a low table. s.radio, s.table (top y).
+export function japanRoom() {
+  const shoji = canvasTex(256, 256, (x, W, H) => { x.fillStyle = '#efe6d0'; x.fillRect(0, 0, W, H); x.strokeStyle = '#7a5a3a'; x.lineWidth = 5; for (let i = 0; i <= 4; i++) { x.beginPath(); x.moveTo(i * W / 4, 0); x.lineTo(i * W / 4, H); x.stroke(); } for (let j = 0; j <= 6; j++) { x.beginPath(); x.moveTo(0, j * H / 6); x.lineTo(W, j * H / 6); x.stroke(); } });
+  shoji.wrapS = THREE.RepeatWrapping; shoji.repeat.set(3, 1);
+  const s = RS.room({ w: 6, d: 5, h: 2.4, wall: '#d8cba8', floor: '#c8b878', ceil: '#a88a5a', hemi: 0.8, sunI: 0.6, wallTex: shoji, lights: [[0.4, 1.8, 0.4, 3, '#fff0d0', 6]] });
+  const tex = canvasTex(128, 128, (x, W) => { x.fillStyle = '#c8b878'; x.fillRect(0, 0, W, W); x.strokeStyle = '#4a3a2a'; x.lineWidth = 3; x.strokeRect(2, 2, W / 2 - 2, W - 4); x.strokeRect(W / 2, 2, W / 2 - 2, W / 2 - 2); x.strokeRect(W / 2, W / 2, W / 2 - 2, W / 2 - 2); });
+  tex.wrapS = tex.wrapT = THREE.RepeatWrapping; tex.repeat.set(3, 2.5); const fl = new THREE.Mesh(new THREE.PlaneGeometry(6, 5), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.9 })); fl.rotation.x = -Math.PI / 2; fl.position.y = 0.005; s.add(fl);
+  const tb = new THREE.Group(); tb.add(LP.at(LP.box(0.9, 0.05, 0.6, '#4a2e1c'), 0, 0.22, 0)); for (const [x, z] of [[-0.4, -0.25], [0.4, -0.25], [-0.4, 0.25], [0.4, 0.25]]) tb.add(LP.at(LP.box(0.06, 0.2, 0.06, '#3a2416'), x, 0.1, z)); tb.position.set(0, 0, -0.9); s.add(tb); s.table = 0.245;
+  const rd = P.radioSet(); rd.position.set(0, 0.245, -0.95); s.add(rd); s.radio = rd;
+  return s;
+}
+// Tokyo Bay, 2 September 1945: the teak deck of a battleship, a triple turret, the table with the instrument of surrender.
+export function missouri(light = 'morning') {
+  const s = NS2.napoStage(light === 'morning' ? 'sunrise' : light, [null, null], { seed: 3531, groundA: null, fog: ['#e6d6c2', 60, 300] });
+  NS2.sea(s, { color: '#4a6a7a', y: -3, size: 600 });
+  const teak = canvasTex(256, 256, (x, W) => { x.fillStyle = '#a8906a'; x.fillRect(0, 0, W, W); for (let i = 0; i < 16; i++) { x.fillStyle = i % 2 ? 'rgba(80,60,40,0.12)' : 'rgba(255,240,210,0.06)'; x.fillRect(0, i * 16, W, 15); x.fillStyle = 'rgba(40,30,20,0.6)'; x.fillRect(0, i * 16 + 15, W, 1); } });
+  teak.wrapS = teak.wrapT = THREE.RepeatWrapping; teak.repeat.set(4, 12);
+  const deck = new THREE.Mesh(new THREE.BoxGeometry(24, 0.4, 60), new THREE.MeshStandardMaterial({ map: teak, roughness: 0.85 })); deck.position.set(0, -0.2, -10); deck.receiveShadow = true; s.add(deck);
+  for (const sx of [-1, 1]) s.add(LP.at(LP.box(0.12, 1.0, 60, '#7a8288'), sx * 12, 0.3, -10));
+  const tur = new THREE.Group(); tur.add(LP.at(LP.box(7, 2.6, 6, '#7a8288'), 0, 1.3, 0)); for (const x of [-1.6, 0, 1.6]) tur.add(LP.at(LP.cyl(0.32, 0.38, 12, '#6a7278', 12), x, 1.7, 7.5, Math.PI / 2 - 0.08, 0, 0)); tur.position.set(-1, 0, -27); s.add(tur);
+  const sup = new THREE.Group(); sup.add(LP.at(LP.box(8, 9, 7, '#7a8288'), 0, 4.5, 0)); sup.add(LP.at(LP.box(5, 4, 5, '#6a7278'), 0, 11, 0)); sup.add(LP.at(LP.cyl(0.2, 0.2, 10, '#5a6268', 6), 0, 18, 0)); sup.position.set(0, 0, -40); s.add(sup);
+  const tb = new THREE.Group(); tb.add(LP.at(LP.box(1.4, 0.05, 0.7, '#2f5a3a'), 0, 0.36, 0)); for (const [x, z] of [[-0.62, -0.3], [0.62, -0.3], [-0.62, 0.3], [0.62, 0.3]]) tb.add(LP.at(LP.box(0.05, 0.36, 0.05, '#3a2a1a'), x, 0.18, z));
+  tb.add(LP.at(LP.box(0.22, 0.004, 0.3, '#f4ecd8'), -0.2, 0.39, 0)); tb.add(LP.at(LP.box(0.22, 0.004, 0.3, '#f4ecd8'), 0.2, 0.39, 0.02)); tb.position.set(0, 0, -3.2); s.add(tb); s.tableTop = 0.39;
+  ticker(s).push(t => s.sea.wave(t));
+  return s;
+}

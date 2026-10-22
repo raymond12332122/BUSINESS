@@ -135,7 +135,7 @@ export function build(ctx) {
     { t: tHit, type: 'bigboom', vol: 0.55 }, { t: tHit + 0.3, type: 'fire', dur: tA2 - tHit - 0.3, vol: 0.35 },
     { t: tA2, type: 'paper', vol: 0.25 }, { t: tPot - 0.2, type: 'tick', vol: 0.25 }, { t: tFaj - 0.2, type: 'tick', vol: 0.25 },
     { t: tB1, type: 'crowd', dur: tB2 - tB1, vol: 0.18 }, { t: tEje - 0.05, type: 'stamp', vol: 0.4 }, { t: tEje + 0.3, type: 'applause', dur: 2.0, vol: 0.4 },
-    { t: tB2, type: 'engine', dur: tB3 - tB2, vol: 0.35 }, { t: tB2 + 0.2, type: 'creak', vol: 0.2 },
+    { t: tB2, type: 'train', dur: tB3 - tB2, vol: 0.45 },
     { t: tB3, type: 'birds', dur: tC1 - tB3, vol: 0.3 }, { t: tB3, type: 'wind', dur: tC1 - tB3, vol: 0.15 },
     { t: tC1, type: 'engines', dur: tC2 - tC1, vol: 0.3 }, { t: tC1, type: 'steps', dur: tC2 - tC1, vol: 0.2 },
     { t: tC2, type: 'plane', dur: tC3 - tC2, vol: 0.5 }, { t: tC3, type: 'plane', dur: 2.5, vol: 0.25 }, { t: tC3 + 0.2, type: 'drone', dur: ctx.dur - tC3, vol: 0.2 },

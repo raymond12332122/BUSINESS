@@ -101,7 +101,7 @@ export function build(ctx) {
   };
 
   const sfx = [
-    { t: 0, type: 'clank', vol: 0.3 }, { t: 0, type: 'typewriter', dur: tB1, vol: 0.06 }, ...Array.from({ length: 9 }, (_, i) => ({ t: 0.3 + i * 0.55, type: 'click', vol: 0.18 })),
+    { t: 0, type: 'clank', vol: 0.3 }, { t: 0, type: 'factory', dur: tB1, vol: 0.35 }, ...Array.from({ length: 9 }, (_, i) => ({ t: 0.3 + i * 0.55, type: 'click', vol: 0.18 })),
     { t: 0.5, type: 'clank', vol: 0.22 }, { t: tA2 + 0.6, type: 'swoosh', vol: 0.3 }, { t: tA2 + 0.9, type: 'pop', vol: 0.3 },
     { t: tB1, type: 'wind', dur: tB2 - tB1, vol: 0.35 }, { t: tB1, type: 'march', dur: tB2 - tB1, vol: 0.3 },
     { t: tB2, type: 'wind', dur: tC1 - tB2, vol: 0.5 }, { t: tB2, type: 'engine', dur: tC1 - tB2, vol: 0.12 }, { t: tDrop, type: 'whoosh', vol: 0.3 }, { t: tDrop + 1.9, type: 'boom', vol: 0.3 },

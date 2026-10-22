@@ -868,3 +868,78 @@ export function handFlag(code = 'gb', s = 1) {
   const f = new THREE.Mesh(new THREE.PlaneGeometry(0.2, 0.13), new THREE.MeshStandardMaterial({ map: flagTex(code, 150, 100), side: THREE.DoubleSide, roughness: 0.8 })); f.position.set(0.105, 0.27, 0); g.add(f); g.flag = f;
   g.scale.setScalar(s); return dyn(g);
 }
+
+// ------------------------------------------------------------ 1945: the bomb, Hiroshima remembered, the end
+// The Trinity test tower: a steel lattice with the shot cab on top (seen far away at dawn).
+export function trinityTower(h = 20) {
+  const g = new THREE.Group(), m = metal('#3a3a3a', { roughness: 0.6 }), b = h * 0.18, tp = h * 0.05;
+  for (const [sx, sz] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) { const a = new THREE.Vector3(sx * b, 0, sz * b), c = new THREE.Vector3(sx * tp, h, sz * tp), d = c.clone().sub(a);
+    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.16, d.length(), 5), m); leg.position.copy(a).add(c).multiplyScalar(0.5); leg.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), d.normalize()); g.add(leg); }
+  for (let i = 1; i < 8; i++) { const y = h * i / 8, w = b + (tp - b) * i / 8; for (const [x, z, ry] of [[0, w, 0], [0, -w, 0], [w, 0, Math.PI / 2], [-w, 0, Math.PI / 2]]) g.add(at(box(2 * w, 0.08, 0.08, '#3a3a3a'), x, y, z, 0, ry, 0)); }
+  g.add(at(box(tp * 2 + 0.8, 1.0, tp * 2 + 0.8, '#5a5a56'), 0, h + 0.5, 0));
+  return g;
+}
+// A mushroom cloud seen from afar: .set(u, t) grows it (u 0..1) — the stem rises, the cap swells and rolls; glowing at first.
+export function mushroom(H = 60) {
+  const g = new THREE.Group(), r = rng(31), mats = [];
+  const mk = (col) => { const m = new THREE.MeshStandardMaterial({ color: col, roughness: 1, flatShading: true, emissive: '#ff8a3a', emissiveIntensity: 0 }); mats.push(m); return m; };
+  const stem = [], cap = [];
+  for (let i = 0; i < 14; i++) { const s = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 1), mk(i < 4 ? '#b8a898' : '#d8ccbc')); s.k = i / 13; s.j = [(r() - 0.5) * 0.3, (r() - 0.5) * 0.3]; g.add(s); stem.push(s); }
+  for (let i = 0; i < 26; i++) { const a = i / 26 * Math.PI * 2 + r() * 0.2, rr = 0.55 + r() * 0.45, s = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 1), mk(['#efe6d8', '#e2d6c4', '#d6c8b4'][i % 3])); s.a = a; s.rr = rr; s.dy = (r() - 0.3) * 0.35; s.sz = 0.7 + r() * 0.5; g.add(s); cap.push(s); }
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(1, 0.32, 8, 26), mk('#e8dccb')); ring.rotation.x = Math.PI / 2; g.add(ring);
+  const base = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 8, 0, Math.PI * 2, 0, Math.PI / 2), mk('#8a7a6a')); g.add(base);
+  g.set = (u, t = 0) => {
+    const e = 1 - Math.pow(1 - clampU(u), 2.2), top = H * (0.2 + 0.8 * e), capR = H * (0.12 + 0.22 * e), glow = Math.max(0, 1 - u * 2.2);
+    stem.forEach(s => { const y = top * s.k * 0.92, w = H * (0.035 + 0.03 * (1 - s.k) + 0.02 * e); s.position.set(s.j[0] * w, y, s.j[1] * w); s.scale.set(w * 1.3, H * 0.07, w * 1.3); s.rotation.y = t * 0.2 + s.k * 3; });
+    cap.forEach(s => { const a = s.a + t * 0.05; s.position.set(Math.cos(a) * capR * s.rr, top + capR * (0.15 + s.dy), Math.sin(a) * capR * s.rr); s.scale.setScalar(capR * 0.45 * s.sz); s.rotation.set(t * 0.1 + s.a, s.a, 0); });
+    ring.position.y = top - capR * 0.1; ring.scale.set(capR * 0.95, capR * 0.95, capR * 0.6);
+    base.scale.set(H * (0.1 + 0.25 * e), H * (0.03 + 0.05 * e), H * (0.1 + 0.25 * e));
+    mats.forEach(m => { m.emissiveIntensity = 1.6 * glow; });
+    g.visible = u > 0.001;
+  };
+  const clampU = v => Math.min(1, Math.max(0, v));
+  g.set(0); return dyn(g);
+}
+// The Genbaku Dome (Hiroshima Prefectural Industrial Promotion Hall) as it stands today: a three-storey shell, the stair
+// tower and the bare oval dome frame. Front toward +z.
+export function genbaku() {
+  const g = new THREE.Group(), wall = canvasTex(256, 128, (x, W, H) => { x.fillStyle = '#a89a86'; x.fillRect(0, 0, W, H); for (let j = 0; j < 3; j++) for (let i = 0; i < 10; i++) { x.fillStyle = '#2a2420'; x.fillRect(8 + i * 25, 12 + j * 40, 12, 26); }
+    for (let i = 0; i < 14; i++) { x.fillStyle = `rgba(60,50,40,${0.2 + (i % 3) * 0.1})`; x.fillRect((i * 37) % W, (i * 23) % H, 18, 8); } });
+  wall.wrapS = THREE.RepeatWrapping;
+  const wm = (rx) => { const t = wall.clone(); t.needsUpdate = true; t.wrapS = THREE.RepeatWrapping; t.repeat.set(rx, 1); return new THREE.MeshStandardMaterial({ map: t, roughness: 0.95 }); };
+  const shell = (w, h, d, x, z) => { for (const [px, pz, ry, len] of [[0, d / 2, 0, w], [0, -d / 2, 0, w], [w / 2, 0, Math.PI / 2, d], [-w / 2, 0, Math.PI / 2, d]]) { const m = new THREE.Mesh(new THREE.BoxGeometry(len, h, 0.35), wm(len / 8)); m.position.set(x + px, h / 2, z + pz); m.rotation.y = ry; g.add(m); } };
+  shell(16, 6, 9, 0, 0);
+  shell(5, 9, 5, 0, 1.0);
+  const rib = metal('#3a3632', { metalness: 0.5, roughness: 0.6 }), dome = new THREE.Group(); dome.position.set(0, 9, 1.0); g.add(dome);
+  for (let i = 0; i < 14; i++) { const a = i / 14 * Math.PI * 2, pts = []; for (let k = 0; k <= 10; k++) { const p = k / 10 * Math.PI / 2; pts.push(new THREE.Vector3(Math.cos(a) * 2.5 * Math.cos(p), 3.4 * Math.sin(p), Math.sin(a) * 2.2 * Math.cos(p))); }
+    dome.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 12, 0.06, 4, false), rib)); }
+  for (const h of [0.35, 0.7]) { const ring = new THREE.Mesh(new THREE.TorusGeometry(1, 0.05, 4, 32), rib); ring.rotation.x = Math.PI / 2; ring.scale.set(2.5 * Math.cos(h * Math.PI / 2), 2.2 * Math.cos(h * Math.PI / 2), 1); ring.position.y = 3.4 * Math.sin(h * Math.PI / 2); dome.add(ring); }
+  g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  return g;
+}
+// A paper crane (origami), about 0.12 long; col = paper colour.
+export function paperCrane(col = '#e84a5a') {
+  const g = new THREE.Group(), m = new THREE.MeshStandardMaterial({ color: col, roughness: 0.7, side: THREE.DoubleSide, flatShading: true });
+  const tri = (pts) => { const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pts.flat(), 3)); geo.computeVertexNormals(); return new THREE.Mesh(geo, m); };
+  g.add(tri([[0, 0, -0.06], [0, 0.025, 0], [0, 0, 0.05]]));                                   // body
+  g.add(tri([[0, 0.02, -0.01], [0.07, 0.035, 0.0], [0, 0.02, 0.02]])); g.add(tri([[0, 0.02, -0.01], [-0.07, 0.035, 0.0], [0, 0.02, 0.02]]));   // wings
+  g.add(tri([[0, 0.0, 0.04], [0, 0.06, 0.07], [0, 0.0, 0.05]])); g.add(tri([[0, 0.0, -0.05], [0, 0.05, -0.08], [0, 0.0, -0.06]]));          // neck and tail
+  return g;
+}
+// A floating paper lantern (tōrō nagashi): a small glowing box on a wooden base. .bob(t).
+export function floatLantern(seed = 0, col = '#ffd890') {
+  const g = new THREE.Group(); g.add(at(box(0.22, 0.04, 0.22, '#6a4a2e'), 0, 0.02, 0));
+  g.add(at(new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.2, 0.18), new THREE.MeshStandardMaterial({ color: col, emissive: col, emissiveIntensity: 1.4, roughness: 0.8 })), 0, 0.14, 0));
+  const gl = glow('#ffcf7a', 0.9, 0.55); gl.position.y = 0.16; g.add(gl);
+  g.bob = t => { g.position.y = 0.03 * Math.sin(t * 1.4 + seed); g.rotation.z = 0.05 * Math.sin(t * 1.1 + seed * 2); };
+  return dyn(g);
+}
+// A white dove with flapping wings, flying toward its +z. .flap(t).
+export function dove(seed = 0) {
+  const g = new THREE.Group(), m = std('#f4f2ee', { roughness: 0.7, emissive: '#ffffff', emissiveIntensity: 0.35 });
+  const b = new THREE.Mesh(new THREE.SphereGeometry(0.12, 10, 8), m); b.scale.set(0.8, 0.8, 1.6); g.add(b); g.add(at(new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 6), m), 0, 0.05, 0.19));
+  g.add(at(new THREE.Mesh(new THREE.ConeGeometry(0.06, 0.16, 6), m), 0, 0, -0.24, -Math.PI / 2, 0, 0));
+  const wings = [1, -1].map(sx => { const w = new THREE.Group(); const p = new THREE.Mesh(new THREE.PlaneGeometry(0.34, 0.16), new THREE.MeshStandardMaterial({ color: '#f8f6f2', side: THREE.DoubleSide, roughness: 0.7, emissive: '#ffffff', emissiveIntensity: 0.35 })); p.rotation.x = -Math.PI / 2; p.position.x = sx * 0.17; w.add(p); w.position.set(sx * 0.05, 0.03, 0); g.add(w); return w; });
+  g.flap = t => { const a = 0.7 * Math.sin(t * 9 + seed * 2); wings[0].rotation.z = a; wings[1].rotation.z = -a; };
+  return dyn(g);
+}
