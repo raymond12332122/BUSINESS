@@ -547,3 +547,59 @@ export function exhibit() {
   s.userData = { interior: true };
   return s;
 }
+
+// ------------------------------------------------------------ Mexico in the war
+// The Florida Strait at night (May 1942): a dark sea, stars and a low moon. s.sea.
+export function nightSea() {
+  const s = NS2.napoStage('night', [null, null], { seed: 3301, groundA: null, fog: ['#0c1424', 40, 220] });
+  NS2.sea(s, { color: '#0e2232', y: 0, size: 600 });
+  P.stars(s, 900, 320, 11);
+  const moon = new THREE.Mesh(new THREE.CircleGeometry(4, 32), new THREE.MeshBasicMaterial({ color: '#f2eedc', fog: false, toneMapped: false })); moon.position.set(60, 26, -170); moon.lookAt(0, 0, 0); s.add(moon);
+  const mg = P.glow('#b8c8ff', 36, 0.3); mg.position.copy(moon.position); mg.material.fog = false; s.add(mg);
+  const path = new THREE.Mesh(new THREE.PlaneGeometry(10, 160), new THREE.MeshBasicMaterial({ color: '#8a9ac0', transparent: true, opacity: 0.12, depthWrite: false })); path.rotation.x = -Math.PI / 2; path.rotation.z = 0.35; path.position.set(25, 0.2, -80); s.add(path);
+  ticker(s).push(t => s.sea.wave(t));
+  return s;
+}
+// Northern Mexico (1942): desert scrub, saguaros and nopales, a sierra behind, a railway running along x at z = 0.
+export function northRail(light = 'golden') {
+  const s = WS.wStage(light, ['#c8a878', '#bc9c6c'], { groundSize: 400 });
+  const tr = RP.track(240); tr.rotation.y = Math.PI / 2; s.add(tr);
+  s.add(MX.sierra({ x0: -220, x1: 220, z: -140, depth: 60, height: 26, seed: 3311, base: '#9a6a52', top: '#c89a78' }));
+  const r = LP.rng(3312);
+  for (let i = 0; i < 70; i++) { const x = -90 + r() * 180, z = (r() > 0.5 ? 1 : -1) * (5 + r() * 60); const k = r(); const p = k < 0.4 ? MX.saguaro(1.4 + r() * 1.2, i) : k < 0.75 ? MX.nopal(1.2 + r() * 0.6, i) : MX.agave(1.3 + r() * 0.5, i); p.position.set(x, 0, z); s.add(p); }
+  LK.outdoor(s, light, { kind: 'dirt', noGrass: true });
+  return s;
+}
+// A farm in California (1943): long rows of lettuce running away from the camera, a red barn, a water tower, a truck.
+export function braceroField(light = 'day') {
+  const s = WS.wStage(light, ['#8a7a5a', '#7e6e50'], { groundSize: 300 });
+  const pts = []; for (let row = -10; row <= 10; row++) for (let i = 0; i < 70; i++) pts.push([row * 0.95, 3 - i * 0.62 + (row % 2) * 0.3]);
+  const head = new THREE.InstancedMesh(new THREE.SphereGeometry(0.11, 10, 6), std('#7ab04a', { roughness: 0.8 }), pts.length), M4 = new THREE.Matrix4(), Q = new THREE.Quaternion(), Sc = new THREE.Vector3();
+  pts.forEach(([x, z], i) => { const k = 0.8 + ((i * 37) % 10) / 25; M4.compose(new THREE.Vector3(x, 0.05, z), Q, Sc.set(k, 0.55 * k, k)); head.setMatrixAt(i, M4); }); head.castShadow = head.receiveShadow = true; s.add(head);
+  for (let row = -10; row <= 10; row++) s.add(LP.at(LP.box(0.5, 0.05, 46, '#6a5a40'), row * 0.95, 0.02, -19));
+  const barn = new THREE.Group(); barn.add(LP.at(LP.box(10, 6, 8, '#9a2a22'), 0, 3, 0)); const rf = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 6.6, 3.2, 4, 1), std('#3a3a3a')); rf.rotation.y = Math.PI / 4; rf.scale.set(1.08, 1, 0.86); rf.position.y = 7.6; barn.add(rf);
+  barn.add(LP.at(LP.box(3, 4, 0.1, '#f2ece0'), 0, 2, 4.05)); barn.position.set(-26, 0, -48); s.add(barn);
+  const wt = new THREE.Group(); for (const [x, z] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) wt.add(LP.at(LP.cyl(0.12, 0.12, 9, '#8a6a4a', 6), x, 4.5, z)); wt.add(LP.at(LP.cyl(2, 2, 3, '#a8a49a', 16), 0, 10.5, 0)); wt.add(LP.at(new THREE.Mesh(new THREE.ConeGeometry(2.2, 1.2, 16), std('#6a6a6a')), 0, 12.6, 0)); wt.position.set(30, 0, -60); s.add(wt);
+  s.add(MX.sierra({ x0: -220, x1: 220, z: -150, depth: 60, height: 20, seed: 3321, base: '#8a8a6a', top: '#a8a07a' }));
+  LK.outdoor(s, light, { kind: 'dirt', noGrass: true });
+  return s;
+}
+// Porac, Luzon (1945): the Escuadrón 201 airstrip — steel matting, tents, palms, Mount Arayat, P-47s with the Mexican triangle.
+// s.planes, s.flag.
+export function luzonField(light = 'morning') {
+  const s = WS.wStage(light, ['#7a8a4e', '#6e7e46'], { groundSize: 400 });
+  const psp = canvasTex(128, 128, (x, W) => { x.fillStyle = '#6a665c'; x.fillRect(0, 0, W, W); x.fillStyle = '#3a3832'; for (let j = 0; j < 8; j++) for (let i = 0; i < 4; i++) { x.beginPath(); x.ellipse(16 + i * 32, 8 + j * 16, 9, 4, 0, 0, 7); x.fill(); } x.fillStyle = '#5a564e'; for (let j = 0; j < 8; j++) x.fillRect(0, j * 16 + 14, W, 2); });
+  psp.wrapS = psp.wrapT = THREE.RepeatWrapping; psp.repeat.set(3, 60);
+  const strip = new THREE.Mesh(new THREE.PlaneGeometry(14, 300), new THREE.MeshStandardMaterial({ map: psp, roughness: 0.8, metalness: 0.2 })); strip.rotation.x = -Math.PI / 2; strip.position.set(0, 0.012, -60); strip.receiveShadow = true; s.add(strip);
+  s.planes = [[-4.5, -6], [0.5, -9], [5.5, -6.5], [-9.5, -12]].map(([x, z], i) => { const p = P.aircraft('p47', { col: '#7a7e74', mx: true }); p.position.set(x, 1.08, z); p.rotation.set(-0.2, 0.25 - i * 0.12, 0); s.add(p);
+    for (const sx of [-1, 1]) { s.add(LP.at(LP.cyl(0.04, 0.04, 1.0, '#2a2a2a', 6), x + sx * 0.75, 0.5, z + 0.8)); s.add(LP.at(new THREE.Mesh(new THREE.CylinderGeometry(0.33, 0.33, 0.16, 16), std('#1c1c1c')), x + sx * 0.75, 0.33, z + 0.8, 0, 0, Math.PI / 2)); }
+    s.add(LP.at(new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.08, 12), std('#1c1c1c')), x, 0.14, z - 2.3, 0, 0, Math.PI / 2)); return p; });
+  for (let i = 0; i < 5; i++) { const t = new THREE.Group(); t.add(LP.at(LP.box(3, 0.05, 3.6, '#6a6a48'), 0, 0.02, 0)); const roof = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 2.4, 1.9, 4, 1), std('#7a7a52', { flatShading: true })); roof.rotation.y = Math.PI / 4; roof.scale.set(1, 1, 1.25); roof.position.y = 0.95; t.add(roof); t.position.set(-14 - (i % 3) * 4.2, 0, 4 - Math.floor(i / 3) * 5 - i * 0.6); s.add(t); }
+  LP.scatter(s, (r, i) => LP.palm(1.6 + r() * 0.9, i), 40, [-70, -90, 70, 20], 3331, [[0, -20, 14], [-12, 0, 9]]);
+  const arayat = new THREE.Mesh(new THREE.ConeGeometry(42, 30, 28, 1), std('#4e6a46', { roughness: 1, flatShading: true })); arayat.position.set(40, 14, -190); s.add(arayat);
+  s.add(MX.sierra({ x0: -260, x1: 260, z: -200, depth: 50, height: 16, seed: 3332, base: '#5a7050', top: '#7a8a68' }));
+  const f = flagPole('mx', { h: 4.2, w: 2.2 }); f.position.set(-2.9, 0, -5.6); s.add(f); s.flag = f; ticker(s).push(t => f.wave(t, 0.6));
+  LK.outdoor(s, light, { kind: 'grass', grass: { area: [-40, -60, 40, 20], n: 4000, clear: [[0, -20, 9], [-12, 0, 6]] } });
+  return s;
+}
+import { flagPole } from '../whatif/flags.js';

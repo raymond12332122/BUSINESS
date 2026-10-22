@@ -305,7 +305,7 @@ const PLANE_MARKS = {
   us: s => decal(1.6, 0.8, (x, W, H) => { const c = W / 2, r = H * 0.47; x.fillStyle = '#f2f2f2'; x.fillRect(c - W * 0.46, H * 0.32, W * 0.92, H * 0.36); x.fillStyle = '#1f3a6a'; x.beginPath(); x.arc(c, H / 2, r, 0, 7); x.fill();
     x.fillStyle = '#f2f2f2'; x.beginPath(); for (let i = 0; i < 10; i++) { const rr = i % 2 ? r * 0.38 : r * 0.92, a = -Math.PI / 2 + i * Math.PI / 5; x.lineTo(c + rr * Math.cos(a), H / 2 + rr * Math.sin(a)); } x.closePath(); x.fill(); }, 256),
 };
-export function aircraft(kind = 'stuka', { col = null } = {}) {
+export function aircraft(kind = 'stuka', { col = null, mx = false } = {}) {
   const sp = PLANES[kind], g = new THREE.Group(), body = new THREE.Group(); g.add(body);
   const C = metal(col || sp.col, sp.metal ? { metalness: 0.75, roughness: 0.35 } : { roughness: 0.65 }), Und = metal(sp.under, sp.metal ? { metalness: 0.75, roughness: 0.35 } : { roughness: 0.65 }), dark = metal('#1c1c1c');
   // fuselage: lathe around the length axis, a little taller than wide
@@ -348,6 +348,10 @@ export function aircraft(kind = 'stuka', { col = null } = {}) {
     const zs = -sp.len * 0.22, rr = rAt(zs);
     for (const sx of [1, -1]) { const m = mk(); m.scale.setScalar(Math.min(rr * 1.5, 1.4) * (sp.mark === 'us' ? 1.2 : 1)); m.rotation.y = sx * Math.PI / 2; m.position.set(sx * (rr + 0.015), 0.0, zs); body.add(m); }
   }
+  // the Mexican Expeditionary Air Force (Escuadrón 201): the tricolour triangle aft of the star, on both sides
+  if (mx) { const zt = -sp.len * 0.36, rt = rAt(zt);
+    for (const sx of [1, -1]) { const m = decal(1, 1, (x, W) => [['#1f7a3a', 0], ['#f2f2f2', 0.16], ['#c8302a', 0.32]].forEach(([c, k]) => { const p = W * k, h = W - 2 * p; x.fillStyle = c; x.beginPath(); x.moveTo(W / 2, 6 + p * 1.15); x.lineTo(W - 6 - p, W - 8 - p * 0.58); x.lineTo(6 + p, W - 8 - p * 0.58); x.closePath(); x.fill(); }));
+      m.scale.setScalar(Math.min(rt * 1.7, 1.2)); m.rotation.y = sx * Math.PI / 2; m.position.set(sx * (rt + 0.016), 0.02, zt); body.add(m); } }
   body.traverse(o => { if (o.isMesh) o.castShadow = true; });
   g.scale.setScalar(sp.s); g.body = body; g.props = props; g.kind = kind;
   g.spin = (t, rpm = 24) => props.forEach((p, i) => p.spin(t + i * 0.37, rpm));
@@ -764,4 +768,53 @@ export function radarDish(r = 0.42) {
   tilt.add(at(cyl(0.012, 0.012, r * 0.9, '#3a3e42', 6), 0, 0, r * 0.12, Math.PI / 2, 0, 0)); tilt.add(at(box(0.05, 0.05, 0.07, '#2a2e32'), 0, 0, r * 0.56));
   tilt.add(at(box(0.16, 0.1, 0.12, '#4a4e52'), 0, 0, -0.04));
   return dyn(g);
+}
+
+// ------------------------------------------------------------ Mexico in the war
+import { flagTex } from '../whatif/flags.js';
+// A 1940s tanker, bow toward +z: long low hull (waterline at y = 0.8 of the hull), the bridge house amidships, the engine
+// house and funnel aft. flag = true paints the Mexican flag and «MÉXICO» on both sides, as neutral ships did (lit at night).
+export function tanker({ len = 36, flag = true } = {}) {
+  const g = new THREE.Group(), W = 4.4, H = 3.0;
+  const sh = new THREE.Shape(); sh.moveTo(-W / 2, -len / 2 + 2); sh.quadraticCurveTo(-W / 2, -len / 2, 0, -len / 2); sh.quadraticCurveTo(W / 2, -len / 2, W / 2, -len / 2 + 2);
+  sh.lineTo(W / 2, len / 2 - 6); sh.quadraticCurveTo(W / 2, len / 2 - 1.2, 0, len / 2); sh.quadraticCurveTo(-W / 2, len / 2 - 1.2, -W / 2, len / 2 - 6); sh.closePath();
+  const part = (y0, h, col) => { const geo = new THREE.ExtrudeGeometry(sh, { depth: h, bevelEnabled: false }); geo.rotateX(-Math.PI / 2); geo.rotateY(Math.PI); const m = mesh(geo, std(col, { roughness: 0.7 })); m.position.y = y0; g.add(m); return m; };
+  part(0, 0.85, '#6a2a22'); part(0.85, H - 0.85, '#2a2c30');
+  const dk = new THREE.ShapeGeometry(sh); dk.rotateX(-Math.PI / 2); dk.rotateY(Math.PI); g.add(at(mesh(dk, std('#5a4a3a')), 0, H + 0.01, 0));
+  const white = '#e8e4d8';
+  g.add(at(box(3.6, 2.2, 3.4, white), 0, H + 1.1, len * 0.14)); g.add(at(box(2.8, 1.1, 2.6, white), 0, H + 2.75, len * 0.14)); g.add(at(box(3.0, 0.12, 2.8, '#3a3a3a'), 0, H + 3.36, len * 0.14));
+  g.add(at(box(4.0, 2.2, 6.2, white), 0, H + 1.1, -len * 0.36)); g.add(at(cyl(0.65, 0.75, 3.2, '#1e1e1e', 14), 0, H + 3.7, -len * 0.38)); g.add(at(cyl(0.68, 0.68, 0.5, '#c9a227', 14), 0, H + 4.6, -len * 0.38));
+  g.add(at(box(0.5, 0.08, len * 0.62, '#4a4a46'), 0, H + 1.05, -len * 0.08));
+  for (const z of [len * 0.4, len * 0.14 - 2.2, -len * 0.2]) g.add(at(cyl(0.08, 0.1, 6, '#3a3a3a', 6), 0, H + 3, z));
+  for (let i = 0; i < 10; i++) g.add(at(box(W - 0.6, 0.18, 0.18, '#3a3430'), 0, H + 0.1, -len * 0.25 + i * 1.9));
+  g.lights = [];
+  if (flag) for (const sx of [-1, 1]) {
+    const f = new THREE.Mesh(new THREE.PlaneGeometry(6.6, 4.4), new THREE.MeshStandardMaterial({ map: flagTex('mx', 300, 200), roughness: 0.8, emissive: '#ffffff', emissiveIntensity: 0.0 }));
+    f.material.emissiveMap = f.material.map; f.position.set(sx * (W / 2 + 0.02), 2.0, len * 0.3); f.rotation.y = sx * Math.PI / 2; g.add(f); g.lights.push(f);
+    const tx = canvasTex(512, 96, (x, w, h) => { x.clearRect(0, 0, w, h); x.fillStyle = '#f4f0e6'; x.font = '900 78px "DejaVu Sans"'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('MÉXICO', w / 2, h / 2 + 4); });
+    const n = new THREE.Mesh(new THREE.PlaneGeometry(9, 1.7), new THREE.MeshStandardMaterial({ map: tx, transparent: true, roughness: 0.8, emissive: '#ffffff', emissiveMap: tx, emissiveIntensity: 0.0 }));
+    n.position.set(sx * (W / 2 + 0.02), 2.0, -len * 0.02); n.rotation.y = sx * Math.PI / 2; g.add(n); g.lights.push(n);
+  }
+  g.lit = k => g.lights.forEach(m => { m.material.emissiveIntensity = 0.55 * k; });
+  g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  return dyn(g);
+}
+// A tank wagon (PEMEX) and an ore wagon for the oil-and-metals train; gauge 1.05 like the tracks; length along z.
+export function tankCar(text = 'PEMEX', col = '#1e1e20') {
+  const g = new THREE.Group(), len = 7.4;
+  g.add(at(box(2.0, 0.3, len, '#2a2622'), 0, 0.95, 0)); g.add(at(cyl(1.0, 1.0, len - 0.6, col, 20), 0, 2.08, 0, Math.PI / 2, 0, 0));
+  for (const e of [-1, 1]) g.add(at(new THREE.Mesh(new THREE.SphereGeometry(1.0, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), std(col)), 0, 2.08, e * (len / 2 - 0.3), e * Math.PI / 2, 0, 0));
+  g.add(at(cyl(0.35, 0.35, 0.45, col, 12), 0, 3.2, 0)); g.add(at(box(2.1, 0.06, 0.6, '#3a3a36'), 0, 3.1, 0));
+  const tx = canvasTex(512, 128, (x, w, h) => { x.clearRect(0, 0, w, h); x.fillStyle = '#f2ece0'; x.font = '900 92px "DejaVu Sans"'; x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText(text, w / 2, h / 2 + 6); });
+  for (const sx of [-1, 1]) { const p = new THREE.Mesh(new THREE.PlaneGeometry(3.2, 0.8), new THREE.MeshStandardMaterial({ map: tx, transparent: true, roughness: 0.8 })); p.position.set(sx * 1.01, 2.1, 0); p.rotation.y = sx * Math.PI / 2; g.add(p); }
+  for (const z of [-len / 2 + 1.2, len / 2 - 1.2]) for (const dz of [-0.55, 0.55]) for (const sx of [-1, 1]) g.add(at(cyl(0.42, 0.42, 0.12, '#1a1a1a', 14), sx * 0.52, 0.42, z + dz, 0, 0, Math.PI / 2));
+  g.len = len; return dyn(g);
+}
+export function oreCar(ore = '#6a5a4a') {
+  const g = new THREE.Group(), len = 6.6;
+  g.add(at(box(2.0, 0.3, len, '#2a2622'), 0, 0.95, 0));
+  for (const sx of [-1, 1]) g.add(at(box(0.1, 1.2, len, '#5a3a2a'), sx * 0.98, 1.7, 0)); for (const e of [-1, 1]) g.add(at(box(2.0, 1.2, 0.1, '#5a3a2a'), 0, 1.7, e * (len / 2 - 0.05)));
+  const heap = new THREE.Mesh(new THREE.SphereGeometry(1, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), std(ore, { roughness: 1, flatShading: true })); heap.scale.set(0.95, 0.55, len / 2 - 0.2); heap.position.y = 2.1; g.add(heap);
+  for (const z of [-len / 2 + 1.1, len / 2 - 1.1]) for (const dz of [-0.55, 0.55]) for (const sx of [-1, 1]) g.add(at(cyl(0.42, 0.42, 0.12, '#1a1a1a', 14), sx * 0.52, 0.42, z + dz, 0, 0, Math.PI / 2));
+  g.len = len; return dyn(g);
 }
