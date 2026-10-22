@@ -40,7 +40,7 @@ const EYES = {
   squint: [0.75, -0.125], shock: [0, -0.375], sparkle: [0.25, -0.375], dizzy: [0.5, -0.375],
 };
 const MOUTH = {
-  neutral: [0, 0], frown: [0.25, 0], open: [0.5, 0], smile: [0.75, 0], wavy: [0, -0.125],
+  neutral: [0, 0], smile: [0.25, 0], open: [0.5, 0], frown: [0.75, 0], wavy: [0, -0.125],   // checked on the atlas: [0.25, 0] is the smile
   tongue: [0.25, -0.125], teeth: [0.5, -0.125], grin: [0.75, -0.125], big: [0.25, -0.25],
   cat: [0.5, -0.25], scream: [0.75, -0.25], small: [0.25, -0.375], tri: [0.5, -0.375], shout: [0.25, -0.5],
 };

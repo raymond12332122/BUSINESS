@@ -55,3 +55,10 @@ export function solemn(t, a, b, line1, line2 = '', { y = 420 } = {}) {
     <div style="font:800 64px/1.15 'Inter Display',Inter;color:#f4efe6;text-shadow:0 4px 24px rgba(0,0,0,.7)">${line1}</div>
     ${line2 ? `<div style="font:600 32px/1.4 Inter;color:#d8d0c2;margin-top:14px;text-shadow:0 3px 14px rgba(0,0,0,.7)">${line2}</div>` : ''}</div>`;
 }
+// A rubber-stamp word that slams onto the screen (drops from bigger, lands with a slight tilt).
+export function slam(t, a, b, text, { x = 960, y = 540, rot = -6, col = '#b8342f', size = 60 } = {}) {
+  if (t < a) return ''; const k = clamp((t - a) / 0.16), out = 1 - ss(b - 0.35, b, t); if (out <= 0) return '';
+  const sc = 1 + 0.7 * (1 - k) ** 2;
+  return `<div style="position:absolute;left:${x}px;top:${y}px;transform:translate(-50%,-50%) rotate(${rot}deg) scale(${sc});opacity:${Math.min(1, k * 1.6) * out};white-space:nowrap;
+    font:900 ${size}px 'Inter Display',Inter;letter-spacing:.06em;color:${col};border:7px solid ${col};border-radius:12px;padding:4px 24px;background:rgba(250,244,230,.86);box-shadow:0 12px 34px rgba(0,0,0,.4)">${text}</div>`;
+}

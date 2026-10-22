@@ -2,6 +2,7 @@
 // breathing and shifting weight) plus looking up at the sky, marching with a slung rifle, aiming, crouching, typing,
 // riveting, mourning and lighting candles.
 import * as M from '../lib/motion.js';
+import { sit } from '../whatif/anim.js';
 export * from '../whatif/anim.js';
 const { sin, cos, max, min, abs, PI } = Math;
 const { ss, clamp, HAND } = M;
@@ -20,7 +21,7 @@ export function holdHand(t, seed = 0, side = 'L', o = {}) {
   p['a' + side] = [sx * 0.55, -0.15, 0.35]; p['h' + side] = HAND.soft; p['pl' + side] = [sx, -0.2, -0.6]; return p;
 }
 // Marching (rifle slung on the back): a firm gait with a strong arm swing; D = distance walked in body units.
-export function march(D, seed = 0, amp = 1) { return M.gait(D, { amp, seed, stride: 1.05 }); }
+export function march(D, seed = 0, amp = 1, stride = 1.05) { return M.gait(D, { amp, seed, stride }); }
 // Crouched behind cover, peeking; k = 0..1 (legs fold, chest leans in).
 export function crouch(t, seed = 0, k = 1, o = {}) {
   const p = M.stand(t, seed, { amt: 0.4, ...o });
@@ -55,3 +56,33 @@ export function vSign(t, seed = 0, e = 1, o = {}) {
 }
 // Arms raised in celebration with a slight bounce (liberation, V-E Day): use whatif cheer() for the bounce.
 // Saluting the flag at attention: whatif salute().
+
+// Seated at a desk, writing: the right hand (pen in a pinch) runs along a line on the sheet at world point P and comes
+// back for the next one, the left hand holds the sheet flat, the eyes follow the pen. yaw = the writer's facing.
+export function write(t, seed, P, yaw = 0, k = 1) {
+  const p = sit(t, seed), rx = -cos(yaw), rz = sin(yaw), bx = -sin(yaw), bz = -cos(yaw);   // her right, and back toward her
+  const ln = t * 0.42 + seed * 0.37, u = ln % 1, row = Math.floor(ln) % 3, run = ss(0, 0.86, u) - ss(0.86, 1, u);
+  const along = -0.045 + 0.09 * run + 0.004 * sin(t * 23 + seed), back = 0.012 * row + 0.003 * sin(t * 17 + seed), up = 0.035 + 0.006 * max(0, sin(t * 11 + seed)) + 0.02 * ss(0.86, 0.93, u) * (1 - ss(0.95, 1, u));
+  const pen = [P[0] + rx * along + bx * back, P[1] + up, P[2] + rz * along + bz * back];
+  p.aR = ['world', ...pen]; p.aWR = k; p.plR = [-1, -0.8, -0.3]; p.hR = HAND.pinch;
+  p.aL = ['world', P[0] - rx * 0.1 + bx * 0.02, P[1] + 0.03, P[2] - rz * 0.1 + bz * 0.02]; p.aWL = k; p.plL = [1, -0.8, -0.3]; p.hL = HAND.flat;
+  p.waist = [p.waist[0] + 10 * k, p.waist[1], p.waist[2]]; p.chest = [p.chest[0] + 8 * k, p.chest[1], p.chest[2]];
+  p.look = pen; p.lookW = 0.75 * k; return p;
+}
+// Standing in a queue with nothing left: shoulders down, head bowed, hands in the coat pockets; k = 0..1.
+export function dejected(t, seed = 0, k = 1, o = {}) {
+  const p = M.stand(t, seed, { amt: 0.45, speed: 0.6, ...o });
+  return withArms(p, { aL: [0.95, 0.02, 0.62], aR: [-0.95, 0.02, 0.62], aWL: k, aWR: k, plL: [1, 0.2, -0.6], plR: [-1, 0.2, -0.6], hL: HAND.relax, hR: HAND.relax,
+    head: add(p.head, [18 * k, 0, 0]), chest: add(p.chest, [7 * k, 0, 0]), shL: [0, 0, -4 * k], shR: [0, 0, 4 * k] });
+}
+// Holding a bowl in both hands in front of the waist (the soup line).
+export function holdBowl(t, seed = 0, k = 1, o = {}) {
+  const p = M.stand(t, seed, { amt: 0.4, ...o });
+  return withArms(p, { aL: [0.2, 0.32, 1.55], aR: [-0.2, 0.32, 1.55], aWL: k, aWR: k, plL: [1, -1, 0], plR: [-1, -1, 0], hL: HAND.soft, hR: HAND.soft, head: add(p.head, [14 * k, 0, 0]) });
+}
+// Ladling soup: the right hand dips into the pot at world point A and pours at world point B; u = 0..1 within one ladle.
+export function ladle(t, seed, A, B, u) {
+  const p = M.stand(t, seed, { amt: 0.4 }), s = ss(0.0, 0.3, u) * (1 - ss(0.55, 0.85, u)), arc = sin(Math.PI * ss(0.3, 0.55, u)) * 0.08;
+  const w = ss(0.3, 0.55, u) * (1 - ss(0.75, 1, u)), q = [A[0] + (B[0] - A[0]) * w, A[1] + (B[1] - A[1]) * w + arc + 0.04 * (1 - s), A[2] + (B[2] - A[2]) * w];
+  return withArms(p, { aR: ['world', ...q], aWR: 1, plR: [-1, -0.6, 0], hR: HAND.grip, aL: [0.25, 0.3, 1.4], aWL: 0.7, plL: [1, -1, 0], hL: HAND.soft, look: q, lookW: 0.5 });
+}

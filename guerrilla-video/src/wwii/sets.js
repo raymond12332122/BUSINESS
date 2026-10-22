@@ -45,17 +45,22 @@ import * as RP from '../rusia/props.js';
 export function depression() {
   const s = WS.wStage('overcast', ['#8f8b84', '#85817a'], { groundSize: 180 });
   const cols = ['#9a8f80', '#8a8070', '#a69a88', '#7e776c'];
-  for (let i = 0; i < 5; i++) { const b = NP.building(7, 9 + (i % 3) * 2, 6, cols[i % 4], { seed: i }); b.position.set(-14 + i * 7.2, 0, -9); s.add(b); }
-  const front = LP.at(LP.box(9, 4.4, 0.4, '#5a4a3a'), 0, 2.2, -5.8); s.add(front);
-  const sign = RP.signBoard('SOPA GRATIS · DESEMPLEADOS', { w: 5.2, h: 0.62, bg: '#26201a', fg: '#f0e6c8', border: '#a08a5a' }); sign.position.set(0, 3.55, -5.55); s.add(sign);
-  s.add(LP.at(LP.box(1.4, 2.6, 0.1, '#2a2018'), -2.4, 1.3, -5.55));
-  for (const x of [-3.9, 3.9]) { const w = LP.at(LP.box(1.8, 1.6, 0.06, '#3a4450'), x, 1.6, -5.56); s.add(w); }
-  const table = LP.at(LP.box(1.6, 0.06, 0.7, '#6a4a2e'), 0.6, 0.62, -4.6); s.add(table);
-  for (const x of [-0.1, 1.3]) for (const z of [-4.85, -4.35]) s.add(LP.at(LP.box(0.06, 0.6, 0.06, '#4a3420'), x, 0.3, z));
-  s.add(LP.at(LP.cyl(0.26, 0.24, 0.36, '#5a5e62', 16), 0.3, 0.83, -4.6)); s.add(LP.at(LP.cyl(0.27, 0.27, 0.03, '#3a3e42', 16), 0.3, 1.02, -4.6));
-  for (let i = 0; i < 6; i++) s.add(LP.at(LP.cyl(0.07, 0.06, 0.06, '#e8e2d4', 10), 0.9 + (i % 3) * 0.16, 0.68, -4.75 + Math.floor(i / 3) * 0.2));
-  for (const x of [-7, 7]) { const l = LP.at(LP.cyl(0.06, 0.08, 3.6, '#2a2a2e', 8), x, 1.8, -4.2); s.add(l); }
-  const paper = RP.newspapers('CRISIS', 1); paper.position.set(-1.6, 0.0, -1.2); paper.rotation.y = 0.5; s.add(paper);
+  for (let i = 0; i < 5; i++) { const b = NP.building(7, 9 + (i % 3) * 2, 6, cols[i % 4], { seed: i }); b.position.set(-14 + i * 7.2, 0, -8.8); s.add(b); }
+  // the soup kitchen's shopfront (chibi scale: a door is 1.6 high); the line forms along it, the table at its left end
+  s.add(LP.at(LP.box(7.5, 2.7, 0.3, '#5a4a3a'), 0, 1.35, -5.65));
+  const sign = RP.signBoard('SOPA GRATIS · DESEMPLEADOS', { w: 3.4, h: 0.42, bg: '#26201a', fg: '#f0e6c8', border: '#a08a5a' }); sign.position.set(-0.4, 1.98, -5.47); s.add(sign);
+  s.add(LP.at(LP.box(0.95, 1.7, 0.06, '#3a2a1c'), -2.75, 0.85, -5.49)); s.add(LP.at(LP.box(0.8, 1.58, 0.06, '#241a12'), -2.75, 0.79, -5.46));
+  for (const x of [0.35, 2.45]) { s.add(LP.at(LP.box(1.4, 1.0, 0.06, '#2a241c'), x, 1.12, -5.49));
+    s.add(LP.at(new THREE.Mesh(new THREE.PlaneGeometry(1.26, 0.86), new THREE.MeshStandardMaterial({ color: '#c8a868', emissive: '#a07838', emissiveIntensity: 0.5, roughness: 0.4 })), x, 1.12, -5.455)); }
+  // trestle table with the pot and the bowls
+  const T = s.table = { x: -1.3, z: -4.72, top: 0.41 };
+  s.add(LP.at(LP.box(1.1, 0.04, 0.42, '#6a4a2e'), T.x, T.top - 0.02, T.z));
+  for (const dx of [-0.5, 0.5]) for (const dz of [-0.17, 0.17]) s.add(LP.at(LP.box(0.035, T.top - 0.04, 0.035, '#4a3420'), T.x + dx, (T.top - 0.04) / 2, T.z + dz));
+  s.pot = [T.x + 0.3, T.top, T.z - 0.04];
+  s.add(LP.at(LP.cyl(0.15, 0.14, 0.2, '#5a5e62', 18), s.pot[0], T.top + 0.1, s.pot[2])); s.add(LP.at(LP.cyl(0.135, 0.135, 0.01, '#8a5a2a', 18), s.pot[0], T.top + 0.18, s.pot[2]));
+  for (let i = 0; i < 4; i++) s.add(LP.at(LP.cyl(0.05, 0.04, 0.035, '#e8e2d4', 12), T.x - 0.4 + (i % 2) * 0.13, T.top + 0.018, T.z - 0.08 + Math.floor(i / 2) * 0.14));
+  for (const x of [-4.2, 4.2]) { s.add(LP.at(LP.cyl(0.04, 0.06, 2.8, '#2a2a2e', 8), x, 1.4, -4.3)); s.add(LP.at(LP.cyl(0.13, 0.1, 0.22, '#3a3a3e', 8), x, 2.86, -4.3)); }
+  const paper = RP.newspapers('CRISIS', 1); paper.position.set(-0.6, 0.0, -3.4); paper.rotation.y = 0.5; s.add(paper);
   LK.outdoor(s, 'overcast', { kind: 'cobble', noGrass: true });
   return s;
 }
@@ -65,7 +70,6 @@ export function depression() {
 export function tribune() {
   const s = WS.wStage('night', ['#141416', '#121214'], { groundSize: 120 });
   s.background = new THREE.Color('#07070a'); if (s.fog) { s.fog.color.set('#0a0a0e'); s.fog.near = 30; s.fog.far = 90; }
-  const wallTex = P.OLD ? null : null;
   const wall = new THREE.Mesh(new THREE.PlaneGeometry(60, 26), new THREE.MeshBasicMaterial({ map: (() => { const c = document.createElement('canvas'); c.width = 512; c.height = 256; const x = c.getContext('2d');
     const g = x.createRadialGradient(256, 150, 10, 256, 150, 300); g.addColorStop(0, '#7a1a14'); g.addColorStop(0.5, '#3a0c0a'); g.addColorStop(1, '#0a0606'); x.fillStyle = g; x.fillRect(0, 0, 512, 256);
     const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })(), toneMapped: false }));
@@ -73,5 +77,22 @@ export function tribune() {
   s.plinths = [-5.2, 0, 5.2].map((x, i) => { const p = LP.at(LP.box(2.6, 1.2 + (i === 1 ? 0.6 : 0), 1.8, '#1c1c20'), x, (1.2 + (i === 1 ? 0.6 : 0)) / 2, -6); s.add(p); p.top = 1.2 + (i === 1 ? 0.6 : 0); p.x = x; return p; });
   s.spots = s.plinths.map(p => { const l = new THREE.SpotLight('#ff4a30', 60, 30, 0.45, 0.6, 1.2); l.position.set(p.x, 14, -2); l.target.position.set(p.x, p.top, -6); s.add(l, l.target); l.intensity = 0; return l; });
   const fill = new THREE.PointLight('#ff6040', 8, 30, 1.2); fill.position.set(0, 6, 4); s.add(fill);
+  // visible stage beams falling on each plinth (scenes fade them in with the spots: s.beams[i].set(k))
+  const tex = (() => { const c = document.createElement('canvas'); c.width = 4; c.height = 128; const x = c.getContext('2d'), g = x.createLinearGradient(0, 0, 0, 128);
+    g.addColorStop(0, 'rgba(255,255,255,0.9)'); g.addColorStop(0.6, 'rgba(255,255,255,0.35)'); g.addColorStop(1, 'rgba(255,255,255,0.12)'); x.fillStyle = g; x.fillRect(0, 0, 4, 128);
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })();
+  s.beams = s.plinths.map(p => { const h = 11, m = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 1.7, h, 28, 1, true), new THREE.MeshBasicMaterial({ map: tex, color: '#ff9a7a', transparent: true, opacity: 0,
+      depthWrite: false, blending: THREE.AdditiveBlending, side: THREE.DoubleSide, toneMapped: false }));
+    m.position.set(p.x, p.top + h / 2, -6); m.userData.dynamic = true; s.add(m);
+    const pool = new THREE.Mesh(new THREE.CircleGeometry(1.5, 32), new THREE.MeshBasicMaterial({ color: '#ff8a6a', transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
+    pool.rotation.x = -Math.PI / 2; pool.position.set(p.x, p.top + 0.01, -6); pool.userData.dynamic = true; s.add(pool);
+    m.set = k => { m.visible = pool.visible = k > 0.01; m.material.opacity = 0.32 * k; pool.material.opacity = 0.45 * k; }; m.set(0); return m; });
+  return s;
+}
+
+// ------------------------------------------------------------ QA: the three tanks side by side on a plain ground
+export function tankRow(d = 0) {
+  const s = WS.wStage('day', ['#9a9686', '#8f8b7c'], { groundSize: 80 });
+  ['pz4', 't34', 'sherman'].forEach((k, i) => { const tk = P.tank(k); tk.position.set(-4 + i * 4, 0, 0); tk.rotation.y = 0.6; tk.drive(d); s.add(tk); });
   return s;
 }

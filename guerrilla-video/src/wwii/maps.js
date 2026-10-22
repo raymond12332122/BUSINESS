@@ -16,6 +16,7 @@ const SOV = ['rus', 'ukr', 'blr', 'tnr', 'cau', 'casia'];
 const w1938 = { ...asg(['deu', 'gpol', 'kal', 'aut'], 'X_GER'), ...asg(['ita', 'tren', 'gor', 'svnw', 'ist', 'lby'], 'X_ITA'),
   ...asg(['gbr', 'cyp', 'mlt', 'kwt', 'pal', 'jor', 'irq', 'egy'], 'A_GBR'), ...asg(['fra', 'als', 'tun', 'dza', 'mar', 'syr', 'lbn'], 'A_FRA'),
   ...asg(['ppol', 'cpol', 'apol', 'egal', 'vol', 'wblr', 'vil'], 'A_POL'), ...asg(['cze', 'svk', 'tcp'], 'TCH'), ...asg(SOV, 'SOV') };
+const w1937 = { ...w1938, aut: 'AUT' };
 const w1939 = { ...w1938, cze: 'X_GER', mem: 'X_GER', svk: 'X_AXM', tcp: 'X_AXM', alb: 'X_ITA' };
 const w1939b = { ...w1939, ...asg(['ppol', 'cpol', 'apol'], 'X_OCC'), ...asg(['egal', 'vol', 'wblr'], 'SOV') };
 const w1940 = { ...w1939b, ...asg(['nld', 'bel', 'lux', 'dnk', 'nsch', 'nor', 'fra'], 'X_OCC'), als: 'X_GER', ...asg(['est', 'lva', 'ltu', 'vil', 'mda', 'buk'], 'SOV') };
@@ -26,7 +27,7 @@ const w1944 = { ...w1942, ...asg(['fra', 'als', 'bel', 'lux', 'tun'], 'A_FRA'), 
   ...asg(['rou', 'trs', 'sdob', 'bgr'], 'SOV'), fin: 'own', grc: 'A_OTH', ita: 'A_OTH', lby: 'A_GBR' };
 const w1945 = { ...w1944, ...asg(['deu', 'gpol', 'kal', 'aut', 'als'], 'OCCALL'), als: 'A_FRA', ...asg(['ppol', 'cpol', 'apol', 'cze', 'svk', 'hun', 'srb', 'hrv', 'bih', 'svn', 'mne', 'voj'], 'SOVZ'),
   ...asg(['nld', 'dnk', 'nsch', 'nor'], 'A_OTH'), ...asg(['tren', 'gor', 'svnw', 'ist'], 'A_OTH') };
-Object.assign(EU.PERIODS, { w1938, w1939, w1939b, w1940, w1941, w1942, w1944, w1945 });
+Object.assign(EU.PERIODS, { w1937, w1938, w1939, w1939b, w1940, w1941, w1942, w1944, w1945 });
 Object.assign(EU.COL, {
   X_GER: '#4b5059', X_OCC: '#9097a0', X_ITA: '#6c7660', X_AXM: '#8e927e', OCCALL: '#a9b6c4', SOVZ: '#d99a8c',
   A_GBR: '#3f6fb5', A_FRA: '#5f8fd6', A_POL: '#7aa6e6', A_OTH: '#89aee0', TCH: '#b9b2d6', SOV: '#c0453a',
