@@ -431,3 +431,61 @@ export function plotTable(w = 3.6, d = 2.6) {
   return g;
 }
 export function rake(len = 0.7) { const g = new THREE.Group(); g.add(at(cyl(0.008, 0.008, len, '#8a6a3a', 6), 0, -len / 2, 0)); g.add(at(box(0.16, 0.02, 0.02, '#5a4a3a'), 0, -len, 0)); return dyn(g); }
+
+// ------------------------------------------------------------ the Eastern Front
+// Shell of a bombed apartment block: four walls with blown-out windows and a jagged top (alpha-cut canvas), no roof.
+export function ruinBlock(w = 8, h = 9, d = 6, col = '#b9a48a', seed = 0) {
+  const g = new THREE.Group(), r = rng(seed + 31);
+  const wall = (len, hh, sd) => {
+    const W = 256, H = Math.round(256 * hh / len), rr = rng(sd);
+    const tex = canvasTex(W, H, (x) => {
+      x.fillStyle = col; x.fillRect(0, 0, W, H);
+      for (let i = 0; i < 60; i++) { x.fillStyle = `rgba(40,30,24,${0.05 + rr() * 0.12})`; x.fillRect(rr() * W, rr() * H, 6 + rr() * 30, 4 + rr() * 20); }
+      x.globalCompositeOperation = 'destination-out';
+      const cols = Math.max(2, Math.round(len / 1.4)), rows = Math.max(2, Math.round(hh / 1.6));
+      for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) { const cx = (i + 0.5) * W / cols, cy = (j + 0.45) * H / rows, ww = W / cols * (0.42 + rr() * 0.2), hh2 = H / rows * (0.5 + rr() * 0.15);
+        x.beginPath(); x.rect(cx - ww / 2, cy - hh2 / 2, ww, hh2); if (rr() < 0.25) x.arc(cx + (rr() - 0.5) * ww, cy, ww * 0.9, 0, 7); x.fill(); }
+      x.beginPath(); x.moveTo(0, 0); let y = H * (0.05 + rr() * 0.3); for (let s = 0; s <= 24; s++) { y = Math.max(0, Math.min(H * 0.6, y + (rr() - 0.5) * H * 0.18)); x.lineTo(s / 24 * W, y); } x.lineTo(W, 0); x.closePath(); x.fill();
+      x.globalCompositeOperation = 'source-over';
+    });
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(len, hh), new THREE.MeshStandardMaterial({ map: tex, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.95 }));
+    m.castShadow = true; m.receiveShadow = true; return m;
+  };
+  for (const [len, x, z, ry] of [[w, 0, d / 2, 0], [w, 0, -d / 2, Math.PI], [d, w / 2, 0, Math.PI / 2], [d, -w / 2, 0, -Math.PI / 2]]) { const m = wall(len, h, seed * 7 + Math.round(x * 3 + z * 5)); m.position.set(x, h / 2, z); m.rotation.y = ry; g.add(m); }
+  for (let f = 1; f < 3; f++) if (r() < 0.7) { const sl = box(w * (0.4 + r() * 0.5), 0.2, d * 0.9, '#8a7a68'); sl.position.set((r() - 0.5) * w * 0.3, f * h / 3.2, 0); sl.rotation.z = (r() - 0.5) * 0.5; g.add(sl); }
+  return shadowy(g);
+}
+// Heap of rubble: broken masonry lumps and a few beams.
+export function rubble(rad = 2.4, seed = 0, col = '#8a7a68') {
+  const g = new THREE.Group(), r = rng(seed + 77);
+  for (let i = 0; i < 26; i++) { const a = r() * Math.PI * 2, d = r() * rad, s = 0.2 + r() * 0.5 * (1 - d / rad * 0.6);
+    const m = mesh(new THREE.DodecahedronGeometry(s, 0), new THREE.Color(col).offsetHSL(0, 0, (r() - 0.5) * 0.12).getStyle()); m.position.set(Math.cos(a) * d, s * 0.5, Math.sin(a) * d); m.rotation.set(r() * 3, r() * 3, r() * 3); m.scale.y = 0.6; g.add(m); }
+  for (let i = 0; i < 4; i++) { const b = box(0.12, 0.12, 1.6 + r(), '#4a3a2a'); b.position.set((r() - 0.5) * rad, 0.4, (r() - 0.5) * rad); b.rotation.set(r() - 0.5, r() * 3, 0.4); g.add(b); }
+  return shadowy(g);
+}
+// The Stalingrad grain elevator: tall concrete silos with a head house.
+export function elevator() {
+  const g = new THREE.Group(), c = '#a8a296';
+  for (let i = 0; i < 6; i++) g.add(at(cyl(1.6, 1.6, 20, c, 18), -5 + i * 3.2, 10, 0));
+  g.add(at(box(19, 20, 3, c), 0, 10, 0)); g.add(at(box(5, 9, 5, c), 9, 24.5, 0));
+  for (let i = 0; i < 8; i++) g.add(at(box(1.2, 1.6, 0.1, '#1a1816'), -8 + i * 2.2, 14 + (i % 2) * 2, 1.56));
+  return shadowy(g);
+}
+// A torn document (the pact): two halves along a jagged tear; .tear(k) pulls them apart (0 whole .. 1 apart).
+export function tornDoc(title, lines, { w = 1.6, h = 2.1 } = {}) {
+  const g = new THREE.Group(), tearX = j => 0.5 + 0.035 * Math.sin(j * 1.7) + 0.02 * Math.sin(j * 4.1);
+  const draw = (x, W, H) => { x.fillStyle = '#efe6cf'; x.fillRect(0, 0, W, H); x.fillStyle = '#2a2420'; x.textAlign = 'center';
+    x.font = '700 30px "DejaVu Serif"'; title.split('\n').forEach((t, i) => x.fillText(t, W / 2, 70 + i * 40));
+    x.font = '22px "DejaVu Serif"'; x.textAlign = 'left'; for (let i = 0; i < 14; i++) x.fillRect(46, 190 + i * 30, W - 92 - (i % 3) * 40, 3);
+    x.textAlign = 'center'; lines.forEach((t, i) => x.fillText(t, W / 2, H - 120 + i * 30));
+    x.strokeStyle = '#1a2a6a'; x.lineWidth = 3; for (const sx of [0.28, 0.72]) { x.beginPath(); x.moveTo(W * sx - 60, H - 50); x.bezierCurveTo(W * sx - 20, H - 80, W * sx + 10, H - 20, W * sx + 60, H - 55); x.stroke(); } };
+  const half = left => { const tex = canvasTex(512, 672, (x, W, H) => { draw(x, W, H); x.globalCompositeOperation = 'destination-out'; x.beginPath();
+      if (left) { x.moveTo(W, 0); for (let j = 0; j <= 30; j++) x.lineTo(tearX(j) * W, j / 30 * H); x.lineTo(W, H); }
+      else { x.moveTo(0, 0); for (let j = 0; j <= 30; j++) x.lineTo(tearX(j) * W, j / 30 * H); x.lineTo(0, H); }
+      x.closePath(); x.fill(); });
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshStandardMaterial({ map: tex, alphaTest: 0.5, side: THREE.DoubleSide, roughness: 0.9 }));
+    const piv = new THREE.Group(); piv.add(m); g.add(piv); return piv; };
+  const L = half(true), R = half(false);
+  g.tear = k => { L.position.set(-0.6 * k, -0.25 * k * k, 0.1 * k); L.rotation.set(0.2 * k, 0.5 * k, 0.35 * k); R.position.set(0.6 * k, -0.35 * k * k, 0.12 * k); R.rotation.set(-0.15 * k, -0.45 * k, -0.4 * k); };
+  g.tear(0); return dyn(g);
+}

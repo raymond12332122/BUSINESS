@@ -112,3 +112,24 @@ export function binoculars(t, seed = 0, k = 1) {
   const p = M.stand(t, seed, { amt: 0.4 });
   return withArms(p, { aL: ['head', 0.3, -0.1, 1.15], aR: ['head', -0.3, -0.1, 1.15], aWL: k, aWR: k, plL: [1, -0.8, -0.2], plR: [-1, -0.8, -0.2], hL: HAND.grip, hR: HAND.grip, head: add(p.head, [-3 * k, 0, 0]) });
 }
+// Shouldering a rifle equipped with lib/gear HOLDS (the rig's own grips place both hands): body squared to the
+// target, cheek to the stock; recoil 0..1 kicks the shoulders back. Use with an outfit that equips the rifle.
+export function aimRifle(t, seed = 0, recoil = 0, o = {}) {
+  const p = M.stand(t, seed, { amt: 0.3, ...o }), r = recoil;
+  p.gun = 'aim'; p.waist = add(p.waist, [6, -8, 0]); p.chest = add(p.chest, [4 - 5 * r, -6, 0]); p.head = [6 - 4 * r, 10, -4];
+  delete p.aL; delete p.aR; return p;
+}
+// Carrying the rifle across the chest (port arms) while moving; mix with a gait for the legs.
+export function portRifle(t, seed = 0, o = {}) { const p = M.stand(t, seed, { amt: 0.4, ...o }); p.gun = 'port'; delete p.aL; delete p.aR; return p; }
+// Arms wrapped around the body, shoulders up, trembling (the winter of 1941).
+export function shiver(t, seed = 0, k = 1, o = {}) {
+  const p = M.stand(t, seed, { amt: 0.3, ...o }), j = 0.006 * sin(t * 38 + seed) * k;
+  return withArms(p, { aL: [-0.55, 0.62 + j, 1.15], aR: [0.55, 0.58 - j, 1.2], aWL: k, aWR: k, plL: [1, -0.4, 0.2], plR: [-1, -0.4, 0.2], hL: HAND.soft, hR: HAND.soft,
+    shL: [0, 0, 10 * k], shR: [0, 0, -10 * k], head: add(p.head, [12 * k + 2 * sin(t * 31), 0, 0]), chest: add(p.chest, [6 * k, 0, 0]) });
+}
+// Pulling a sled by a rope over the shoulder: leaning forward, both hands at the right shoulder; mix with a gait.
+export function haul(t, seed = 0, k = 1) {
+  const p = M.stand(t, seed, { amt: 0.3 });
+  return withArms(p, { aR: [-0.45, 0.95, 0.4], aL: [-0.25, 0.85, 0.9], aWL: k, aWR: k, plL: [1, -0.6, 0], plR: [-1, -0.6, 0], hL: HAND.grip, hR: HAND.grip,
+    waist: add(p.waist, [16 * k, 0, 0]), chest: add(p.chest, [8 * k, 0, 0]), head: add(p.head, [-6 * k, 0, 0]) });
+}

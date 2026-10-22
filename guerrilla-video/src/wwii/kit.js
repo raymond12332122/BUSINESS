@@ -9,6 +9,7 @@ import { mesh, box, cyl, at } from '../lib/props.js';
 import { generic, sombrero } from '../mx/kit.js';
 import { uniformize } from '../napo/kit.js';
 import { hat } from '../amer/kit.js';
+import { HOLDS } from '../lib/gear.js';
 import { stahlhelm, brodie, adrian, serviceCap, kepiFR, bowler, nurseVeil, pack, PAL as W1 } from '../ww1/kit.js';
 export * from '../whatif/kit.js';
 export { hat, sombrero };
@@ -153,6 +154,8 @@ Object.assign(WK.OUTFITS, {
   frances: r => { anon(r); uni(r, 'fr40'); hat(r, adrian('#6c6a50'), HELM); backpack(r, '#5a5a48', '#6a6a58'); slungRifle(r); return r; },
   polaco: r => { anon(r); uni(r, 'pl'); hat(r, stahlhelm('#5d6048'), HELM); slungRifle(r); return r; },
   sovietico: r => { anon(r); uni(r, 'sov'); hat(r, ssh40('#4f5a3a'), HELM); slungRifle(r); return r; },
+  sovieticoArmado: r => { anon(r); uni(r, 'sov'); hat(r, ssh40('#4f5a3a'), HELM); r.equip(P.rifle('#2e3138', '#6a4a2e'), HOLDS); return r; },
+  sovieticoInviernoArmado: r => { anon(r); uni(r, 'sovWinter'); hat(r, ssh40('#e6eaec'), HELM); r.equip(P.rifle('#2e3138', '#6a4a2e'), HOLDS); return r; },
   sovieticoGorro: r => { anon(r); uni(r, 'sov'); hat(r, sideCap('#6c6b45', { mark: 'star' }), CAP); slungRifle(r); return r; },
   sovieticoInvierno: r => { anon(r); uni(r, 'sovWinter'); hat(r, ssh40('#e6eaec'), HELM); slungRifle(r); return r; },
   estadounidense: r => { anon(r); uni(r, 'od'); hat(r, m1('#59603f'), HELM); backpack(r, '#6a6440', '#5a5636'); slungRifle(r, '#2e3138', '#7a5232'); return r; },

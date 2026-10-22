@@ -292,3 +292,29 @@ export function opsRoom() {
   const clock = new THREE.Mesh(new THREE.CircleGeometry(0.3, 24), new THREE.MeshStandardMaterial({ color: '#f2ead8' })); clock.position.set(3.0, 2.85, -3.46); s.add(clock);
   return s;
 }
+
+// ------------------------------------------------------------ Stalingrad, 1942-43: a city of ruins (streets along z and x)
+export function stalingrad(light = 'overcast', { snow = false } = {}) {
+  const s = WS.wStage(light, snow ? ['#d8dde2', '#cfd5da'] : ['#6e6458', '#655c50'], { groundSize: 260 });
+  if (s.fog) { s.fog.color.set(snow ? '#c8ccd2' : '#a89c8c'); s.fog.near = 14; s.fog.far = 110; }
+  const r = LP.rng(snow ? 2601 : 2501), cols = ['#b9a48a', '#a8a090', '#c2b49a', '#9a8c7a'];
+  for (let i = 0; i < 5; i++) for (let j = 0; j < 5; j++) { if ((i === 2 && j < 4) || (j === 1 && i < 4)) continue;   // keep two streets clear
+    const b = P.ruinBlock(6 + r() * 3, 6 + r() * 6, 5 + r() * 2, cols[(i + j) % 4], i * 5 + j); b.position.set(-22 + i * 11 + (r() - 0.5) * 2, 0, 4 - j * 12 + (r() - 0.5) * 2); b.rotation.y = (r() - 0.5) * 0.2; s.add(b); }
+  for (let i = 0; i < 16; i++) { const rb = P.rubble(1.6 + r() * 1.6, i, snow ? '#9a9890' : '#857664'); rb.position.set(-26 + r() * 52, 0, 8 - r() * 56); s.add(rb); }
+  const el = P.elevator(); el.position.set(-30, 0, -70); el.rotation.y = 0.3; s.add(el);
+  const wreck = P.tank('pz4', { col: '#2e2e2c' }); wreck.scale.setScalar(0.48); wreck.position.set(4.2, -0.12, -9); wreck.rotation.set(0.06, -0.7, 0.08); wreck.turret.rotation.y = 0.9; s.add(wreck);
+  if (!snow) { for (const [x, z, k] of [[-14, -30, 1.4], [10, -44, 1.8], [-34, -52, 1.2], [22, -24, 1.0]]) { W1.smokeFrom(s, new THREE.Vector3(x, 4, z), { n: 14, color: '#3a3430', size: 3 * k, rise: 30, drift: [5, 0, -3], life: 8, opacity: 0.7 }); W1.fireAt(s, new THREE.Vector3(x, 1.5, z), { n: 10, size: 1.8 * k, rise: 2, spread: 2 }); } }
+  else { const sn = RP.snowfall(s, { area: [-14, 0, -24, 14, 12, 8], n: 1800 }); ticker(s).push(t => sn.update(t)); }
+  LK.outdoor(s, light, { kind: snow ? 'snow' : 'dirt', noGrass: true });
+  return s;
+}
+
+// ------------------------------------------------------------ winter 1941: open snowfield before Moscow, birches, a blizzard
+export function winterField(light = 'blizzard', { blizzard = true } = {}) {
+  const s = RS.rStage('snow', RS.SNOW, { seed: 2701, bumps: 0.6 });
+  if (s.fog) { s.fog.color.set('#d4dae0'); s.fog.near = blizzard ? 6 : 20; s.fog.far = blizzard ? 48 : 140; }
+  LP.scatter(s, (r, i) => LP.birch(1.3 + r() * 0.5, i), 60, [-70, -90, 70, 20], 2702, [[0, 0, 10]]);
+  const sn = RP.snowfall(s, { area: [-14, 0, -20, 14, 10, 10], n: blizzard ? 3200 : 1200, speed: blizzard ? 2.2 : 1.0, drift: blizzard ? 2.4 : 0.4 }); ticker(s).push(t => sn.update(t));
+  LK.outdoor(s, light, { kind: 'snow', noGrass: true });
+  return s;
+}
