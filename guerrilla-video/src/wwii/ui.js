@@ -69,3 +69,17 @@ export function memList(t, a, b, title, items, { x = 1300, y = 170, w = 560 } = 
     <div style="font:800 21px Inter;letter-spacing:.16em;color:#e0b84a;margin-bottom:12px">${title}</div>${items.map(([txt, tt]) => { const o = ss(tt, tt + 0.4, t);
       return `<div style="display:flex;align-items:center;gap:16px;margin:11px 0;opacity:${o};transform:translateX(${(1 - o) * 24}px)"><div style="width:12px;height:12px;border-radius:6px;background:#ffcf7a;box-shadow:0 0 14px #ffb04a;flex:none"></div><div style="font:700 31px Inter;color:#f4efe6">${txt}</div></div>`; }).join('')}</div>`;
 }
+// The human cost, as quiet bars on a dark panel: rows [label, valueText, lo, hi, cue] in millions (hi > lo draws the
+// uncertain range lighter), plus an optional pictogram row (1 in n people) — values and labels in text colours.
+export function lossChart(t, a, b, rows, picto = null, { x = 1180, y = 150, w = 640, max = 27 } = {}) {
+  const k = K(t, a, b, 0.5, 0.5); if (k <= 0) return '';
+  const bar = ([label, val, lo, hi, cue]) => { const o = ss(cue, cue + 0.5, t), wl = (w - 60) * lo / max * o, wr = (w - 60) * (hi - lo) / max * o;
+    return `<div style="margin:12px 0 18px;opacity:${0.25 + 0.75 * ss(cue - 0.2, cue + 0.2, t)}"><div style="display:flex;justify-content:space-between;font:800 26px Inter;color:#f4efe6"><span>${label}</span><span style="color:#e0b84a">${val}</span></div>
+      <div style="display:flex;height:16px;margin-top:8px"><div style="width:${wl}px;background:#c9a227;border-radius:4px 0 0 4px"></div><div style="width:${wr}px;background:rgba(201,162,39,.45);border-radius:0 4px 4px 0"></div></div></div>`; };
+  const pic = picto ? (() => { const [label, val, n, cue] = picto, o = ss(cue, cue + 0.4, t);
+    const fig = (dark) => `<svg width="34" height="54" viewBox="0 0 34 54"><circle cx="17" cy="10" r="8" fill="${dark ? '#c9a227' : 'rgba(244,239,230,.35)'}"/><rect x="7" y="20" width="20" height="32" rx="7" fill="${dark ? '#c9a227' : 'rgba(244,239,230,.35)'}"/></svg>`;
+    return `<div style="margin:12px 0 4px;opacity:${0.25 + 0.75 * o}"><div style="display:flex;justify-content:space-between;font:800 26px Inter;color:#f4efe6"><span>${label}</span><span style="color:#e0b84a">${val}</span></div>
+      <div style="display:flex;gap:10px;margin-top:10px">${Array.from({ length: n }, (_, i) => fig(i === 0 && o > 0.5)).join('')}</div></div>`; })() : '';
+  return `<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;padding:24px 30px;${PANEL};opacity:${k}">
+    <div style="font:800 20px Inter;letter-spacing:.16em;color:#e0b84a;margin-bottom:6px">MUERTOS EN LA GUERRA · MILLONES DE PERSONAS</div>${rows.map(bar).join('')}${pic}</div>`;
+}

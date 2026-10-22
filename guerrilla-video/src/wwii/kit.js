@@ -189,6 +189,7 @@ Object.assign(WK.OUTFITS, {
   ana: r => { anon(r); uni(r, 'dressB'); return r; },
   turing: r => { anon(r); uni(r, 'tweed'); return r; },
   wren: r => { anon(r); uni(r, 'wren'); return r; },
+  mp: r => { anon(r); uni(r, 'od'); hat(r, m1('#eeeeea'), HELM); return r; },   // white-helmeted military police (Nuremberg)
   ninoGueto: r => { anon(r); uni(r, pick(r, ['kid', 'coatC'])); return r; },
   duelo: r => { anon(r); uni(r, 'mourn'); return r; },
   bracero: r => { anon(r); uni(r, 'bracero'); hat(r, sombrero('palm'), { scale: 0.8, y: 0.9, tilt: -0.05 }); return r; },
@@ -224,6 +225,7 @@ const SIL = {
     arm(x, 'R', k ? [[300, 330], [372, 300], [440, 268]] : [[300, 330], [350, 420], [318, 470]], 26); arm(x, 'L', [[212, 330], [200, 400], [236, 372]], 26); x.fillRect(222, 352, 34, 26); },
   stalin: (x, k) => { body(x, { cap: 'peak', coat: true }); arm(x, 'R', [[300, 330], [330, 420], k ? [300, 400] : [296, 430]], 28); pipe(x, k ? [300, 392] : [296, 422]); arm(x, 'L', [[212, 330], [196, 440], [204, 520]], 28); },
   tojo: (x, k) => { body(x, { cap: 'peak', glasses: true }); arm(x, 'R', [[300, 330], [318, 440], [312, 540]], 26); arm(x, 'L', [[212, 330], [190, 440], k ? [214, 520] : [206, 530]], 26); sword(x); },
+  defendant: (x, k) => { body(x, { cap: 'bald', tilt: k ? 0.04 : 0 }); arm(x, 'R', [[300, 330], [320, 440], [306, 540]], 26); arm(x, 'L', [[212, 330], [192, 440], [206, 540]], 26); },   // the accused at Nuremberg (faceless)
   hirohito: (x, k) => { mic(x); body(x, { cap: 'peak', glasses: true }); arm(x, 'R', [[300, 330], [318, 440], [312, 540]], 26); arm(x, 'L', [[212, 330], [196, 440], [204, 540]], 26); },
 };
 const BLACK = '#0b0b0e';

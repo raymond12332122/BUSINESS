@@ -602,7 +602,7 @@ export function luzonField(light = 'morning') {
   LK.outdoor(s, light, { kind: 'grass', grass: { area: [-40, -60, 40, 20], n: 4000, clear: [[0, -20, 9], [-12, 0, 6]] } });
   return s;
 }
-import { flagPole } from '../whatif/flags.js';
+import { flagPole, flagTex } from '../whatif/flags.js';
 
 // ------------------------------------------------------------ 6 June 1944: the Channel and the beaches of Normandy
 // Dawn over the Channel: Higgins boats heading for the coast (+z), destroyers and transports behind, barrage balloons.
@@ -717,5 +717,65 @@ export function missouri(light = 'morning') {
   const tb = new THREE.Group(); tb.add(LP.at(LP.box(1.4, 0.05, 0.7, '#2f5a3a'), 0, 0.36, 0)); for (const [x, z] of [[-0.62, -0.3], [0.62, -0.3], [-0.62, 0.3], [0.62, 0.3]]) tb.add(LP.at(LP.box(0.05, 0.36, 0.05, '#3a2a1a'), x, 0.18, z));
   tb.add(LP.at(LP.box(0.22, 0.004, 0.3, '#f4ecd8'), -0.2, 0.39, 0)); tb.add(LP.at(LP.box(0.22, 0.004, 0.3, '#f4ecd8'), 0.2, 0.39, 0.02)); tb.position.set(0, 0, -3.2); s.add(tb); s.tableTop = 0.39;
   ticker(s).push(t => s.sea.wave(t));
+  return s;
+}
+
+// ------------------------------------------------------------ the legacy: remembrance, the UN, Nuremberg, the Cold War
+// A war cemetery (Normandy): rows of white crosses and Stars of David on a lawn, a line of trees, overcast.
+export function cemetery(light = 'overcast') {
+  const s = WS.wStage(light, ['#6e8a4e', '#668246'], { groundSize: 300 });
+  const cg = [new THREE.BoxGeometry(0.09, 0.62, 0.06).translate(0, 0.31, 0), new THREE.BoxGeometry(0.36, 0.08, 0.06).translate(0, 0.44, 0)];
+  const geo = BufferUtils.mergeGeometries(cg), mat = std('#f4f2ec', { roughness: 0.6 });
+  const pts = []; for (let row = 0; row < 14; row++) for (let i = 0; i < 26; i++) { const x = -15 + i * 1.2 + (row % 2) * 0.6, z = 2 - row * 1.5; if (Math.abs(x) < 0.7 && z > -1) continue; pts.push([x, z, (row * 26 + i) % 23 === 0]); }
+  const crosses = pts.filter(p => !p[2]), stars = pts.filter(p => p[2]);
+  const im = new THREE.InstancedMesh(geo, mat, crosses.length), M4 = new THREE.Matrix4(); crosses.forEach(([x, z], i) => { M4.makeTranslation(x, 0, z); im.setMatrixAt(i, M4); }); im.castShadow = true; im.receiveShadow = true; s.add(im);
+  const sh = new THREE.Shape(); for (let i = 0; i < 6; i++) { const a = i * Math.PI / 3 + Math.PI / 2; sh[i ? 'lineTo' : 'moveTo'](Math.cos(a) * 0.2, Math.sin(a) * 0.2); } sh.closePath();
+  const sh2 = new THREE.Shape(); for (let i = 0; i < 6; i++) { const a = i * Math.PI / 3 - Math.PI / 2; sh2[i ? 'lineTo' : 'moveTo'](Math.cos(a) * 0.2, Math.sin(a) * 0.2); } sh2.closePath();
+  stars.forEach(([x, z]) => { const g = new THREE.Group(); g.add(LP.at(LP.box(0.08, 0.36, 0.06, '#f4f2ec'), 0, 0.18, 0)); for (const shp of [sh, sh2]) { const m = new THREE.Mesh(new THREE.ExtrudeGeometry(shp, { depth: 0.06, bevelEnabled: false }), mat); m.position.set(0, 0.46, -0.03); g.add(m); } g.position.set(x, 0, z); s.add(g); });
+  LP.scatter(s, (r, i) => LP.roundTree(2.2 + r() * 0.8, '#3e5a30', i), 26, [-40, -40, 40, -26], 3601);
+  for (const x of [-20, 20]) for (let i = 0; i < 6; i++) { const t = LP.roundTree(2.0, '#4a6a3a', i + (x > 0 ? 9 : 0)); t.position.set(x, 0, 4 - i * 5); s.add(t); }
+  LK.outdoor(s, light, { kind: 'grass', grass: { area: [-18, -22, 18, 6], n: 3000 } });
+  return s;
+}
+import * as BufferUtils from 'three/addons/utils/BufferGeometryUtils.js';
+// San Francisco, June 1945: a stage with the flags of the founding nations in an arc and the UN emblem behind,
+// a table with the Charter. s.table (top y), s.flags.
+export function unHall() {
+  const s = RS.room({ w: 14, d: 10, h: 6, wall: '#2a3a5a', lower: '#1e2a40', lowerH: 1.0, floor: '#5a3a2a', ceil: '#1a2232', hemi: 0.7, sunI: 0.4,
+    lights: [[-3, 4.5, 1, 14, '#fff0d8', 12], [3, 4.5, 1, 14, '#fff0d8', 12], [0, 4.5, -3, 10, '#fff0d8', 10]], bg: '#0e1420' });
+  const em = new THREE.Mesh(new THREE.PlaneGeometry(4.2, 2.8), new THREE.MeshStandardMaterial({ map: flagTex('un', 300, 200), roughness: 0.8, emissive: '#ffffff', emissiveIntensity: 0.12 })); em.material.emissiveMap = em.material.map; em.position.set(0, 3.6, -4.95); s.add(em);
+  const codes = ['br', 'cn', 'fr', 'gb', 'mx', 'su', 'us', 'ca', 'au', 'nl', 'be', 'ph'];
+  s.flags = codes.map((c, i) => { const a = -1.15 + 2.3 * i / (codes.length - 1), f = flagPole(c, { h: 2.6, w: 1.1, gold: true }); f.position.set(Math.sin(a) * 5.2, 0, -4.2 + (1 - Math.cos(a)) * 3.4); f.rotation.y = -a * 0.5; s.add(f); return f; });
+  s.add(LP.at(LP.box(10, 0.3, 4, '#4a2e20'), 0, 0.15, -2.6));
+  const tb = new THREE.Group(); tb.add(LP.at(LP.box(1.6, 0.04, 0.6, '#2f5a3a'), 0, 0.36, 0)); tb.add(LP.at(LP.box(1.62, 0.3, 0.62, '#2f5a3a'), 0, 0.19, 0)); tb.add(LP.at(LP.box(0.22, 0.008, 0.3, '#f4ecd8'), 0.1, 0.384, 0.05)); tb.position.set(0, 0.3, -1.6); s.add(tb); s.table = 0.3 + 0.384; s.stageY = 0.3;
+  ticker(s).push(t => s.flags.forEach((f, i) => f.wave(t + i * 0.3, 0.25)));
+  return s;
+}
+// Nuremberg, 1945–46: the courtroom — the judges' bench with the four flags at the back, the dock along the left wall,
+// the white-helmeted guards. s.dock = [[x, z], ...] seats for the (silhouetted) accused.
+export function nuremberg() {
+  const s = RS.room({ w: 11, d: 9, h: 4.2, wall: '#6a7262', lower: '#4a3a2a', lowerH: 1.4, floor: '#4a3a2a', ceil: '#d8d4c4', hemi: 0.8, sunI: 0.5,
+    lights: [[0, 3.8, 0, 8, '#fff2dc', 12], [-3, 3.8, -2, 6, '#fff2dc', 9]] });
+  const bench = new THREE.Group(); bench.add(LP.at(LP.box(7, 1.1, 1.0, '#5a3a24'), 0, 0.55, 0)); bench.add(LP.at(LP.box(7.2, 0.06, 1.1, '#6a4a30'), 0, 1.13, 0)); bench.position.set(0.8, 0, -3.6); s.add(bench);
+  ['us', 'gb', 'su', 'fr'].forEach((c, i) => { const f = new THREE.Mesh(new THREE.PlaneGeometry(0.4, 0.27), new THREE.MeshStandardMaterial({ map: flagTex(c), roughness: 0.8 })); f.position.set(-1.6 + i * 1.6 + 0.8, 1.45, -3.55); s.add(f); s.add(LP.at(LP.cyl(0.01, 0.01, 0.45, '#c9a227', 4), -1.6 + i * 1.6 + 0.6, 1.36, -3.56)); });
+  s.dock = [];
+  for (let row = 0; row < 2; row++) { s.add(LP.at(LP.box(0.5, 0.2 + row * 0.25, 5.4, '#4a2e1c'), -4.6 + row * 0.6, (0.2 + row * 0.25) / 2, 0)); s.add(LP.at(LP.box(0.08, 0.7, 5.4, '#3a2416'), -3.9 + row * 0.0, 0.35, 0));
+    for (let i = 0; i < 6; i++) s.dock.push([-4.6 + row * 0.6, -2.2 + i * 0.85, 0.2 + row * 0.25]); }
+  s.add(LP.at(LP.box(0.06, 0.9, 5.4, '#3a2416'), -3.85, 0.45, 0));
+  const tables = [[1.2, -1.2], [1.2, 0.6], [2.8, 1.8]]; tables.forEach(([x, z]) => s.add(LP.at(LP.box(1.8, 0.4, 0.6, '#5a3a24'), x, 0.2, z)));
+  return s;
+}
+// A field of red poppies at golden hour around a simple stone memorial (1939 – 1945).
+export function poppyField(light = 'golden') {
+  const s = WS.wStage(light, ['#7a8a4a', '#728244'], { groundSize: 300 });
+  const pts = []; const r = LP.rng(3611); for (let i = 0; i < 2600; i++) { const x = -22 + r() * 44, z = 8 - r() * 40; if (Math.hypot(x, z + 3) < 2.2) continue; pts.push([x, z, 0.8 + r() * 0.5]); }
+  const head = new THREE.InstancedMesh(new THREE.SphereGeometry(0.06, 8, 4), std('#c8201e', { roughness: 0.7 }), pts.length), stem = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.006, 0.006, 0.3, 4).translate(0, 0.15, 0), std('#4a6a2a'), pts.length);
+  const M4 = new THREE.Matrix4(), Q = new THREE.Quaternion(), Sv = new THREE.Vector3();
+  pts.forEach(([x, z, k], i) => { M4.compose(new THREE.Vector3(x, 0.3 * k, z), Q, Sv.set(k, 0.55 * k, k)); head.setMatrixAt(i, M4); M4.compose(new THREE.Vector3(x, 0, z), Q, Sv.set(1, k, 1)); stem.setMatrixAt(i, M4); });
+  s.add(head, stem);
+  const mem = new THREE.Group(); mem.add(LP.at(LP.box(1.6, 0.3, 1.6, '#c8c0b0'), 0, 0.15, 0)); mem.add(LP.at(LP.box(0.7, 2.6, 0.7, '#d8d2c4'), 0, 1.6, 0)); mem.add(LP.at(LP.box(0.9, 0.2, 0.9, '#c8c0b0'), 0, 2.95, 0));
+  const tx = canvasTex(256, 128, (x, W, H) => { x.fillStyle = '#d8d2c4'; x.fillRect(0, 0, W, H); x.fillStyle = '#4a4438'; x.font = '900 46px "DejaVu Sans"'; x.textAlign = 'center'; x.fillText('1939', W / 2, 52); x.fillText('1945', W / 2, 108); });
+  const plq = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 0.3), new THREE.MeshStandardMaterial({ map: tx, roughness: 0.9 })); plq.position.set(0, 1.4, 0.36); mem.add(plq); mem.position.set(0, 0, -3); s.add(mem); s.memorial = mem;
+  LK.outdoor(s, light, { kind: 'grass', grass: { area: [-14, -20, 14, 8], n: 3500 } });
   return s;
 }
