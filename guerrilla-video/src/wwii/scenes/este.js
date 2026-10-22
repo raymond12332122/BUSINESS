@@ -56,15 +56,15 @@ export function build(ctx) {
     inf.forEach((r, i) => { const D = (t - tA2) * 0.32; r.root.position.set(r.x0, 0, r.z0 + D); K.act(r, A.march(D / r.unit, 0, 1, 1.4), t, { mouth: 'neutral' }); });
     stk.forEach((p, i) => { p.position.set(-30 + (t - tA2) * 14 + i * 6, 16 + i * 2, -26 - i * 5); p.rotation.set(0, Math.PI / 2, 0); p.spin(t); });
     Pl.tick?.(t);
-    return U.film(t) + U.popCard(t, tInv - 0.15, tB + 0.25, 'OPERACIÓN BARBARROJA', 'La mayor invasión de la historia', 'del mar Báltico al mar Negro', { x: 1440, y: 140, w: 480, accent: '#b8342f' })
-      + U.bigNumber(t, tTre - 0.2, tB + 0.25, '3 millones', 'DE SOLDADOS ALEMANES', { y: 860, size: 96, count: 0, band: true });
+    return U.film(t) + U.popCard(t, tInv - 0.15, tTre - 0.2, 'OPERACIÓN BARBARROJA', 'La mayor invasión de la historia', 'del mar Báltico al mar Negro', { x: 1440, y: 140, w: 480, accent: '#b8342f' })
+      + U.bigNumber(t, tTre - 0.2, tB + 0.25, '3 millones', 'DE SOLDADOS ALEMANES', { y: 200, size: 96, count: 0, band: true });
   };
 
   // ================================================================ B: the siege of Leningrad — water from the Neva on sleds, the bread queue
   const Ln = RS.petroStreet('snowDusk', { snowing: true, bakery: false, lit: 0.15 });
   const sg = RP.signBoard('ХЛЕБ', { w: 2.0, h: 0.6, bg: '#5a2a1e', fg: '#f3e2b0' }); sg.position.set(-6.94, 2.4, -5.0); sg.rotation.y = Math.PI / 2; Ln.add(sg);
   const queue = Array.from({ length: 5 }, (_, i) => { const r = K.person(Ln, CAST[(i + 3) % 10], i % 2 ? 'civilMujer' : 'refugiado', -5.9 + (i % 2) * 0.08, -4.6 + i * 0.62, Math.PI + (i % 2 ? 0.1 : -0.1), { shadow: false }); return r; });
-  const haulers = [[0.6, -9, 0], [-1.6, -12, 1]].map(([x, z, i]) => { const r = K.person(Ln, ['daiwa', 'spe'][i], i ? 'nino' : 'civilMujer', x, z, 0); const s_ = sled(); Ln.add(s_); const rp = rope(); Ln.add(rp); return { r, s: s_, rp, x, z, i }; });
+  const haulers = [[0.5, -1.2, 0], [-1.5, -2.8, 1]].map(([x, z, i]) => { const r = K.person(Ln, ['daiwa', 'spe'][i], i ? 'nino' : 'civilMujer', x, z, 0); const s_ = sled(); Ln.add(s_); const rp = rope(); Ln.add(rp); return { r, s: s_, rp, x, z, i }; });
   const actB = t => {
     queue.forEach((r, i) => K.act(r, A.dejected(t, i + 2, 1), t, { mouth: 'neutral' }));
     haulers.forEach(h => {
@@ -92,8 +92,8 @@ export function build(ctx) {
 
   // ================================================================ C2: the Soviet counter-attack in the snow
   const Ws = S.winterField('snow', { blizzard: false });
-  const skiers = Array.from({ length: 7 }, (_, i) => { const r = K.person(Ws, CAST[(i + 5) % 10], 'sovieticoInviernoArmado', -3 + i * 1.0 + (i % 2) * 0.2, -7 - (i % 3) * 1.2, Math.PI * 0, { shadow: false }); r.x0 = r.root.position.x; r.z0 = r.root.position.z; return r; });
-  const t34s = [[-4.2, -12], [4.0, -13.5]].map(([x, z]) => { const tk = P.tank('t34'); tk.scale.setScalar(0.48); tk.position.set(x, 0, z); Ws.add(tk); tk.z0 = z; return tk; });
+  const skiers = Array.from({ length: 7 }, (_, i) => { const r = K.person(Ws, CAST[(i + 5) % 10], 'sovieticoInviernoArmado', -3 + i * 1.0 + (i % 2) * 0.2, -4.2 - (i % 3) * 1.0, Math.PI * 0, { shadow: false }); r.x0 = r.root.position.x; r.z0 = r.root.position.z; return r; });
+  const t34s = [[-4.4, -8.5], [4.2, -9.5]].map(([x, z]) => { const tk = P.tank('t34'); tk.scale.setScalar(0.48); tk.position.set(x, 0, z); Ws.add(tk); tk.z0 = z; return tk; });
   const actC2 = t => {
     skiers.forEach((r, i) => { const D = (t - tC2 + 0.5) * 0.55, z = r.z0 + D; r.root.position.set(r.x0, 0, z);
       K.act(r, M.mix(A.portRifle(t, i), M.gait(D / r.unit, { run: 0.6, amp: 1, seed: i }), 0.7), t, { mouth: i % 2 ? 'open' : 'neutral' }); });
@@ -105,9 +105,11 @@ export function build(ctx) {
   // ================================================================ D: Stalingrad — the city fought for house by house
   const Sg = S.stalingrad('overcast');
   const runners = Array.from({ length: 4 }, (_, i) => { const r = K.person(Sg, CAST[(i + 2) % 10], 'sovieticoArmado', -5 - i * 0.9, -3.2 - (i % 2) * 0.6, Math.PI / 2, { shadow: false }); r.x0 = r.root.position.x; r.z0 = r.root.position.z; return r; });
-  const cover = P.rubble(1.0, 9); cover.position.set(1.6, 0, -1.2); Sg.add(cover);
-  const shooter = K.person(Sg, 'tamamo', 'sovieticoArmado', 1.6, -0.55, Math.PI + 0.35);
-  const mate = K.person(Sg, 'daiwa', 'sovieticoArmado', 2.25, -0.3, Math.PI - 0.2);
+  // the remains of a wall to fight from
+  const wall = new THREE.Group(); [[-0.9, 0.42], [-0.3, 0.5], [0.3, 0.38], [0.9, 0.46]].forEach(([x, h]) => { const b = new THREE.Mesh(new THREE.BoxGeometry(0.62, h, 0.26), std('#9a8a74', { roughness: 0.95 })); b.position.set(x, h / 2, 0); b.rotation.z = (x * 7 % 2 - 1) * 0.04; b.castShadow = true; b.receiveShadow = true; wall.add(b); });
+  wall.position.set(0, 0, -0.95); Sg.add(wall); const rb = P.rubble(0.7, 9); rb.position.set(1.5, 0, -1.3); Sg.add(rb);
+  const shooter = K.person(Sg, 'tamamo', 'sovieticoArmado', 0.15, -0.5, Math.PI);
+  const mate = K.person(Sg, 'daiwa', 'sovieticoArmado', -0.6, -0.4, Math.PI - 0.3);
   const flash = P.glow('#ffd27a', 0.5, 0); Sg.add(flash);
   const actD = (t, close) => {
     runners.forEach((r, i) => { const tr = M.travel(t, tD + 0.2 + i * 0.35, 9 / r.unit, 1.2, 0.5); r.root.position.set(r.x0 + tr.D * r.unit, 0, r.z0);
@@ -124,7 +126,7 @@ export function build(ctx) {
 
   // ================================================================ E: February 1943 — the 6th Army walks into captivity
   const Sw = S.stalingrad('snow', { snow: true });
-  const pows = Array.from({ length: 9 }, (_, i) => { const r = K.person(Sw, CAST[(i + 1) % 10], 'alemanGorro', -0.4 + (i % 2) * 0.55, -12 + i * 1.05, 0, { shadow: false }); r.z0 = r.root.position.z; r.x0 = r.root.position.x; return r; });
+  const pows = Array.from({ length: 9 }, (_, i) => { const r = K.person(Sw, CAST[(i + 1) % 10], 'alemanGorro', -0.4 + (i % 2) * 0.55, -9 + i * 1.05, 0, { shadow: false }); r.z0 = r.root.position.z; r.x0 = r.root.position.x; return r; });
   const guard = K.person(Sw, 'suzuka', 'sovieticoInviernoArmado', 1.9, -2.2, -Math.PI / 2 + 0.4);
   const actE = t => {
     pows.forEach((r, i) => { const D = (t - tE + 2) * 0.24, z = r.z0 + D; r.root.position.set(r.x0, 0, z);
@@ -163,13 +165,13 @@ export function build(ctx) {
   ];
   const shots = [
     { t0: 0, set: Tr, p0: [0, 2.6, 1.6], l0: [0, 2.55, -1.6], p1: [0, 2.6, 0.9], l1: [0, 2.6, -1.6], fov0: 40, act: actA1 },
-    { t0: tA2, set: Pl, p0: [9, 0.75, 1.0], l0: [-2, 1.0, -9], p1: [8.2, 0.7, 0.4], l1: [-2, 1.0, -8], fov0: 46, act: actA2 },
-    { t0: tB, set: Ln, p0: [1.4, 0.95, 4.6], l0: [-1.4, 0.95, -8], p1: [1.2, 0.9, 3.9], l1: [-1.4, 0.95, -8], fov0: 44, act: actB },
+    { t0: tA2, set: Pl, p0: [7.0, 0.75, 1.2], l0: [-2, 1.0, -9], p1: [6.4, 0.7, 0.6], l1: [-2, 1.0, -8], fov0: 46, act: actA2 },
+    { t0: tB, set: Ln, p0: [1.0, 0.95, 4.2], l0: [-2.6, 0.9, -8], p1: [0.8, 0.9, 3.5], l1: [-2.6, 0.9, -8], fov0: 46, act: actB },
     { t0: tC, set: Wb, p0: [2.2, 0.85, 2.0], l0: [-0.5, 0.6, -2.4], p1: [1.95, 0.82, 1.7], l1: [-0.5, 0.6, -2.4], fov0: 44, act: actC },
     { t0: tC2, set: Ws, p0: [1.6, 0.5, 3.4], l0: [0, 0.9, -10], p1: [1.4, 0.48, 2.9], l1: [0, 0.9, -10], fov0: 46, act: actC2 },
-    { t0: tD, set: Sg, p0: [7.5, 3.4, 8.5], l0: [-2, 0.8, -8], p1: [6.6, 3.0, 7.4], l1: [-2, 0.8, -8], fov0: 46, act: t => actD(t, false) },
-    { t0: tD2, set: Sg, p0: [3.3, 0.72, 1.3], l0: [1.6, 0.5, -1.2], p1: [3.1, 0.7, 1.0], l1: [1.6, 0.5, -1.2], fov0: 42, act: t => actD(t, true) },
-    { t0: tE, set: Sw, p0: [3.6, 1.15, 4.2], l0: [-0.4, 0.55, -6], p1: [3.2, 1.1, 3.6], l1: [-0.4, 0.55, -6], fov0: 44, act: actE },
+    { t0: tD, set: Sg, p0: [0.6, 4.4, 9.5], l0: [-1.5, 0.6, -8], p1: [0.4, 3.9, 8.2], l1: [-1.5, 0.6, -8], fov0: 48, act: t => actD(t, false) },
+    { t0: tD2, set: Sg, p0: [1.55, 0.78, -2.6], l0: [-0.15, 0.55, -0.45], p1: [1.4, 0.76, -2.4], l1: [-0.15, 0.55, -0.45], fov0: 42, act: t => actD(t, true) },
+    { t0: tE, set: Sw, p0: [2.7, 0.95, 3.6], l0: [-0.3, 0.55, -5], p1: [2.4, 0.92, 3.1], l1: [-0.3, 0.55, -5], fov0: 44, act: actE },
     { t0: tF, set: Mf, p0: [fx, 26, fz + 13], l0: [fx, 0, fz], p1: [fx - 3, 28, fz + 14], l1: [fx - 3, 0, fz], fov0: 40, act: actF },
   ];
   const inst = { scene: Tr, scenes: [Tr, Pl, Ln, Wb, Ws, Sg, Sw, Mf], sfx };

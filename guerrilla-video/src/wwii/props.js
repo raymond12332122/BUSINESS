@@ -441,7 +441,7 @@ export function ruinBlock(w = 8, h = 9, d = 6, col = '#b9a48a', seed = 0) {
     const tex = canvasTex(W, H, (x) => {
       x.fillStyle = col; x.fillRect(0, 0, W, H);
       for (let i = 0; i < 60; i++) { x.fillStyle = `rgba(40,30,24,${0.05 + rr() * 0.12})`; x.fillRect(rr() * W, rr() * H, 6 + rr() * 30, 4 + rr() * 20); }
-      x.globalCompositeOperation = 'destination-out';
+      x.globalCompositeOperation = 'destination-out'; x.fillStyle = 'rgba(0,0,0,1)';
       const cols = Math.max(2, Math.round(len / 1.4)), rows = Math.max(2, Math.round(hh / 1.6));
       for (let i = 0; i < cols; i++) for (let j = 0; j < rows; j++) { const cx = (i + 0.5) * W / cols, cy = (j + 0.45) * H / rows, ww = W / cols * (0.42 + rr() * 0.2), hh2 = H / rows * (0.5 + rr() * 0.15);
         x.beginPath(); x.rect(cx - ww / 2, cy - hh2 / 2, ww, hh2); if (rr() < 0.25) x.arc(cx + (rr() - 0.5) * ww, cy, ww * 0.9, 0, 7); x.fill(); }
