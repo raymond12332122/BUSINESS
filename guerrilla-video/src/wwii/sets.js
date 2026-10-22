@@ -345,11 +345,11 @@ export function pacificSea(light = 'day') {
 }
 
 // ------------------------------------------------------------ an island beach under assault (Tarawa, Iwo Jima…): shore along x
-export function islandBeach(light = 'day') {
+export function islandBeach(light = 'day', { palms = true } = {}) {
   const s = NS2.napoStage(light, [null, null], { seed: 2821, groundA: null, fog: ['#e2e6e2', 60, 260] });
   NS2.sea(s, { color: '#3a8aa0', y: 0, size: 500 });
   const sand = new THREE.Mesh(new THREE.BoxGeometry(200, 1.0, 60), std('#e0d0a0', { roughness: 1 })); sand.position.set(0, -0.164, 30); sand.rotation.x = -0.012; s.add(sand);   // waterline at z = 2
-  LP.scatter(s, (r, i) => LP.palm(1.4 + r() * 0.8, i), 34, [-40, 6, 40, 34], 2822, [[2, 6, 7]]);
+  if (palms) LP.scatter(s, (r, i) => LP.palm(1.4 + r() * 0.8, i), 34, [-40, 6, 40, 34], 2822, [[2, 6, 7]]);
   for (const [x, z, k] of [[-12, 20, 1.4], [8, 26, 1.8], [22, 18, 1.1]]) W1.smokeFrom(s, new THREE.Vector3(x, 2, z), { n: 12, color: '#4a4440', size: 2.4 * k, rise: 24, drift: [4, 0, -3], life: 7, opacity: 0.7 });
   for (let i = 0; i < 3; i++) { const d = P.destroyer(); d.position.set(-40 + i * 34, 0, -70 - i * 10); d.rotation.y = Math.PI / 2; s.add(d); }
   return s;
@@ -369,5 +369,45 @@ export function greatWallSet(light = 'golden') {
   const near = P.greatWall([[-9, -1.2], [-3, -1.6], [3, -1.4], [9, -1.0]], () => 0); s.add(near); s.walkY = 2.0;
   LP.scatter(s, (r, i) => LP.pine(1.4 + r() * 0.6, '#3e5a30', i), 40, [-90, -110, 90, -30], 2831);
   LK.outdoor(s, light, { kind: 'grass', grass: { area: [-14, 0, 14, 10], n: 3000 } });
+  return s;
+}
+
+// ------------------------------------------------------------ North Africa: the desert at El Alamein (dunes, scrub, an escarpment)
+export function desert(light = 'golden') {
+  const s = WS.wStage(light, ['#d8c08a', '#ccb47e'], { groundSize: 300, bumps: 0.4 });
+  const r = LP.rng(2901);
+  for (let i = 0; i < 26; i++) { const d = new THREE.Mesh(new THREE.SphereGeometry(5 + r() * 6, 18, 8, 0, Math.PI * 2, 0, Math.PI / 2), std('#d4bc86', { roughness: 1 })); d.scale.set(1.6, 0.18 + r() * 0.12, 1); d.position.set(-90 + r() * 180, 0, -20 - r() * 90); d.rotation.y = r() * 3; s.add(d); }
+  s.add(MX.sierra({ x0: -220, x1: 220, z: -130, depth: 50, height: 9, seed: 2902, base: '#b89a6a', top: '#d0b282' }));
+  for (let i = 0; i < 40; i++) s.add(LP.at(LP.bush(0.35 + r() * 0.3, '#7a7a4a', i), -30 + r() * 60, 0, 6 - r() * 50));
+  const wreck = P.tank('pz4', { col: '#5a4e3a' }); wreck.scale.setScalar(0.48); wreck.position.set(-9, -0.1, -16); wreck.rotation.set(0.05, 0.8, -0.06); wreck.turret.rotation.y = -1.1; s.add(wreck);
+  W1.smokeFrom(s, new THREE.Vector3(-9, 1.2, -16), { n: 10, color: '#2a2624', size: 1.4, rise: 14, drift: [3, 0, -2], life: 5, opacity: 0.7 });
+  LK.outdoor(s, light, { kind: 'dirt', noGrass: true });
+  return s;
+}
+
+// ------------------------------------------------------------ Sicily, July 1943: a beach below a white hill town (shore along x, sea at -z)
+export function sicily(light = 'day') {
+  const s = islandBeach(light, { palms: false });
+  LP.scatter(s, (r, i) => LP.roundTree(0.9 + r() * 0.4, '#7a8a5a', i), 26, [-40, 8, 40, 30], 2912, [[2, 6, 7]]);   // olive groves
+  const hill = new THREE.Mesh(new THREE.SphereGeometry(30, 28, 12, 0, Math.PI * 2, 0, Math.PI / 2), std('#a89a68', { roughness: 1 })); hill.scale.set(1.6, 0.42, 0.8); hill.position.set(6, 0, 52); s.add(hill);
+  const r = LP.rng(2911);
+  for (let i = 0; i < 24; i++) { const a = r() * Math.PI, d = 8 + r() * 14, x = 6 + Math.cos(a) * d * 1.4, z = 40 + Math.sin(a) * d * 0.5, y = 9.5 * Math.sqrt(Math.max(0, 1 - ((x - 6) / 48) ** 2 - ((z - 52) / 24) ** 2));
+    const h = LP.house(2.2 + r(), 2, 1.6 + r(), ['#f2ece0', '#ece2cc', '#f6f0e4'][i % 3], '#c46a44'); h.position.set(x, y, z); h.rotation.y = r() * 0.6; s.add(h); }
+  const ch = new THREE.Group(); ch.add(LP.at(LP.box(3, 3, 5, '#f2ece0'), 0, 1.5, 0)); ch.add(LP.at(LP.box(1.4, 6, 1.4, '#f2ece0'), 1.6, 3, 2)); ch.add(LP.at(new THREE.Mesh(new THREE.SphereGeometry(1.2, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), std('#c46a44')), 0, 3, 0));
+  ch.position.set(6, 12, 52); s.add(ch);
+  return s;
+}
+
+// ------------------------------------------------------------ the Apennines in winter (Monte Castello, 1945): a snowy slope rising to -z
+export function apennines(light = 'snow') {
+  const s = RS.rStage('snow', RS.SNOW, { seed: 2921, bumps: 0.8 });
+  const sl = new THREE.PlaneGeometry(120, 80, 60, 40); sl.rotateX(-Math.PI / 2); const sp = sl.attributes.position;
+  for (let i = 0; i < sp.count; i++) { const z = sp.getZ(i) - 40, x = sp.getX(i); sp.setY(i, Math.max(0, -z - 4) * 0.22 + 0.6 * Math.sin(x * 0.2) * Math.min(1, Math.max(0, (-z - 4) / 6))); }
+  sl.computeVertexNormals(); const slope = new THREE.Mesh(sl, std('#e8eef2', { roughness: 0.95 })); slope.position.z = -40; slope.receiveShadow = true; s.add(slope);   // heights were computed at z - 40
+  s.slopeY = (x, z) => Math.max(0, -z - 4) * 0.22 + 0.6 * Math.sin(x * 0.2) * Math.min(1, Math.max(0, (-z - 4) / 6));
+  s.add(MX.sierra({ x0: -200, x1: 200, z: -120, depth: 60, height: 34, seed: 2922, base: '#8a8f9a', top: '#f4f6f8' }));
+  { const r = LP.rng(2923); for (let i = 0; i < 120; i++) { const x = -50 + r() * 100, z = 34 - r() * 94; if (Math.abs(x) < 4.5 && z > -15 && z < 5) continue; const t = LP.pine(1.3 + r() * 0.6, '#2e4a34', i); t.position.set(x, s.slopeY(x, z) - 0.1, z); s.add(t); } }
+  const sn = RP.snowfall(s, { area: [-14, 0, -20, 14, 10, 10], n: 1200 }); ticker(s).push(t => sn.update(t));
+  LK.outdoor(s, light, { kind: 'snow', noGrass: true });
   return s;
 }

@@ -133,3 +133,8 @@ export function haul(t, seed = 0, k = 1) {
   return withArms(p, { aR: [-0.45, 0.95, 0.4], aL: [-0.25, 0.85, 0.9], aWL: k, aWR: k, plL: [1, -0.6, 0], plR: [-1, -0.6, 0], hL: HAND.grip, hR: HAND.grip,
     waist: add(p.waist, [16 * k, 0, 0]), chest: add(p.chest, [8 * k, 0, 0]), head: add(p.head, [-6 * k, 0, 0]) });
 }
+// Hands over the ears (the guns are firing).
+export function coverEars(t, seed = 0, k = 1) {
+  const p = M.stand(t, seed, { amt: 0.4 });
+  return withArms(p, { aL: ['head', 1.05, -0.35, 0.1], aR: ['head', -1.05, -0.35, 0.1], aWL: k, aWR: k, plL: [1, -0.5, 0.3], plR: [-1, -0.5, 0.3], hL: HAND.flat, hR: HAND.flat, head: add(p.head, [8 * k, 0, 0]) });
+}

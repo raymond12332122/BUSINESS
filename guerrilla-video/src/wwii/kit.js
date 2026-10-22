@@ -158,6 +158,8 @@ Object.assign(WK.OUTFITS, {
   chino: r => { anon(r); uni(r, 'roc'); hat(r, adrian('#4a5458'), HELM); slungRifle(r); return r; },
   chinoArmado: r => { anon(r); uni(r, 'roc'); hat(r, adrian('#4a5458'), HELM); r.equip(P.rifle('#2e3138', '#6a4a2e'), HOLDS); return r; },
   marineArmado: r => { anon(r); uni(r, 'od'); hat(r, m1('#4f5a38'), HELM); r.equip(P.rifle('#2e3138', '#7a5232'), HOLDS); return r; },
+  brasilenoArmado: r => { anon(r); uni(r, 'brasil'); hat(r, m1('#5d6044'), HELM); r.equip(P.rifle('#2e3138', '#7a5232'), HOLDS); return r; },
+  desiertoArmado: r => { anon(r); uni(r, 'desert'); hat(r, brodie('#8a7a52'), { scale: 0.9, y: 0.88, tilt: -0.02, cap: true }); r.equip(P.rifle('#2e3138', '#7a5232'), HOLDS); return r; },
   sovieticoArmado: r => { anon(r); uni(r, 'sov'); hat(r, ssh40('#4f5a3a'), HELM); r.equip(P.rifle('#2e3138', '#6a4a2e'), HOLDS); return r; },
   sovieticoInviernoArmado: r => { anon(r); uni(r, 'sovWinter'); hat(r, ssh40('#e6eaec'), HELM); r.equip(P.rifle('#2e3138', '#6a4a2e'), HOLDS); return r; },
   sovieticoGorro: r => { anon(r); uni(r, 'sov'); hat(r, sideCap('#6c6b45', { mark: 'star' }), CAP); slungRifle(r); return r; },
@@ -214,6 +216,8 @@ export function stand_in(set, key, x = 0, z = 0, yaw = 0) {
 const SIL = {
   hitler: (x, k) => { podium(x); body(x, { cap: 'peak' }); arm(x, 'R', k ? [[300, 330], [372, 268], [384, 196]] : [[300, 330], [372, 330], [388, 286]], 26); fist(x, k ? [384, 188] : [390, 280]); arm(x, 'L', [[212, 330], [170, 420], [196, 470]], 26); },
   mussolini: (x, k) => { rail(x); body(x, { cap: 'bald', tilt: k ? -0.12 : -0.05 }); arm(x, 'R', [[300, 330], [352, 410], [300, 470]], 28); arm(x, 'L', [[212, 330], [160, 410], [212, 470]], 28); },
+  rommel: (x, k) => { body(x, { cap: 'peak' }); x.fillStyle = BLACK; x.fillRect(214, 192, 84, 16); for (const sx of [236, 276]) { x.beginPath(); x.arc(sx, 200, 13, 0, 7); x.fill(); }   // goggles on the cap
+    arm(x, 'R', k ? [[300, 330], [372, 300], [440, 268]] : [[300, 330], [350, 420], [318, 470]], 26); arm(x, 'L', [[212, 330], [200, 400], [236, 372]], 26); x.fillRect(222, 352, 34, 26); },
   stalin: (x, k) => { body(x, { cap: 'peak', coat: true }); arm(x, 'R', [[300, 330], [330, 420], k ? [300, 400] : [296, 430]], 28); pipe(x, k ? [300, 392] : [296, 422]); arm(x, 'L', [[212, 330], [196, 440], [204, 520]], 28); },
   tojo: (x, k) => { body(x, { cap: 'peak', glasses: true }); arm(x, 'R', [[300, 330], [318, 440], [312, 540]], 26); arm(x, 'L', [[212, 330], [190, 440], k ? [214, 520] : [206, 530]], 26); sword(x); },
   hirohito: (x, k) => { mic(x); body(x, { cap: 'peak', glasses: true }); arm(x, 'R', [[300, 330], [318, 440], [312, 540]], 26); arm(x, 'L', [[212, 330], [196, 440], [204, 540]], 26); },

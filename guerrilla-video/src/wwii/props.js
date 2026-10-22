@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import { mesh, box, cyl, at, rng } from '../lib/props.js';
 import { canvasTex } from '../whatif/kit.js';
 import * as OLD from '../ww2/kit.js';
+import { puffTex } from '../mx/props.js';
 export { OLD };
 const std = (color, o = {}) => new THREE.MeshStandardMaterial({ color, roughness: 0.8, ...o });
 const dyn = g => { g.userData.dynamic = true; return g; };
@@ -20,6 +21,21 @@ const glowTex = (() => { let t = null; return () => t || (t = canvasTex(128, 128
 export function glow(color = '#ff7a2a', size = 10, opacity = 0.7) {
   const m = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex(), color, transparent: true, opacity, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false }));
   m.scale.setScalar(size); m.userData.dynamic = true; return m;
+}
+// Muzzle blast: white-hot core, orange halo and a few smoke puffs blown forward (+z) and up. .set(u), u = seconds since the shot.
+export function muzzleBlast({ size = 1, smoke = '#cfc4b0' } = {}) {
+  const g = new THREE.Group(), core = glow('#fff4d6', 1, 0), halo = glow('#ff9a3a', 1, 0); g.add(halo, core);
+  const puffs = [0, 1, 2, 3].map(i => { const m = new THREE.Sprite(new THREE.SpriteMaterial({ map: puffTex(), color: smoke, transparent: true, depthWrite: false, opacity: 0 })); m.material.rotation = i * 2.4; m.userData.dynamic = true; g.add(m); return m; });
+  g.set = u => {
+    const kf = u >= 0 && u < 0.12 ? 1 - u / 0.12 : 0;
+    core.material.opacity = kf; core.scale.setScalar(size * (0.5 + 1.2 * kf));
+    halo.material.opacity = 0.55 * kf; halo.scale.setScalar(size * (1.2 + 2.8 * kf));
+    puffs.forEach((m, i) => { const k = u >= 0 ? Math.min(1, u / (1.2 + 0.25 * i)) : 1, e = 1 - (1 - k) * (1 - k);
+      m.position.set((i - 1.5) * 0.18 * size * e, (0.1 + 0.35 * i) * size * e, (0.3 + 0.45 * i) * size * e);
+      m.scale.setScalar(size * (0.35 + (1.1 + 0.3 * i) * e)); m.material.opacity = 0.7 * (1 - k) * Math.min(1, u * 25); });
+    return kf;
+  };
+  g.set(9); g.userData.dynamic = true; return g;
 }
 // Searchlight: a drum on a mount and a long soft beam; .aim(yaw, pitch) points it (radians, pitch up from the horizon).
 export function searchlight({ len = 80, r1 = 4.2, color = '#d8e6ff', opacity = 0.42 } = {}) {
@@ -526,4 +542,19 @@ export function greatWall(pts, hAt = () => 0, col = '#b8a888') {
   }
   g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
   return g;
+}
+// British 25-pounder field gun: shield, barrel on a cradle, two wheels, trail; .fire(k) recoils the barrel.
+export function fieldGun(col = '#8a7c58') {
+  const g = new THREE.Group(), m = metal(col), dark = metal('#2a2a26');
+  const cradle = new THREE.Group(); cradle.position.set(0, 0.62, 0); cradle.rotation.x = -0.18; g.add(cradle);
+  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.065, 1.5, 12), m); barrel.rotation.x = Math.PI / 2; barrel.position.z = 0.6; cradle.add(barrel);
+  cradle.add(at(new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.14, 12), dark), 0, 0, 1.38, Math.PI / 2, 0, 0));
+  cradle.add(at(new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.2, 0.7), m), 0, -0.05, 0.05));
+  g.add(at(new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.62, 0.05), m), 0, 0.6, 0.35, -0.12, 0, 0));
+  for (const sx of [-1, 1]) { const w = new THREE.Mesh(new THREE.CylinderGeometry(0.33, 0.33, 0.12, 18), dark); w.rotation.z = Math.PI / 2; w.position.set(sx * 0.52, 0.33, 0.12); g.add(w); }
+  g.add(at(new THREE.Mesh(new THREE.BoxGeometry(0.18, 0.12, 1.5), m), 0, 0.22, -0.7, 0.18, 0, 0));
+  g.fire = k => { barrel.position.z = 0.6 - 0.18 * k; };
+  g.muzzle = new THREE.Object3D(); g.muzzle.position.set(0, 0, 1.46); cradle.add(g.muzzle);
+  g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  return dyn(g);
 }
