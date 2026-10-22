@@ -41,6 +41,21 @@ const DRAW = {
   mc: (x, W, H) => htri(x, W, H, ['#ce1126', '#ffffff']),
   un: (x, W, H) => { x.fillStyle = '#5b92e5'; x.fillRect(0, 0, W, H); x.strokeStyle = '#ffffff'; x.lineWidth = H * 0.02; for (const r of [0.08, 0.16, 0.24]) { x.beginPath(); x.arc(W / 2, H * 0.47, H * r, 0, 7); x.stroke(); }
     x.beginPath(); x.moveTo(W / 2 - H * 0.24, H * 0.47); x.lineTo(W / 2 + H * 0.24, H * 0.47); x.moveTo(W / 2, H * 0.23); x.lineTo(W / 2, H * 0.71); x.stroke(); },
+  // Second World War video
+  gb: (x, W, H) => { x.fillStyle = '#012169'; x.fillRect(0, 0, W, H); const d = Math.hypot(W, H);
+    const diag = (w, c) => { x.strokeStyle = c; x.lineWidth = w; x.beginPath(); x.moveTo(0, 0); x.lineTo(W, H); x.moveTo(W, 0); x.lineTo(0, H); x.stroke(); };
+    diag(H * 0.2, '#ffffff'); diag(H * 0.07, '#c8102e'); x.fillStyle = '#ffffff'; x.fillRect(W / 2 - H * 0.17, 0, H * 0.34, H); x.fillRect(0, H / 2 - H * 0.17, W, H * 0.34);
+    x.fillStyle = '#c8102e'; x.fillRect(W / 2 - H * 0.1, 0, H * 0.2, H); x.fillRect(0, H / 2 - H * 0.1, W, H * 0.2); },
+  su: (x, W, H) => { x.fillStyle = '#cc0000'; x.fillRect(0, 0, W, H); x.fillStyle = '#ffd700'; x.strokeStyle = '#ffd700';
+    star(x, W * 0.16, H * 0.14, H * 0.06, 5, 0.4); x.lineWidth = H * 0.035; x.beginPath(); x.arc(W * 0.155, H * 0.33, H * 0.1, -0.2, Math.PI * 1.15); x.stroke();
+    x.beginPath(); x.moveTo(W * 0.1, H * 0.42); x.lineTo(W * 0.21, H * 0.27); x.stroke(); x.fillRect(W * 0.185, H * 0.23, H * 0.07, H * 0.04); },
+  pl: (x, W, H) => htri(x, W, H, ['#ffffff', '#dc143c']),
+  cn: (x, W, H) => { x.fillStyle = '#fe0000'; x.fillRect(0, 0, W, H); x.fillStyle = '#000095'; x.fillRect(0, 0, W / 2, H / 2); x.fillStyle = '#ffffff';
+    star(x, W / 4, H / 4, H * 0.16, 12, 0.55); x.fillStyle = '#000095'; x.beginPath(); x.arc(W / 4, H / 4, H * 0.085, 0, 7); x.fill(); x.fillStyle = '#ffffff'; x.beginPath(); x.arc(W / 4, H / 4, H * 0.07, 0, 7); x.fill(); },
+  nl: (x, W, H) => htri(x, W, H, ['#ae1c28', '#ffffff', '#21468b']),
+  be: (x, W, H) => vtri(x, W, H, ['#000000', '#fdda24', '#ef3340']),
+  ph: (x, W, H) => { htri(x, W, H, ['#0038a8', '#ce1126']); x.fillStyle = '#ffffff'; x.beginPath(); x.moveTo(0, 0); x.lineTo(W * 0.43, H / 2); x.lineTo(0, H); x.closePath(); x.fill();
+    x.fillStyle = '#fcd116'; x.beginPath(); x.arc(W * 0.15, H / 2, H * 0.09, 0, 7); x.fill(); },
 };
 export const FLAG_CODES = Object.keys(DRAW);
 const cache = new Map();

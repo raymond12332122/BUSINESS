@@ -1,0 +1,30 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style></head><body>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+// Set viewer for QA across videos: window.show('mod:fn:arg1:arg2', [px,py,pz], [lx,ly,lz], fov, extras)
+// mod = ww1 | rusia | napo | whatif | narco | mx | amer | wwii. extras: 'probe' adds two WWII chibis; 't=1.5' ticks the set.
+import * as THREE from 'three';
+import * as C from '../lib/chars.js';
+import * as K from './kit.js';
+import * as A from '../whatif/anim.js';
+const MODS = { ww1: '../ww1/sets.js', rusia: '../rusia/sets.js', napo: '../napo/sets.js', whatif: '../whatif/sets.js', narco: '../narco/sets.js', mx: '../mx/sets.js', amer: '../amer/sets.js', wwii: './sets.js' };
+try {
+  const W = 1280, H = 720;
+  const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); r.setSize(W, H); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(r.domElement);
+  await C.loadCast();
+  const cache = {}, cam = new THREE.PerspectiveCamera(38, W / H, 0.1, 900);
+  window.show = async (name, p, l, fov = 38, extras = 'probe') => {
+    const key = name + '|' + extras;
+    if (!cache[key]) {
+      const [mod, fn, ...args] = name.split(':'), S = await import(MODS[mod]);
+      const Ar = args.map(a => (a === 'true' ? true : a === 'false' ? false : isNaN(+a) ? a : +a));
+      const s = S[fn](...Ar);
+      if (extras.includes('probe')) { const a = K.person(s, 'doto', 'britanico', -0.7, 0, 0), b = K.person(s, 'oguri', 'aleman', 0.7, 0, 0); K.act(a, A.stand(0.3, 1), 0.3, {}); K.act(b, A.stand(0.3, 2), 0.3, {}); }
+      cache[key] = s;
+    }
+    const s = cache[key], m = /t=([\d.]+)/.exec(extras); if (m && s.tick) s.tick(+m[1]);
+    cam.fov = fov; cam.position.set(...p); cam.lookAt(...l); cam.updateProjectionMatrix(); r.render(s, cam);
+  };
+  window.__ready = true;
+} catch (e) { window.__error = String(e.stack || e); window.__ready = true; }
+</script></body></html>

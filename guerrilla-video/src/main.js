@@ -18,7 +18,7 @@ async function boot() {
   const ui = document.getElementById('ui'), fade = document.getElementById('fade');
   // Finishing pass (post-processing, animated grass/clouds) for videos that ship one.
   let post = null, look = null;
-  if ((VIDEO === 'amer' || VIDEO === 'whatif') && QP.get('post') !== '0') { look = await import('./amer/look.js'); post = look.makePost(renderer, W, H); }
+  if ((VIDEO === 'amer' || VIDEO === 'whatif' || VIDEO === 'wwii') && QP.get('post') !== '0') { look = await import('./amer/look.js'); post = look.makePost(renderer, W, H); }
 
   const TL = await (await fetch(LANG === 'en' ? `${BASE}/timeline.json` : `${BASE}/${LANG}/timeline.json`)).json();
   await C.loadCast();
