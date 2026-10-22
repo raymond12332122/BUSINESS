@@ -640,3 +640,128 @@ export function annexView() {
     for (const [cx, cy, r] of [[66, 96, 58], [30, 120, 40], [104, 112, 44], [70, 52, 42]]) { const gr = x.createRadialGradient(cx - 10, cy - 12, 4, cx, cy, r); gr.addColorStop(0, '#7a9a5a'); gr.addColorStop(1, '#3e5a32'); x.fillStyle = gr; x.beginPath(); x.arc(cx, cy, r, 0, 7); x.fill(); }
   });
 }
+
+// ------------------------------------------------------------ the home front, the Night Witches, the codebreakers, the science
+const redStar = (s = 0.4) => decal(s, s, (x, W) => { x.fillStyle = '#c8302a'; x.strokeStyle = '#f2f0ea'; x.lineWidth = W * 0.05; x.beginPath();
+  for (let i = 0; i < 10; i++) { const r = i % 2 ? W * 0.19 : W * 0.46, a = -Math.PI / 2 + i * Math.PI / 5; x.lineTo(W / 2 + r * Math.cos(a), W / 2 + r * Math.sin(a)); } x.closePath(); x.stroke(); x.fill(); });
+// The Polikarpov Po-2 biplane of the Night Witches, at chibi scale (two open cockpits a seated chibi fits: front at z = 0.42,
+// rear at z = -0.38, seat height 0 = the fuselage axis). Nose toward +z. .spin(t, rpm), .bombs (two small bombs under the wings).
+export function biplane({ col = '#4a5a3a', under = '#9fb0b8' } = {}) {
+  const g = new THREE.Group(), C = metal(col, { roughness: 0.8, metalness: 0.05 }), Un = metal(under, { roughness: 0.8, metalness: 0.05 }), dark = metal('#1c1c1c'), wood = metal('#8a6a40', { roughness: 0.6 });
+  const prof = [[-2.1, 0.0], [-2.1, 0.05], [-1.3, 0.18], [-0.4, 0.29], [0.6, 0.31], [1.4, 0.3], [1.85, 0.27], [1.95, 0.0]];
+  const lat = new THREE.LatheGeometry(prof.map(([z, r]) => new THREE.Vector2(r, z)), 18); lat.rotateX(Math.PI / 2); lat.scale(1, 1.15, 1);
+  g.add(mesh(lat, C));
+  for (const z of [0.42, -0.38]) { const rim = new THREE.Mesh(new THREE.TorusGeometry(0.2, 0.025, 6, 20), dark); rim.rotation.x = Math.PI / 2; rim.scale.set(1, 1.25, 1); rim.position.set(0, 0.33, z); g.add(rim); }
+  g.add(at(new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.16, 0.02), new THREE.MeshStandardMaterial({ color: '#cfe0e8', transparent: true, opacity: 0.45, roughness: 0.1 })), 0, 0.42, 0.66, -0.4, 0, 0));   // little windscreen
+  const wing = (span, chord, y, z) => { const w = new THREE.Group(); w.position.set(0, y, z);
+    const top = new THREE.Mesh(new THREE.BoxGeometry(span, 0.05, chord), [C, C, C, Un, C, C]); w.add(top);
+    for (const sx of [-1, 1]) w.add(at(new THREE.Mesh(new THREE.CylinderGeometry(chord / 2, chord / 2, 0.05, 14, 1, false, 0, Math.PI), [C, C, Un]), sx * span / 2, 0, 0, 0, 0, 0));
+    w.children.slice(1).forEach((m, i) => { m.rotation.set(0, i ? 0 : Math.PI, 0); });
+    return w; };
+  const up = wing(5.4, 0.68, 0.86, 1.12), lo = wing(4.9, 0.62, -0.3, 1.02); g.add(up, lo);
+  for (const sx of [-1, 1]) {
+    for (const dz of [-0.24, 0.24]) g.add(at(cyl(0.018, 0.018, 1.16, '#3a3a34', 6), sx * 1.75, 0.28, 1.08 + dz));                 // interplane struts
+    g.add(at(cyl(0.016, 0.016, 0.62, '#3a3a34', 6), sx * 0.24, 0.58, 1.2, 0, 0, -sx * 0.25));                                     // cabane struts
+    const wh = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, 0.08, 16), dark); wh.rotation.z = Math.PI / 2; wh.position.set(sx * 0.42, -0.62, 1.3); g.add(wh);
+    g.add(at(cyl(0.015, 0.015, 0.5, '#2a2a28', 5), sx * 0.3, -0.42, 1.3, 0, 0, sx * 0.55));
+    const st = redStar(0.36); st.position.set(sx * 0.215, 0.05, -1.25); st.rotation.y = sx * Math.PI / 2; st.rotation.x = 0; g.add(st);
+  }
+  g.add(at(box(1.7, 0.03, 0.42, col), 0, 0.06, -1.88)); const fin = new THREE.Shape(); fin.moveTo(0, 0); fin.lineTo(0.5, 0); fin.lineTo(0.22, 0.56); fin.lineTo(0, 0.56); fin.closePath();
+  const fm = new THREE.Mesh(new THREE.ExtrudeGeometry(fin, { depth: 0.03, bevelEnabled: false }), C); fm.rotation.y = -Math.PI / 2; fm.position.set(0.015, 0.06, -2.15); g.add(fm);
+  const rs = redStar(0.3); rs.position.set(0.035, 0.3, -1.98); rs.rotation.y = Math.PI / 2; g.add(rs); const rs2 = redStar(0.3); rs2.position.set(-0.035, 0.3, -1.98); rs2.rotation.y = -Math.PI / 2; g.add(rs2);
+  const eng = new THREE.Group(); eng.position.z = 1.92; g.add(eng); eng.add(at(cyl(0.12, 0.12, 0.12, '#2a2a2a', 14), 0, 0, 0, Math.PI / 2, 0, 0));
+  for (let i = 0; i < 5; i++) { const a = i * Math.PI * 2 / 5, c = at(cyl(0.05, 0.05, 0.2, '#3a3a3a', 8), Math.sin(a) * 0.17, Math.cos(a) * 0.17, 0, 0, 0, -a); eng.add(c); }
+  const hub = new THREE.Group(); hub.position.z = 2.05; g.add(hub); hub.add(at(cyl(0.05, 0.05, 0.08, '#2a2a2a', 10), 0, 0, 0, Math.PI / 2, 0, 0));
+  for (const sx of [-1, 1]) hub.add(at(box(0.07, 0.68, 0.025, '#6a4a2a'), 0, sx * 0.36, 0, 0, sx * 0.3, 0));
+  hub.add(at(new THREE.Mesh(new THREE.CircleGeometry(0.72, 24), new THREE.MeshBasicMaterial({ color: '#b8b0a0', transparent: true, opacity: 0, depthWrite: false })), 0, 0, 0.02)); const disc = hub.children[hub.children.length - 1];
+  g.bombs = [-0.75, 0.75].map(x => { const b = new THREE.Group(); b.add(at(cyl(0.05, 0.05, 0.3, '#3a3a36', 10), 0, 0, 0, Math.PI / 2, 0, 0)); b.add(at(new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 6), dark), 0, 0, 0.15));
+    b.add(at(box(0.14, 0.012, 0.06, '#2a2a28'), 0, 0, -0.17)); b.add(at(box(0.012, 0.14, 0.06, '#2a2a28'), 0, 0, -0.17)); b.position.set(x, -0.4, 1.0); b.home = b.position.clone(); g.add(b); return b; });
+  g.spin = (t, rpm = 24) => { hub.rotation.z = t * rpm; disc.material.opacity = rpm > 10 ? 0.16 : 0; };
+  g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  return dyn(g);
+}
+// The Turing–Welchman "bombe": a tall cabinet with three banks of twelve coloured drums that turn. Front at +z. .spin(t).
+export function bombe() {
+  const g = new THREE.Group(), W = 1.45, H = 1.38, D = 0.48;
+  g.add(at(box(W, H, D, '#2c2c2e'), 0, H / 2 + 0.06, 0)); g.add(at(box(W + 0.06, 0.06, D + 0.06, '#1a1a1c'), 0, 0.03, 0));
+  g.add(at(box(W - 0.06, 0.18, 0.02, '#4a4a4c'), 0, H - 0.05, D / 2 + 0.01));
+  const cols = ['#d8d4c8', '#b8342f', '#2f6a9a', '#2f7a4a', '#c9a227', '#8a5aa8'];
+  g.drums = [];
+  for (let row = 0; row < 3; row++) for (let i = 0; i < 12; i++) {
+    const d = new THREE.Group(); d.position.set(-W / 2 + 0.1 + i * (W - 0.2) / 11, 0.34 + row * 0.33, D / 2 + 0.03); g.add(d);
+    d.add(at(new THREE.Mesh(new THREE.CylinderGeometry(0.052, 0.052, 0.05, 18), std(cols[(i + row * 2) % 6], { roughness: 0.45 })), 0, 0, 0, Math.PI / 2, 0, 0));
+    d.add(at(new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.056, 10), std('#1a1a1a')), 0, 0, 0, Math.PI / 2, 0, 0));
+    d.add(at(box(0.012, 0.03, 0.006, '#f4f0e6'), 0, 0.034, 0.028)); d.rate = [3.2, 1.1, 0.4][row] * (1 + (i % 3) * 0.07); g.drums.push(d);
+  }
+  for (const sx of [-1, 1]) g.add(at(box(0.04, H - 0.1, D - 0.04, '#3a3a3c'), sx * (W / 2 + 0.01), H / 2 + 0.06, 0));
+  g.spin = t => g.drums.forEach((d, i) => { d.rotation.z = -t * d.rate + i; });
+  g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  return dyn(g);
+}
+// An Enigma machine with the lid open (front at +z): keyboard, lampboard, three rotors, plugboard. .lamp(i) lights lamp i (-1 = none).
+export function enigma() {
+  const g = new THREE.Group(), W = 0.26, D = 0.22;
+  g.add(at(box(W, 0.08, D, '#4a3424'), 0, 0.04, 0)); g.add(at(box(W - 0.01, 0.004, D - 0.01, '#1a1a1a'), 0, 0.081, 0));
+  g.add(at(box(W, 0.12, 0.012, '#4a3424'), 0, 0.14, -D / 2 - 0.004));                                                       // the open lid
+  const keyM = std('#ece6d6', { roughness: 0.5 }), lampOff = new THREE.MeshStandardMaterial({ color: '#c8c2b0', roughness: 0.3 });
+  const rows = [9, 8, 9];
+  rows.forEach((n, r) => { for (let i = 0; i < n; i++) { const x = (i - (n - 1) / 2) * 0.024; g.add(at(new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.008, 10), keyM), x, 0.088, 0.075 - r * 0.022)); } });
+  g.lamps = [];
+  rows.forEach((n, r) => { for (let i = 0; i < n; i++) { const x = (i - (n - 1) / 2) * 0.024, m = new THREE.Mesh(new THREE.SphereGeometry(0.008, 10, 6), lampOff.clone()); m.position.set(x, 0.084, 0.0 - r * 0.022); g.add(m); g.lamps.push(m); } });
+  for (let i = 0; i < 3; i++) { const w = new THREE.Mesh(new THREE.CylinderGeometry(0.024, 0.024, 0.016, 16), std('#6a6a64', { metalness: 0.4 })); w.rotation.z = Math.PI / 2; w.position.set(-0.03 + i * 0.03, 0.095, -0.08); g.add(w); }
+  g.add(at(box(W - 0.02, 0.05, 0.004, '#141414'), 0, 0.035, D / 2 + 0.002));
+  for (let i = 0; i < 13; i++) for (const y of [0.025, 0.045]) g.add(at(new THREE.Mesh(new THREE.CircleGeometry(0.0035, 8), new THREE.MeshBasicMaterial({ color: '#c9a227' })), -0.11 + i * 0.0183, y, D / 2 + 0.005));
+  let on = -1;
+  g.lamp = i => { if (i === on) return; if (on >= 0) { g.lamps[on].material.emissive.set('#000000'); g.lamps[on].material.color.set('#c8c2b0'); } on = i;
+    if (i >= 0) { g.lamps[i].material.emissive.set('#ffd060'); g.lamps[i].material.emissiveIntensity = 2.2; g.lamps[i].material.color.set('#fff2c0'); } };
+  return dyn(g);
+}
+// Colossus (1944): racks of glowing valves and the "bedstead" that ran the paper tape over its wheels. Front at +z. .spin(t).
+export function colossus() {
+  const g = new THREE.Group();
+  const vt = canvasTex(128, 256, (x, W, H) => { x.fillStyle = '#4a4e52'; x.fillRect(0, 0, W, H); for (let j = 0; j < 16; j++) for (let i = 0; i < 8; i++) { const gr = x.createRadialGradient(8 + i * 16, 8 + j * 16, 1, 8 + i * 16, 8 + j * 16, 6);
+    gr.addColorStop(0, (i * 3 + j) % 5 ? '#ffcf7a' : '#ff9a40'); gr.addColorStop(1, 'rgba(60,40,20,0.2)'); x.fillStyle = gr; x.beginPath(); x.arc(8 + i * 16, 8 + j * 16, 6, 0, 7); x.fill(); } });
+  for (const sx of [-1, 1]) { const r = mesh(new THREE.BoxGeometry(0.8, 1.32, 0.32), [metal('#5a5e62'), metal('#5a5e62'), metal('#5a5e62'), metal('#5a5e62'), new THREE.MeshStandardMaterial({ map: vt, emissive: '#ffffff', emissiveMap: vt, emissiveIntensity: 0.55, roughness: 0.6 }), metal('#5a5e62')]);
+    r.position.set(sx * 0.43, 0.66, -0.2); g.add(r); }
+  const bed = new THREE.Group(); bed.position.set(0, 0, 0.35); g.add(bed);
+  for (const sx of [-1, 1]) { bed.add(at(box(0.04, 0.72, 0.04, '#2a2a2c'), sx * 0.45, 0.36, 0)); }
+  bed.add(at(box(0.94, 0.04, 0.04, '#2a2a2c'), 0, 0.72, 0)); bed.add(at(box(0.94, 0.04, 0.04, '#2a2a2c'), 0, 0.3, 0));
+  g.wheels = [-0.36, -0.12, 0.12, 0.36].map((x, i) => { const w = new THREE.Group(); w.position.set(x, i % 2 ? 0.62 : 0.4, 0.03); bed.add(w);
+    w.add(at(new THREE.Mesh(new THREE.CylinderGeometry(0.08, 0.08, 0.02, 16), metal('#8a8e92', { metalness: 0.5 })), 0, 0, 0, Math.PI / 2, 0, 0)); w.add(at(box(0.15, 0.012, 0.024, '#3a3a3c'), 0, 0, 0.012)); return w; });
+  const tp = []; for (const [x, y] of [[-0.44, 0.4], [-0.36, 0.48], [-0.12, 0.7], [0.12, 0.48], [0.36, 0.7], [0.44, 0.62], [0.36, 0.32], [-0.36, 0.32], [-0.44, 0.4]]) tp.push(new THREE.Vector3(x, y, 0.045));
+  bed.add(new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(tp, true), 60, 0.006, 3, true), new THREE.MeshStandardMaterial({ color: '#f4f0e2', roughness: 0.8 })));
+  g.spin = t => g.wheels.forEach((w, i) => { w.rotation.z = -t * (6 + i); });
+  return dyn(g);
+}
+// A V-2 rocket as a museum model (black-and-white test paint, four fins). Stands on its fins at y = 0.
+export function v2(h = 1.6) {
+  const g = new THREE.Group(), k = h / 14;
+  const prof = [[0, 0.0], [0, 0.62], [1.2, 0.82], [5.6, 0.84], [8.6, 0.8], [11.4, 0.5], [13.2, 0.18], [14, 0.0]].map(([y, r]) => new THREE.Vector2(r * k, y * k));
+  const tex = canvasTex(128, 128, (x, W, H) => { x.fillStyle = '#f2f0ea'; x.fillRect(0, 0, W, H); x.fillStyle = '#141414'; x.fillRect(0, H * 0.25, W / 4, H * 0.25); x.fillRect(W / 2, H * 0.25, W / 4, H * 0.25); x.fillRect(W / 4, H * 0.5, W / 4, H * 0.15); x.fillRect(W * 0.75, H * 0.5, W / 4, H * 0.15); });
+  g.add(mesh(new THREE.LatheGeometry(prof, 24), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.5 })));
+  const fin = new THREE.Shape(); fin.moveTo(0, 0); fin.lineTo(1.9 * k, 0); fin.lineTo(1.2 * k, 3.6 * k); fin.lineTo(0, 4.6 * k); fin.closePath();
+  for (let i = 0; i < 4; i++) { const f = new THREE.Mesh(new THREE.ExtrudeGeometry(fin, { depth: 0.12 * k, bevelEnabled: false }), std(i % 2 ? '#141414' : '#f2f0ea')); const a = i * Math.PI / 2 + Math.PI / 4; f.position.set(Math.cos(a) * 0.55 * k, 0, Math.sin(a) * 0.55 * k); f.rotation.y = -a; g.add(f); }
+  return g;
+}
+// Penicillin: a culture flask and a Petri dish with the green mould (Fleming's plate).
+export function penicillin() {
+  const g = new THREE.Group(), glass = new THREE.MeshStandardMaterial({ color: '#d8ece8', transparent: true, opacity: 0.45, roughness: 0.08, metalness: 0.1, depthWrite: false });
+  const fl = [[0, 0.0], [0.16, 0.0], [0.17, 0.02], [0.17, 0.12], [0.06, 0.32], [0.05, 0.42], [0.06, 0.44]].map(([r, y]) => new THREE.Vector2(r, y));
+  g.add(at(new THREE.Mesh(new THREE.LatheGeometry(fl, 24), glass), -0.12, 0, 0));
+  g.add(at(new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.16, 0.08, 24), new THREE.MeshStandardMaterial({ color: '#e8c860', transparent: true, opacity: 0.8, roughness: 0.3 })), -0.12, 0.045, 0));
+  const mold = canvasTex(64, 64, (x, W) => { x.fillStyle = '#e6e2c8'; x.fillRect(0, 0, W, W); for (const [cx, cy, r] of [[30, 28, 12], [44, 40, 6], [20, 44, 5], [40, 18, 4]]) { const gr = x.createRadialGradient(cx, cy, 1, cx, cy, r); gr.addColorStop(0, '#f4f2e0'); gr.addColorStop(0.5, '#4a8a4a'); gr.addColorStop(1, 'rgba(74,138,74,0.2)'); x.fillStyle = gr; x.beginPath(); x.arc(cx, cy, r, 0, 7); x.fill(); } });
+  g.add(at(new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 0.02, 28), new THREE.MeshStandardMaterial({ map: mold, roughness: 0.6 })), 0.16, 0.01, 0.06));
+  g.add(at(new THREE.Mesh(new THREE.CylinderGeometry(0.15, 0.15, 0.03, 28, 1, true), glass), 0.16, 0.016, 0.06));
+  return g;
+}
+// A radar dish on a turning pedestal (museum model): .head turns about y; the bowl looks toward +z, tilted up.
+export function radarDish(r = 0.42) {
+  const g = new THREE.Group(), m = metal('#c8ccd0', { metalness: 0.5, roughness: 0.35, side: THREE.DoubleSide });
+  g.add(at(cyl(0.14, 0.18, 0.12, '#4a4e52', 16), 0, 0.06, 0)); g.add(at(cyl(0.035, 0.035, 0.46, '#6a6e72', 8), 0, 0.35, 0));
+  const head = new THREE.Group(); head.position.y = 0.6; g.add(head); g.head = head;
+  const tilt = new THREE.Group(); tilt.rotation.x = -0.45; head.add(tilt);
+  const dish = new THREE.Mesh(new THREE.SphereGeometry(r, 28, 10, 0, Math.PI * 2, 0, 0.8), m); dish.rotation.x = -Math.PI / 2; dish.position.z = r * 0.62; tilt.add(dish);
+  tilt.add(at(cyl(0.012, 0.012, r * 0.9, '#3a3e42', 6), 0, 0, r * 0.12, Math.PI / 2, 0, 0)); tilt.add(at(box(0.05, 0.05, 0.07, '#2a2e32'), 0, 0, r * 0.56));
+  tilt.add(at(box(0.16, 0.1, 0.12, '#4a4e52'), 0, 0, -0.04));
+  return dyn(g);
+}

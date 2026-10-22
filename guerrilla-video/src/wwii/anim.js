@@ -138,3 +138,11 @@ export function coverEars(t, seed = 0, k = 1) {
   const p = M.stand(t, seed, { amt: 0.4 });
   return withArms(p, { aL: ['head', 1.05, -0.35, 0.1], aR: ['head', -1.05, -0.35, 0.1], aWL: k, aWR: k, plL: [1, -0.5, 0.3], plR: [-1, -0.5, 0.3], hL: HAND.flat, hR: HAND.flat, head: add(p.head, [8 * k, 0, 0]) });
 }
+// "We can do it!": the right upper arm out to the side and the forearm bent straight up (fist), chin up; e = 0..1
+// (FK on the right arm, like the wave: an IK target on one arm alone would reset the other).
+export function flex(t, seed = 0, e = 1, o = {}) {
+  const p = M.stand(t, seed, { amt: 0.4, wide: 1.3, ...o });
+  const q = withArms({ ...p }, { armR: [-8, 18, 6], elbR: [0, 26, -105], hR: HAND.fist,
+    head: add(p.head, [-6, -8, 4]), chest: add(p.chest, [-4, -6, 0]) });
+  return e >= 1 ? q : M.mix(p, q, e);
+}

@@ -481,3 +481,69 @@ export function annex() {
   s.P = [0.3, desk.top, -0.95];
   return s;
 }
+
+// ------------------------------------------------------------ the home front, the Night Witches, Bletchley Park, the science
+// An aircraft plant (1943): a long hall, two lines of fighters on low jigs nose toward +z, skylights, hanging lamps.
+// s.planes[line][i]; the near plane of the left line is at (-3.2, 0.85, -2.5); the aisle is x = 0.
+export function aircraftPlant() {
+  const s = RS.room({ w: 26, d: 76, h: 10, wall: '#b4b0a4', lower: '#6a6e72', lowerH: 1.6, floor: '#8c8a84', ceil: '#5e6064', hemi: 1.0, sunI: 0.7,
+    lights: [[0, 8, 0, 30, '#fff2dc', 40], [0, 8, -20, 30, '#fff2dc', 40]], bg: '#2a2c30' });
+  s.fog = new THREE.Fog('#a8a8a4', 30, 80);
+  for (let i = 0; i < 12; i++) { const z = 30 - i * 6.2; s.add(LP.at(LP.box(26, 0.35, 0.3, '#3a3e44'), 0, 9.2, z)); s.add(LP.at(LP.box(0.2, 1.2, 0.2, '#3a3e44'), 0, 8.5, z));
+    const lamp = new THREE.Group(); lamp.add(LP.at(LP.cyl(0.02, 0.02, 2.6, '#2a2a2a', 4), 0, 7.6, 0)); lamp.add(LP.at(new THREE.Mesh(new THREE.ConeGeometry(0.55, 0.4, 16, 1, true), new THREE.MeshStandardMaterial({ color: '#2f5a3a', side: THREE.DoubleSide })), 0, 6.2, 0));
+    const gl = P.glow('#fff0c8', 2.2, 0.55); gl.position.y = 6.0; lamp.add(gl); for (const x of [-5.5, 5.5]) { const l = lamp.clone(); l.position.set(x, 0, z); s.add(l); } }
+  for (let i = 0; i < 6; i++) { const sk = new THREE.Mesh(new THREE.PlaneGeometry(6, 4), new THREE.MeshBasicMaterial({ color: '#eef4f8' })); sk.rotation.x = Math.PI / 2; sk.position.set(-6 + (i % 2) * 12, 9.95, 24 - Math.floor(i / 2) * 20); s.add(sk); }
+  for (const x of [-1.8, 1.8]) s.add(LP.at(LP.box(0.12, 0.012, 70, '#d8b830'), x, 0.006, -4));
+  s.planes = [-3.2, 3.2].map((x, li) => Array.from({ length: 5 }, (_, i) => { const p = P.aircraft('p47', { col: li ? '#8a8e88' : '#59603f' }); p.position.set(x, 0.85, -2.5 - i * 7.5); s.add(p);
+    for (const dz of [-1.0, 1.4]) s.add(LP.at(LP.box(0.5, 0.42, 0.3, '#c9a227'), x, 0.21, p.position.z + dz)); return p; }));
+  s.add(LP.at(LP.box(1.4, 0.75, 0.7, '#5a5e62'), 2.0, 0.375, 4.2)); s.add(LP.at(LP.box(1.2, 0.04, 0.6, '#9a9e9e'), 2.0, 0.77, 4.2));   // a workbench
+  return s;
+}
+// Night over the front (1943): a dark plain far below with a few fires, searchlights, the moon and stars. Flying height ALT = 26.
+export function nightFront() {
+  const s = WS.wStage('nightCity', ['#1a1e1a', '#161a16'], { groundSize: 400 });
+  if (s.fog) { s.fog.color.set('#0e1424'); s.fog.near = 30; s.fog.far = 170; }
+  P.stars(s, 900, 320, 9);
+  const moon = new THREE.Mesh(new THREE.CircleGeometry(5, 32), new THREE.MeshBasicMaterial({ color: '#f4f0dc', fog: false, toneMapped: false })); moon.position.set(-70, 70, -160); moon.lookAt(0, 26, 0); s.add(moon);
+  const mg = P.glow('#c8d4ff', 40, 0.35); mg.position.copy(moon.position); mg.material.fog = false; s.add(mg);
+  s.fires = [[-30, -40], [10, -60], [40, -30], [-60, -80], [25, -95], [-8, -25]].map(([x, z], i) => { W1.fireAt(s, new THREE.Vector3(x, 0.5, z), { n: 8, size: 3, rise: 3, spread: 3, ph: i }); const g = P.glow('#ff7a2a', 18, 0.5); g.position.set(x, 2, z); s.add(g); return g; });
+  s.lights = [[-20, -50, 0.4], [30, -70, 2.1], [0, -110, 3.3]].map(([x, z, ph]) => { const l = P.searchlight({ len: 140, r1: 5 }); l.position.set(x, 0, z); s.add(l); l.ph = ph; return l; });
+  ticker(s).push(t => s.lights.forEach(l => l.aim(0.6 * Math.sin(t * 0.21 + l.ph), 0.9 + 0.2 * Math.sin(t * 0.27 + l.ph))));
+  s.ALT = 26;
+  return s;
+}
+// Bletchley Park, Hut 11A (1943): cream-painted wooden walls, the bombe against the back wall, a table with an Enigma machine and
+// message sheets, blackout curtains. s.bombe, s.table (top y), s.enigma.
+export function bletchley() {
+  const s = RS.room({ w: 7.4, d: 6.4, h: 2.7, wall: '#d4ccb2', lower: '#5e5444', lowerH: 0.7, floor: '#6a5a48', ceil: '#e4dcc8', hemi: 0.75, sunI: 0.4,
+    lights: [[-1.2, 2.3, -0.6, 3.5, '#ffe6bc', 7], [1.6, 2.3, 0.6, 3.0, '#ffe6bc', 7]] });
+  const bm = P.bombe(); bm.position.set(-1.2, 0, -2.85); s.add(bm); s.bombe = bm;
+  const tb = RP.desk(1.6, 0.8, '#5a4030'); tb.position.set(1.4, 0, -0.9); s.add(tb); s.table = tb.top;
+  const en = P.enigma(); en.position.set(1.2, tb.top, -0.98); en.rotation.y = Math.PI; s.add(en); s.enigma = en;   // its keyboard toward the far side of the table
+  for (let i = 0; i < 5; i++) { const sh = LP.at(LP.box(0.1, 0.002, 0.14, '#f2ecd8'), 1.6 + (i % 3) * 0.12, tb.top + 0.002 + i * 0.002, -0.95 + (i % 2) * 0.1); sh.rotation.y = (i * 0.37) % 0.6 - 0.3; s.add(sh); }
+  for (const x of [-3.0, 2.2]) { s.add(LP.at(LP.box(1.1, 1.1, 0.04, '#1a1a20'), x, 1.6, -3.17)); for (const dx of [-0.62, 0.62]) s.add(LP.at(LP.box(0.24, 1.5, 0.06, '#2a3a5a'), x + dx, 1.5, -3.12)); }
+  for (const [x, z] of [[-1.2, -1.8], [1.4, -0.9]]) { const l = new THREE.Group(); l.add(LP.at(LP.cyl(0.006, 0.006, 0.7, '#2a2a2a', 4), 0, 2.35, 0)); l.add(LP.at(new THREE.Mesh(new THREE.ConeGeometry(0.22, 0.14, 16, 1, true), new THREE.MeshStandardMaterial({ color: '#2f5a3a', side: THREE.DoubleSide, emissive: '#2f5a3a', emissiveIntensity: 0.3 })), 0, 1.98, 0));
+    const g = P.glow('#fff0c8', 0.6, 0.6); g.position.y = 1.92; l.add(g); l.position.set(x, 0, z); s.add(l); }
+  const cork = LP.at(LP.box(1.4, 0.8, 0.03, '#a8865a'), 2.0, 1.45, -3.17); s.add(cork);
+  for (let i = 0; i < 9; i++) s.add(LP.at(LP.box(0.16, 0.2, 0.005, ['#f2ecd8', '#e8e0c8', '#f6f0e0'][i % 3]), 1.5 + (i % 4) * 0.3, 1.25 + Math.floor(i / 4) * 0.25, -3.15));
+  return s;
+}
+// The science the war sped up, as a museum: four plinths in a row along x under spotlights (radar, penicillin, rockets, computers).
+// s.items[i], s.spots[i] (intensity set by the scene), s.X[i] the plinth x positions, s.TOP plinth top height.
+export function exhibit() {
+  const s = new THREE.Scene(); s.background = new THREE.Color('#0c1220'); s.fog = new THREE.Fog('#0c1220', 9, 30);
+  s.add(new THREE.HemisphereLight('#8a9aba', '#141820', 0.9));
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(60, 30), new THREE.MeshStandardMaterial({ color: '#1a2030', roughness: 0.5 })); fl.rotation.x = -Math.PI / 2; fl.receiveShadow = true; s.add(fl);
+  const back = new THREE.Mesh(new THREE.PlaneGeometry(60, 12), new THREE.MeshStandardMaterial({ color: '#141c2c', roughness: 0.9 })); back.position.set(0, 6, -4); s.add(back);
+  s.X = [-3.6, -1.2, 1.2, 3.6]; s.TOP = 0.62;
+  s.X.forEach(x => { const p = LP.at(LP.box(0.9, s.TOP, 0.9, '#d8d4cc'), x, s.TOP / 2, 0); p.castShadow = p.receiveShadow = true; s.add(p); });
+  const rad = P.radarDish(0.42); rad.scale.setScalar(1.25); rad.position.set(s.X[0], s.TOP, 0); s.add(rad);
+  const pen = P.penicillin(); pen.scale.setScalar(1.3); pen.position.set(s.X[1], s.TOP, 0); s.add(pen);
+  const v = P.v2(1.5); v.position.set(s.X[2], s.TOP, 0); s.add(v);
+  const co = P.colossus(); co.scale.setScalar(0.62); co.position.set(s.X[3], s.TOP, 0); s.add(co);
+  s.items = [rad, pen, v, co];
+  s.spots = s.X.map(x => { const l = new THREE.SpotLight('#fff2dc', 0, 10, 0.4, 0.45, 1.0); l.position.set(x, 5.2, 2.2); l.target.position.set(x, s.TOP + 0.4, 0); l.castShadow = true; l.shadow.mapSize.set(512, 512); s.add(l, l.target); return l; });
+  ticker(s).push(t => { rad.head.rotation.y = 0.6 * Math.sin(t * 0.8); co.spin(t); });
+  s.userData = { interior: true };
+  return s;
+}

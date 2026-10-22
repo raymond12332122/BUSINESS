@@ -6,6 +6,7 @@ import * as THREE from 'three';
 import * as C from '../lib/chars.js';
 import * as K from './kit.js';
 import * as A from '../whatif/anim.js';
+import * as WA from './anim.js';
 import { stage } from '../lib/stage.js';
 try {
   const W = 1600, H = 900, q = new URLSearchParams(location.search);
@@ -24,7 +25,7 @@ try {
       { c.root.updateMatrixWorld(true); const hv2 = new THREE.Vector3(); c.j.head.bone.getWorldPosition(hv2); const bb2 = new THREE.Box3().setFromObject(c.root, true); (window.__dbg = window.__dbg || {})['big:' + o + ':h'] = { head: +hv2.y.toFixed(3), top: +bb2.max.y.toFixed(3), unit: c.unit }; }
       if (c.hat) { c.root.updateMatrixWorld(true); const v = new THREE.Vector3(), h = new THREE.Vector3(), sc = new THREE.Vector3(); c.hat.getWorldPosition(v); c.j.head.bone.getWorldPosition(h); c.hat.getWorldScale(sc); (window.__dbg = window.__dbg || {})[o] = { hat: v.toArray().map(n => +n.toFixed(3)), head: h.toArray().map(n => +n.toFixed(3)), scale: sc.toArray().map(n => +n.toFixed(3)), vis: c.hat.visible }; } }
     else if (who === 'sil') { const s = K.silhouette(o, 2.2); s.position.set(x, 0, 0); scene.add(s); s.gesture(t); }
-    else { const c = K.person(scene, who, o, x, 0, 0); K.act(c, q.get('gun') ? { ...A.stand(t, i), gun: q.get('gun'), waist: [6, -8, 0], chest: [4, -6, 0], head: [6, 10, -4] } : A.stand(t, i), t, q.get('mouth') ? { mouth: q.get('mouth'), eye: q.get('eye') || undefined } : {}); c.root.updateMatrixWorld(true); const hv = new THREE.Vector3(); c.j.head.bone.getWorldPosition(hv); const bb = new THREE.Box3().setFromObject(c.root, true); (window.__dbg = window.__dbg || {})[who + ':' + o] = { head: +hv.y.toFixed(3), top: +bb.max.y.toFixed(3), unit: c.unit }; }
+    else { const c = K.person(scene, who, o, x, 0, 0); K.act(c, q.get('pose') ? WA[q.get('pose')](t, i, 1) : q.get('gun') ? { ...A.stand(t, i), gun: q.get('gun'), waist: [6, -8, 0], chest: [4, -6, 0], head: [6, 10, -4] } : A.stand(t, i), t, q.get('mouth') ? { mouth: q.get('mouth'), eye: q.get('eye') || undefined } : {}); c.root.updateMatrixWorld(true); const hv = new THREE.Vector3(); c.j.head.bone.getWorldPosition(hv); const bb = new THREE.Box3().setFromObject(c.root, true); (window.__dbg = window.__dbg || {})[who + ':' + o] = { head: +hv.y.toFixed(3), top: +bb.max.y.toFixed(3), unit: c.unit }; }
     const v = new THREE.Vector3(x, 0, 0).project(cam); const d = document.createElement('div'); d.className = 'l'; d.textContent = o; d.style.left = ((v.x + 1) / 2 * W) + 'px'; d.style.top = ((1 - v.y) / 2 * H + 8) + 'px'; ui.appendChild(d);
   });
   r.render(scene, cam); window.__info = { ok: 1, dbg: window.__dbg }; window.__ready = true;

@@ -187,6 +187,8 @@ Object.assign(WK.OUTFITS, {
   nino: r => { anon(r); uni(r, 'kid'); r.wear('chest', nameTag(), [0.05, 0.44, 0.105]); return r; },
   refugiado: r => { anon(r); uni(r, pick(r, ['coatA', 'coatB', 'coatC'])); return r; },
   ana: r => { anon(r); uni(r, 'dressB'); return r; },
+  turing: r => { anon(r); uni(r, 'tweed'); return r; },
+  wren: r => { anon(r); uni(r, 'wren'); return r; },
   ninoGueto: r => { anon(r); uni(r, pick(r, ['kid', 'coatC'])); return r; },
   duelo: r => { anon(r); uni(r, 'mourn'); return r; },
   bracero: r => { anon(r); uni(r, 'bracero'); hat(r, sombrero('palm'), { scale: 0.8, y: 0.9, tilt: -0.05 }); return r; },
