@@ -41,6 +41,7 @@ export const PAL = {
   fisher: { dark: '#2a2a1e', mid: '#5a5a3a', light: '#e6dfc8', gold: '#c9a227' }, diplo: { dark: '#101216', mid: '#24282f', light: '#f1efea', gold: '#8c7a55' },
   waaf: { dark: '#1a2230', mid: '#4a5a74', light: '#e6e6e0', gold: '#c9a227' }, afs: { dark: '#0e1218', mid: '#1e2632', light: '#c8c8c0', gold: '#c0272d' },
   panzer: { dark: '#0e0e10', mid: '#1e1e22', light: '#3c3c44', gold: '#c8c8c8' },
+  roc: { dark: '#20262c', mid: '#4e5a64', light: '#c8ccc8', gold: '#c9a227' },
   sci: { dark: '#8a8a86', mid: '#eeeeea', light: '#ffffff', gold: '#6a8aa8' }, mourn: { dark: '#0e0e10', mid: '#24242a', light: '#d8d6d0', gold: '#6a6a6a' },
 };
 const uni = (r, p) => uniformize(r, PAL[p] || p);
@@ -154,6 +155,9 @@ Object.assign(WK.OUTFITS, {
   frances: r => { anon(r); uni(r, 'fr40'); hat(r, adrian('#6c6a50'), HELM); backpack(r, '#5a5a48', '#6a6a58'); slungRifle(r); return r; },
   polaco: r => { anon(r); uni(r, 'pl'); hat(r, stahlhelm('#5d6048'), HELM); slungRifle(r); return r; },
   sovietico: r => { anon(r); uni(r, 'sov'); hat(r, ssh40('#4f5a3a'), HELM); slungRifle(r); return r; },
+  chino: r => { anon(r); uni(r, 'roc'); hat(r, adrian('#4a5458'), HELM); slungRifle(r); return r; },
+  chinoArmado: r => { anon(r); uni(r, 'roc'); hat(r, adrian('#4a5458'), HELM); r.equip(P.rifle('#2e3138', '#6a4a2e'), HOLDS); return r; },
+  marineArmado: r => { anon(r); uni(r, 'od'); hat(r, m1('#4f5a38'), HELM); r.equip(P.rifle('#2e3138', '#7a5232'), HOLDS); return r; },
   sovieticoArmado: r => { anon(r); uni(r, 'sov'); hat(r, ssh40('#4f5a3a'), HELM); r.equip(P.rifle('#2e3138', '#6a4a2e'), HOLDS); return r; },
   sovieticoInviernoArmado: r => { anon(r); uni(r, 'sovWinter'); hat(r, ssh40('#e6eaec'), HELM); r.equip(P.rifle('#2e3138', '#6a4a2e'), HOLDS); return r; },
   sovieticoGorro: r => { anon(r); uni(r, 'sov'); hat(r, sideCap('#6c6b45', { mark: 'star' }), CAP); slungRifle(r); return r; },

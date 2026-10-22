@@ -13,6 +13,8 @@ import * as W1P from '../ww1/props.js';
 import * as NS from '../napo/sets.js';
 import * as NPR from '../napo/props.js';
 import * as WP from '../whatif/props.js';
+import * as NS2 from '../napo/sets.js';
+import * as MX from '../mx/props.js';
 export const { bakeAll } = W1;
 export { WS, W1 };
 const std = (c, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.8, ...o });
@@ -316,5 +318,56 @@ export function winterField(light = 'blizzard', { blizzard = true } = {}) {
   LP.scatter(s, (r, i) => LP.birch(1.3 + r() * 0.5, i), 60, [-70, -90, 70, 20], 2702, [[0, 0, 10]]);
   const sn = RP.snowfall(s, { area: [-14, 0, -20, 14, 10, 10], n: blizzard ? 3200 : 1200, speed: blizzard ? 2.2 : 1.0, drift: blizzard ? 2.4 : 0.4 }); ticker(s).push(t => sn.update(t));
   LK.outdoor(s, light, { kind: 'snow', noGrass: true });
+  return s;
+}
+
+// ------------------------------------------------------------ 7 December 1941: Pearl Harbor (Battleship Row along x at z = -14)
+export function pearlHarbor(light = 'morning') {
+  const s = NS2.napoStage(light, [null, null], { seed: 2801, groundA: null, fog: ['#d8e2e8', 60, 260] });
+  NS2.sea(s, { color: '#3a7a92', y: 0, size: 500 });
+  const isl = new THREE.Mesh(new THREE.CylinderGeometry(30, 32, 1.2, 40), std('#7a9a58', { roughness: 1 })); isl.scale.set(1.6, 1, 0.5); isl.position.set(6, 0.1, -32); s.add(isl);
+  s.add(LP.at(LP.box(90, 0.6, 3, '#9a9488'), 6, 0.3, -18.5));
+  s.ships = [-28, -14, 0, 14, 28].map((x, i) => { const b = RP.dreadnought(30, '#7a8288'); b.position.set(x, -0.2, -14.5 + (i % 2) * -0.4); b.rotation.y = Math.PI / 2; s.add(b); return b; });
+  s.add(MX.sierra({ x0: -200, x1: 200, z: -110, depth: 60, height: 26, seed: 2802, base: '#4e6a3a', top: '#6e8a4e' }));
+  LP.scatter(s, (r, i) => LP.palm(1.4 + r() * 0.6, i), 18, [-30, 8, 30, 16], 2803);
+  const pier = new THREE.Group(); pier.add(LP.at(LP.box(3, 0.2, 14, '#7a6a52'), 0, 0.6, 0)); for (let i = 0; i < 8; i++) for (const sx of [-1.3, 1.3]) pier.add(LP.at(LP.cyl(0.1, 0.1, 1.6, '#4a3a2a', 6), sx, 0, -6 + i * 1.7));
+  pier.position.set(4, 0, 2); s.add(pier); s.pierY = 0.7;
+  const shore = new THREE.Mesh(new THREE.BoxGeometry(160, 0.8, 30), std('#b8a888', { roughness: 1 })); shore.position.set(0, 0.2, 24); s.add(shore);
+  return s;
+}
+
+// ------------------------------------------------------------ the open Pacific (Midway): sea, haze, a carrier task force
+export function pacificSea(light = 'day') {
+  const s = NS2.napoStage(light, [null, null], { seed: 2811, groundA: null, fog: ['#dfe8ee', 80, 340] });
+  NS2.sea(s, { color: '#2e6a88', y: 0, size: 600 });
+  W1.clouds(s, 18, { y: 40, spread: 300 });
+  return s;
+}
+
+// ------------------------------------------------------------ an island beach under assault (Tarawa, Iwo Jima…): shore along x
+export function islandBeach(light = 'day') {
+  const s = NS2.napoStage(light, [null, null], { seed: 2821, groundA: null, fog: ['#e2e6e2', 60, 260] });
+  NS2.sea(s, { color: '#3a8aa0', y: 0, size: 500 });
+  const sand = new THREE.Mesh(new THREE.BoxGeometry(200, 1.0, 60), std('#e0d0a0', { roughness: 1 })); sand.position.set(0, -0.164, 30); sand.rotation.x = -0.012; s.add(sand);   // waterline at z = 2
+  LP.scatter(s, (r, i) => LP.palm(1.4 + r() * 0.8, i), 34, [-40, 6, 40, 34], 2822, [[2, 6, 7]]);
+  for (const [x, z, k] of [[-12, 20, 1.4], [8, 26, 1.8], [22, 18, 1.1]]) W1.smokeFrom(s, new THREE.Vector3(x, 2, z), { n: 12, color: '#4a4440', size: 2.4 * k, rise: 24, drift: [4, 0, -3], life: 7, opacity: 0.7 });
+  for (let i = 0; i < 3; i++) { const d = P.destroyer(); d.position.set(-40 + i * 34, 0, -70 - i * 10); d.rotation.y = Math.PI / 2; s.add(d); }
+  return s;
+}
+
+// ------------------------------------------------------------ China: the Great Wall over the hills
+export function greatWallSet(light = 'golden') {
+  const s = WS.wStage(light, ['#8a8a58', '#7e7e50'], { groundSize: 300 });
+  const hAt = (x, z) => Math.max(0, 6 * Math.sin(x * 0.05 + 1) + 4 * Math.sin(z * 0.07) + 7) * (z < -6 ? 1 : 0.0) ;
+  const hills = new THREE.PlaneGeometry(260, 200, 90, 70); hills.rotateX(-Math.PI / 2); const hp = hills.attributes.position;
+  for (let i = 0; i < hp.count; i++) { const x = hp.getX(i), z = hp.getZ(i) - 70; hp.setY(i, Math.max(0, 6 * Math.sin(x * 0.05 + 1) + 4 * Math.sin(z * 0.07) + 7) * Math.min(1, Math.max(0, (-z - 6) / 10))); }
+  hills.computeVertexNormals(); const hm = new THREE.Mesh(hills, std('#7a8050', { roughness: 1 })); hm.position.z = -70; hm.receiveShadow = true; s.add(hm);
+  const hY = (x, z) => Math.max(0, 6 * Math.sin(x * 0.05 + 1) + 4 * Math.sin(z * 0.07) + 7) * Math.min(1, Math.max(0, (-z - 6) / 10));
+  const pts = Array.from({ length: 22 }, (_, i) => [-60 + i * 6, -22 - 8 * Math.sin(i * 0.5) - (i % 3)]);
+  s.add(P.greatWall(pts, hY));
+  // a wall walk in the foreground for the soldiers (flat, at ground level)
+  const near = P.greatWall([[-9, -1.2], [-3, -1.6], [3, -1.4], [9, -1.0]], () => 0); s.add(near); s.walkY = 2.0;
+  LP.scatter(s, (r, i) => LP.pine(1.4 + r() * 0.6, '#3e5a30', i), 40, [-90, -110, 90, -30], 2831);
+  LK.outdoor(s, light, { kind: 'grass', grass: { area: [-14, 0, 14, 10], n: 3000 } });
   return s;
 }

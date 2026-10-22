@@ -276,6 +276,9 @@ const PLANES = {
   p47: { s: 0.5, col: '#59603f', under: '#9aa092', mark: 'us', len: 11.0, fus: [[-5.5, 0.12], [-3.6, 0.45], [0, 0.78], [2.8, 0.8], [4.6, 0.72], [5.4, 0.6]], fh: 1.18,
     wing: { z: 1.3, y: -0.45, span: 6.2, root: 2.9, ellipse: true, dihedral: 0.1 }, tail: { z: -4.7, y: 0.35, span: 2.2, root: 1.3, tip: 0.8 }, fin: { z: -4.8, h: 1.5, root: 1.6, tip: 0.8 },
     nose: { r: 1.85, z: 5.45, blades: 4, cowl: '#59603f' }, canopy: { z: 0.4, len: 2.0, r: 0.4, y: 0.75 } },
+  sbd: { s: 0.5, col: '#5a6a7c', under: '#c8ccd0', mark: 'us', len: 10.1, fus: [[-5.0, 0.12], [-3.4, 0.42], [0, 0.66], [2.6, 0.7], [4.3, 0.64], [5.0, 0.5]], fh: 1.12,
+    wing: { z: 1.0, y: -0.45, span: 6.2, root: 3.0, tip: 1.4, sweep: 0.15, dihedral: 0.09 }, tail: { z: -4.3, y: 0.3, span: 2.0, root: 1.3, tip: 0.8 }, fin: { z: -4.4, h: 1.4, root: 1.5, tip: 0.8 },
+    nose: { r: 1.6, z: 5.05, blades: 3, cowl: '#5a6a7c' }, canopy: { z: -0.2, len: 3.0, r: 0.4, y: 0.62 } },
   b29: { s: 0.5, col: '#c8ccd0', under: '#c8ccd0', mark: 'us', metal: true, len: 30.2, fus: [[-15, 0.2], [-12, 1.2], [-6, 1.45], [8, 1.45], [12.5, 1.35], [14.6, 0.9], [15.1, 0.2]], fh: 1.0,
     wing: { z: 1.5, y: -0.2, span: 21.5, root: 5.8, tip: 1.6, sweep: 0.6, dihedral: 0.06 }, tail: { z: -13.4, y: 0.3, span: 6.0, root: 3.0, tip: 1.4 }, fin: { z: -13.6, h: 5.0, root: 4.6, tip: 1.8 },
     engines: [[-4.6, -0.1, 4.0], [-9.4, -0.1, 3.0], [4.6, -0.1, 4.0], [9.4, -0.1, 3.0]], er: 2.4, glassNose: true },
@@ -488,4 +491,39 @@ export function tornDoc(title, lines, { w = 1.6, h = 2.1 } = {}) {
   const L = half(true), R = half(false);
   g.tear = k => { L.position.set(-0.6 * k, -0.25 * k * k, 0.1 * k); L.rotation.set(0.2 * k, 0.5 * k, 0.35 * k); R.position.set(0.6 * k, -0.35 * k * k, 0.12 * k); R.rotation.set(-0.15 * k, -0.45 * k, -0.4 * k); };
   g.tear(0); return dyn(g);
+}
+
+// ------------------------------------------------------------ the Pacific
+// Aircraft carrier (Akagi/Kaga style for Midway): long flight deck with markings, starboard island, hull; bow +z.
+export function carrier(col = '#6a6e72', { japanese = true } = {}) {
+  const g = new THREE.Group(), L = 46, W = 5.4;
+  const sh = new THREE.Shape(); sh.moveTo(-W / 2, -L / 2); sh.lineTo(W / 2, -L / 2); sh.lineTo(W / 2, L / 2 - 8); sh.quadraticCurveTo(W / 2, L / 2 - 2, 0, L / 2); sh.quadraticCurveTo(-W / 2, L / 2 - 2, -W / 2, L / 2 - 8); sh.closePath();
+  const hg = new THREE.ExtrudeGeometry(sh, { depth: 2.4, bevelEnabled: false }); hg.rotateX(-Math.PI / 2); g.add(new THREE.Mesh(hg, std('#4e5458', { roughness: 0.6 })));
+  for (const sx of [-1, 1]) for (let i = 0; i < 6; i++) g.add(at(cyl(0.12, 0.12, 0.8, '#3a3e42', 6), sx * (W / 2 - 0.2), 3.0, -L / 2 + 6 + i * 6));
+  const deckTex = canvasTex(128, 1024, (x, Wd, H) => { x.fillStyle = japanese ? '#a88a62' : '#5a5e5a'; x.fillRect(0, 0, Wd, H); x.strokeStyle = 'rgba(40,30,20,0.25)'; x.lineWidth = 2; for (let i = 0; i < 64; i++) { x.beginPath(); x.moveTo(0, i * 16); x.lineTo(Wd, i * 16); x.stroke(); }
+    x.fillStyle = '#f2f0ea'; x.fillRect(Wd / 2 - 2, 0, 4, H); if (japanese) { x.fillStyle = '#c0242a'; x.beginPath(); x.arc(Wd / 2, 120, 40, 0, 7); x.fill(); } });
+  const deck = new THREE.Mesh(new THREE.BoxGeometry(W + 1.2, 0.2, L + 2), [std('#6a5a44'), std('#6a5a44'), new THREE.MeshStandardMaterial({ map: deckTex, roughness: 0.85 }), std('#6a5a44'), std('#6a5a44'), std('#6a5a44')]);
+  deck.position.y = 3.6; g.add(deck);
+  for (const sx of [-1, 1]) for (let i = 0; i < 7; i++) g.add(at(box(0.18, 1.2, 0.18, '#4a4e52'), sx * (W / 2 + 0.3), 2.9, -L / 2 + 4 + i * 6.6));
+  const isl = new THREE.Group(); isl.position.set(W / 2 - 0.2, 3.7, 3); g.add(isl);
+  isl.add(at(box(1.2, 2.2, 3.2, col), 0, 1.1, 0)); isl.add(at(box(1.4, 0.9, 2.0, col), 0, 2.6, 0.3)); isl.add(at(cyl(0.08, 0.1, 3, '#3a3e42', 6), 0, 4.2, -0.4));
+  const fun = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.6, 1.8, 12), std('#3a3a3a')); fun.position.set(0.2, 1.4, -2.4); fun.rotation.z = -0.5; isl.add(fun);
+  g.deckY = 3.7; g.L = L; g.W = W;
+  g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  return g;
+}
+// A stretch of the Great Wall along a path of [x, z] points over the hills: wall, crenellations and watchtowers.
+export function greatWall(pts, hAt = () => 0, col = '#b8a888') {
+  const g = new THREE.Group(), m = std(col, { roughness: 0.95 }), dark = std('#8a7c64', { roughness: 0.95 });
+  for (let i = 0; i + 1 < pts.length; i++) {
+    const [x0, z0] = pts[i], [x1, z1] = pts[i + 1], y0 = hAt(x0, z0), y1 = hAt(x1, z1), len = Math.hypot(x1 - x0, z1 - z0), mx = (x0 + x1) / 2, mz = (z0 + z1) / 2, my = (y0 + y1) / 2;
+    const seg = new THREE.Group(); seg.position.set(mx, my, mz); seg.rotation.y = Math.atan2(x1 - x0, z1 - z0); seg.rotation.x = -Math.atan2(y1 - y0, len); g.add(seg);
+    seg.add(at(new THREE.Mesh(new THREE.BoxGeometry(1.4, 2.0, len + 0.05), m), 0, 0.6, 0));
+    for (let k = 0; k < Math.floor(len / 0.6); k++) for (const sx of [-0.62, 0.62]) seg.add(at(new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.3, 0.3), dark), sx, 1.75, -len / 2 + 0.3 + k * 0.6));
+    if (i % 3 === 0) { const tw = new THREE.Group(); tw.position.set(x0, y0, z0); g.add(tw); tw.add(at(new THREE.Mesh(new THREE.BoxGeometry(2.4, 3.4, 2.4), m), 0, 1.3, 0));
+      for (const [a, b] of [[-1, -1], [1, -1], [-1, 1], [1, 1]]) tw.add(at(new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.4, 0.4), dark), a * 1.0, 3.2, b * 1.0));
+      for (const sx of [-1, 1]) tw.add(at(new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.5, 0.3), std('#1a1814')), sx * 1.21, 2.0, 0)); }
+  }
+  g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  return g;
 }
