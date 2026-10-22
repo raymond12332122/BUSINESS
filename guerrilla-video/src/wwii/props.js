@@ -365,3 +365,69 @@ export function barrier(len = 3.8, h = 0.52) {
   g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
   return dyn(g);
 }
+
+// ------------------------------------------------------------ 1940: France, Dunkirk, the Battle of Britain
+// A Dunkirk "little ship": pointed wooden hull, wheelhouse, short mast (chibi scale, ~3 long, bow toward +z). .bob(t).
+export function smallBoat(col = '#3a5a7a', { cabin = true, trim = '#e8e2d4', seed = 0 } = {}) {
+  const g = new THREE.Group(), hull = new THREE.Group(); g.add(hull);
+  const L = 3.0, B = 1.0, sh = new THREE.Shape([[-B / 2, -L / 2], [B / 2, -L / 2], [B / 2, L * 0.15], [0, L / 2], [-B / 2, L * 0.15]].map(([x, z]) => new THREE.Vector2(x, z)));
+  const hg = new THREE.ExtrudeGeometry(sh, { depth: 0.55, bevelEnabled: true, bevelThickness: 0.06, bevelSize: 0.08, bevelSegments: 2 }); hg.rotateX(-Math.PI / 2); hg.translate(0, -0.2, 0);
+  hull.add(new THREE.Mesh(hg, std(col, { roughness: 0.6 })));
+  const dk = new THREE.ShapeGeometry(sh); dk.rotateX(-Math.PI / 2); hull.add(at(new THREE.Mesh(dk, std('#a88a62')), 0, 0.36, 0));
+  const rail = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: 0.05, bevelEnabled: false }), std(trim)); rail.geometry.rotateX(-Math.PI / 2); rail.position.y = 0.35; rail.scale.set(1.02, 1, 1.01); hull.add(rail);
+  if (cabin) { hull.add(at(box(0.7, 0.5, 0.8, trim), 0, 0.6, -0.55)); hull.add(at(box(0.8, 0.06, 0.9, '#5a4a3a'), 0, 0.88, -0.55));
+    for (const sx of [-1, 1]) hull.add(at(box(0.02, 0.18, 0.5, '#2a3440'), sx * 0.36, 0.68, -0.55)); hull.add(at(box(0.5, 0.18, 0.02, '#2a3440'), 0, 0.68, -0.14)); }
+  hull.add(at(cyl(0.03, 0.035, 1.6, '#5a4a3a', 6), 0, 1.15, 0.45));
+  hull.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  g.bob = t => { hull.position.y = 0.04 * Math.sin(t * 1.3 + seed); hull.rotation.z = 0.05 * Math.sin(t * 1.1 + seed * 2); hull.rotation.x = 0.03 * Math.sin(t * 0.9 + seed); };
+  return dyn(g);
+}
+// Destroyer (offshore at Dunkirk): grey hull, bridge, two raked funnels, gun mounts (bow toward +z, ~24 long).
+export function destroyer(col = '#7a828a') {
+  const g = new THREE.Group(), L = 24, W = 2.6;
+  const sh = new THREE.Shape(); sh.moveTo(-W / 2, -L / 2); sh.lineTo(W / 2, -L / 2); sh.lineTo(W / 2, L / 2 - 6); sh.quadraticCurveTo(W / 2, L / 2 - 1.5, 0, L / 2); sh.quadraticCurveTo(-W / 2, L / 2 - 1.5, -W / 2, L / 2 - 6); sh.closePath();
+  const hg = new THREE.ExtrudeGeometry(sh, { depth: 1.6, bevelEnabled: false }); hg.rotateX(-Math.PI / 2); g.add(new THREE.Mesh(hg, std('#5a6068', { roughness: 0.6 })));
+  const dk = new THREE.ShapeGeometry(sh); dk.rotateX(-Math.PI / 2); g.add(at(new THREE.Mesh(dk, std('#6a6a62')), 0, 1.61, 0));
+  g.add(at(box(1.8, 1.4, 3.0, col), 0, 2.3, 4.5)); g.add(at(box(1.4, 0.8, 1.6, col), 0, 3.4, 4.8)); g.add(at(cyl(0.08, 0.1, 5, '#3a3f44', 6), 0, 5.5, 3.8));
+  for (const z of [0.5, -2.8]) { const f = new THREE.Mesh(new THREE.CylinderGeometry(0.55, 0.6, 2.6, 14), std(col)); f.position.set(0, 3.0, z); f.rotation.x = -0.15; g.add(f); g.add(at(cyl(0.58, 0.58, 0.25, '#1a1a1a', 14), 0, 4.3, z - 0.2)); }
+  for (const z of [8.5, 6.6, -6.5, -9.0]) { const t = new THREE.Group(); t.position.set(0, 1.6, z); g.add(t); t.add(at(box(1.0, 0.6, 1.2, col), 0, 0.3, 0)); t.add(at(cyl(0.07, 0.07, 1.6, '#3a3f44', 6), 0, 0.35, z > 0 ? 1.2 : -1.2, Math.PI / 2, 0, 0)); }
+  g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  return g;
+}
+// Arc de Triomphe (scaled for the chibi Champs-Élysées): two great piers, the arch, the attic.
+export function arcTriomphe(col = '#d8ccb4') {
+  const g = new THREE.Group(), m = std(col, { roughness: 0.85 });
+  for (const sx of [-1, 1]) { g.add(at(new THREE.Mesh(new THREE.BoxGeometry(4.6, 11, 7.2), m), sx * 5.0, 5.5, 0)); g.add(at(new THREE.Mesh(new THREE.BoxGeometry(4.0, 3.2, 0.12), std('#bfb39a')), sx * 5.0, 4.2, 3.62)); }
+  g.add(at(new THREE.Mesh(new THREE.BoxGeometry(14.6, 4.5, 7.2), m), 0, 13.25, 0));
+  const arch = new THREE.Mesh(new THREE.CylinderGeometry(2.7, 2.7, 7.2, 24, 1, false, -Math.PI / 2, Math.PI), m); arch.rotation.x = Math.PI / 2; arch.rotation.z = Math.PI / 2; arch.position.y = 8.3; g.add(arch);
+  g.add(at(new THREE.Mesh(new THREE.BoxGeometry(5.4, 2.7, 7.2), m), 0, 9.65, 0));
+  g.add(at(new THREE.Mesh(new THREE.BoxGeometry(15.2, 0.5, 7.8), std('#c8bca4')), 0, 15.5, 0)); g.add(at(new THREE.Mesh(new THREE.BoxGeometry(15.2, 0.4, 7.8), std('#c8bca4')), 0, 11.1, 0));
+  return shadowy(g);
+}
+// Maginot Line casemate: a concrete blockhouse half sunk in a grassy mound, with gun embrasures and a steel cupola.
+export function casemate() {
+  const g = new THREE.Group(), conc = std('#a8a498', { roughness: 0.95 });
+  const mound = new THREE.Mesh(new THREE.SphereGeometry(6, 28, 12, 0, Math.PI * 2, 0, Math.PI / 2), std('#6e8a48', { roughness: 1 })); mound.scale.set(1.2, 0.32, 0.8); mound.position.z = -2.4; g.add(mound);
+  g.add(at(new THREE.Mesh(new THREE.BoxGeometry(5.4, 1.9, 3.2), conc), 0, 0.95, 0.4));
+  g.add(at(new THREE.Mesh(new THREE.BoxGeometry(5.8, 0.35, 3.6), conc), 0, 2.0, 0.4));
+  for (const x of [-1.4, 0.2, 1.6]) g.add(at(box(0.7, 0.26, 0.06, '#141414'), x, 1.15, 2.02));
+  const cup = new THREE.Mesh(new THREE.SphereGeometry(0.75, 20, 10, 0, Math.PI * 2, 0, Math.PI / 2), std('#5a5e58', { roughness: 0.5, metalness: 0.4 })); cup.position.set(1.4, 2.15, 0.0); g.add(cup);
+  for (let i = 0; i < 4; i++) { const a = i / 4 * Math.PI * 2 + 0.4; g.add(at(box(0.18, 0.06, 0.04, '#141414'), 1.4 + Math.sin(a) * 0.62, 2.45, Math.cos(a) * 0.62, 0, a, 0)); }
+  return shadowy(g);
+}
+// RAF operations room plotting table: a map of south-east England and the Channel, with raid counters.
+export function plotTable(w = 3.6, d = 2.6) {
+  const g = new THREE.Group();
+  const tex = canvasTex(1024, 740, (x, W, H) => {
+    x.fillStyle = '#9ec2d4'; x.fillRect(0, 0, W, H);
+    x.fillStyle = '#d8d0a8'; x.beginPath(); [[0, 0], [W, 0], [W, H * 0.32], [W * 0.86, H * 0.36], [W * 0.78, H * 0.48], [W * 0.62, H * 0.5], [W * 0.46, H * 0.55], [W * 0.3, H * 0.52], [W * 0.14, H * 0.58], [0, H * 0.6]].forEach(([a, b], i) => i ? x.lineTo(a, b) : x.moveTo(a, b)); x.fill();
+    x.fillStyle = '#c8c0a0'; x.beginPath(); [[W * 0.5, H], [W * 0.62, H * 0.86], [W * 0.84, H * 0.8], [W, H * 0.74], [W, H]].forEach(([a, b], i) => i ? x.lineTo(a, b) : x.moveTo(a, b)); x.fill();
+    x.strokeStyle = 'rgba(40,40,40,0.35)'; x.lineWidth = 2; for (let i = 0; i <= 12; i++) { x.beginPath(); x.moveTo(i * W / 12, 0); x.lineTo(i * W / 12, H); x.stroke(); } for (let j = 0; j <= 9; j++) { x.beginPath(); x.moveTo(0, j * H / 9); x.lineTo(W, j * H / 9); x.stroke(); }
+    x.fillStyle = '#2a2a2a'; x.font = '700 30px "DejaVu Sans"'; x.fillText('LONDRES', W * 0.42, H * 0.22); x.fillText('CANAL DE LA MANCHA', W * 0.36, H * 0.68); x.fillText('FRANCIA', W * 0.7, H * 0.93);
+  });
+  g.add(at(box(w + 0.2, 0.36, d + 0.2, '#4a3a28'), 0, 0.18, 0));
+  const top = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshStandardMaterial({ map: tex, roughness: 0.7 })); top.rotation.x = -Math.PI / 2; top.position.y = 0.365; g.add(top); g.top = 0.365;
+  g.counters = Array.from({ length: 9 }, (_, i) => { const c = new THREE.Group(); c.add(at(box(0.16, 0.05, 0.1, i < 5 ? '#c0392b' : '#2a4a8a'), 0, 0.025, 0)); c.add(at(box(0.04, 0.12, 0.04, '#e8e2d4'), 0.05, 0.08, 0)); c.userData.dynamic = true; g.add(c); return c; });
+  return g;
+}
+export function rake(len = 0.7) { const g = new THREE.Group(); g.add(at(cyl(0.008, 0.008, len, '#8a6a3a', 6), 0, -len / 2, 0)); g.add(at(box(0.16, 0.02, 0.02, '#5a4a3a'), 0, -len, 0)); return dyn(g); }

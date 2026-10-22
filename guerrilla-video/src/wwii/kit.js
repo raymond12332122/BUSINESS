@@ -38,6 +38,7 @@ export const PAL = {
   coatA: { dark: '#1e1a18', mid: '#4a3e36', light: '#d8d0c4', gold: '#8a7a55' }, coatB: { dark: '#1a1e24', mid: '#3e4652', light: '#d8d8d4', gold: '#8a7a55' },
   coatC: { dark: '#2a2016', mid: '#6a5640', light: '#e6dcc6', gold: '#8a7a55' }, kid: { dark: '#2a2a3a', mid: '#5a5a7a', light: '#f2f0ea', gold: '#c0272d' },
   fisher: { dark: '#2a2a1e', mid: '#5a5a3a', light: '#e6dfc8', gold: '#c9a227' }, diplo: { dark: '#101216', mid: '#24282f', light: '#f1efea', gold: '#8c7a55' },
+  waaf: { dark: '#1a2230', mid: '#4a5a74', light: '#e6e6e0', gold: '#c9a227' }, afs: { dark: '#0e1218', mid: '#1e2632', light: '#c8c8c0', gold: '#c0272d' },
   panzer: { dark: '#0e0e10', mid: '#1e1e22', light: '#3c3c44', gold: '#c8c8c8' },
   sci: { dark: '#8a8a86', mid: '#eeeeea', light: '#ffffff', gold: '#6a8aa8' }, mourn: { dark: '#0e0e10', mid: '#24242a', light: '#d8d6d0', gold: '#6a6a6a' },
 };
@@ -142,6 +143,8 @@ export function nameTag() { const g = new THREE.Group(); g.add(at(box(0.06, 0.04
 Object.assign(WK.OUTFITS, {
   // soldiers
   aleman: r => { anon(r); uni(r, 'feld'); hat(r, stahlhelm('#55594f'), HELM); backpack(r, '#5a5e52', '#4a4e44'); slungRifle(r); return r; },
+  waaf: r => { anon(r); uni(r, 'waaf'); hat(r, sideCap('#3e4c64'), CAP); return r; },
+  bombero: r => { anon(r); uni(r, 'afs'); hat(r, brodie('#2a2a2c'), { scale: 0.9, y: 0.88, tilt: -0.02, cap: true }); return r; },
   tanquista: r => { anon(r); uni(r, 'panzer'); hat(r, sideCap('#1a1a1e'), CAP); r.wear('head', headphones(), [0, 0.88, -0.02]); return r; },
   alemanGorro: r => { anon(r); uni(r, 'feld'); hat(r, sideCap('#62665b'), CAP); return r; },
   afrika: r => { anon(r); uni(r, 'afrika'); hat(r, sideCap('#a49c70'), CAP); slungRifle(r); return r; },

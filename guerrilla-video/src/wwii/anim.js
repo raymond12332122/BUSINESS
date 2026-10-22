@@ -107,3 +107,8 @@ export function headset(t, seed = 0, k = 1) {
   const p = M.stand(t, seed, { amt: 0.4 });
   return withArms(p, { aL: ['head', 1.05, -0.2, 0.15], aWL: k, plL: [1, -0.6, 0.2], hL: HAND.soft, head: add(p.head, [-4, -8 * k, 0]) });
 }
+// Looking through binoculars: both hands at the eyes (the scene places the glasses between the wrists).
+export function binoculars(t, seed = 0, k = 1) {
+  const p = M.stand(t, seed, { amt: 0.4 });
+  return withArms(p, { aL: ['head', 0.3, -0.1, 1.15], aR: ['head', -0.3, -0.1, 1.15], aWL: k, aWR: k, plL: [1, -0.8, -0.2], plR: [-1, -0.8, -0.2], hL: HAND.grip, hR: HAND.grip, head: add(p.head, [-3 * k, 0, 0]) });
+}

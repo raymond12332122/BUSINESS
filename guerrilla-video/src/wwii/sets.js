@@ -9,6 +9,10 @@ import * as P from './props.js';
 import * as LK from '../amer/look.js';
 import * as RS from '../rusia/sets.js';
 import * as AS from '../amer/sets.js';
+import * as W1P from '../ww1/props.js';
+import * as NS from '../napo/sets.js';
+import * as NPR from '../napo/props.js';
+import * as WP from '../whatif/props.js';
 export const { bakeAll } = W1;
 export { WS, W1 };
 const std = (c, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: 0.8, ...o });
@@ -28,7 +32,7 @@ export function blitzNight() {
     const w = 9 + (i * 7 % 3), h = 8 + ((i * 5 + (side > 0 ? 2 : 0)) % 4), b = P.terrace(w, h, 6, cols[(i + (side > 0 ? 1 : 0)) % 4], i * 2 + (side > 0 ? 1 : 0));
     b.position.set(side * 9, 0, 6 - i * 11.5); b.rotation.y = -side * Math.PI / 2; s.add(b);
   }
-  const sp = P.stPauls(); sp.position.set(-22, 0, -120); sp.scale.setScalar(1.3); s.add(sp);
+  const sp = P.stPauls(); sp.position.set(-22, 0, -120); sp.scale.setScalar(1.3); s.add(sp); s.stPauls = sp;
   const bb = P.bigBen(); bb.position.set(30, 0, -135); s.add(bb);
   s.lights = [[-40, -70, 0.3], [-8, -95, 1.7], [26, -80, 3.1], [55, -60, 4.4]].map(([x, z, ph]) => { const l = P.searchlight(); l.position.set(x, 0, z); s.add(l); l.ph = ph; return l; });
   s.balloons = [[-30, -60, 30], [14, -75, 36], [48, -100, 32], [-55, -110, 40]].map(([x, z, h]) => { const b = P.balloon(h); b.position.set(x, 0, z); s.add(b); return b; });
@@ -186,5 +190,105 @@ export function plains(light = 'day', { burning = true } = {}) {
     W1.smokeFrom(s, new THREE.Vector3(x, 3, z), { n: 14, color: '#3a3632', size: 2.4 * k, rise: 22, drift: [6, 0, -2], life: 6, opacity: 0.8 });
   }
   LK.outdoor(s, light, { kind: 'grass', grass: { area: [-14, -18, 18, 8], n: 5000 } });
+  return s;
+}
+
+// ------------------------------------------------------------ May 1940: the Maginot Line, facing east (+z is the front)
+export function maginot(light = 'morning') {
+  const s = WS.wStage(light, ['#7a9452', '#6e884a'], { groundSize: 260 });
+  const c = P.casemate(); c.position.set(0, 0, -3.2); s.add(c);
+  for (let i = 0; i < 3; i++) { const w = W1P.wire(9, i); w.position.set(-6 + i * 6, 0, 3.5 + (i % 2) * 0.6); s.add(w); }
+  for (let r = 0; r < 4; r++) for (let i = 0; i < 26; i++) { const x = -13 + i * 1.0 + (r % 2) * 0.5, h = 0.5 + ((i * 7 + r) % 3) * 0.12; s.add(LP.at(LP.box(0.12, h, 0.12, '#4a4440'), x, h / 2, 6.5 + r * 0.8, 0.12 * (i % 2 ? 1 : -1), 0, 0)); }
+  LP.scatter(s, (r, i) => LP.roundTree(1.5 + r() * 0.7, '#3e5a30', i), 50, [-90, 30, 90, 90], 2301);
+  for (let i = 0; i < 6; i++) { const b = P.casemate(); b.position.set(-60 + i * 24, 0, -8 - (i % 2) * 4); b.scale.setScalar(0.8); s.add(b); }
+  LK.outdoor(s, light, { kind: 'grass', grass: { area: [-12, -6, 12, 10], n: 5000 } });
+  return s;
+}
+
+// ------------------------------------------------------------ the Ardennes: a narrow road through dense pine forest (road along z)
+export function ardennes(light = 'morning') {
+  const s = WS.wStage(light, ['#4e5e3a', '#46563a'], { groundSize: 240 });
+  if (s.fog) { s.fog.color.set('#b8c0b0'); s.fog.near = 8; s.fog.far = 70; }
+  const road = []; for (let i = 0; i < 40; i++) { const z = 10 - i * 3, x = 2.2 * Math.sin(z * 0.06); road.push([x, z]); s.add(LP.at(LP.box(3.4, 0.02, 3.2, '#8a7c64'), x, 0.011, z, 0, Math.atan(0.13 * Math.cos(z * 0.06)), 0)); }
+  s.roadX = z => 2.2 * Math.sin(z * 0.06);
+  const r = LP.rng(2401);
+  for (let i = 0; i < 260; i++) { const z = 12 - r() * 120, side = r() < 0.5 ? -1 : 1, x = s.roadX(z) + side * (2.6 + r() * 16); const t = LP.pine(1.8 + r() * 1.4, ['#2e4a2a', '#344e2c', '#2a4426'][i % 3], i); t.position.set(x, 0, z); s.add(t); }
+  for (let i = 0; i < 30; i++) { const z = 10 - r() * 100, x = s.roadX(z) + (r() < 0.5 ? -1 : 1) * (2.0 + r() * 1.2); s.add(LP.at(new THREE.Mesh(new THREE.DodecahedronGeometry(0.3 + r() * 0.4, 0), std('#7a7a72')), x, 0.15, z)); }
+  LK.outdoor(s, light, { kind: 'grass', grass: { area: [-8, -30, 8, 8], n: 3000, colors: ['#4a5e34', '#3e5230'] } });
+  return s;
+}
+
+// ------------------------------------------------------------ Dunkirk, late May 1940: the beach, the long lines into the sea, the little ships
+// Shore along x; dry sand for z > -4, the sea floor slopes down so a chibi wading at z = -9 is in to the waist.
+export function dunkirk(light = 'overcast') {
+  const s = WS.wStage(light, ['#d8c8a0', '#cdbd94'], { groundSize: 300 });
+  s.sandY = z => z > -3 ? 0.12 - Math.max(0, -z) * 0.01 : 0.09 - (-z - 3) * 0.045;
+  if (s.userData.ground) s.userData.ground.position.y = -6;
+  const sg = new THREE.PlaneGeometry(240, 110, 120, 110); sg.rotateX(-Math.PI / 2); const sp = sg.attributes.position;
+  for (let i = 0; i < sp.count; i++) { const z = sp.getZ(i) + 5; sp.setY(i, Math.max(-3, s.sandY(z)) + 0.02 * Math.sin(sp.getX(i) * 0.9) * (z > -3 ? 1 : 0)); }
+  sg.computeVertexNormals(); const sand = new THREE.Mesh(sg, std('#d4c49a', { roughness: 1 })); sand.position.z = 5; sand.receiveShadow = true; s.add(sand); s.userData.sand = sand;
+  W1.water(s, { color: '#4a6a78', y: 0.0, w: 400, d: 300, z: -150, amp: 0.6 });
+  // dunes and the burning town behind
+  for (let i = 0; i < 14; i++) { const d = new THREE.Mesh(new THREE.SphereGeometry(6, 16, 8, 0, Math.PI * 2, 0, Math.PI / 2), std('#cdbd8e')); d.scale.set(1.4, 0.35, 0.8); d.position.set(-70 + i * 11, 0, 22 + (i % 3) * 3); s.add(d); }
+  for (let i = 0; i < 6; i++) { const h = NPR.townhouseFR(4, 6, ['#d8ccb4', '#cbbfa6', '#e0d4bc'][i % 3], i); h.position.set(20 + i * 5, 0, 40); s.add(h); }
+  for (const [x, z, k] of [[26, 46, 1.4], [40, 52, 1.8], [12, 58, 1.2]]) W1.smokeFrom(s, new THREE.Vector3(x, 4, z), { n: 16, color: '#2a2624', size: 3.2 * k, rise: 40, drift: [-14, 0, -6], life: 9, opacity: 0.85 });
+  // the East Mole: a long wooden jetty out to sea
+  const mole = new THREE.Group(); mole.position.set(-14, 0, 0); s.add(mole);
+  mole.add(LP.at(LP.box(1.4, 0.08, 46, '#6a5a44'), 0, 0.75, -24)); for (let i = 0; i < 24; i++) for (const sx of [-0.6, 0.6]) mole.add(LP.at(LP.cyl(0.07, 0.07, 1.6, '#4a3a2a', 6), sx, 0.0, -2 - i * 1.9));
+  s.mole = mole;
+  const ds = P.destroyer(); ds.position.set(8, 0, -48); ds.rotation.y = Math.PI / 2 + 0.2; s.add(ds); s.destroyer = ds;
+  const ds2 = P.destroyer(); ds2.position.set(-34, 0, -70); ds2.rotation.y = Math.PI / 2 - 0.1; ds2.scale.setScalar(0.9); s.add(ds2);
+  s.boats = [['#3a5a7a', 1, -12.6, 0.3], ['#7a3a2a', 5.0, -14.9, -0.5], ['#2a5a3a', -4.0, -14.0, 0.9], ['#5a4a6a', 9, -19, 0.2], ['#3a3a3a', -9, -20, -0.3]].map(([c, x, z, r], i) => {
+    const b = P.smallBoat(c, { seed: i }); b.position.set(x, 0, z); b.rotation.y = r; s.add(b); return b; });
+  ticker(s).push(t => s.boats.forEach(b => b.bob(t)));
+  LK.outdoor(s, light, { kind: 'dirt', noGrass: true });
+  return s;
+}
+
+// ------------------------------------------------------------ 14 June 1940: the Champs-Élysées (avenue along z, the Arc at the far end)
+export function champs(light = 'overcast') {
+  const s = WS.wStage(light, ['#a8a49a', '#9e9a90'], { groundSize: 300 });
+  s.add(LP.at(LP.box(9, 0.02, 200, '#6a6a6c'), 0, 0.011, -60));
+  for (const x of [-6.2, 6.2]) s.add(LP.at(LP.box(3.4, 0.08, 200, '#b8b2a6'), x, 0.04, -60));
+  for (const sx of [-1, 1]) for (let i = 0; i < 11; i++) { const h = NPR.townhouseFR(5.2, 5.6, ['#e2d6bf', '#d8ccb4', '#e8dcc6'][i % 3], i); h.scale.setScalar(1.25); h.position.set(sx * 12.5, 0, 8 - i * 8.2); h.rotation.y = -sx * Math.PI / 2; s.add(h); }
+  for (const sx of [-1, 1]) for (let i = 0; i < 15; i++) s.add(LP.at(LP.roundTree(1.1, '#5a7a3a', i + (sx > 0 ? 40 : 0)), sx * 7.4, 0, 8 - i * 5.5));
+  const arc = P.arcTriomphe(); arc.position.set(0, 0, -92); s.add(arc); if (s.fog) s.fog.far = Math.max(s.fog.far, 240);
+  const ef = WP.eiffel(30); ef.position.set(-46, 0, -90); s.add(ef);
+  LK.outdoor(s, light, { kind: 'cobble', noGrass: true });
+  return s;
+}
+
+// ------------------------------------------------------------ June 1940: the House of Commons (aisle along z, the Speaker's chair at -z)
+export function commons() {
+  const s = AS.interior({ wall: '#5a4630', floor: '#3a2a1c', w: 9, d: 11, h: 4.2, lights: [[0, 3.6, 0], [0, 3.6, -3]], windows: false, bulbs: false, paper: 'stripes', dress: { paperAccent: '#3a2a1c', paintings: 0 } });
+  s.userData.hemi.intensity = 0.75;
+  s.benches = [];
+  for (const sx of [-1, 1]) for (let row = 0; row < 3; row++) {
+    const x = sx * (1.25 + row * 0.62), y = 0.2 + row * 0.2, base = y - 0.05;
+    if (row) s.add(LP.at(LP.box(0.62, base, 9.4, '#3a2a1c'), x, base / 2, -0.4));
+    s.add(LP.at(LP.box(0.5, 0.06, 9.2, '#2f5a3a'), x, y, -0.4)); s.add(LP.at(LP.box(0.5, Math.max(0.04, y - 0.06), 9.2, '#3a2a1c'), x, (y - 0.06) / 2, -0.4));
+    s.add(LP.at(LP.box(0.08, 0.3, 9.2, '#2f5a3a'), x + sx * 0.27, y + 0.15, -0.4));
+    s.benches.push({ x, y: y + 0.03, sx, row });
+  }
+  const tb = new THREE.Group(); tb.add(LP.at(LP.box(1.0, 0.54, 2.6, '#4a3020'), 0, 0.27, 0)); tb.add(LP.at(LP.box(1.04, 0.03, 2.64, '#2f5a3a'), 0, 0.555, 0));
+  for (const sz of [-1, 1]) tb.add(LP.at(LP.box(0.26, 0.16, 0.2, '#7a5a30'), sz * 0.36, 0.65, 0.9 * sz));
+  tb.position.set(0, 0, -0.6); s.add(tb); s.table = tb; s.dispatch = [[0.36, 0.73, 0.3], [-0.36, 0.73, -1.5]];
+  const sp = new THREE.Group(); sp.add(LP.at(LP.box(1.2, 1.5, 0.8, '#4a3020'), 0, 0.75, 0)); sp.add(LP.at(LP.box(1.4, 0.2, 1.0, '#6a4a2a'), 0, 2.4, 0.1)); for (const sx of [-0.6, 0.6]) sp.add(LP.at(LP.box(0.1, 2.4, 0.1, '#4a3020'), sx, 1.2, 0.4));
+  sp.position.set(0, 0, -4.9); s.add(sp);
+  return s;
+}
+
+// ------------------------------------------------------------ an RAF sector operations room: the plotting table and the gallery
+export function opsRoom() {
+  const s = RS.room({ w: 8, d: 7, h: 3.4, wall: '#6a6a5a', lower: '#3a3a30', lowerH: 1.0, floor: '#4a4036', ceil: '#d8d4c4', hemi: 0.55, sunI: 0.3, lights: [[0, 2.9, 0.5, 6, '#ffe2b8', 8], [0, 2.9, -2, 4, '#ffe2b8', 8]] });
+  const tb = P.plotTable(3.4, 2.4); tb.position.set(0, 0, 0.3); s.add(tb); s.table = tb;
+  const gal = new THREE.Group(); gal.add(LP.at(LP.box(8, 1.1, 1.6, '#4a3a2a'), 0, 0.55, 0)); gal.add(LP.at(LP.box(8, 0.5, 0.06, '#3a2a1e'), 0, 1.35, 0.8));
+  gal.add(LP.at(new THREE.Mesh(new THREE.PlaneGeometry(8, 0.9), new THREE.MeshStandardMaterial({ color: '#a8c0d0', transparent: true, opacity: 0.18, roughness: 0.1 })), 0, 2.05, 0.8));
+  gal.position.set(0, 0, -2.7); s.add(gal); s.galleryY = 1.1;
+  const tote = new THREE.Mesh(new THREE.PlaneGeometry(5.6, 0.9), new THREE.MeshBasicMaterial({ map: (() => { const c = document.createElement('canvas'); c.width = 512; c.height = 96; const x = c.getContext('2d');
+    x.fillStyle = '#1a1a16'; x.fillRect(0, 0, 512, 96); for (let i = 0; i < 12; i++) for (let j = 0; j < 4; j++) { x.fillStyle = ['#e04a3a', '#e8c24a', '#4ac06a', '#3a3a34'][(i * 3 + j * 5) % 4]; x.fillRect(10 + i * 41, 10 + j * 20, 30, 12); }
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t; })() }));
+  tote.position.set(0, 2.85, -3.47); s.add(tote);
+  const clock = new THREE.Mesh(new THREE.CircleGeometry(0.3, 24), new THREE.MeshStandardMaterial({ color: '#f2ead8' })); clock.position.set(3.0, 2.85, -3.46); s.add(clock);
   return s;
 }
