@@ -28,7 +28,7 @@ export function dark(t, a, b, name, role, { side = 'r', top = 92, w = 560 } = {}
 // Date stamp in a corner, like a newsreel caption.
 export function stamp(t, a, b, date, place = '', { x = 72, y = 940, align = 'left' } = {}) {
   const k = K(t, a, b, 0.35, 0.35); if (k <= 0) return '';
-  return `<div style="position:absolute;${align}:${x}px;top:${y - 40}px;opacity:${k};transform:translateY(${(1 - k) * 12}px);font:800 30px 'DejaVu Sans Mono',monospace;color:#f4ecd8;letter-spacing:.08em;text-shadow:0 2px 10px rgba(0,0,0,.7)">
+  return `<div class="dstamp" style="position:absolute;${align}:${x}px;top:${y - 40}px;opacity:${k};transform:translateY(${(1 - k) * 12}px);font:800 30px 'DejaVu Sans Mono',monospace;color:#f4ecd8;letter-spacing:.08em;text-shadow:0 2px 10px rgba(0,0,0,.7)">
     ${date}${place ? `<span style="color:#e0b84a"> · ${place}</span>` : ''}</div>`;
 }
 // A big number that counts up (value in units; fmt adds thousands separators), with a label under it.
@@ -82,4 +82,15 @@ export function lossChart(t, a, b, rows, picto = null, { x = 1180, y = 150, w = 
       <div style="display:flex;gap:10px;margin-top:10px">${Array.from({ length: n }, (_, i) => fig(i === 0 && o > 0.5)).join('')}</div></div>`; })() : '';
   return `<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;padding:24px 30px;${PANEL};opacity:${k}">
     <div style="font:800 20px Inter;letter-spacing:.16em;color:#e0b84a;margin-bottom:6px">MUERTOS EN LA GUERRA · MILLONES DE PERSONAS</div>${rows.map(bar).join('')}${pic}</div>`;
+}
+// Closing cast card, static so every line can be read: the big models and who they play (two columns), then the chibi
+// cast in one paragraph and a closing note (no fixed row heights, so a long line wraps instead of overlapping the next).
+export function castCard(t, a, b, leads, extras, note, { x = 1110, y = 50, w = 760 } = {}) {
+  const k = K(t, a, b, 0.5, 0.45); if (k <= 0) return '';
+  return `<div style="position:absolute;left:${x}px;top:${y}px;width:${w}px;padding:22px 30px;${PANEL};opacity:${k};transform:translateY(${(1 - k) * 16}px)">
+    <div style="font:900 26px Inter;letter-spacing:.3em;color:#e0b84a;margin-bottom:6px">ELENCO</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;column-gap:24px">${leads.map(([u, f]) =>
+      `<div style="margin:8px 0"><div style="font:900 32px/1.15 'Inter Display',Inter;color:#fff">${u}</div><div style="font:700 23px/1.25 Inter;color:#e0b84a">${f}</div></div>`).join('')}</div>
+    <div style="font:600 22px/1.4 Inter;color:#d9d3c7;margin-top:12px">${extras}</div>
+    <div style="font:600 19px Inter;color:#b8b2a6;font-style:italic;margin-top:10px">${note}</div></div>`;
 }

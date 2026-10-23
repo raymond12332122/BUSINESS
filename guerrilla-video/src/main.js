@@ -58,7 +58,7 @@ async function boot() {
     return null;
   }
 
-  window.renderAt = (T) => {
+  window.renderAt = (T, dry = false) => {   // dry: overlays only (no 3D render), returns how many stamps were lifted
     let i = TL.scenes.findIndex(s => T >= s.start && T < s.start + s.dur);
     if (i < 0) i = TL.scenes.length - 1;
     const s = TL.scenes[i], inst = built[i], t = T - s.start;
@@ -68,13 +68,21 @@ async function boot() {
     if (sc.userData.sky) sc.userData.sky.position.copy(inst.ctx.camera.position);
     if (look) look.tick(T);
     const views = inst.views ? inst.views(t) : null;   // split-screen panels
-    if (post) post.render(sc, inst.ctx.camera, views);
+    if (dry) { /* overlays only */ }
+    else if (post) post.render(sc, inst.ctx.camera, views);
     else if (views) { renderer.setScissorTest(true); for (const v of views) { renderer.setViewport(v.x * W, 0, v.w * W, H); renderer.setScissor(v.x * W, 0, v.w * W, H); renderer.render(v.scene, v.camera); } renderer.setScissorTest(false); renderer.setViewport(0, 0, W, H); }
     else renderer.render(sc, inst.ctx.camera);
     const cap = captionAt(s.lines, t);
     ui.innerHTML = trHTML(html) + (cap && !inst.noCaptions && !(inst.hideCaptions && inst.hideCaptions(t)) ? `<div class="cap">${cap}</div>` : '');
+    // a corner date stamp that a two-line caption would cover is lifted just above the caption box
+    let lifted = 0; const capEl = ui.querySelector('.cap');
+    if (capEl) for (const st of ui.querySelectorAll('.dstamp')) {
+      const a = st.getBoundingClientRect(), c = capEl.getBoundingClientRect(), over = a.bottom - (c.top - 10);
+      if (over > 0 && a.right > c.left && a.left < c.right) { st.style.top = `${parseFloat(st.style.top) - over}px`; lifted++; }
+    }
     const fi = i === 0 ? 0.6 : 0.3, fo = 0.3;
     fade.style.opacity = Math.max(0, 1 - t / fi, i === TL.scenes.length - 1 ? (t - (s.dur - 1.2)) / 1.2 : 1 - (s.dur - t) / fo).toFixed(3);
+    return lifted;
   };
   window.getEvents = () => {
     const ev = [];

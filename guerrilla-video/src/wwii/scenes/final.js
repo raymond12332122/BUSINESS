@@ -26,9 +26,9 @@ export function build(ctx) {
       K.act(r, p, t, { mouth: t > tGen ? 'smile' : 'neutral', eye: t > tRec && r.i % 4 === 0 ? 'happy' : undefined }); });
     K.act(child, A.setDown(t, 3, clamp(0.5 + 0.5 * Math.sin(Math.min(Math.PI / 2, (t - tB) * 0.9)))), t, { mouth: 'neutral' });
     return U.film(t)
-      + U.credits(t, tC - 0.3, ctx.dur - 3.5, [['Tamamo Cross', 'Winston Churchill'], ['Sirius Symboli', 'Franklin D. Roosevelt'], ['Mejiro McQueen', 'Charles de Gaulle'], ['Symboli Rudolf', 'Manuel Ávila Camacho'],
-        ['Oguri Cap · Manhattan Cafe · Meisho Doto', 'soldados, pilotos y descifradoras'], ['Daiwa Scarlet · Silence Suzuka · Daitaku Helios', 'obreras, enfermeras y brujas de la noche'],
-        ['Special Week · Hishi Akebono · Tamamo Cross', 'braceros, marineros y civiles'], ['Los dictadores', 'sólo aparecen como siluetas']], { title: 'ELENCO', x: 1290, w: 560, speed: 1.0 })
+      + U.castCard(t, tB + 0.9, ctx.dur - 3.55, [['Tamamo Cross', 'Winston Churchill'], ['Sirius Symboli', 'Franklin D. Roosevelt'], ['Mejiro McQueen', 'Charles de Gaulle'], ['Symboli Rudolf', 'Manuel Ávila Camacho']],
+        'Oguri Cap, Manhattan Cafe, Meisho Doto, Daiwa Scarlet, Silence Suzuka, Daitaku Helios, Special Week, Hishi Akebono y Tamamo Cross como soldados, obreras, pilotos, enfermeras y civiles.',
+        'Los dictadores sólo aparecen como siluetas.')
       + U.bigTitle(t, ctx.dur - 3.4, ctx.dur + 1, 'LA SEGUNDA GUERRA MUNDIAL', '1939 – 1945', 'Recordar para que nunca vuelva a pasar', { top: 600 });
   };
 
