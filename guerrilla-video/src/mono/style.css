@@ -1,0 +1,11 @@
+/* Vertical short "Monopolio": pixel captions, dossier labels and title cards (1080x1920 layout, rendered at 720x1280). */
+.wcap{position:absolute;left:0;right:0;text-align:center;transform:translateY(-50%);pointer-events:none;
+  font:400 118px/1 VT323,monospace;letter-spacing:.05em;text-transform:uppercase;color:#f3ead8;
+  text-shadow:0 5px 0 #050407,5px 0 0 #050407,-5px 0 0 #050407,0 -5px 0 #050407,5px 5px 0 #050407,-5px 5px 0 #050407,5px -5px 0 #050407,-5px -5px 0 #050407,0 11px 0 rgba(0,0,0,.55)}
+.wcap.hot{color:#f2c14e}
+.wcap.red{color:#e8484a}
+.wcap.ghost{color:#cfd6e6;opacity:.92}
+.px{font-family:'Pixelify Sans',monospace}
+.goth{font-family:'Jacquard 24',serif}
+.vt{font-family:VT323,monospace}
+.silk{font-family:Silkscreen,monospace}

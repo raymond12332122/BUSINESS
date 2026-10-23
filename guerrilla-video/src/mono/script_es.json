@@ -1,0 +1,135 @@
+{
+ "scenes": [
+  {
+   "id": "abre",
+   "lead": 1.6,
+   "tail": 0.5,
+   "gaps": {
+    "0": 0.7
+   },
+   "lines": [
+    "Buenas noches, Entrenador. Pase... y cierre la puerta.",
+    "Esta noche le voy a enseñar a quedarse con un mercado entero... sin romper una sola ley."
+   ],
+   "styles": {
+    "1": "[soft tone][confident]"
+   }
+  },
+  {
+   "id": "escala",
+   "lead": 0.5,
+   "tail": 0.4,
+   "gaps": {
+    "0": 0.5
+   },
+   "lines": [
+    "Primero: crezca.",
+    "Mientras más clientes tiene, menos le cuesta cada uno. A sus rivales, en cambio, cada cliente les sale caro."
+   ]
+  },
+  {
+   "id": "rival",
+   "lead": 0.4,
+   "tail": 0.4,
+   "lines": [
+    "Hasta que un día aparece alguien más barato: cinco chicas, un cuarto rentado y una app que cuesta la mitad.",
+    "¿Una guerra de precios? Usted tendría que rebajarle a millones de clientes; ellas, sólo a unos cuantos.",
+    "Así que no pelee. Cómprelas. Un cheque sale más barato que una guerra."
+   ],
+   "styles": {
+    "1": "[sarcastic][soft tone]"
+   }
+  },
+  {
+   "id": "asesina",
+   "lead": 0.5,
+   "tail": 0.5,
+   "gaps": {
+    "0": 0.8
+   },
+   "lines": [
+    "Y después... apague su app.",
+    "Los economistas tienen un nombre para eso: adquisiciones asesinas.",
+    "En las farmacéuticas, hasta siete de cada cien compras sirvieron para enterrar el medicamento de un rival."
+   ],
+   "styles": {
+    "0": "[whispering]",
+    "1": "[soft tone][confident]"
+   }
+  },
+  {
+   "id": "radar",
+   "lead": 0.4,
+   "tail": 0.4,
+   "lines": [
+    "Eso sí: cómprelas pequeñas. Debajo de cierto tamaño, la ley ni siquiera le pide avisar.",
+    "Y curiosamente, muchas compras caen justo debajo de esa línea."
+   ]
+  },
+  {
+   "id": "jaula",
+   "lead": 0.4,
+   "tail": 0.5,
+   "gaps": {
+    "1": 0.8
+   },
+   "lines": [
+    "Ahora, haga que irse duela: sus fotos, sus contactos, sus archivos... todo, adentro.",
+    "Y cuando todos sus amigos ya están aquí, ninguna app rival sirve, por buena que sea.",
+    "Por cierto, Entrenador... ¿en qué app está viendo esto?"
+   ],
+   "styles": {
+    "2": "[whispering]"
+   }
+  },
+  {
+   "id": "cobro",
+   "lead": 0.6,
+   "tail": 0.6,
+   "gaps": {
+    "0": 0.6
+   },
+   "lines": [
+    "Y entonces, sólo entonces... suba los precios.",
+    "¿A dónde más van a ir?"
+   ],
+   "styles": {
+    "1": "[sarcastic][soft tone]"
+   }
+  },
+  {
+   "id": "limite",
+   "lead": 0.5,
+   "tail": 0.5,
+   "gaps": {
+    "2": 0.6
+   },
+   "lines": [
+    "Pero no se pase. Cuando una empresa se traga un mercado entero, los gobiernos la parten.",
+    "A Standard Oil la dividieron en treinta y cuatro pedazos. A AT&T, en siete.",
+    "En México, hoy eso lo vigila la Comisión Nacional Antimonopolio.",
+    "Aunque, con los años... varios pedazos se volvieron a juntar."
+   ],
+   "styles": {
+    "0": "[calm][confident]",
+    "3": "[whispering]"
+   }
+  },
+  {
+   "id": "cierre",
+   "lead": 0.6,
+   "tail": 3.6,
+   "gaps": {
+    "0": 0.5
+   },
+   "lines": [
+    "Con esto termina la sesión de esta noche, Entrenador.",
+    "Y explica, de paso, por qué nadie se atreve a postularse contra mí en el Consejo Estudiantil."
+   ],
+   "styles": {
+    "1": "[satisfied][soft tone]"
+   }
+  }
+ ],
+ "style": "[soft tone][calm]"
+}

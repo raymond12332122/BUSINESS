@@ -6,10 +6,21 @@ const VIDEO = new URLSearchParams(location.search).get('video') || 'guerrilla';
 const BASE = VIDEO === 'guerrilla' ? '/build' : `/build/${VIDEO}`;
 const SCENE_DIR = VIDEO === 'guerrilla' ? './scenes' : `./${VIDEO}/scenes`;
 
-const W = 1920, H = 1080;
+const VERT = VIDEO === 'mono';   // vertical (9:16) shorts
+const W = VERT ? 1080 : 1920, H = VERT ? 1920 : 1080;
 
 async function boot() {
   const QP = new URLSearchParams(location.search);
+  let capFn = null;   // a video can bring its own caption style (one word at a time, for the shorts)
+  if (VERT) {
+    for (const el of [document.documentElement, document.body]) { el.style.width = W + 'px'; el.style.height = H + 'px'; }
+    for (const f of ['fonts/fonts.css', 'style.css']) {
+      const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = `./${VIDEO}/${f}`;
+      await new Promise(r => { l.onload = l.onerror = r; document.head.append(l); });
+    }
+    await Promise.all(["700 60px 'Pixelify Sans'", "400 60px 'Jacquard 24'", "400 60px VT323", "700 40px Silkscreen", "400 40px Silkscreen"].map(f => document.fonts.load(f, 'ÁÉÍÓÚÑ¿¡$%')));
+    capFn = (await import(`./${VIDEO}/caps.js`)).caption;
+  }
   const renderer = new THREE.WebGLRenderer({ antialias: QP.get('aa') !== '0', preserveDrawingBuffer: true });
   renderer.setSize(W, H); renderer.setPixelRatio(Math.min(1, window.devicePixelRatio || 1));
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = QP.get('soft') === '0' ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
@@ -19,6 +30,7 @@ async function boot() {
   // Finishing pass (post-processing, animated grass/clouds) for videos that ship one.
   let post = null, look = null;
   if ((VIDEO === 'amer' || VIDEO === 'whatif' || VIDEO === 'wwii') && QP.get('post') !== '0') { look = await import('./amer/look.js'); post = look.makePost(renderer, W, H); }
+  if (VIDEO === 'mono' && QP.get('post') !== '0') { look = await import('./mono/look.js'); post = look.makePost(renderer, W, H); }
 
   const TL = await (await fetch(LANG === 'en' ? `${BASE}/timeline.json` : `${BASE}/${LANG}/timeline.json`)).json();
   await C.loadCast();
@@ -29,7 +41,7 @@ async function boot() {
     const mod = await import(`${SCENE_DIR}/${s.id}.js`);
     if (mod.preload) await mod.preload();
     const camera = new THREE.PerspectiveCamera(35, W / H, 0.1, 900);
-    const ctx = { L: s.lines, dur: s.dur, camera, W, H, renderer,
+    const ctx = { L: s.lines, dur: s.dur, start: s.start, camera, W, H, renderer,
       project(v) { camera.updateMatrixWorld(); const p = new THREE.Vector3(...v).project(camera); return [(p.x + 1) / 2 * W, (1 - p.y) / 2 * H, p.z < 1]; } };
     const inst = mod.build(ctx);
     inst.ctx = ctx; built.push(inst);
@@ -73,7 +85,8 @@ async function boot() {
     else if (views) { renderer.setScissorTest(true); for (const v of views) { renderer.setViewport(v.x * W, 0, v.w * W, H); renderer.setScissor(v.x * W, 0, v.w * W, H); renderer.render(v.scene, v.camera); } renderer.setScissorTest(false); renderer.setViewport(0, 0, W, H); }
     else renderer.render(sc, inst.ctx.camera);
     const cap = captionAt(s.lines, t);
-    ui.innerHTML = trHTML(html) + (cap && !inst.noCaptions && !(inst.hideCaptions && inst.hideCaptions(t)) ? `<div class="cap">${cap}</div>` : '');
+    const capOn = !inst.noCaptions && !(inst.hideCaptions && inst.hideCaptions(t));
+    ui.innerHTML = trHTML(html) + (!capOn ? '' : capFn ? capFn(s.lines, t, inst) : cap ? `<div class="cap">${cap}</div>` : '');
     // a corner date stamp that a two-line caption would cover is lifted just above the caption box
     let lifted = 0; const capEl = ui.querySelector('.cap');
     if (capEl) for (const st of ui.querySelectorAll('.dstamp')) {

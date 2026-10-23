@@ -253,7 +253,7 @@ export class Rig {
       const up = pick(new RegExp(`^Eye_up_\\d+_${side}(_\\d+)?$`)), lo = pick(new RegExp(`^Eye_bottom_\\d+_${side}(_\\d+)?$`));
       if (!up.length || !lo.length) continue;
       const dw = cen(lo).sub(cen(up)).multiplyScalar(0.92);
-      for (const b of up) rig.lids.push({ b, rest: b.position.clone(), d: toLocal(b, dw) });
+      for (const b of up) rig.lids.push({ b, rest: b.position.clone(), d: toLocal(b, dw), side });
     }
     const open = (BIG[this.key] || 1.4) * 0.0075;
     for (const b of pick(/^(Mouth_bottom_\d+_[CLR]|Tooth_bottom(_[LR])?|Chin)(_\d+)?$/)) rig.lips.push({ b, rest: b.position.clone(), d: toLocal(b, new THREE.Vector3(0, -open, 0)) });
@@ -262,10 +262,12 @@ export class Rig {
   }
   setFaceBones(eye, mouth) {
     // numbers give continuous values: eye = lid closure 0..1, mouth = jaw opening 0..1 (or [opening, smile])
-    const c = typeof eye === 'number' ? eye : { blink: 1, closed: 1, happy: 0.8, flat: 0.45, squint: 0.55, dizzy: 0.7 }[eye] || 0;
+    // eye = [left, right] closes each eye on its own (a wink)
+    const lid = e => typeof e === 'number' ? e : { blink: 1, closed: 1, happy: 0.8, flat: 0.45, squint: 0.55, dizzy: 0.7 }[e] || 0;
+    const c = Array.isArray(eye) ? null : lid(eye), cs = Array.isArray(eye) ? { L: lid(eye[0]), R: lid(eye[1]) } : null;
     const mo = typeof mouth === 'number' ? mouth : Array.isArray(mouth) ? mouth[0] : { open: 0.8, shout: 1, scream: 1.1, big: 0.9, teeth: 0.45, grin: 0.35, tri: 0.7, wavy: 0.25, tongue: 0.5 }[mouth] || 0;
     const sm = Array.isArray(mouth) ? mouth[1] : { smile: 1, grin: 1, cat: 0.8, teeth: 0.8, happy: 0.8 }[mouth] || 0;
-    for (const L of this.faceRig.lids) L.b.position.copy(L.rest).addScaledVector(L.d, c);
+    for (const L of this.faceRig.lids) L.b.position.copy(L.rest).addScaledVector(L.d, cs ? cs[L.side] : c);
     for (const L of this.faceRig.lips) L.b.position.copy(L.rest).addScaledVector(L.d, mo);
     for (const L of this.faceRig.corners) L.b.position.copy(L.rest).addScaledVector(L.d, sm);
   }

@@ -760,19 +760,109 @@ def insects(d):   # cicadas over the cane fields
     x = fft_filter(noise(d), lo=4000, hi=7500) * (0.5 + 0.5 * np.sin(2 * np.pi * 85 * t)) ** 2 * (0.6 + 0.4 * np.sin(2 * np.pi * 0.18 * t) ** 2)
     return fade(norm(x) * 0.22 + birds(d) * 0.5, 1.0, 1.0)
 
+# ------------------------------------------------------------------ "Monopolio": a rainy office at midnight
+def rain(d):
+    n = int(d * SR); r = np.random.default_rng(11)
+    base = fft_filter(noise(d), lo=300, hi=8000) * (0.85 + 0.15 * np.sin(2 * np.pi * 0.13 * t_(d)))
+    imp = np.zeros(n); idx = r.integers(0, max(1, n - 1), int(d * 60)); imp[idx] = r.uniform(0.3, 1.0, len(idx)) * r.choice([-1, 1], len(idx))
+    return fade(norm(base) * 0.5 + norm(fft_filter(imp, lo=1800, hi=7000)) * 0.35, 0.8, 0.8)
+def thunder():   # a crack, then a long rolling rumble
+    d = 4.5; t = t_(d)
+    crack_ = fft_filter(noise(d), lo=800, hi=9000) * np.exp(-t * 9) * (t < 0.6)
+    rum = fft_filter(noise(d), hi=180) * (1 - np.exp(-t * 6)) * np.exp(-t * 0.75) * (0.6 + 0.4 * np.sin(2 * np.pi * 1.3 * t + 2 * np.sin(2 * np.pi * 0.4 * t)))
+    return norm(norm(crack_) * 0.5 + norm(rum), 0.95)
+def hum(d):   # mains hum of the glowing table
+    t = t_(d); x = sum(np.sin(2 * np.pi * 60 * k * t) / k for k in (1, 2, 3, 4, 5)) * (0.7 + 0.3 * np.sin(2 * np.pi * 0.3 * t))
+    return fade(norm(fft_filter(x, hi=900)) * 0.6, 0.6, 0.6)
+def rise():   # the tower grinding up out of the table
+    d = 1.6; t = t_(d); f = 55 + 120 * (t / d) ** 1.5
+    x = np.sin(2 * np.pi * np.cumsum(f) / SR) * 0.6 + norm(fft_filter(noise(d), lo=60, hi=500) * (0.5 + 0.5 * np.sin(2 * np.pi * 14 * t))) * 0.5
+    return fade(norm(x) * np.minimum(1, t / 0.2) * np.exp(-np.maximum(0, t - 1.2) * 6), 0.01, 0.1)
+def crt():   # a CRT coming on: degauss thump, static, whine
+    d = 0.9; t = t_(d)
+    return norm(np.sin(2 * np.pi * (80 * t - 30 * t * t)) * np.exp(-t * 12) * 0.8 + norm(fft_filter(noise(d), lo=1500, hi=9000) * np.exp(-t * 7)) * 0.5 + np.sin(2 * np.pi * 7800 * t) * 0.08) * 0.9
+def neon(d):   # a neon sign flickering on, then buzzing
+    t = t_(d); r = np.random.default_rng(3)
+    buzz = fft_filter(np.sign(np.sin(2 * np.pi * 120 * t)) * 0.3 + np.sin(2 * np.pi * 240 * t) * 0.2, hi=2500)
+    fl = np.repeat((r.random(int(d * 20) + 1) > 0.35).astype(float), int(SR / 20) + 1)[:len(t)]; fl = np.where(t < 0.8, fl, 1.0)
+    return fade(norm(buzz * fl) * 0.5, 0.02, 0.4)
+def slide():   # paper sliding across a table
+    d = 1.4; t = t_(d); return norm(fft_filter(noise(d), lo=900, hi=5000) * np.exp(-t * 2.2) * np.minimum(1, t / 0.05)) * 0.7
+def glass():   # the dome landing: glass ring over a dull thud
+    d = 2.2; t = t_(d); r = np.random.default_rng(8)
+    parts = sum(np.sin(2 * np.pi * f * t) * np.exp(-t * k) for f, k in zip(r.uniform(1800, 6500, 9), r.uniform(2.5, 6, 9)))
+    return norm(norm(parts) * 0.7 + np.sin(2 * np.pi * 90 * t) * np.exp(-t * 14) * 0.6) * 0.9
+def lock():   # two clicks and a little metal ring
+    d = 0.6; t = t_(d); x = np.zeros(len(t))
+    for t0, a in ((0.0, 1.0), (0.09, 0.8)):
+        i = int(t0 * SR); n = int(0.03 * SR); x[i:i + n] += fft_filter(noise(0.03), lo=1500, hi=8000)[:n] * np.exp(-np.arange(n) / SR * 120) * a
+    return norm(x + np.sin(2 * np.pi * 2400 * t) * np.exp(-t * 18) * 0.3 + np.sin(2 * np.pi * 3700 * t) * np.exp(-t * 25) * 0.2) * 0.9
+def shatter():   # glass bursting into tinkling shards
+    d = 2.0; t = t_(d); r = np.random.default_rng(21); tinks = np.zeros(len(t))
+    for _ in range(40):
+        i = int(r.uniform(0, 1.3) * SR); n = int(0.25 * SR); tt = np.arange(n) / SR
+        tinks[i:i + n] += (np.sin(2 * np.pi * r.uniform(2500, 8000) * tt) * np.exp(-tt * r.uniform(15, 40)) * r.uniform(0.2, 1.0))[:len(tinks) - i]
+    return norm(norm(fft_filter(noise(d), lo=1200, hi=11000) * np.exp(-t * 7)) * 0.8 + norm(tinks) * 0.6) * 0.95
+def glitch():   # digital tearing
+    d = 0.45; t = t_(d); r = np.random.default_rng(4); x = np.zeros(len(t))
+    for _ in range(9):
+        i = int(r.uniform(0, d - 0.06) * SR); n = int(r.uniform(0.02, 0.06) * SR)
+        x[i:i + n] += (np.sign(np.sin(2 * np.pi * r.uniform(200, 2200) * np.arange(n) / SR)) * r.uniform(0.4, 1.0))[:len(x) - i]
+    return norm(np.round(x * 6) / 6 + fft_filter(noise(d), lo=3000, hi=9000) * 0.3) * 0.6
+def heart(d):   # slow heartbeat
+    t = t_(d); x = np.zeros(len(t)); k = np.arange(int(0.2 * SR)) / SR
+    lub, dub = np.sin(2 * np.pi * 55 * k) * np.exp(-k * 22), np.sin(2 * np.pi * 48 * k) * np.exp(-k * 26) * 0.7
+    for b in np.arange(0, d, 60 / 72):
+        for off, s_ in ((0, lub), (0.28, dub)):
+            i = int((b + off) * SR); x[i:i + len(s_)] += s_[:max(0, len(x) - i)]
+    return fade(norm(x) * 0.9, 0.3, 0.3)
+def sonar():
+    d = 2.2; t = t_(d); ping = np.sin(2 * np.pi * 1180 * t) * np.exp(-t * 3.2) * np.minimum(1, t / 0.004)
+    echo = np.zeros(len(t)); i = int(0.42 * SR); echo[i:] += ping[:len(t) - i] * 0.35
+    return norm(ping + echo) * 0.6
+def chime():
+    d = 2.4; t = t_(d); x = np.zeros(len(t))
+    for j, m in enumerate((86, 89, 93, 98)):
+        i = int(j * 0.09 * SR); tt = t[:len(t) - i]; x[i:] += np.sin(2 * np.pi * 440 * 2 ** ((m - 69) / 12) * tt) * np.exp(-tt * 2.5) * 0.5
+    return norm(x) * 0.5
+def drawer():   # a metal filing drawer rolling out, then the clunk
+    d = 0.9; t = t_(d)
+    rattle = fft_filter(noise(d), lo=200, hi=2500) * (0.6 + 0.4 * np.sign(np.sin(2 * np.pi * 31 * t))) * np.minimum(1, t / 0.05) * np.exp(-np.maximum(0, t - 0.6) * 12)
+    clunk = np.zeros(len(t)); i = int(0.62 * SR); k = np.arange(int(0.2 * SR)) / SR
+    clunk[i:i + len(k)] += (np.sin(2 * np.pi * 140 * k) * np.exp(-k * 30) + fft_filter(noise(0.2), lo=500, hi=3000)[:len(k)] * np.exp(-k * 40))[:len(clunk) - i]
+    return norm(norm(rattle) * 0.6 + clunk * 0.8) * 0.85
+def buzzoff():   # a sign sputtering out
+    d = 0.9; t = t_(d); r = np.random.default_rng(9)
+    buzz = fft_filter(np.sign(np.sin(2 * np.pi * 120 * t)) * 0.5 + noise(d) * 0.15, hi=3000)
+    g = np.repeat((r.random(len(t) // 1200 + 1) > 0.4).astype(float), 1200)[:len(t)]
+    pop_ = np.zeros(len(t)); i = int(0.55 * SR); pop_[i:i + 300] = fft_filter(noise(0.01), lo=800, hi=6000)[:300] * np.exp(-np.arange(300) / 60)
+    return norm(norm(buzz * g * (t < 0.55)) * 0.6 + pop_) * 0.8
+def powerdown():
+    d = 1.6; t = t_(d); f = 220 * np.exp(-t * 2.2) + 30
+    return norm(np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 1.2) + fft_filter(noise(d), hi=400) * np.exp(-t * 2) * 0.4) * 0.7
+def crtoff():
+    d = 0.6; t = t_(d); f = 3800 * np.exp(-t * 9) + 120
+    return norm(np.sin(2 * np.pi * np.cumsum(f) / SR) * np.exp(-t * 5) + fft_filter(noise(d), lo=2000, hi=9000) * np.exp(-t * 10) * 0.5) * 0.6
+def reverse():   # a reversed swell, for the pieces pulling back together
+    d = 1.8; t = t_(d); x = fft_filter(noise(d), lo=200, hi=4000) * (t / d) ** 2.5 + np.sin(2 * np.pi * (110 + 60 * t / d) * t) * (t / d) ** 3 * 0.5
+    x[-int(0.04 * SR):] *= np.linspace(1, 0, int(0.04 * SR)); return norm(x) * 0.75
+
 
 ONE = {'shot': shot, 'boom': lambda: boom(False), 'bigboom': lambda: boom(True), 'whoosh': whoosh, 'pop': pop, 'click': click,
        'thud': thud, 'creak': creak, 'sting': sting, 'sting2': sting2, 'tension': tension, 'beep': beep, 'tick': tick,
        'missile': missile, 'brakes': brakes, 'cheer': cheer, 'clank': clank, 'charge': charge, 'whistle': whistle, 'bell': bell, 'laugh': laugh,
        'neigh': neigh, 'cannon': cannon, 'volley': volley, 'broadside': broadside,
        'hit': hit, 'stamp': stamp, 'swoosh': swoosh, 'gavel': gavel, 'cash': cash, 'paper': paper, 'cock': cock, 'notify': notify, 'shutter': shutter,
-       'fanfare': fanfare, 'horn': horn, 'shout': shout, 'curtain': curtain, 'crack': crack, 'knock': doorknock, 'door': door, 'splash': splash}
+       'fanfare': fanfare, 'horn': horn, 'shout': shout, 'curtain': curtain, 'crack': crack, 'knock': doorknock, 'door': door, 'splash': splash,
+       'thunder': thunder, 'rise': rise, 'crt': crt, 'slide': slide, 'register': cash, 'glass': glass, 'lock': lock, 'shatter': shatter, 'glitch': glitch,
+       'sonar': sonar, 'chime': chime, 'drawer': drawer, 'buzzoff': buzzoff, 'powerdown': powerdown, 'crtoff': crtoff, 'reverse': reverse}
 LOOP = {'engine': engine, 'march': march, 'drone': drone, 'train': train, 'wind': wind, 'clock': clock,
         'plane': plane, 'siren': siren, 'waves': waves, 'factory': factory, 'bells': bells, 'crowd': crowd, 'mg': mg, 'fire': fire,
         'drums': drums, 'choir': choir, 'riser': riser, 'gunfire': gunfire, 'engines': engine, 'sirens': siren, 'typewriter': typewriter, 'traffic': traffic,
         'swell': swell, 'jet': jet, 'heli': heli, 'harbor': harbor, 'bubbling': bubbling, 'birds': birds, 'night': night,
         'pour': pour, 'hiss': hiss, 'camera': camera,
-        'drum': drumroll, 'quill': quill, 'hooves': hooves, 'applause': applause, 'organ': organ, 'harpsichord': harpsichord, 'whisper': whisper, 'steps': steps, 'insects': insects}
+        'drum': drumroll, 'quill': quill, 'hooves': hooves, 'applause': applause, 'organ': organ, 'harpsichord': harpsichord, 'whisper': whisper, 'steps': steps, 'insects': insects,
+        'rain': rain, 'hum': hum, 'neon': neon, 'heart': heart}
 
 sfx = np.zeros(N)
 cache = {}
@@ -1110,6 +1200,40 @@ def whatif_pop(moods=WHATIF_MOODS, bpm=124, key=0):
 
 
 # ------------------------------------------------------------------ music bed (D minor, slow pads + soft pulse)
+# ------------------------------------------------------------------ "Monopolio": a warped music-box waltz in D minor over a low drone
+MONO_LEVEL = {'abre': 0.75, 'escala': 0.85, 'rival': 0.9, 'asesina': 0.65, 'radar': 0.85, 'jaula': 0.95, 'cobro': 0.8, 'limite': 1.0, 'cierre': 0.7}
+def mono_bed():
+    bpm = 66; beat = 60 / bpm; bar = 3 * beat; ta = np.arange(N) / SR
+    L, R = np.zeros(N), np.zeros(N)
+    dr = sum(np.sin(2 * np.pi * f * ta + 0.4 * np.sin(2 * np.pi * 0.07 * (k + 1) * ta)) for k, f in enumerate([73.42, 110.0, 146.83])) + 0.6 * np.sin(2 * np.pi * 36.71 * ta)
+    dr *= 0.55 + 0.45 * np.sin(2 * np.pi * 0.05 * ta) ** 2
+    def box(m, d=1.8, det=0.0):
+        t = t_(d); f = 440 * 2 ** ((m - 69) / 12) * (1 + det) * (1 + 0.0035 * np.sin(2 * np.pi * 0.6 * t))
+        ph = 2 * np.pi * np.cumsum(f) / SR
+        x = np.sin(ph) + 0.45 * np.sin(2 * ph) * np.exp(-t * 6) + 0.25 * np.sin(3.01 * ph) * np.exp(-t * 9) + 0.12 * np.sin(5.43 * ph) * np.exp(-t * 14)
+        return x * np.exp(-t * 3.0) * (1 - np.exp(-t * 400))
+    A = [[74, 77, 81], [80, 81, 77], [76, 74, 73], [74, 0, 0]]
+    B = [[81, 79, 77], [76, 77, 74], [73, 76, 69], [74, 0, 0]]
+    C = [[77, 76, 74], [73, 74, 70], [69, 70, 73], [74, 0, 0]]
+    tune = A + B + A + C; low = [50, 45, 46, 45]
+    r = np.random.default_rng(7); level = np.ones(N)
+    for sc in TL['scenes']:
+        a, b = int(sc['start'] * SR), int((sc['start'] + sc['dur']) * SR); level[a:b] = MONO_LEVEL.get(sc['id'], 0.8)
+    level = np.convolve(level, np.ones(int(SR)) / SR, mode='same')
+    k = 0
+    for b0 in np.arange(1.2, TOTAL - 2, bar):
+        notes = tune[k % len(tune)]; k += 1
+        for j, m in enumerate(notes):
+            if not m: continue
+            x = box(m, det=r.uniform(-0.005, 0.005)); i = int((b0 + j * beat + r.uniform(-0.015, 0.015)) * SR)
+            if i >= N: continue
+            x = x[:N - i] * level[i]; pan = 0.35 + 0.3 * r.random(); L[i:i + len(x)] += x * pan * 0.9; R[i:i + len(x)] += x * (1 - pan) * 0.9
+        x = box(low[(k - 1) % 4] - 12, 2.6) * 0.7; i = int(b0 * SR)
+        if i < N: x = x[:N - i] * level[i]; L[i:i + len(x)] += x * 0.5; R[i:i + len(x)] += x * 0.5
+    L, R = room(L), room(R)
+    L += dr * 0.28 * level; R += dr * 0.28 * level
+    return L, R
+
 if VIDEO == 'mx':
     musL, musR = corrido(); t_all = np.arange(N) / SR
     sc_ = 0.15 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
@@ -1138,7 +1262,10 @@ if VIDEO == 'wwii':
 if VIDEO == 'whatif':
     musL, musR = whatif_pop(); t_all = np.arange(N) / SR
     sc_ = 0.15 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
-if VIDEO not in ('mx', 'napo', 'amer', 'narco', 'puebla', 'rusia', 'ww1', 'whatif', 'wwii'):
+if VIDEO == 'mono':
+    musL, musR = mono_bed(); t_all = np.arange(N) / SR
+    sc_ = 0.16 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
+if VIDEO not in ('mx', 'napo', 'amer', 'narco', 'puebla', 'rusia', 'ww1', 'whatif', 'wwii', 'mono'):
     prog = [[146.8, 174.6, 220.0], [116.5, 146.8, 174.6], [174.6, 220.0, 261.6], [130.8, 164.8, 196.0]]  # Dm Bb F C
     bar = 4 * beat
     musL, musR = np.zeros(N), np.zeros(N)
