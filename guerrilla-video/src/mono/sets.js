@@ -120,7 +120,7 @@ export function office() {
   // the uplight from the table onto the host, and a cool key from the front-left for faces
   // villain lighting: a cold uplight from the table, a warm soft key from the lamp side, a red rim from behind
   const glow = new THREE.SpotLight('#5aa0ff', 1.0, 3.2, 0.32, 0.9, 1.5); glow.position.set(0, P.TABLE.H + 0.06, -0.05); glow.target.position.set(0, 1.5, -0.85); s.add(glow, glow.target); s.tableGlow = glow;
-  const cityLight = new THREE.PointLight('#4f8fff', 0.6, 1.6, 1.6); cityLight.position.set(0, P.TABLE.H + 0.55, 0.1); s.add(cityLight);
+  const cityLight = new THREE.PointLight('#4f8fff', 0.4, 1.5, 1.6); cityLight.position.set(0, P.TABLE.H + 0.75, 0.3); s.add(cityLight); s.cityLight = cityLight;
   const key = new THREE.SpotLight('#ffe2c4', 6, 7, 0.36, 0.85, 1.6); key.position.set(-1.25, 2.35, 1.05); key.target.position.set(0, 1.3, -0.82); key.castShadow = true;
   key.shadow.mapSize.set(1024, 1024); key.shadow.bias = -0.0004; key.shadow.normalBias = 0.02; s.add(key, key.target); s.key = key;
   const rim = new THREE.PointLight('#ff2a3a', 4.5, 1.5, 2); rim.position.set(0.15, 1.7, -1.55); s.add(rim); s.rim = rim;

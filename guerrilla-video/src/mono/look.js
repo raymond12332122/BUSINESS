@@ -48,6 +48,10 @@ const PSX = {
     }`,
 };
 
+// HDR clamp before the bloom: a tiny specular spark (a gold fringe, a gem) must not bloom into a big blob.
+const CLAMP = { uniforms: { tDiffuse: { value: null }, cap: { value: 2.2 } },
+  vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+  fragmentShader: 'uniform sampler2D tDiffuse; uniform float cap; varying vec2 vUv; void main(){ vec4 c = texture2D(tDiffuse, vUv); float m = max(max(c.r, c.g), c.b); gl_FragColor = vec4(m > cap ? c.rgb * (cap / m) : c.rgb, c.a); }' };
 export function makePost(renderer, W, H) {
   const pr = renderer.getPixelRatio() * 0.5, w = Math.round(W * pr), h = Math.round(H * pr);
   const rt = new THREE.WebGLRenderTarget(w, h, { type: THREE.HalfFloatType, samples: 4 });
@@ -55,7 +59,8 @@ export function makePost(renderer, W, H) {
   const rp = new RenderPass(new THREE.Scene(), new THREE.PerspectiveCamera());
   const bloom = new UnrealBloomPass(new THREE.Vector2(w, h), 0.7, 0.6, 0.9);
   const psx = new ShaderPass(PSX); psx.uniforms.res.value.set(w, h);
-  composer.addPass(rp); composer.addPass(bloom); composer.addPass(new OutputPass()); composer.addPass(psx);
+  const clampP = new ShaderPass(CLAMP);
+  composer.addPass(rp); composer.addPass(clampP); composer.addPass(bloom); composer.addPass(new OutputPass()); composer.addPass(psx);
   return {
     composer, bloom, psx,
     render(scene, camera) {

@@ -75,6 +75,8 @@ export function tvShot(s, d = 1.2, dy = 0.05, dx = 0) {
   const p = c.clone().addScaledVector(n, d).addScaledVector(side, dx); p.y += dy;
   return { p: p.toArray(), l: c.toArray() };
 }
+// Caption height per time: lower (under the monitor) inside the given [t0, t1] windows.
+export const capLow = wins => t => wins.some(([a, b]) => t >= a && t < b) ? 0.86 : 0.68;
 // Face presets: speaking with a thin smile, the smug half-lidded look, a wink, a cold stare.
 export const FACE = {
   talk: (on, smile = 0.3) => ({ talk: on ? 0.8 : false, smile }),

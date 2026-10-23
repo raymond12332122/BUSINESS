@@ -22,7 +22,7 @@ SR, GAP = 24000, 0.45
 OUT = os.path.join(ROOT, 'build', VIDEO, LANG); VD = os.path.join(ROOT, 'assets', 'voice', VIDEO); os.makedirs(VD, exist_ok=True)
 script = json.load(open(os.path.join(ROOT, 'src', VIDEO, f'script_{LANG}.json')))
 # Spoken forms for the TTS only; subtitles keep the script's spelling.
-SAY = [(r'AT&T', 'Ei Ti and Ti'), (r'\bStandard Oil\b', 'Estándar Óil'), (r'\bapp\b', 'ap')]
+SAY = [(r'AT&T', 'Ei Ti and Ti'), (r'\bapp\b', 'ap')]
 
 
 def say(text):
@@ -71,6 +71,13 @@ def asr():
     return _asr
 
 
+def check(a16, text):
+    """How well an unprompted transcription matches the line (0..1), and what Whisper heard."""
+    segs, _ = asr().transcribe(a16, language=LANG, beam_size=5)
+    heard = ' '.join(s.text.strip() for s in segs)
+    return difflib.SequenceMatcher(None, [norm(x) for x in text.split()], [norm(x) for x in heard.split()]).ratio(), heard
+
+
 def align(a16, text):
     """Word times (s, in a16) for each script token, how much of the line Whisper recognised, and what it heard."""
     segs, _ = asr().transcribe(a16, language=LANG, word_timestamps=True, initial_prompt=text, beam_size=5)
@@ -111,11 +118,14 @@ for si, sc in enumerate(script['scenes']):
         for k, f in enumerate(takes):
             if not DRY and not os.path.exists(f): tts(spoken, f); print(f'  fetched s{si:02d}_l{li} take {k}', flush=True)
         if FETCH: continue
+        # the take Whisper understands best on its own wins; then the script is aligned onto it
         best = None
         for src in takes:
-            a16 = decode(src, 16000); times, score, heard = align(a16, text)
-            if best is None or score > best[1]: best = (src, score, times, heard)
-        src, score, times, heard = best
+            a16 = decode(src, 16000); sc_, heard = check(a16, text) if len(takes) > 1 else (1.0, '')
+            if best is None or sc_ > best[1]: best = (src, sc_, a16, heard)
+        src, score, a16, heard = best
+        times, _, aligned = align(a16, text)
+        heard = heard or aligned
         report.append((sc['id'], li, score, heard))
         a = decode(src, SR)
         nz = np.nonzero(np.abs(a) > 0.008)[0]

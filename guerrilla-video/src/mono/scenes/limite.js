@@ -15,7 +15,7 @@ export function build(ctx) {
   const tSt = wt(L[1], 'standard'), tPed = wt(L[1], 'pedazos'), tAT = wt(L[1], 'at'), tSie = wt(L[1], 'siete');
   const tMx = wt(L[2], 'méxico'), tAnti = wt(L[2], 'antimonopolio');
   const tAu = wt(L[3], 'aunque'), tVa = wt(L[3], 'varios'), tJu = wt(L[3], 'juntar');
-  const O = S.office(), rud = K.host(O), tv = K.tvShot(O, 0.98, 0.02, 0.04);
+  const O = S.office(), rud = K.host(O), tv = K.tvShot(O, 1.18, 0.0, 0.0);
   const dome = P.dome(0.92, 0.95); dome.scale.set(1, 1, 0.62); dome.position.set(0, K.TOP, 0); O.add(dome);
   // glass shards for the moment it breaks
   const rnd = (i => { const v = Math.sin(i * 91.7 + 13.1) * 43758.5453; return v - Math.floor(v); });
@@ -29,6 +29,7 @@ export function build(ctx) {
     return { m, p, v, r: new THREE.Vector3(rnd(i + 6) * 9, rnd(i + 7) * 9, rnd(i + 8) * 9) };
   });
   const act = t => {
+    const close = t < tCu - 0.25; O.key.intensity = close ? 3.2 : 6; O.tableGlow.intensity = close ? 0.3 : 1.0; O.cityLight.intensity = close ? 0.05 : 0.4;
     const broken = t > tPar;
     dome.visible = !broken;
     shards.forEach(({ m, p, v, r }) => { const d = t - tPar; m.visible = d > 0 && d < 1.6;
@@ -58,7 +59,7 @@ export function build(ctx) {
     { t0: tSt - 0.3, set: O, p0: tv.p, l0: tv.l, p1: tv.p.map((v, i) => v + (tv.l[i] - v) * 0.12), l1: tv.l, fov0: 50, act },
     { t0: tAu - 0.3, set: O, p0: [1.1, 1.05, 0.55], l0: [0.5, 1.12, -0.32], p1: [0.85, 1.1, 0.72], l1: [0.45, 1.15, -0.35], fov0: 50, ease: 'inOut', act },
   ];
-  const inst = { scene: O, scenes: [O], sfx };
+  const inst = { scene: O, scenes: [O], sfx, capY: K.capLow([[tSt - 0.3, tAu - 0.3]]) };
   S.bakeAll(inst.scenes);
   inst.update = t => run(inst, ctx, shots, t);
   return inst;

@@ -14,7 +14,7 @@ export function build(ctx) {
   const tAp = wt(L[0], 'apague'), tApp = wt(L[0], 'app');
   const tEc = wt(L[1], 'economistas'), tAd = wt(L[1], 'adquisiciones'), tAs = wt(L[1], 'asesinas');
   const tFa = wt(L[2], 'farmac'), tSi = wt(L[2], 'siete'), tEn = wt(L[2], 'enterrar'), tRi = wt(L[2], 'rival');
-  const O = S.office(), tv = K.tvShot(O, 0.98, 0.02, 0.04);
+  const O = S.office(), tv = K.tvShot(O, 1.18, 0.0, 0.0);
   const girls = [['spe', -0.75, 0.44], ['daiwa', -0.67, 0.47], ['suzuka', -0.59, 0.48], ['cafe', -0.51, 0.47], ['hishi', -0.43, 0.44]]
     .map(([w, x, z], i) => { const r = K.figurine(O.city, w, x, z, 0.1 * (2 - i)); r.i = i; return r; });
   // Rudolf at the ADQ cabinet (the third, z = -1.61), facing it; the top drawer slides out towards her
@@ -58,7 +58,7 @@ export function build(ctx) {
     { t0: tAs + 0.35, set: O, p0: [2.66, 1.64, -1.28], l0: [2.72, 1.04, -1.62], p1: [2.68, 1.58, -1.34], l1: [2.73, 1.03, -1.62], fov0: 50, act },
     { t0: tFa - 0.3, set: O, p0: [-1.85, O.deskTop + 0.5, -1.98], l0: [-2.18, O.deskTop, -2.36], p1: [-1.95, O.deskTop + 0.38, -2.07], l1: [-2.18, O.deskTop, -2.36], fov0: 46, ease: 'out', act },
   ];
-  const inst = { scene: O, scenes: [O], sfx };
+  const inst = { scene: O, scenes: [O], sfx, capY: K.capLow([[tApp + 0.05, tEc - 0.3]]) };
   S.bakeAll(inst.scenes);
   inst.update = t => run(inst, ctx, shots, t);
   return inst;

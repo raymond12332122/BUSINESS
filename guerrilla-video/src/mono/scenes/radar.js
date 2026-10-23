@@ -13,7 +13,7 @@ export function build(ctx) {
   const L = ctx.L;
   const tEs = wt(L[0], 'eso'), tCo = wt(L[0], 'cómprelas'), tPe = wt(L[0], 'pequeñas'), tDe = wt(L[0], 'debajo'), tAv = wt(L[0], 'avisar');
   const tCu = wt(L[1], 'curiosamente'), tMu = wt(L[1], 'muchas'), tJu = wt(L[1], 'justo'), tLi = wt(L[1], 'línea');
-  const O = S.office(), rud = K.host(O), tv = K.tvShot(O, 0.98, 0.02, 0.04);
+  const O = S.office(), rud = K.host(O), tv = K.tvShot(O, 1.18, 0.0, 0.0);
   const hs = P.house(77); hs.userData.dynamic = true; O.add(hs);
   const p0 = new THREE.Vector3(-0.15, K.TOP, -0.42), p1 = new THREE.Vector3(-0.07, 1.27, -0.56);
   const act = t => {
@@ -35,7 +35,7 @@ export function build(ctx) {
     { t0: tDe - 0.3, set: O, p0: tv.p, l0: tv.l, p1: tv.p.map((v, i) => v + (tv.l[i] - v) * 0.1), l1: tv.l, fov0: 50, act },
     { t0: tJu - 0.1, set: O, p0: [0.16, 1.32, -0.12], l0: [-0.03, 1.33, -0.82], p1: [0.12, 1.33, -0.2], l1: [-0.03, 1.33, -0.82], fov0: 44, act },
   ];
-  const inst = { scene: O, scenes: [O], sfx };
+  const inst = { scene: O, scenes: [O], sfx, capY: K.capLow([[tDe - 0.3, tJu - 0.1]]) };
   S.bakeAll(inst.scenes);
   inst.update = t => run(inst, ctx, shots, t);
   return inst;

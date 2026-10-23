@@ -41,6 +41,7 @@ export function build(ctx) {
     rivalApp.material.opacity = (1 - dying) * (Math.sin(t * 23) > -0.3 ? 1 : 0.4); rivalApp.scale.setScalar(0.12 * (1 - 0.3 * dying));
     O.led.set(`${Math.round(80 + 12 * ss(tTd, tAq + 0.5, t))}%`);
     O.userData.look.glitch = t > tPo - 0.3 ? Math.max(0, 1 - Math.abs(t - tApp - 0.1) / 0.18) * 0.7 + Math.max(0, 1 - Math.abs(t - tEsto - 0.25) / 0.25) * 0.9 : 0;
+    O.tableGlow.intensity = t > tPo - 0.3 ? 0.35 : 1.0; O.cityLight.intensity = t > tPo - 0.3 ? 0.08 : 0.4;
     const p = t < tPo - 0.3 ? K.steeple(t, 8) : K.lean(t, 8, 0.7);
     if (t > tPo - 0.3) { p.look = [0, 1.36, 0.6]; p.lookW = 0.9; }
     K.act(rud, p, t, t > tEsto + 0.35 ? K.FACE.smug : K.FACE.smugTalk(t < L[2].t1));

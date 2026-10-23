@@ -14,7 +14,7 @@ export function build(ctx) {
   const tAp = wt(L[0], 'aparece'), tBa = wt(L[0], 'barato'), tCi = wt(L[0], 'cinco'), tMit = wt(L[0], 'mitad');
   const tGu = wt(L[1], 'guerra'), tUs = wt(L[1], 'usted'), tEl = wt(L[1], 'ellas'), tCua = wt(L[1], 'cuantos');
   const tNo = wt(L[2], 'no'), tCo = wt(L[2], 'cómprelas'), tChe = wt(L[2], 'cheque'), tGue = wt(L[2], 'guerra');
-  const O = S.office(), rud = K.host(O), tv = K.tvShot(O, 0.98, 0.02, 0.04);
+  const O = S.office(), rud = K.host(O), tv = K.tvShot(O, 1.18, 0.0, 0.0);
   // the five founders, game pieces in front of their garage; later two of them hold up the (to them) giant check
   const girls = [['spe', -0.75, 0.44], ['daiwa', -0.67, 0.47], ['suzuka', -0.59, 0.48], ['cafe', -0.51, 0.47], ['hishi', -0.43, 0.44]]
     .map(([w, x, z], i) => { const r = K.figurine(O.city, w, x, z, 0.1 * (2 - i)); r.i = i; return r; });
@@ -60,7 +60,7 @@ export function build(ctx) {
     { t0: tNo - 0.3, set: O, p0: [0.06, 0.87, 0.78], l0: [0.04, 1.02, -0.6], p1: [0.06, 0.88, 0.72], l1: [0.04, 1.0, -0.6], fov0: 50, act },
     { t0: tChe - 0.2, set: O, p0: [-0.5, 0.9, 0.95], l0: [-0.6, 0.88, 0.42], p1: [-0.53, 0.89, 0.86], l1: [-0.6, 0.88, 0.43], fov0: 58, act },
   ];
-  const inst = { scene: O, scenes: [O], sfx };
+  const inst = { scene: O, scenes: [O], sfx, capY: K.capLow([[tUs - 0.2, tNo - 0.3]]) };
   S.bakeAll(inst.scenes);
   inst.update = t => run(inst, ctx, shots, t);
   return inst;
