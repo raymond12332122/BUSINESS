@@ -34,7 +34,7 @@ export function cctv(t, a, b, cam, date, clock0, { frame = true } = {}) {
   const s = Math.floor(clock0 + (t - a)), hh = String(Math.floor(s / 3600) % 24).padStart(2, '0'), mm = String(Math.floor(s / 60) % 60).padStart(2, '0'), sc = String(s % 60).padStart(2, '0');
   const corner = (x, y, r) => `<div style="position:absolute;${x}:70px;${y}:70px;width:60px;height:60px;border-${y}:3px solid rgba(240,240,230,.75);border-${x}:3px solid rgba(240,240,230,.75)"></div>`;
   return `<div style="position:absolute;inset:0;opacity:${k}">${frame ? corner('left', 'top') + corner('right', 'top') + corner('left', 'bottom') + corner('right', 'bottom') : ''}
-    <div class="mono" style="position:absolute;left:110px;top:96px;font-size:32px;color:#f0eee4;text-shadow:0 0 8px rgba(0,0,0,.9)"><span style="color:#ff3b3b;opacity:${Math.floor(t * 1.6) % 2 ? 0.25 : 1}">●</span> REC · ${cam}</div>
+    <div class="mono" style="position:absolute;left:110px;top:96px;font-size:32px;color:#f0eee4;text-shadow:0 0 8px rgba(0,0,0,.9)"><span style="color:#ff3b3b;opacity:${Math.floor(t * 1.6) % 2 ? 0.25 : 1}">●</span> REC · ${cam}<br><span style="font-size:22px;letter-spacing:.3em;opacity:.75">RECREACIÓN</span></div>
     <div class="mono" style="position:absolute;right:110px;top:96px;font-size:32px;color:#f0eee4;text-align:right;text-shadow:0 0 8px rgba(0,0,0,.9)">${date}<br>${hh}:${mm}:${sc}</div></div>`;
 }
 // Location / time tag (lower-left above the captions).

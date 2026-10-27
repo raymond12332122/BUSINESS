@@ -25,7 +25,7 @@ export function build(ctx) {
     K.act(seller, K.A.wave(t, 1), t, { smile: 0.9, eye: 'happy' });
     passers.forEach((r, i) => K.act(r, walkIn(r, t, t3 - 0.5 + i * 0.3, [[-3.5, 4, -5][i], [1.2, 1.6, 2.2][i]], [Math.PI / 2, -Math.PI / 2, Math.PI / 2][i], 6, { seed: i + 3, speed: 0.45 }), t, {}));
     return U.letterbox(1) + U.chapter(t, 0.2, t1 - 0.3, 7, 'EL CLÓSET') + U.tag(t, tSat - 0.6, t2 - 0.2, 'NAUCALPAN, ESTADO DE MÉXICO', 'JUNTO A CIUDAD SATÉLITE') +
-      U.counter(t, t2 + 0.8, t3 - 0.2, 'COMPRADORES', 0, 0, { x: 1560, y: 330, dur: 0.5, pad: 1, size: 150 });
+      U.stamp(t, wt(L[2], 'famosas') + 0.1, t3 - 0.2, 'DEMASIADO FAMOSAS', { x: 1380, y: 330, size: 74, rot: -6 });
   };
   const sfx = [
     { t: 0, type: 'night', dur: t3, vol: 0.25 }, { t: 0, type: 'clock', dur: t3, vol: 0.18 }, { t: t1 + 0.6, type: 'creak', vol: 0.4 }, { t: t1 + 1.2, type: 'drawer', vol: 0.3 },
