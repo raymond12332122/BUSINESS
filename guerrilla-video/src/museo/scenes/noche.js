@@ -46,7 +46,9 @@ export function build(ctx) {
     fam.forEach((r, i) => K.act(r, i === 1 ? K.A.seated(K.A.stand, t, 1) : K.mix(K.A.sit(t, i), K.A.sitTalk(t, i, 0.6), 0.7), t, { talk: i !== 1 && i % 2 === 0 ? 0.6 : false, smile: i === 1 ? 0.15 : 0.6 }));
     // walk to the car, then gone (inside); the car pulls away at tSal
     for (const [r, x0, z0, sd] of [[w1, 8.6, 9.2, 1], [w2, 9.3, 9.0, 2]]) { const p = walkIn(r, t, t1 + 0.2 + sd * 0.25, [x0, z0], -Math.PI / 2 - 0.12, 3.2, { seed: sd, speed: 0.42 }); r.root.visible = t < tSal - 0.1; K.act(r, p, t, {}); }
-    const dv = Math.max(0, t - tSal); car.position.x = 4 - (dv * dv * 1.6 + dv * 2.2); car.drive(t, Math.min(1, dv)); car.position.z = 10.4 + Math.min(0.6, dv * 0.4);
+    const dv = Math.max(0, t - tSal); car.position.x = 4 - (dv * dv * 0.9 + dv * 2.0); car.drive(t, Math.min(1, dv)); car.position.z = 10.4 + Math.min(0.6, dv * 0.4);
+    // the follow shot pans with the car as it pulls away down the avenue
+    if (t >= tSal + 0.2 && t < t2 - 0.1) ctx.camera.lookAt(car.position.x - 1.2, 0.65, car.position.z);
     // the fence: hands up on the rail, a knee up, then over (cut)
     const ck = clamp((t - tRej) / 1.4);
     K.act(f1, K.climb(t, 1, [-4.15, 1.42, 4.68], [-4.45, 1.42, 4.68], ck), t, {}); K.act(f2, K.climb(t, 2, [-3.45, 1.42, 4.68], [-3.75, 1.42, 4.68], clamp(ck - 0.3)), t, {});
