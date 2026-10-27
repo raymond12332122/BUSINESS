@@ -346,11 +346,12 @@ export function acapulco() {
   const ns2 = P.neonSign('ACAPULCO', '#3ad8ff', 3.6, 0.8); ns2.position.set(3.6, 3.1, 3.98); ns2.rotation.y = Math.PI; s.add(ns2);
   for (const [x, z] of [[-6.2, -3], [6.2, -3.2], [-6.5, 2.6], [6.4, 2.4]]) { const p = LP.palm(1.5, x * 3); p.position.set(x, 0.3, z); s.add(p); }
   const sl = P.xmasLights([[-6, 2.6, -3.6], [-3, 2.3, -3.4], [0, 2.6, -3.6], [3, 2.3, -3.4], [6, 2.6, -3.6]], 40); s.add(sl);
-  for (const [x, z] of [[-3, -1], [2.5, -1.4]]) { s.add(at(cyl(0.45, 0.45, 0.04, '#e8e2d4', 18), x, 0.95, z)); s.add(at(cyl(0.04, 0.04, 0.65, '#2a2a2a', 6), x, 0.62, z)); }
+  for (const [x, z] of [[-3, -1], [2.5, -1.4]]) { s.add(at(cyl(0.45, 0.45, 0.04, '#e8e2d4', 18), x, 0.85, z)); s.add(at(cyl(0.04, 0.04, 0.55, '#2a2a2a', 6), x, 0.575, z)); }
   const warm = new THREE.PointLight('#ff9a6a', 5, 10, 1.4); warm.position.set(0, 2.6, 1.0); s.add(warm);
   const pink = new THREE.PointLight('#ff4ab8', 3, 9, 1.5); pink.position.set(-2, 2.2, 2.6); s.add(pink);
   ticker(s).push(t => { ns.flicker(t); ns2.flicker(t + 0.7); sl.blink(t); moonGlow.material.opacity = 0.1 + 0.03 * Math.sin(t * 1.3); });
   s.userData.look = { ...NIGHT_LOOK, bloom: 0.7, bloomT: 0.8, warm: 0.08, sat: 1.12, rimColor: '#ff9ad8', rim: 0.35 };
+  s.deckY = 0.3;
   return s;
 }
 

@@ -15,7 +15,7 @@ export function build(ctx) {
   const t1 = L[1].t0, t2 = L[2].t0, t3 = L[3].t0, tGua = wt(L[3], 'mas'), tPel = wt(L[3], '2018'), t4 = L[4].t0, t5 = L[5].t0, tEnd = L[5].t1;
   // ---- Sardina walks away down an empty, foggy avenue
   const R = S.reforma({ fireworks: false }); R.fog.near = 6; R.fog.far = 30;
-  const sar = K.person(R, 'daiwa', 'sardina', -2, 9.4, Math.PI / 2 + 0.25);
+  const sar = K.person(R, 'daiwa', 'sardina', -2, 9.4, 1.13);
   // ---- the hall today: empty spots, a security camera, a custodian
   const X = S.sala('maya', { night: false }); X.cases[0].piece.userData.dynamic = true;
   const cam = P.cctvCam(); cam.position.set(-1.6, 3.6, -4.25); cam.rotation.x = 0.35; cam.scale.setScalar(1.6); X.add(cam);
@@ -29,14 +29,14 @@ export function build(ctx) {
   const fillP = new THREE.PointLight('#b8c8f0', 3, 3, 1.5); fillP.position.set(-0.9, 1.4, 0.3); C.add(fillP);
   // ---- the crypt today with visitors round Pakal's mask
   const Cr = S.cripta({ night: false });
-  const v2 = [[-1.75, 0.25, 1.1, 'tamamo'], [-0.05, 0.3, -1.25, 'doto'], [-1.45, -0.45, 0.75, 'mcqueen']].map(([x, z, y, k]) => K.person(Cr, k, 'visitante', x, z, y));
+  const v2 = [[-1.75, 0.25, 1.1, 'tamamo'], [-0.05, 0.3, -1.25, 'doto']].map(([x, z, y, k]) => K.person(Cr, k, 'visitante', x, z, y));
   const cu2 = K.person(Cr, 'helios', 'custodio', 1.9, 1.6, -2.2);
   // ---- the patio at dusk for the last pull-back
   const Pt = S.patio();
   const act = t => {
     R.tick(t); X.tick?.(t); Pt.tick(t); cam.blink(t); alarm.material.emissiveIntensity = Math.floor(t * 2.2) % 2 ? 0.3 : 3.2;
     X.cases[0].piece.visible = !(t >= t1 - 0.3 && t < t2);   // the 13 that never came back: an empty case
-    K.act(sar, walkIn(sar, t, 0.3, [-2, 9.4], Math.PI / 2 + 0.25, 8, { seed: 2, speed: 0.4 }), t, {});
+    K.act(sar, walkIn(sar, t, 0.3, [-2, 9.4], 1.13, 8, { seed: 2, speed: 0.4 }), t, {});
     K.act(cust, walkIn(cust, t, tGua - 0.6, [-1.0, 0.3], 0, 1.6, { seed: 3, speed: 0.34 }), t, { eye: 'open' });
     vis.forEach((r, i) => K.act(r, i === 1 ? K.A.point(t, i, 0.4, 0.1) : i ? K.A.think(t, i) : K.A.stand(t, i), t, {}));
     K.act(per, K.A.seated(K.A.dejected || K.A.think, t, 1), t, { eye: 0.4, mouth: [0, 0] });

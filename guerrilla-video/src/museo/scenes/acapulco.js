@@ -16,8 +16,9 @@ export function build(ctx) {
   const per = K.person(A, 'oguri', 'perchesAca', -3.0, -0.35, Math.PI), n1 = K.person(A, 'mcqueen', 'narco', -3.35, -1.65, 0.25), n2 = K.person(A, 'tamamo', 'narco', -2.55, -1.7, -0.3);
   const dancers = K.crowd(A, 'fiesta', 6, [0.5, 0.4, 5, 2.8], { seed: 3, face: [0, -1] });
   const cabo = K.person(A, 'hishi', 'cabo', 2.0, -0.9, -0.9);
-  const gold = [0, 1].map(i => { const g = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.008, 18), P.goldM()); g.position.set(-3.08 + i * 0.12, 0.975, -0.75); A.add(g); g.userData.dynamic = true; return g; });
-  const env = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.012, 0.1), new THREE.MeshStandardMaterial({ color: '#d8c8a0' })); env.position.set(-3.0, 0.975, -1.3); A.add(env); env.userData.dynamic = true;
+  for (const r of [per, n1, n2, cabo, ...dancers]) r.root.position.y = A.deckY;   // on the terrace deck, not sunk into it
+  const gold = [0, 1].map(i => { const g = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.008, 18), P.goldM()); g.position.set(-3.08 + i * 0.12, 0.875, -0.75); A.add(g); g.userData.dynamic = true; return g; });
+  const env = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.012, 0.1), new THREE.MeshStandardMaterial({ color: '#d8c8a0' })); env.position.set(-2.76, 0.876, -1.3); A.add(env); env.userData.dynamic = true;
   const act = t => {
     A.tick(t);
     K.act(per, K.A.talk(t, 1, 0.5), t, { talk: t > 0.6 && t < t1 ? 0.6 : false, smile: 0.4 });
@@ -37,11 +38,11 @@ export function build(ctx) {
     { t: t3, type: 'sting', vol: 0.4 }, { t: t3 + 0.6, type: 'buzzoff', vol: 0.45 }, { t: t3 + 0.5, type: 'heart', dur: ctx.dur - t3, vol: 0.25 },
   ];
   const shots = [
-    { t0: 0, set: A, p0: [1.5, 2.6, 2.8], l0: [-6, 2.5, -80], p1: [-0.5, 1.8, 1.4], l1: [-3, 0.9, -1.0], fov0: 50, act },
-    { t0: 3.6, set: A, p0: [-1.8, 1.25, 0.6], l0: [-3.0, 0.85, -1.0], p1: [-2.1, 1.2, 0.3], l1: [-3.0, 0.85, -1.0], fov0: 46, act },
-    { t0: t1 - 0.2, set: A, p0: [-2.55, 1.45, -0.55], l0: [-3.0, 0.95, -1.0], p1: [-2.65, 1.38, -0.6], l1: [-3.0, 0.95, -1.05], fov0: 40, act },
-    { t0: t2 - 0.2, set: A, p0: [0.4, 1.05, 0.9], l0: [2.0, 0.85, -0.9], p1: [0.9, 1.02, 0.4], l1: [2.0, 0.86, -0.9], fov0: 44, act },
-    { t0: t3 - 0.15, set: A, p0: [1.05, 0.98, 0.35], l0: [2.0, 0.85, -0.9], p1: [1.25, 0.96, 0.08], l1: [2.0, 0.86, -0.9], fov0: 42, act },
+    { t0: 0, set: A, p0: [1.5, 2.6, 2.8], l0: [-6, 2.5, -80], p1: [-0.5, 2.1, 1.4], l1: [-3, 1.2, -1.0], fov0: 50, act },
+    { t0: 3.6, set: A, p0: [-1.8, 1.22, 0.6], l0: [-3.0, 1.1, -1.0], p1: [-2.1, 1.2, 0.3], l1: [-3.0, 1.1, -1.0], fov0: 46, act },
+    { t0: t1 - 0.2, set: A, p0: [-2.95, 1.95, -0.7], l0: [-3.0, 0.87, -1.02], p1: [-2.97, 1.88, -0.74], l1: [-3.0, 0.87, -1.04], fov0: 40, act },
+    { t0: t2 - 0.2, set: A, p0: [0.4, 1.35, 0.9], l0: [2.0, 1.15, -0.9], p1: [0.9, 1.32, 0.4], l1: [2.0, 1.16, -0.9], fov0: 44, act },
+    { t0: t3 - 0.15, set: A, p0: [1.05, 1.28, 0.35], l0: [2.0, 1.15, -0.9], p1: [1.25, 1.26, 0.08], l1: [2.0, 1.16, -0.9], fov0: 42, act },
   ];
   const inst = { scene: A, scenes: [A], sfx };
   S.bakeAll(inst.scenes);

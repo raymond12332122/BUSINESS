@@ -36,7 +36,8 @@ export function build(ctx) {
   for (let i = 0; i < 9; i++) { const b = P.bundle(i + 2, 0.06, i === 4 ? 0.9 : 0); b.position.set(1.2 + (i % 3) * 0.16, 0.48, 0.45 + Math.floor(i / 3) * 0.16); b.rotation.y = i; bundles.add(b); }
   const a1 = K.person(B, 'helios', 'agente', 0.75, 0.75, 2.0);
   // ---- Perches led out in handcuffs
-  const per = K.person(Rd2, 'oguri', 'perchesDia', 0.5, -1.0, 0), e1 = K.person(Rd2, 'mcqueen', 'agente', 0.95, -1.15, 0), e2 = K.person(Rd2, 'suzuka', 'agente', 0.05, -1.2, 0);
+  const per = K.person(Rd2, 'oguri', 'perchesDia', 0.5, -0.95, 0), e1 = K.person(Rd2, 'mcqueen', 'agente', 0.95, -0.95, 0), e2 = K.person(Rd2, 'suzuka', 'agente', 0.05, -0.95, 0);
+  for (const r of [per, e1, e2]) r.root.position.y = 0.14;   // standing on the sidewalk slab
   const act = t => {
     Rd.tick(t); E.tick(t); Rd2.tick(t); B.tick(t); Wn.tick(t);
     K.act(cabo, K.cuffs(t, 1), t, { eye: 0.4, mouth: [0, 0] }); K.act(ag1, K.A.stand(t, 2), t, {}); K.act(ag2, K.A.stand(t, 3), t, {});
@@ -49,7 +50,7 @@ export function build(ctx) {
     const pk = ss(t111 - 0.6, t111 + 0.6, t);
     K.act(a1, K.reach(t, 1, [1.4, 0.55, 0.55], ss(tClo + 0.4, tClo + 1.2, t)), t, { eye: t > t111 ? 'shock' : 'open' });
     bundles.children[4].visible = true; bundles.scale.setScalar(0.7 + 0.3 * pk);
-    for (const [r, x0, sd] of [[per, 0.5, 1], [e1, 0.95, 2], [e2, 0.05, 3]]) { const p = walkIn(r, t, t5 - 0.6, [x0, -1.0 - (sd > 1 ? 0.15 : 0)], 0, 2.2, { seed: sd, speed: 0.36 }); K.act(r, r === per ? K.mix(p, K.cuffs(t, 1), 0.65) : p, t, r === per ? { eye: 0.4, mouth: [0, 0] } : {}); }
+    for (const [r, x0, sd] of [[per, 0.5, 1], [e1, 0.95, 2], [e2, 0.05, 3]]) { r.root.visible = t >= t5 - 0.3; const p = walkIn(r, t, t5 - 0.6, [x0, -0.95 - (sd > 1 ? 0.12 : 0)], 0, 1.3, { seed: sd, speed: 0.36 }); K.act(r, r === per ? K.mix(p, K.cuffs(t, 1), 0.65) : p, t, r === per ? { eye: 0.4, mouth: [0, 0] } : {}); }
     return U.letterbox(1) + U.chapter(t, 0.2, t1 - 0.4, 9, 'LA CAÍDA') + U.tag(t, 0.6, t1 - 0.3, 'GUADALAJARA', 'ENERO DE 1989', { x: 1300, y: 160 }) +
       U.dossier(t, t1 + 0.4, t2 - 0.2, 'DECLARACIÓN', ['Sabe quién tiene', 'las piezas del museo'], { x: 1250, y: 170, w: 520, rot: 2 }) +
       U.tag(t, t2 + 0.2, tLin - 0.2, 'SUBPROCURADOR', 'JAVIER COELLO TREJO', { x: 96, y: 160 }) + U.wiretap(t, t2 + 0.8, t3 - 0.2) +
