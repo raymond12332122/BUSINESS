@@ -8,19 +8,24 @@ const SCENE_DIR = VIDEO === 'guerrilla' ? './scenes' : `./${VIDEO}/scenes`;
 
 const VERT = VIDEO === 'mono';   // vertical (9:16) shorts
 const W = VERT ? 1080 : 1920, H = VERT ? 1920 : 1080;
+// videos that bring their own web fonts and stylesheet (src/<video>/fonts/fonts.css, src/<video>/style.css)
+const FONTS = {
+  mono: ["700 60px 'Pixelify Sans'", "400 60px 'Jacquard 24'", "400 60px VT323", "700 40px Silkscreen", "400 40px Silkscreen"],
+  museo: ["400 60px 'Bebas Neue'", "400 40px 'Special Elite'", "400 40px 'Share Tech Mono'", "400 60px Anton", "900 60px 'Playfair Display'", "700 60px 'Playfair Display'"],
+};
 
 async function boot() {
   const QP = new URLSearchParams(location.search);
   let capFn = null;   // a video can bring its own caption style (one word at a time, for the shorts)
-  if (VERT) {
-    for (const el of [document.documentElement, document.body]) { el.style.width = W + 'px'; el.style.height = H + 'px'; }
+  if (VERT) for (const el of [document.documentElement, document.body]) { el.style.width = W + 'px'; el.style.height = H + 'px'; }
+  if (FONTS[VIDEO]) {
     for (const f of ['fonts/fonts.css', 'style.css']) {
       const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = `./${VIDEO}/${f}`;
       await new Promise(r => { l.onload = l.onerror = r; document.head.append(l); });
     }
-    await Promise.all(["700 60px 'Pixelify Sans'", "400 60px 'Jacquard 24'", "400 60px VT323", "700 40px Silkscreen", "400 40px Silkscreen"].map(f => document.fonts.load(f, 'ÁÉÍÓÚÑ¿¡$%')));
-    capFn = (await import(`./${VIDEO}/caps.js`)).caption;
+    await Promise.all(FONTS[VIDEO].map(f => document.fonts.load(f, 'ÁÉÍÓÚÑ¿¡$%')));
   }
+  if (VERT) capFn = (await import(`./${VIDEO}/caps.js`)).caption;
   const renderer = new THREE.WebGLRenderer({ antialias: QP.get('aa') !== '0', preserveDrawingBuffer: true });
   renderer.setSize(W, H); renderer.setPixelRatio(Math.min(1, window.devicePixelRatio || 1));
   renderer.shadowMap.enabled = true; renderer.shadowMap.type = QP.get('soft') === '0' ? THREE.PCFShadowMap : THREE.PCFSoftShadowMap;
@@ -30,9 +35,10 @@ async function boot() {
   // Finishing pass (post-processing, animated grass/clouds) for videos that ship one.
   let post = null, look = null;
   if ((VIDEO === 'amer' || VIDEO === 'whatif' || VIDEO === 'wwii') && QP.get('post') !== '0') { look = await import('./amer/look.js'); post = look.makePost(renderer, W, H); }
-  if (VIDEO === 'mono' && QP.get('post') !== '0') { look = await import('./mono/look.js'); post = look.makePost(renderer, W, H); }
+  if ((VIDEO === 'mono' || VIDEO === 'museo') && QP.get('post') !== '0') { look = await import(`./${VIDEO}/look.js`); post = look.makePost(renderer, W, H); }
 
   const TL = await (await fetch(LANG === 'en' ? `${BASE}/timeline.json` : `${BASE}/${LANG}/timeline.json`)).json();
+  if (VIDEO === 'museo') C.castOnly(['oguri', 'tamamo', 'cafe', 'doto', 'mcqueen', 'daiwa', 'suzuka', 'helios', 'spe', 'hishi', 'groove']);
   await C.loadCast();
   const only = new URLSearchParams(location.search).get('only');
   const built = [];

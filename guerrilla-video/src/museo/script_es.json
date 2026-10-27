@@ -1,0 +1,190 @@
+{
+ "style": "[serious][calm]",
+ "scenes": [
+  {
+   "id": "frio",
+   "lead": 1.6,
+   "tail": 3.2,
+   "gaps": {
+    "0": 0.8,
+    "2": 0.7
+   },
+   "lines": [
+    "Ciudad de México. Nochebuena de 1985.",
+    "Tres meses después del terremoto, la ciudad hace lo posible por celebrar: cenas en familia, ponche, abrazos.",
+    "En Chapultepec, el Museo Nacional de Antropología guarda silencio... y guarda sus tesoros.",
+    "Esa noche, mientras todo el país brindaba, dos jóvenes estaban a punto de cometer el robo del siglo."
+   ],
+   "styles": {
+    "3": "[suspenseful][serious]"
+   }
+  },
+  {
+   "id": "botin",
+   "lead": 0.6,
+   "tail": 0.8,
+   "lines": [
+    "Ahí estaban algunas de las piezas más valiosas del país.",
+    "La máscara funeraria de Pakal, el gran rey maya de Palenque: un mosaico de jade que cubrió su rostro durante más de mil años.",
+    "La máscara zapoteca del dios murciélago, de Monte Albán.",
+    "Una vasija mexica de obsidiana con forma de mono. Según un curador del museo, solo ella valía unos 27 millones de dólares en el mercado negro.",
+    "Y oro: joyas mixtecas, como el pectoral de Yanhuitlán, y ofrendas del cenote sagrado de Chichén Itzá."
+   ]
+  },
+  {
+   "id": "equipo",
+   "lead": 0.6,
+   "tail": 0.8,
+   "gaps": {
+    "0": 0.6
+   },
+   "lines": [
+    "Los ladrones no eran una mafia internacional.",
+    "Eran dos estudiantes de veterinaria, veinteañeros y sin antecedentes: Carlos Perches Treviño y Ramón Sardina García.",
+    "Durante seis meses visitaron el museo unas cincuenta veces.",
+    "Tomaban fotos, hacían dibujos, memorizaban cada sala... y observaban a los guardias.",
+    "Los policías debían recorrer las 26 salas cada dos horas. Ellos se aprendieron la rutina."
+   ]
+  },
+  {
+   "id": "plan",
+   "lead": 0.5,
+   "tail": 0.9,
+   "gaps": {
+    "0": 0.6,
+    "2": 0.6
+   },
+   "lines": [
+    "Primero eligieron Año Nuevo.",
+    "Pero se enteraron de que el museo iba a reparar el aire acondicionado...",
+    "y su camino para entrar era, justamente, un ducto del aire acondicionado.",
+    "Así que adelantaron el golpe una semana: sería en Nochebuena, cuando la vigilancia se relajaba."
+   ]
+  },
+  {
+   "id": "noche",
+   "lead": 0.6,
+   "tail": 0.9,
+   "gaps": {
+    "1": 0.6,
+    "3": 0.8
+   },
+   "lines": [
+    "El 24 de diciembre cenaron con sus familias, como si nada.",
+    "Después se vistieron de negro y salieron en el Volkswagen sedán de Perches, rumbo al museo.",
+    "Cerca de la una de la mañana saltaron la reja que da a Paseo de la Reforma,",
+    "y se metieron por el ducto, a gatas, hasta el sótano de la Sala Maya.",
+    "Mientras tanto, los nueve policías de guardia estaban todos juntos en un solo lugar del museo... celebrando la Navidad."
+   ],
+   "styles": {
+    "3": "[whispering]"
+   }
+  },
+  {
+   "id": "robo",
+   "lead": 0.6,
+   "tail": 1.0,
+   "gaps": {
+    "1": 0.6,
+    "2": 0.8
+   },
+   "lines": [
+    "En la oscuridad abrieron siete vitrinas, en tres salas.",
+    "Pieza por pieza, llenaron una maleta de lona con 124 objetos: 94 eran de oro.",
+    "Ahí iba también la máscara de Pakal.",
+    "Las versiones no coinciden: unos dicen que tardaron media hora; otros, tres horas.",
+    "Lo que sí se sabe es que salieron por el mismo ducto... sin cruzarse con un solo guardia."
+   ],
+   "styles": {
+    "2": "[whispering]"
+   }
+  },
+  {
+   "id": "alba",
+   "lead": 0.8,
+   "tail": 0.9,
+   "gaps": {
+    "0": 0.6
+   },
+   "lines": [
+    "A las ocho de la mañana del 25 de diciembre, en el cambio de turno, aparecieron las vitrinas vacías.",
+    "Donde los guardias habían celebrado quedaron galletas y vasos con restos de licor.",
+    "Los nueve fueron detenidos e interrogados.",
+    "México lo bautizó como «el robo del siglo».",
+    "Se alertó a la Interpol, a las aduanas y a los aeropuertos. Los expertos estaban convencidos de que era obra de profesionales.",
+    "Hubo hasta una recompensa de 50 millones de pesos... que nunca se pagó."
+   ]
+  },
+  {
+   "id": "closet",
+   "lead": 0.7,
+   "tail": 0.9,
+   "gaps": {
+    "0": 0.7
+   },
+   "lines": [
+    "Pero el tesoro nunca salió del país.",
+    "Estaba arriba de un clóset, en la casa de los padres de Perches, en Naucalpan, junto a Ciudad Satélite.",
+    "Y ahí descubrieron el verdadero problema: las piezas eran tan famosas que nadie se atrevía a comprarlas.",
+    "Era como querer vender la Mona Lisa en un tianguis."
+   ],
+   "styles": {
+    "3": "[sarcastic]"
+   }
+  },
+  {
+   "id": "acapulco",
+   "lead": 0.6,
+   "tail": 0.9,
+   "gaps": {
+    "2": 0.6
+   },
+   "lines": [
+    "Perches se mudó a Acapulco. Ahí se hizo amigo de narcotraficantes e intentó cambiar las piezas por cocaína.",
+    "Según la investigación, al menos dos terminaron cambiadas por droga.",
+    "En ese ambiente conoció a un traficante: Salvador Gutiérrez, alias «El Cabo».",
+    "Ese contacto sería su perdición."
+   ],
+   "styles": {
+    "3": "[suspenseful][serious]"
+   }
+  },
+  {
+   "id": "caida",
+   "lead": 0.6,
+   "tail": 0.9,
+   "gaps": {
+    "2": 0.6,
+    "3": 0.7
+   },
+   "lines": [
+    "En enero de 1989, la policía detuvo a El Cabo por un asunto de drogas que no tenía nada que ver.",
+    "Para reducir su condena, soltó un secreto: sabía quién tenía las piezas del museo.",
+    "El subprocurador Javier Coello Trejo mandó intervenir sus llamadas desde la cárcel... y en la línea apareció Perches.",
+    "Lo vigilaron durante 45 días.",
+    "En junio de 1989, la policía entró a la casa de sus padres. En el clóset seguía una bolsa deportiva: 111 piezas, envueltas en papel de baño.",
+    "Perches fue detenido junto con otras siete personas."
+   ]
+  },
+  {
+   "id": "final",
+   "lead": 0.7,
+   "tail": 3.6,
+   "gaps": {
+    "1": 0.6,
+    "4": 0.8
+   },
+   "lines": [
+    "A Ramón Sardina nunca lo encontraron. Sigue prófugo, y según la investigación se quedó con siete piezas.",
+    "En total, 13 piezas nunca regresaron.",
+    "Perches pasó más de diez años en prisión.",
+    "El museo reforzó su seguridad con alarmas, cámaras y más guardias. Y en 2018, la historia llegó al cine con la película «Museo», con Gael García Bernal.",
+    "Hoy, la máscara de Pakal vuelve a brillar en su vitrina.",
+    "Porque el robo del siglo no lo planeó una banda internacional, sino dos estudiantes... que descubrieron demasiado tarde que un tesoro así no se puede vender."
+   ],
+   "styles": {
+    "5": "[soft tone][calm]"
+   }
+  }
+ ]
+}

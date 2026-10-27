@@ -1,0 +1,8 @@
+/* "El robo del siglo" (1920x1080 layout, rendered at 1280x720): heist-film captions, title fonts and dossier paper. */
+.cap{bottom:40px;font:600 36px/1.32 Inter;background:rgba(5,7,11,.72);border-radius:6px;padding:10px 28px;letter-spacing:.005em;
+  box-shadow:0 0 0 1px rgba(255,255,255,.06);text-shadow:0 2px 3px rgba(0,0,0,.6)}
+.bebas{font-family:'Bebas Neue',Impact,sans-serif;letter-spacing:.04em}
+.mono{font-family:'Share Tech Mono','DejaVu Sans Mono',monospace}
+.type{font-family:'Special Elite','Courier New',monospace}
+.anton{font-family:Anton,Impact,sans-serif}
+.play{font-family:'Playfair Display',Georgia,serif}

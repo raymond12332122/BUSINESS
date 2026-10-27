@@ -8,6 +8,7 @@ text, voice, model and speed, so a changed line is fetched again); the take Whis
 Fish Audio returns audio only, so word timings come from Whisper on each line, mapped back onto the script's own
 words (subtitles keep the real spelling). A line Whisper can't follow is synthesized again (up to 3 tries, best kept).
 Optional script keys: "style" (a cue before every line, e.g. "[calm]") and per scene "styles": {"<line>": "[whispering]"}.
+FISH_SCENES=id,id with --fetch-only fetches just those scenes (run a few of these beside the main run to fetch in parallel).
 """
 import difflib, hashlib, json, os, re, ssl, subprocess, sys, time, unicodedata, urllib.error, urllib.request, wave
 import numpy as np
@@ -16,13 +17,16 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 LANG, VOICE, VIDEO = sys.argv[1], sys.argv[2], sys.argv[3]
 DRY, FETCH = '--dry' in sys.argv, '--fetch-only' in sys.argv
 TAKES = int(os.environ.get('FISH_TAKES', '2'))
+ONLY = [x for x in os.environ.get('FISH_SCENES', '').split(',') if x]
 MODEL = next((a for a in sys.argv[4:] if not a.startswith('--')), os.environ.get('FISH_MODEL', 's2.1-pro'))
 SPEED = float(os.environ.get('FISH_SPEED', '0.94'))
 SR, GAP = 24000, 0.45
 OUT = os.path.join(ROOT, 'build', VIDEO, LANG); VD = os.path.join(ROOT, 'assets', 'voice', VIDEO); os.makedirs(VD, exist_ok=True)
 script = json.load(open(os.path.join(ROOT, 'src', VIDEO, f'script_{LANG}.json')))
 # Spoken forms for the TTS only; subtitles keep the script's spelling.
-SAY = [(r'AT&T', 'Ei Ti and Ti'), (r'\bapp\b', 'ap')]
+SAY = [(r'AT&T', 'Ei Ti and Ti'), (r'\bapp\b', 'ap'), (r'\bPerches\b', 'Pérches'), (r'\b1985\b', 'mil novecientos ochenta y cinco')]
+# Whisper results per take, so a re-run (one line changed) only listens to the new takes.
+CACHE_F = os.path.join(VD, 'asr_cache.json'); CACHE = json.load(open(CACHE_F)) if os.path.exists(CACHE_F) else {}
 
 
 def say(text):
@@ -72,10 +76,15 @@ def asr():
 
 
 def check(a16, text):
-    """How well an unprompted transcription matches the line (0..1), and what Whisper heard."""
-    segs, _ = asr().transcribe(a16, language=LANG, beam_size=5)
-    heard = ' '.join(s.text.strip() for s in segs)
-    return difflib.SequenceMatcher(None, [norm(x) for x in text.split()], [norm(x) for x in heard.split()]).ratio(), heard
+    """How well an unprompted transcription matches the line (0..1), what Whisper heard, and where to cut trailing noise
+    (a word Whisper heard after the end of the script, e.g. a stray syllable the voice adds)."""
+    segs, _ = asr().transcribe(a16, language=LANG, beam_size=5, word_timestamps=True)
+    ws = [w for s in segs for w in s.words if norm(w.word)]
+    heard = ' '.join(w.word.strip() for w in ws)
+    nt, nw = [norm(x) for x in text.split()], [norm(w.word) for w in ws]
+    sm = difflib.SequenceMatcher(None, nt, nw, autojunk=False); ops = sm.get_opcodes(); cut = None
+    if ops and ops[-1][0] == 'insert' and ops[-1][1] == len(nt) and ops[-1][3] > 0: cut = ws[ops[-1][3] - 1].end + 0.1
+    return sm.ratio(), heard, cut
 
 
 def align(a16, text):
@@ -85,7 +94,9 @@ def align(a16, text):
     toks = text.split(); nt, nw = [norm(x) for x in toks], [norm(w.word) for w in ws]
     times = [None] * len(toks)
     sm = difflib.SequenceMatcher(None, nt, nw, autojunk=False); hit = 0
-    for tag, i1, i2, j1, j2 in sm.get_opcodes():
+    ops = sm.get_opcodes(); cut = None
+    if ops and ops[-1][0] == 'insert' and ops[-1][1] == len(nt) and ops[-1][3] > 0: cut = ws[ops[-1][3] - 1].end + 0.12   # trailing noise read as words
+    for tag, i1, i2, j1, j2 in ops:
         if tag == 'equal':
             for k in range(i2 - i1): times[i1 + k] = (ws[j1 + k].start, ws[j1 + k].end); hit += 1
         elif tag == 'replace':   # e.g. "AT&T" heard as "ei ti and ti": spread the tokens over those words
@@ -102,12 +113,13 @@ def align(a16, text):
             for m in range(k, j): times[m] = (a + (b - a) * (m - k) / (j - k), a + (b - a) * (m - k + 1) / (j - k))
             k = j
         else: k += 1
-    return times, hit / max(1, len(toks)), ' '.join(w.word.strip() for w in ws)
+    return times, hit / max(1, len(toks)), ' '.join(w.word.strip() for w in ws), cut
 
 
 timeline, chunks, t, report = [], [], 0.0, []
 style0 = script.get('style', '')
 for si, sc in enumerate(script['scenes']):
+    if FETCH and ONLY and sc['id'] not in ONLY: continue
     gaps, styles = sc.get('gaps', {}), sc.get('styles', {})
     lt, lines = sc['lead'], []
     for li, text in enumerate(sc['lines']):
@@ -121,13 +133,23 @@ for si, sc in enumerate(script['scenes']):
         # the take Whisper understands best on its own wins; then the script is aligned onto it
         best = None
         for src in takes:
-            a16 = decode(src, 16000); sc_, heard = check(a16, text) if len(takes) > 1 else (1.0, '')
-            if best is None or sc_ > best[1]: best = (src, sc_, a16, heard)
-        src, score, a16, heard = best
-        times, _, aligned = align(a16, text)
+            ck = hashlib.sha1((src + text + str(os.path.getmtime(src))).encode()).hexdigest()
+            if ck in CACHE and len(CACHE[ck]) == 3: sc_, heard, ccut = CACHE[ck]
+            else:
+                sc_, heard, ccut = check(decode(src, 16000), text) if len(takes) > 1 else (1.0, '', None)
+                CACHE[ck] = [sc_, heard, ccut]
+            if best is None or sc_ > best[1]: best = (src, sc_, heard, ccut)
+        src, score, heard, ccut = best
+        ak = hashlib.sha1(('align' + src + text + str(os.path.getmtime(src))).encode()).hexdigest()
+        if ak in CACHE: times, aligned, cut = CACHE[ak]
+        else:
+            times, _, aligned, cut = align(decode(src, 16000), text); CACHE[ak] = [times, aligned, cut]
+        json.dump(CACHE, open(CACHE_F, 'w'))
+        cut = cut or ccut
         heard = heard or aligned
         report.append((sc['id'], li, score, heard))
         a = decode(src, SR)
+        if cut and cut * SR < len(a): a = a[: int(cut * SR)]; a[-int(0.06 * SR):] *= np.linspace(1, 0, int(0.06 * SR))
         nz = np.nonzero(np.abs(a) > 0.008)[0]
         s0 = max(nz[0] - int(0.03 * SR), 0); a = a[s0: nz[-1] + int(0.15 * SR)]
         a[: int(0.01 * SR)] *= np.linspace(0, 1, int(0.01 * SR)); a[-int(0.03 * SR):] *= np.linspace(1, 0, int(0.03 * SR))

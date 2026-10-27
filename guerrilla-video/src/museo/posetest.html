@@ -1,0 +1,38 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style></head><body>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+// Pose lab for the museum video: window.pose(name, t, [px,py,pz], [lx,ly,lz]) renders one rig in a neutral room.
+import * as THREE from 'three';
+import * as C from '../lib/chars.js';
+import * as K from './kit.js';
+import * as P from './props.js';
+try {
+  const W = 1280, H = 720;
+  const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); r.setSize(W, H); r.shadowMap.enabled = true; r.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(r.domElement);
+  C.castOnly(['oguri', 'daiwa', 'spe', 'hishi', 'groove']); await C.loadCast();
+  const s = new THREE.Scene(); s.background = new THREE.Color('#30343a');
+  s.add(new THREE.HemisphereLight('#ffffff', '#404040', 1.4)); const d = new THREE.DirectionalLight('#ffffff', 2); d.position.set(3, 6, 5); s.add(d);
+  const fl = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.MeshStandardMaterial({ color: '#7a7670' })); fl.rotation.x = -Math.PI / 2; s.add(fl);
+  for (let i = -10; i <= 10; i++) { const l = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.002, 20), new THREE.MeshBasicMaterial({ color: '#555' })); l.position.set(i * 0.5, 0.001, 0); s.add(l); }
+  const cam = new THREE.PerspectiveCamera(35, W / H, 0.05, 100);
+  const rigs = {};
+  const get = (key, outfit) => { const k = key + outfit; if (!rigs[k]) { rigs[k] = K.person(s, key, outfit, 0, 0, 0); } for (const o of Object.values(rigs)) o.root.visible = false; rigs[k].root.visible = true; return rigs[k]; };
+  window.pose = (name, t, p, l) => {
+    let rg;
+    if (name === 'crawl') { rg = get('oguri', 'perches'); K.lie(rg); rg.root.position.set(0, 0.03, 0);
+      const u = t * 0.3, pp = K.crawl(t, 1, u); rg.root.updateMatrixWorld(true);
+      const sw = Math.sin(u * 9 + 1) * 0.06; pp.aL = ['world', 0.16, 0.0, 0.62 + sw]; pp.aR = ['world', -0.16, 0.0, 0.62 - sw]; pp.aWL = pp.aWR = 1; pp.plL = [1, -1, 0]; pp.plR = [-1, -1, 0];
+      K.act(rg, pp, t, {}); }
+    else if (name === 'climb') { rg = get('daiwa', 'sardina'); rg.root.position.set(0, 0, 0); rg.root.rotation.set(0, 0, 0); K.act(rg, K.climb(t, 2, [0.18, 1.0, 0.25], [-0.18, 1.0, 0.25], (t % 2) / 2), t, {}); }
+    else if (name === 'reach') { rg = get('oguri', 'perches'); rg.root.position.set(0, 0, 0); rg.root.rotation.set(0, 0, 0); K.act(rg, K.reach(t, 1, [0, 0.62, 0.32], 1), t, {}); }
+    else if (name === 'toast') { rg = get('spe', 'guardia'); rg.root.position.set(0, 0, 0); rg.root.rotation.set(0, 0, 0); K.act(rg, K.toast(t, 3, 1), t, { mouth: [0.6, 1] }); }
+    else if (name === 'torch') { rg = get('oguri', 'perches'); rg.root.position.set(0, 0, 0); rg.root.rotation.set(0, 0, 0); if (!rg.torch) rg.torch = K.giveTorch(rg); K.act(rg, K.torch(t, 1, [0, 0.6, 2]), t, {}); }
+    else if (name === 'carry') { rg = get('daiwa', 'sardina'); rg.root.position.set(0, 0, 0); rg.root.rotation.set(0, 0, 0); if (!rg.case_) rg.case_ = K.giveCase(rg); K.act(rg, K.carry(K.A.stand(t, 2)), t, {}); }
+    else if (name === 'cuffs') { rg = get('oguri', 'perchesDia'); rg.root.position.set(0, 0, 0); rg.root.rotation.set(0, 0, 0); K.act(rg, K.cuffs(t, 1), t, {}); }
+    else if (name === 'cabo') { rg = get('hishi', 'cabo'); rg.root.position.set(0, 0, 0); rg.root.rotation.set(0, 0, 0); K.act(rg, K.A.stand(t, 1), t, {}); }
+    else if (name === 'groove') { rg = get('groove', 'self'); rg.root.position.set(0, 0, 0); rg.root.rotation.set(0, 0, 0); K.act(rg, K.A.crossArms(t, 1), t, {}); }
+    cam.position.set(...p); cam.lookAt(...l); cam.updateProjectionMatrix(); r.render(s, cam);
+  };
+  window.__ready = true;
+} catch (e) { window.__error = String(e.stack || e); window.__ready = true; }
+</script></body></html>

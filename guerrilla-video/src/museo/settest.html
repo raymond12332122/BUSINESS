@@ -1,0 +1,35 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#000}</style>
+<link rel="stylesheet" href="./fonts/fonts.css"></head><body>
+<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
+<script type="module">
+// Set viewer for the museum video: window.show('fn:arg1:arg2', [px,py,pz], [lx,ly,lz], fov, extras)
+// extras: 'probe' adds two chibis (Perches and a guard), 'post' renders through the heist look, 't=1.5' ticks the set.
+import * as THREE from 'three';
+import * as C from '../lib/chars.js';
+import * as K from './kit.js';
+import * as S from './sets.js';
+import * as LOOK from './look.js';
+try {
+  const W = 1280, H = 720;
+  await Promise.all(["400 60px 'Bebas Neue'", "400 40px 'Special Elite'", "400 40px 'Share Tech Mono'", "900 60px 'Playfair Display'"].map(f => document.fonts.load(f, 'ÁÉÍÓÚÑ')));
+  const r = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true }); r.setSize(W, H); r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.toneMapping = THREE.ACESFilmicToneMapping; document.body.appendChild(r.domElement);
+  C.castOnly(['oguri', 'cafe', 'spe', 'daiwa', 'groove']);
+  await C.loadCast();
+  const post = LOOK.makePost(r, W, H);
+  const cache = {}, cam = new THREE.PerspectiveCamera(38, W / H, 0.1, 900);
+  window.show = async (name, p, l, fov = 38, extras = 'probe') => {
+    const key = name + '|' + extras;
+    if (!cache[key]) {
+      const [fn, ...args] = name.split(':');
+      const Ar = args.map(a => (a === 'true' ? true : a === 'false' ? false : isNaN(+a) ? a : +a));
+      const s = S[fn](...Ar);
+      if (extras.includes('probe')) { const a = K.person(s, 'oguri', 'perches', -0.5, 0.6, 0.3), b = K.person(s, 'spe', 'guardia', 0.5, 0.6, -0.3); K.act(a, K.A.stand(0.3, 1), 0.3, {}); K.act(b, K.A.stand(0.3, 2), 0.3, {}); }
+      cache[key] = s;
+    }
+    const s = cache[key], m = /t=([\d.]+)/.exec(extras); if (m && s.tick) s.tick(+m[1]);
+    cam.fov = fov; cam.position.set(...p); cam.lookAt(...l); cam.updateProjectionMatrix();
+    if (extras.includes('post')) { LOOK.tick(m ? +m[1] : 0); post.render(s, cam); } else r.render(s, cam);
+  };
+  window.__ready = true;
+} catch (e) { window.__error = String(e.stack || e); window.__ready = true; }
+</script></body></html>

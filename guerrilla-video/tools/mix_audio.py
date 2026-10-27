@@ -848,6 +848,96 @@ def reverse():   # a reversed swell, for the pieces pulling back together
     x[-int(0.04 * SR):] *= np.linspace(1, 0, int(0.04 * SR)); return norm(x) * 0.75
 
 
+
+# ------------------------------------------------------------------ "El robo del siglo" (museum heist) effects
+def clink():   # two glasses touching
+    t = t_(1.2); x = sum(a * np.sin(2 * np.pi * f * t) * np.exp(-t * k) for f, a, k in ((2630, 1, 9), (3710, 0.6, 12), (5120, 0.4, 16), (6890, 0.2, 22)))
+    y = x.copy(); d = int(0.09 * SR); y[d:] += x[:-d] * 0.7
+    return fade(norm(y, 0.5), 0.001, 0.2)
+def fountain(d):   # water falling into a basin
+    x = fft_filter(noise(d), lo=350, hi=4200) * (0.75 + 0.25 * np.sin(2 * np.pi * 0.31 * t_(d)))
+    for k in range(int(d * 14)):
+        i = int(rng.uniform(0, d - 0.05) * SR); f = rng.uniform(900, 2600); tt = t_(0.05)
+        x[i:i + len(tt)] += np.sin(2 * np.pi * f * tt * (1 + tt * 6)) * np.exp(-tt * 70) * 0.8
+    return fade(norm(x, 0.35), 0.4, 0.6)
+def radio(d):   # a little transistor radio playing a Christmas tune (Jingle Bells, 1857), tinny and crackly
+    bpm = 132; b = 60 / bpm
+    mel = [(64, 1), (64, 1), (64, 2), (64, 1), (64, 1), (64, 2), (64, 1), (67, 1), (60, 1.5), (62, 0.5), (64, 4), (65, 1), (65, 1), (65, 1.5), (65, 0.5), (65, 1), (64, 1), (64, 1), (64, 0.5), (64, 0.5), (64, 1), (62, 1), (62, 1), (64, 1), (62, 2), (67, 2)]
+    out = np.zeros(int(d * SR) + SR); t0 = 0.0
+    while t0 < d:
+        for m, du in mel:
+            if t0 >= d: break
+            f = 440 * 2 ** ((m + 7 - 69) / 12); tt = t_(du * b * 0.92)
+            tone = np.sign(np.sin(2 * np.pi * f * tt)) * 0.5 + np.sin(2 * np.pi * f * 2 * tt) * 0.3
+            i = int(t0 * SR); out[i:i + len(tt)] += tone * np.exp(-tt * 2.5) * 0.6
+            fb = 440 * 2 ** ((m - 12 + 7 - 69) / 12); out[i:i + len(tt)] += np.sin(2 * np.pi * fb * tt) * np.exp(-tt * 4) * 0.35
+            t0 += du * b
+    x = fft_filter(out[: int(d * SR)], lo=350, hi=2800) + fft_filter(noise(d), lo=2000) * 0.04
+    for k in range(int(d * 6)): i = int(rng.uniform(0, d) * SR); x[i:i + 40] += rng.uniform(-0.6, 0.6)
+    return fade(norm(x, 0.4), 0.2, 0.4)
+def vw(d):   # air-cooled flat-four putter of a Volkswagen sedán pulling away
+    t = t_(d); rpm = 14 + 22 * np.minimum(1, t / 3.5); ph = 2 * np.pi * np.cumsum(rpm) / SR
+    x = np.sin(ph) + 0.6 * np.sin(2 * ph + 0.3) + 0.35 * np.sign(np.sin(ph)) * 0.5
+    x = fft_filter(x, hi=900) + fft_filter(noise(d), lo=200, hi=1500) * 0.12 * (0.6 + 0.4 * np.sin(ph * 0.5))
+    return fade(norm(x, 0.5) * np.minimum(1, t / 0.4), 0.05, 0.8)
+def fence():   # iron fence rattling under a climber's weight
+    out = np.zeros(int(0.9 * SR))
+    for k in range(6):
+        i = int(rng.uniform(0, 0.5) * SR); tt = t_(0.35); f = rng.uniform(380, 900)
+        hit = (np.sin(2 * np.pi * f * tt) + 0.6 * np.sin(2 * np.pi * f * 2.76 * tt) + 0.3 * np.sin(2 * np.pi * f * 5.4 * tt)) * np.exp(-tt * rng.uniform(9, 16))
+        out[i:i + len(tt)] += hit * rng.uniform(0.5, 1)
+    return fade(norm(out + fft_filter(noise(0.9), lo=1500) * np.exp(-t_(0.9) * 4) * 0.2, 0.6), 0.001, 0.2)
+def crawl(d):   # hands and knees on a sheet-metal duct: hollow bongs and scrapes
+    out = np.zeros(int(d * SR)); t0 = 0.0; k = 0
+    while t0 < d - 0.3:
+        tt = t_(0.45); f = 150 + 40 * (k % 2) + rng.uniform(-10, 10)
+        bong = (np.sin(2 * np.pi * f * tt) + 0.5 * np.sin(2 * np.pi * f * 2.3 * tt) + 0.25 * np.sin(2 * np.pi * f * 4.1 * tt)) * np.exp(-tt * 11)
+        i = int(t0 * SR); out[i:i + len(tt)] += bong[: len(out) - i] * rng.uniform(0.5, 1)
+        sc = fft_filter(noise(0.2), lo=1500, hi=6000) * np.exp(-t_(0.2) * 12) * 0.25; j = i + int(0.1 * SR); out[j:j + len(sc)] += sc[: max(0, len(out) - j)]
+        t0 += rng.uniform(0.32, 0.48); k += 1
+    return fade(norm(fft_filter(out, hi=5000), 0.6), 0.05, 0.3)
+def cardoor():
+    a = fft_filter(noise(0.05), lo=2000) * env_exp(0.05, 60) * 0.4; b = (np.sin(2 * np.pi * 70 * t_(0.25)) + fft_filter(noise(0.25), hi=600)) * env_exp(0.25, 18)
+    x = np.zeros(int(0.5 * SR)); x[:len(a)] += a; i = int(0.18 * SR); x[i:i + len(b)] += b * 0.9
+    return fade(norm(x, 0.6), 0.001, 0.1)
+def coins():   # small gold pieces dropped into a canvas bag
+    out = np.zeros(int(0.7 * SR))
+    for k in range(5):
+        i = int(rng.uniform(0, 0.35) * SR); tt = t_(0.25); f = rng.uniform(2200, 4200)
+        out[i:i + len(tt)] += (np.sin(2 * np.pi * f * tt) + 0.5 * np.sin(2 * np.pi * f * 1.52 * tt)) * np.exp(-tt * rng.uniform(18, 30)) * rng.uniform(0.4, 1)
+    return fade(norm(out + fft_filter(noise(0.7), hi=900) * env_exp(0.7, 10) * 0.25, 0.45), 0.001, 0.1)
+def zipper():
+    t = t_(0.7); x = fft_filter(noise(0.7), lo=1800, hi=7000) * (0.5 + 0.5 * np.sign(np.sin(2 * np.pi * (60 + 40 * t) * t)))
+    return fade(norm(x, 0.45), 0.02, 0.1)
+def cuffs():   # handcuffs ratcheting shut
+    out = np.zeros(int(0.75 * SR))
+    for k in range(7): i = int((0.05 + k * 0.045) * SR); tt = t_(0.03); out[i:i + len(tt)] += fft_filter(noise(0.03), lo=2500) * np.exp(-tt * 120) + np.sin(2 * np.pi * 3200 * tt) * np.exp(-tt * 90) * 0.5
+    tt = t_(0.3); i = int(0.4 * SR); out[i:i + len(tt)] += (np.sin(2 * np.pi * 1900 * tt) + 0.5 * np.sin(2 * np.pi * 2870 * tt)) * np.exp(-tt * 14) * 0.6
+    return fade(norm(out, 0.55), 0.001, 0.1)
+def reel(d):   # reel-to-reel recorder: motor whine, tape hiss, a faint voice-band murmur
+    t = t_(d); x = np.sin(2 * np.pi * 120 * t) * 0.15 + np.sin(2 * np.pi * 240 * t) * 0.08 + fft_filter(noise(d), lo=3000) * 0.12
+    x += fft_filter(noise(d), lo=300, hi=1800) * (0.5 + 0.5 * np.sin(2 * np.pi * 3.1 * t) * np.sin(2 * np.pi * 0.7 * t)) * 0.25
+    return fade(norm(x, 0.35), 0.2, 0.3)
+def press():   # newspaper press: rhythmic clatter
+    d = 2.2; out = np.zeros(int(d * SR))
+    for k in range(int(d * 7)): i = int(k / 7 * SR); tt = t_(0.08); out[i:i + len(tt)] += fft_filter(noise(0.08), lo=400, hi=4000) * np.exp(-tt * 40) * (1 if k % 2 else 0.6)
+    return fade(norm(out + np.sin(2 * np.pi * 55 * t_(d)) * 0.2, 0.5), 0.05, 0.4)
+def disco(d):   # an 80s disco beat heard from outside the club (muffled)
+    bpm = 120; b = 60 / bpm; out = np.zeros(int(d * SR) + SR)
+    kick = sweep(110, 45, 0.25) * env_exp(0.25, 14); hat = fft_filter(noise(0.04), lo=6000) * env_exp(0.04, 80)
+    bass = lambda m, du: np.sin(2 * np.pi * 440 * 2 ** ((m - 69) / 12) * t_(du)) * env_exp(du, 6)
+    line = [38, 50, 38, 50, 41, 53, 43, 55]
+    for k in range(int(d / b) + 1):
+        i = int(k * b * SR); out[i:i + len(kick)] += kick; j = int((k + 0.5) * b * SR); out[j:j + len(hat)] += hat * 0.5
+        m = line[k % 8]; bb = bass(m, b * 0.45); out[i:i + len(bb)] += bb * 0.6; out[j:j + len(bb)] += bass(m + 12, b * 0.45) * 0.4
+    x = fft_filter(out[: int(d * SR)], hi=650)
+    return fade(norm(x, 0.5), 0.3, 0.6)
+def projector(d):   # film projector: shutter clatter at 24 fps and the motor
+    t = t_(d); x = np.zeros(len(t))
+    for k in range(int(d * 24)): i = int(k / 24 * SR); tt = t_(0.012); x[i:i + len(tt)] += fft_filter(noise(0.012), lo=1500) * np.exp(-tt * 300) * 0.6
+    x += np.sin(2 * np.pi * 96 * t) * 0.08 + fft_filter(noise(d), lo=200, hi=900) * 0.05
+    return fade(norm(x, 0.35), 0.2, 0.4)
+
 ONE = {'shot': shot, 'boom': lambda: boom(False), 'bigboom': lambda: boom(True), 'whoosh': whoosh, 'pop': pop, 'click': click,
        'thud': thud, 'creak': creak, 'sting': sting, 'sting2': sting2, 'tension': tension, 'beep': beep, 'tick': tick,
        'missile': missile, 'brakes': brakes, 'cheer': cheer, 'clank': clank, 'charge': charge, 'whistle': whistle, 'bell': bell, 'laugh': laugh,
@@ -855,14 +945,16 @@ ONE = {'shot': shot, 'boom': lambda: boom(False), 'bigboom': lambda: boom(True),
        'hit': hit, 'stamp': stamp, 'swoosh': swoosh, 'gavel': gavel, 'cash': cash, 'paper': paper, 'cock': cock, 'notify': notify, 'shutter': shutter,
        'fanfare': fanfare, 'horn': horn, 'shout': shout, 'curtain': curtain, 'crack': crack, 'knock': doorknock, 'door': door, 'splash': splash,
        'thunder': thunder, 'rise': rise, 'crt': crt, 'slide': slide, 'register': cash, 'glass': glass, 'lock': lock, 'shatter': shatter, 'glitch': glitch,
-       'sonar': sonar, 'chime': chime, 'drawer': drawer, 'buzzoff': buzzoff, 'powerdown': powerdown, 'crtoff': crtoff, 'reverse': reverse}
+       'sonar': sonar, 'chime': chime, 'drawer': drawer, 'buzzoff': buzzoff, 'powerdown': powerdown, 'crtoff': crtoff, 'reverse': reverse,
+       'clink': clink, 'fence': fence, 'cardoor': cardoor, 'coins': coins, 'zipper': zipper, 'cuffs': cuffs, 'press': press}
 LOOP = {'engine': engine, 'march': march, 'drone': drone, 'train': train, 'wind': wind, 'clock': clock,
         'plane': plane, 'siren': siren, 'waves': waves, 'factory': factory, 'bells': bells, 'crowd': crowd, 'mg': mg, 'fire': fire,
         'drums': drums, 'choir': choir, 'riser': riser, 'gunfire': gunfire, 'engines': engine, 'sirens': siren, 'typewriter': typewriter, 'traffic': traffic,
         'swell': swell, 'jet': jet, 'heli': heli, 'harbor': harbor, 'bubbling': bubbling, 'birds': birds, 'night': night,
         'pour': pour, 'hiss': hiss, 'camera': camera,
         'drum': drumroll, 'quill': quill, 'hooves': hooves, 'applause': applause, 'organ': organ, 'harpsichord': harpsichord, 'whisper': whisper, 'steps': steps, 'insects': insects,
-        'rain': rain, 'hum': hum, 'neon': neon, 'heart': heart}
+        'rain': rain, 'hum': hum, 'neon': neon, 'heart': heart,
+        'fountain': fountain, 'radio': radio, 'vw': vw, 'crawl': crawl, 'reel': reel, 'disco': disco, 'projector': projector}
 
 sfx = np.zeros(N)
 cache = {}
@@ -870,7 +962,7 @@ for e in EV:
     ty, t0, vol = e['type'], e['t'], e.get('vol', 1.0)
     if ty in LOOP: x = LOOP[ty](max(0.3, e.get('dur', 2)))
     else:
-        if ty not in cache or ty in ('shot', 'splash'): cache[ty] = ONE[ty]()
+        if ty not in cache or ty in ('shot', 'splash', 'coins', 'fence', 'clink'): cache[ty] = ONE[ty]()
         x = cache[ty]
     i = int(t0 * SR); x = x[: max(0, N - i)]
     sfx[i:i + len(x)] += x * vol
@@ -1234,6 +1326,108 @@ def mono_bed():
     L += dr * 0.28 * level; R += dr * 0.28 * level
     return L, R
 
+
+# ------------------------------------------------------------------ "El robo del siglo": a heist score in D minor
+# Moods per scene: 'xmas' (a music box playing Silent Night, Gruber 1818), 'mystery' (pads and celesta), 'heist' (walking
+# pizzicato bass, brushes and vibraphone stabs), 'tension' (pulsing bass ostinato, ticking hats, low strings), 'somber'
+# (sparse piano over a pad), 'low' (a quiet pad under the diegetic disco) and 'coda' (piano, strings, then the music box).
+MUSEO_MOODS = {'frio': 'xmas', 'botin': 'mystery', 'equipo': 'heist', 'plan': 'heist', 'noche': 'tension', 'robo': 'tension', 'alba': 'somber',
+               'closet': 'somber', 'acapulco': 'low', 'caida': 'tension', 'final': 'coda'}
+def museo_bed():
+    L, R = np.zeros(N), np.zeros(N)
+    def add(x, t0, gl=0.5, gr=0.5):
+        i = int(t0 * SR)
+        if i >= N or i < 0: return
+        x = x[: N - i]; L[i:i + len(x)] += x * gl; R[i:i + len(x)] += x * gr
+    memo_ = {}
+    def memo(k, f):
+        if k not in memo_: memo_[k] = f()
+        return memo_[k]
+    F = lambda m: 440 * 2 ** ((m - 69) / 12)
+    def box(m, d=1.8):
+        def mk():
+            t = t_(d); f = F(m) * (1 + 0.003 * np.sin(2 * np.pi * 0.6 * t)); ph = 2 * np.pi * np.cumsum(f) / SR
+            x = np.sin(ph) + 0.45 * np.sin(2 * ph) * np.exp(-t * 6) + 0.25 * np.sin(3.01 * ph) * np.exp(-t * 9) + 0.12 * np.sin(5.43 * ph) * np.exp(-t * 14)
+            return x * np.exp(-t * 2.6) * (1 - np.exp(-t * 400))
+        return memo(('box', m, d), mk)
+    def pad(ms, d, hi=1000):
+        def mk():
+            t = t_(d); x = sum(sum(2 * ((F(m) * (1 + det) * t) % 1) - 1 for det in (-0.004, 0.004)) for m in ms) / (2 * len(ms))
+            return fft_filter(x, hi=hi) * np.minimum(1, t / 1.2) * np.minimum(1, (d - t) / 1.2)
+        return memo(('pad', tuple(ms), round(d, 2), hi), mk)
+    def pizz(m, d=0.6): return memo(('pz', m), lambda: fade(ks(F(m), d, 0.25, 0.993), 0.002, 0.05))
+    def vib(m, d=1.4):
+        def mk():
+            t = t_(d); x = (np.sin(2 * np.pi * F(m) * t) + 0.25 * np.sin(2 * np.pi * F(m) * 4 * t) * np.exp(-t * 8)) * np.exp(-t * 2.2) * (0.75 + 0.25 * np.sin(2 * np.pi * 5.5 * t))
+            return x * (1 - np.exp(-t * 300))
+        return memo(('vib', m), mk)
+    def piano(m, d=2.2): return memo(('pn', m), lambda: ks(F(m), d, 0.4, 0.997))
+    def brush(): return memo(('br',), lambda: fft_filter(noise(0.22), lo=1800, hi=7000) * env_exp(0.22, 14))
+    def hat(): return memo(('ht',), lambda: fft_filter(noise(0.04), lo=7000) * env_exp(0.04, 90))
+    def kick(): return memo(('kk',), lambda: sweep(95, 40, 0.35) * env_exp(0.35, 10))
+    def sub(m, d): return memo(('sub', m, round(d, 3)), lambda: fade(fft_filter(np.tanh(2.5 * np.sin(2 * np.pi * F(m) * t_(d))), hi=420) * env_exp(d, 5), 0.004, 0.03))
+    def strings(ms, d):
+        def mk():
+            t = t_(d); x = sum(np.sin(2 * np.pi * F(m) * (1 + 0.002 * np.sin(2 * np.pi * 5 * t)) * t) for m in ms) / len(ms)
+            return fft_filter(x, hi=1800) * np.minimum(1, t / 2.0) * np.minimum(1, (d - t) / 1.5)
+        return memo(('st', tuple(ms), round(d, 2)), mk)
+    scenes = {sc['id']: sc for sc in TL['scenes']}
+    span = lambda ids: (scenes[ids[0]]['start'], scenes[ids[-1]]['start'] + scenes[ids[-1]]['dur'])
+    # Silent Night (in D), 3/4: [(midi, beats)]
+    SN = [(69, 1.5), (71, 0.5), (69, 1), (66, 3), (69, 1.5), (71, 0.5), (69, 1), (66, 3), (76, 2), (76, 1), (73, 3), (74, 2), (74, 1), (69, 3)]
+    def music_box(t0, t1, bpm=66, gain=1.0):
+        b = 60 / bpm; tt = t0
+        while tt < t1 - 1:
+            for m, du in SN:
+                if tt >= t1 - 1: break
+                add(box(m + 12, 2.2) * 0.5 * gain, tt, 0.42, 0.58); tt += du * b
+        return tt
+    # ---- frio: the music box over a soft pad, then a low swell into the title
+    a, z = span(['frio']); tL3 = a + scenes['frio']['lines'][3]['t0']
+    music_box(a + 1.0, tL3 + 0.5)
+    for k, ch in enumerate([[50, 57, 62], [55, 59, 62], [50, 57, 62], [45, 57, 61]]): add(pad(ch, 6.0) * 0.18, a + 0.5 + k * 5.5)
+    add(strings([38, 45, 50], z - tL3 + 0.5) * 0.35, tL3 - 0.3); add(sub(26, 3.5) * 0.7, z - 3.0)
+    # ---- botin: mystery pads + celesta arpeggios
+    a, z = span(['botin']); ch = [[50, 53, 57], [46, 50, 53], [43, 46, 50], [45, 49, 52]]
+    for k, tt in enumerate(np.arange(a, z, 4.0)):
+        c = ch[k % 4]; add(pad(c, 4.4) * 0.2, tt)
+        for j, m in enumerate([c[0] + 24, c[1] + 24, c[2] + 24, c[1] + 36]): add(box(m, 1.4) * 0.16, tt + j * 0.5 + 0.25, 0.35 + 0.1 * j, 0.65 - 0.1 * j)
+    # ---- equipo + plan: the heist groove (96 bpm)
+    a, z = span(['equipo', 'plan']); bpm = 96; b = 60 / bpm
+    walk = [[38, 41, 45, 48], [34, 38, 41, 45], [31, 34, 38, 41], [33, 37, 40, 43]]; chords = [[62, 65, 69], [58, 62, 65], [55, 58, 62], [57, 61, 64]]
+    for k, tt in enumerate(np.arange(a + 0.3, z - 0.5, 4 * b)):
+        w = walk[k % 4]; c = chords[k % 4]
+        for j in range(4): add(pizz(w[j]) * 0.72, tt + j * b, 0.45, 0.55); add(brush() * (0.28 if j % 2 else 0.13), tt + j * b, 0.4, 0.6)
+        for j in range(4): add(hat() * 0.12, tt + j * b + 2 * b / 3, 0.6, 0.4)
+        for m in c: add(vib(m + 12) * 0.11, tt + 1.5 * b, 0.6, 0.4)
+        if k % 2 == 1: add(vib(c[2] + 24) * 0.07, tt + 3.5 * b, 0.65, 0.35)
+    # ---- noche + robo, and caida: tension (112 bpm) building
+    for ids, grow in ((['noche', 'robo'], 1.0), (['caida'], 0.8)):
+        a, z = span(ids); bpm = 112; b = 60 / bpm; ost = [38, 38, 50, 38, 41, 38, 40, 38]; prog = [[50, 53, 57], [46, 50, 53], [43, 46, 50], [45, 49, 52]]
+        for k, tt in enumerate(np.arange(a, z - 0.3, 8 * b / 2)):
+            u = (tt - a) / max(1, z - a); c = prog[k % 4]
+            for j in range(8): add(sub(ost[j] + (0 if k % 4 < 3 else 2), b / 2 * 0.9) * (0.28 + 0.18 * u * grow), tt + j * b / 2)
+            for j in range(16): add(hat() * (0.05 + 0.06 * u), tt + j * b / 4, 0.55, 0.45)
+            add(strings([c[0] - 12, c[1] - 12, c[2]], 4 * b + 0.6) * (0.12 + 0.1 * u), tt)
+            if u > 0.4: add(kick() * 0.35 * grow, tt); add(kick() * 0.25 * grow, tt + 2 * b)
+    # ---- alba + closet: somber piano over pads
+    for ids in (['alba'], ['closet']):
+        a, z = span(ids); prog = [[50, 53, 57], [46, 50, 53], [48, 52, 55], [45, 49, 52]]
+        for k, tt in enumerate(np.arange(a + 0.5, z, 4.4)):
+            c = prog[k % 4]; add(pad(c, 4.8) * 0.24, tt)
+            for j, m in enumerate([c[0] + 12, c[2] + 12, c[1] + 24]): add(piano(m) * 0.32, tt + j * 1.1, 0.5 - 0.1 * j, 0.5 + 0.1 * j)
+    # ---- acapulco: a low, warm pad under the club's beat
+    a, z = span(['acapulco'])
+    for k, tt in enumerate(np.arange(a, z, 5.0)): add(pad([[50, 57, 60], [46, 53, 57]][k % 2], 5.5, hi=700) * 0.12, tt)
+    # ---- final: piano + strings, then the music box returns for the title
+    a, z = span(['final']); t5 = a + scenes['final']['lines'][5]['t0']; prog = [[50, 53, 57], [53, 57, 60], [46, 50, 53], [45, 49, 52]]
+    for k, tt in enumerate(np.arange(a + 0.4, t5, 4.4)):
+        c = prog[k % 4]; add(strings([c[0] - 12, c[1], c[2]], 5.0) * 0.16, tt)
+        for j, m in enumerate([c[0] + 12, c[1] + 12, c[2] + 12, c[1] + 24]): add(piano(m) * 0.16, tt + j * 0.55)
+    music_box(t5 + 0.2, z + 2.0, bpm=62, gain=1.1); add(pad([50, 57, 62], z - t5 + 1) * 0.16, t5)
+    L, R = room(L), room(R)
+    return L, R
+
 if VIDEO == 'mx':
     musL, musR = corrido(); t_all = np.arange(N) / SR
     sc_ = 0.15 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
@@ -1265,7 +1459,10 @@ if VIDEO == 'whatif':
 if VIDEO == 'mono':
     musL, musR = mono_bed(); t_all = np.arange(N) / SR
     sc_ = 0.16 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
-if VIDEO not in ('mx', 'napo', 'amer', 'narco', 'puebla', 'rusia', 'ww1', 'whatif', 'wwii', 'mono'):
+if VIDEO == 'museo':
+    musL, musR = museo_bed(); t_all = np.arange(N) / SR
+    sc_ = 0.17 / (max(np.max(np.abs(musL)), np.max(np.abs(musR))) + 1e-9); musL, musR = musL * sc_, musR * sc_
+if VIDEO not in ('mx', 'napo', 'amer', 'narco', 'puebla', 'rusia', 'ww1', 'whatif', 'wwii', 'mono', 'museo'):
     prog = [[146.8, 174.6, 220.0], [116.5, 146.8, 174.6], [174.6, 220.0, 261.6], [130.8, 164.8, 196.0]]  # Dm Bb F C
     bar = 4 * beat
     musL, musR = np.zeros(N), np.zeros(N)
