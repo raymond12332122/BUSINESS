@@ -71,7 +71,7 @@ export function reforma({ fireworks = true } = {}) {
   const tl = P.tlaloc(5); tl.position.set(-10.5, 0, 0.5); tl.rotation.y = 0.15; s.add(tl); s.tlaloc = tl;
   const tlL = new THREE.SpotLight('#ffd8a8', 34, 12, 0.5, 0.6, 1.4); tlL.position.set(-8.4, 0.4, 4); tlL.target.position.set(-10.5, 3, 0.5); s.add(tlL, tlL.target);
   s.lamps = [];
-  for (let x = -40; x <= 40; x += 10) { const l = P.reformaLamp(5.2, x % 20 === 0 ? '#ffd27a' : '#9ad8ff', { light: Math.abs(x) <= 10 }); l.position.set(x, 0, 8.6); l.rotation.y = -Math.PI / 2; s.add(l); s.lamps.push(l); }
+  for (let x = -40; x <= 40; x += 10) { const l = P.reformaLamp(5.2, x % 20 === 0 ? '#ffd27a' : '#9ad8ff'); l.position.set(x, 0, 8.6); l.rotation.y = -Math.PI / 2; s.add(l); s.lamps.push(l); }
   // Chapultepec trees behind the museum and along the avenue
   const r = rng(5);
   for (let i = 0; i < 40; i++) { const t = LP.roundTree(1.6 + r() * 1.2, ['#16241a', '#1a2a1e', '#13201a'][i % 3], i, '#1a140e'); t.position.set(-60 + i * 3 + r() * 2, 0, -22 - r() * 12); s.add(t); }
