@@ -36,6 +36,7 @@ export function build(ctx) {
   const act = t => {
     R.tick(t); X.tick?.(t); Pt.tick(t); cam.blink(t); alarm.material.emissiveIntensity = Math.floor(t * 2.2) % 2 ? 0.3 : 3.2;
     X.cases[0].piece.visible = !(t >= t1 - 0.3 && t < t2);   // the 13 that never came back: an empty case
+    for (const r of [cust, ...vis]) r.root.visible = t >= t3 - 0.3;   // the hall fills up only for the security beat
     K.act(sar, walkIn(sar, t, 0.3, [-2, 9.4], 1.13, 8, { seed: 2, speed: 0.4 }), t, {});
     K.act(cust, walkIn(cust, t, tGua - 0.6, [-1.0, 0.3], 0, 1.6, { seed: 3, speed: 0.34 }), t, { eye: 'open' });
     vis.forEach((r, i) => K.act(r, i === 1 ? K.A.point(t, i, 0.4, 0.1) : i ? K.A.think(t, i) : K.A.stand(t, i), t, {}));
