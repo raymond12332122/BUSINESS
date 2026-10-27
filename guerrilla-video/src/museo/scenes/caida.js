@@ -20,11 +20,11 @@ export function build(ctx) {
   // ---- the interrogation room
   const I = S.interrogatorio(), ch = RP.chairR('#3a3a3c', '#2a2a2c', 0.46); ch.position.set(0, 0, -0.85); I.add(ch);
   const cabo2 = K.person(I, 'hishi', 'cabo', 0, -0.85, 0); K.seatOn(cabo2, ch.top + 0.005);
-  const q = K.person(I, 'mcqueen', 'agente', 0.75, 0.35, -2.4);
+  const q = K.person(I, 'mcqueen', 'agente', 0.8, -1.05, -1.29);
   // ---- the wiretap room: Air Groove (the deputy prosecutor) and a technician on headphones
   const E = S.escucha(), ch2 = RP.chairR('#3a2a1c', '#2a2a2c', 0.46); ch2.position.set(-0.35, 0, 0.35); ch2.rotation.y = Math.PI; E.add(ch2);
   const tec = K.person(E, 'spe', 'tecnico', -0.35, 0.35, Math.PI); K.seatOn(tec, ch2.top + 0.005);
-  const fis = K.leader(E, 'groove', 0.95, 0.55, -2.6);
+  const fis = K.leader(E, 'groove', 1.35, 0.75, -0.55);
   // ---- 45 days: the watch car across the street (night)
   const Wn = S.redada({ night: true });
   // ---- June 1989: the raid at dawn, then the closet
@@ -34,7 +34,7 @@ export function build(ctx) {
   const bag = P.duffel(0.62, 0.15); bag.position.set(1.6, 0.47, 0.25); bag.rotation.y = 0.3; B.add(bag); bag.userData.dynamic = true;
   const bundles = new THREE.Group(); B.add(bundles); bundles.userData.dynamic = true;
   for (let i = 0; i < 9; i++) { const b = P.bundle(i + 2, 0.06, i === 4 ? 0.9 : 0); b.position.set(1.2 + (i % 3) * 0.16, 0.48, 0.45 + Math.floor(i / 3) * 0.16); b.rotation.y = i; bundles.add(b); }
-  const a1 = K.person(B, 'helios', 'agente', 0.75, 0.75, 2.0), a2 = K.person(B, 'cafe', 'agente', 2.45, -1.35, -0.6);
+  const a1 = K.person(B, 'helios', 'agente', 0.75, 0.75, 2.0);
   // ---- Perches led out in handcuffs
   const per = K.person(Rd2, 'oguri', 'perchesDia', 0.5, -1.0, 0), e1 = K.person(Rd2, 'mcqueen', 'agente', 0.95, -1.15, 0), e2 = K.person(Rd2, 'suzuka', 'agente', 0.05, -1.2, 0);
   const act = t => {
@@ -43,11 +43,11 @@ export function build(ctx) {
     K.act(cabo2, K.A.seated(K.A.talk, t, 1, 0.6), t, { talk: t > t1 + 0.3 && t < t2 - 0.4 ? 0.6 : false, eye: 0.3, smile: 0.2 });
     K.act(q, K.A.crossArms(t, 4), t, { eye: 0.3 });
     K.act(tec, K.A.seated(K.A.headset || K.A.stand, t, 1), t, { eye: t > tLin ? 'shock' : 0.3 });
-    K.act(fis, K.mix(K.A.crossArms(t, 2), K.A.point(t, 2, 0.6, 0.25), ss(tLin - 0.2, tLin + 0.5, t)), t, { eye: t > tLin ? 'open' : 0.35, mouth: [0, 0.1] });
+    K.act(fis, K.mix(K.A.crossArms(t, 2), K.A.point(t, 2, 0.6, 0.25), ss(tLin - 0.2, tLin + 0.5, t)), t, { eye: t > tLin ? 'open' : 0.12, mouth: [0, 0.1] });
     team.forEach(r => { r.root.visible = t < t5 - 0.3; });
     team.forEach((r, i) => K.act(r, walkIn(r, t, t4 + 1.4 + i * 0.15, [[-1.6, -0.9, 0.2, 0.9][i], [2.4, 2.6, 2.5, 2.8][i]], Math.PI, 1.6, { seed: i, speed: 0.55, run: 0.4 }), t, {}));
     const pk = ss(t111 - 0.6, t111 + 0.6, t);
-    K.act(a1, K.reach(t, 1, [1.4, 0.55, 0.55], ss(tClo + 0.4, tClo + 1.2, t)), t, { eye: t > t111 ? 'shock' : 'open' }); K.act(a2, K.A.stand(t, 2), t, {});
+    K.act(a1, K.reach(t, 1, [1.4, 0.55, 0.55], ss(tClo + 0.4, tClo + 1.2, t)), t, { eye: t > t111 ? 'shock' : 'open' });
     bundles.children[4].visible = true; bundles.scale.setScalar(0.7 + 0.3 * pk);
     for (const [r, x0, sd] of [[per, 0.5, 1], [e1, 0.95, 2], [e2, 0.05, 3]]) { const p = walkIn(r, t, t5 - 0.6, [x0, -1.0 - (sd > 1 ? 0.15 : 0)], 0, 2.2, { seed: sd, speed: 0.36 }); K.act(r, r === per ? K.mix(p, K.cuffs(t, 1), 0.65) : p, t, r === per ? { eye: 0.4, mouth: [0, 0] } : {}); }
     return U.letterbox(1) + U.chapter(t, 0.2, t1 - 0.4, 9, 'LA CAÍDA') + U.tag(t, 0.6, t1 - 0.3, 'GUADALAJARA', 'ENERO DE 1989', { x: 1300, y: 160 }) +

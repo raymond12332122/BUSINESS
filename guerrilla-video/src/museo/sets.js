@@ -358,7 +358,7 @@ export function acapulco() {
 // Desk at the origin (top at s.deskY) with the reel deck and a lamp; the case board on the back wall; blinds on the left.
 export function escucha() {
   const s = rRoom({ w: 7, d: 6, h: 2.9, wall: '#6a6450', lower: '#4a4436', lowerH: 0.95, floor: '#3a3630', ceil: '#cfc8b8', hemi: 0.3, sunI: 0.25, bg: '#050505',
-    lights: [[0.5, 1.4, 0.4, 3.5, '#ffd090', 5]] });
+    lights: [[0.1, 2.0, 0.7, 3.5, '#ffd090', 5]] });
   const dk = RP.desk(2.4, 1.1, '#3a2a1c', 0.72); dk.position.set(0, 0, -0.4); s.add(dk); s.deskY = dk.top;
   const deck = P.reelDeck(); deck.position.set(-0.35, dk.top, -0.55); s.add(deck); s.deck = deck;
   const deck2 = P.reelDeck(); deck2.position.set(0.3, dk.top, -0.62); deck2.rotation.y = -0.15; s.add(deck2); s.deck2 = deck2;
